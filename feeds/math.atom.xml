@@ -83,4 +83,4 @@
         "}); ";
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
-&lt;/script&gt;</summary></entry></feed>
+&lt;/script&gt;</summary><category term="complex analysis"></category><category term="MATLAB"></category><category term="Moebius transformations"></category><category term="Visual Complex Analysis"></category></entry></feed>
