@@ -42,6 +42,46 @@
 <div class="span9">
 <div class="article">
 <div class="content-title">
+<a href="http://fritzm.github.io/power-harness-2.html"><h1>PDP-11/45: Power Harness, continued</h1></a>
+Sat 23 April 2016
+
+by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+</div>
+<div><p>Moved the power modules and partial harness back over to the racks today, got everything remounted, finished and
+dressed the backplane end and completed the inter-H742 connections.</p>
+<p>I did not do the runs for the backplane memory to the lower H742, as I do not have any of this.  I probably won't ever
+have any, either: these options are specialized to the 11/45, are quite rare, and only cover part of the available
+address space.  Additionally, I'd need to track down the details of a backplane ECO to do this part of the harness
+correctly.  The core and MOS memory that I do have are all system-unit options.</p>
+<p>Here are some pics of the in-rack wiring in progress, and a couple of the finished view of the harness.  If you add up
+the capacity of the modules, you'll see that an 11/45 like mine, with floating point, is provisioned with +5V at 100
+[sic] amps, and -15V at 20 amps.  That's no joke of a power supply...</p>
+<p><a href="http://fritzm.github.io/images/pdp11/harness-progress.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/harness-progress.jpg"/></a>
+<a href="http://fritzm.github.io/images/pdp11/harness-complete.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/harness-complete.jpg"/></a>
+<a href="http://fritzm.github.io/images/pdp11/power-supplies.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/power-supplies.jpg"/></a></p></div>
+<hr/>
+</div>
+<div class="article">
+<div class="content-title">
+<a href="http://fritzm.github.io/power-harness.html"><h1>PDP-11/45: Power Harness</h1></a>
+Sun 17 April 2016
+
+by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+</div>
+<div><p>The main bit I'm missing for the PDP-11/45 is the power distribution harness; somewhere over the years this was
+misplaced, or maybe I accidentally gave it away with some excess PDP-11/40 parts somewhere along the way.  In any case,
+I haven't had any luck tracking one of these down (made extra difficult by the fact that my 11/45 is an early model
+which requires a slightly different harness than more recent models), so I'll have to build one myself from scratch.</p>
+<p>Luckily the required harness is pretty well documented in the engineering print sets.  The crimp pins are standard
+Mate-n-Lok still in production.  Some of the connectors are out of production, but they weren't too hard to track down.</p>
+<p>Here are some pictures of the amassed wire of appropriate guages and colors, connectors, crimp pins, and the start of
+the harness built out from the upper H742 on the bench:</p>
+<p><a href="http://fritzm.github.io/images/pdp11/harness-parts.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/harness-parts.jpg"/></a>
+<a href="http://fritzm.github.io/images/pdp11/harness-bench.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/harness-bench.jpg"/></a></p></div>
+<hr/>
+</div>
+<div class="article">
+<div class="content-title">
 <a href="http://fritzm.github.io/ebay-parts.html"><h1>PDP-11/45: Some parts from eBay</h1></a>
 Sat 09 April 2016
 
@@ -243,38 +283,6 @@ by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fr
 </div>
 <div><p>Well, might as well start at the beginning with the AC power system, so here's the 861 power control.  In very good shape for some 40 year old kit!  The neon indicator lamps have gone, so I sourced the modern equivalent and put them on order.  Everything else is tight and clean:</p>
 <p><a href="http://fritzm.github.io/images/pdp11/861.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/861.jpg"/></a></p></div>
-<hr/>
-</div>
-<div class="article">
-<div class="content-title">
-<a href="http://fritzm.github.io/begin-again.html"><h1>PDP-11/45: Begin Again</h1></a>
-Sun 15 March 2015
-
-by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
-</div>
-<div><p>Back in the mid/late '80s, when I was hanging around CMU, a computer club member introduced me to the club's nearly forgotten hardware lab.  It was still stuffed with remnants of the earlier time-sharing age, including two or three full-cabinet PDP-11 systems with names like "Banshee" and "Centaur".  I thought these were the coolest -- CPUs you could see inside, and hack with a soldering iron and a wire wrap gun.  Real front panels with lights and toggles, and machine language programming as a physical activity.  For a kid fascinated with computers, it was great.  You couldn't get closer to the metal; you could quite literally get your head inside these machines.</p>
-<p>I began spending off hours in the lab, puttering with the 11s and getting to know them.  Eventually, the club decided it was time to clean house and remove all of the older equipment.  Most stuff was scheduled to be hauled away to the dump, but I was welcome to anything I wanted to haul away myself in advance.  So I bothered some friends with a car, disassembled one of the 11/45s there ("Banshee" I believe) which seemed like the nicest thing, and hauled it off to my off-campus house.  There it resided in the basement with many other oddments for some years.</p>
-<p>Eventually, I ended up moving out to CA, and after some time the 11/45 CPU was disassembled and packed into moving boxes for the west coast as practically as possible, leaving all the bulkier parts behind.</p>
-<p>After a couple of years in CA, I happened on a decomissioned two-rack 11/40 system at Stanford, essentially free for the effort of hauling.  This had most of the missing cabinetry, power supplies, and peripherals needed to reconstruct the 11/45!  So I procurred this and added it to a growing west coast equipment stash.  And then real-life set in -- job changes, house moves, raising a kid...  Through all of that I held on to all the parts, vowing to "get to it someday".  I would pick through the stuff from time to time over the years, but never had the time to take the project very far.</p>
-<p>Well, now "someday" is here!  The kid is off to college and I've moved house once again, but this time I reserved some working space for the project and pulled all the parts so they are together and accessible.  So here we go...</p>
-<p>Here are a some pics from the first weekend: the two H960 racks that are the bones of the whole thing, some glamour shots of the processor backplane and the RK11-C disk controller, and my buddy Chris helping to remount the RK05 drives on their rails temporarily to keep them off the floor and out of harm's way:</p>
-<p><a href="http://fritzm.github.io/images/pdp11/racks.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/racks.jpg"/></a>
-<a href="http://fritzm.github.io/images/pdp11/kb11a-backplane.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/kb11a-backplane.jpg"/></a>
-<a href="http://fritzm.github.io/images/pdp11/rk11c.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/rk11c.jpg"/></a>
-<a href="http://fritzm.github.io/images/pdp11/rk05-help.png"><img src="/images/pdp11/rk05-help.png"/></a></p></div>
-<hr/>
-</div>
-<div class="article">
-<div class="content-title">
-<a href="http://fritzm.github.io/jsfiddle-test.html"><h1>three.js and JSFiddle</h1></a>
-Tue 02 December 2014
-
-by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
-</div>
-<div><p>Here's a small web toy, as a test of embedding a client-side visualisation in this blog.  The toy written in JavaScript using the <a href="http://threejs.org/">Three.js</a> 3D graphics library, and is hosted at JSFiddle.net.  If you click the "Edit in JSFiddle" link, you'll go off site to a full multi-pane view of the toy, where you can inspect and modify and play with the various parts of the HTML, CSS, and JavaScript.</p>
-<div style="text-align: center">
-<iframe allowfullscreen="allowfullscreen" frameborder="0" height="340" src="http://jsfiddle.net/fritzm/5cyVe/embedded/result/#result" width="501"></iframe>
-</div></div>
 <hr/>
 </div>
 <div class="pagination">
