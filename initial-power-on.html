@@ -42,28 +42,32 @@
 <div class="span9">
 <div class="article">
 <div class="content-title">
-<h1>PDP-11/45: Power Harness</h1>
-Sun 17 April 2016
+<h1>PDP-11/45: Initial Power On!</h1>
+Sun 08 May 2016
 
 by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
 </div>
-<div><p>The main bit I'm missing from the 11/45 is the power distribution harness; somewhere over the years this was
-misplaced, or maybe I accidentally gave it away along with some excess 11/40 parts.  In any case, I haven't had any
-luck tracking one of these down (made extra difficult by the fact that my 11/45 is an early model which requires a
-slightly different harness than more recent models), so I'll have to build one myself from scratch.</p>
-<p>Luckily the required harness is pretty well documented in the engineering print sets.  The crimp pins are standard
-Mate-n-Lok still in production.  Some of the connectors are out of production, but they haven't been too hard to
-track down.</p>
-<p>Here are some pictures of the amassed wire of appropriate guages and colors, connectors, crimp pins, and the start of
-the harness build on the bench:</p>
-<p><a href="http://fritzm.github.io/images/pdp11/harness-parts.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/harness-parts.jpg"/></a>
-<a href="http://fritzm.github.io/images/pdp11/harness-bench.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/harness-bench.jpg"/></a></p></div>
+<div><p>Beeped out the new harness to check for shorts or incorrect pins, then plugged in just the H742s and fired it up.  All
+the DC regulator modules seem to be working, and I was able to trim them up to nominal voltages at the CPU end of the
+harness.  The indicator lamps on all but one of the DC regulators seem to be burned out, though, so I put some new lamps
+on order (at last for the +5V regulators; a modern equivalent for the -15V regulators is tougher to find).</p>
+<p>Given that success, I plugged in the CPU side of the harness, took a deep breath, and powered on!  Hmmm.  No detonations
+or smoke, but all data/address/mode lights lit (see below), which is not right...  Front panel lamp test and data
+address mode switches and indicators are working though at least.</p>
+<p>Some investigation on the backplane turned up no +5V to slots 10 though 15, which could be part of the problem.  Ah,
+that's what the mysterious clipped red wire soldered to the backplane might have been about (visible in the top right
+<a href="http://fritzm.github.io/images/pdp11/kb11a-backplane.jpg">here</a>...)  Sure enough, some inspection shows the corresponding trace on
+the backplane looks burnt!  I could hack this red wire into my new harness I guess, but I'd rather remove it and try to
+repair the board trace with a shunt.  So the backplane will have to come out.  I guess that's what I get for not
+investigating the weird red wire and for not beeping out the power distribution on the backplane before mounting
+and populating it...</p>
+<p><a href="http://fritzm.github.io/images/pdp11/initial-power-on.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/initial-power-on.jpg"/></a></p></div>
 <hr>
 <h2>Comments</h2>
 <div id="disqus_thread"></div>
 <script type="text/javascript">
     var disqus_shortname = 'fritzm'; 
-    var disqus_title = 'PDP-11/45: Power Harness';
+    var disqus_title = 'PDP-11/45: Initial Power On!';
 
     (function() {
         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

@@ -1,23 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>fritzm.github.io</title><link href="http://fritzm.github.io/" rel="alternate"></link><link href="http://fritzm.github.io/feeds/pdp-11.atom.xml" rel="self"></link><id>http://fritzm.github.io/</id><updated>2016-04-23T00:00:00-07:00</updated><entry><title>PDP-11/45: Power Harness, continued</title><link href="http://fritzm.github.io/power-harness-2.html" rel="alternate"></link><published>2016-04-23T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-04-23:power-harness-2.html</id><summary type="html">&lt;p&gt;Moved the power modules and partial harness back over to the racks today, got everything remounted, finished and
-dressed the backplane end and completed the inter-H742 connections.&lt;/p&gt;
-&lt;p&gt;I did not do the runs for the backplane memory to the lower H742, as I do not have any of this.  I probably won't ever
-have any, either: these options are specialized to the 11/45, are quite rare, and only cover part of the available
-address space.  Additionally, I'd need to track down the details of a backplane ECO to do this part of the harness
-correctly.  The core and MOS memory that I do have are all system-unit options.&lt;/p&gt;
-&lt;p&gt;Here are some pics of the in-rack wiring in progress, and a couple of the finished view of the harness.  If you add up
-the capacity of the modules, you'll see that an 11/45 like mine, with floating point, is provisioned with +5V at 100
+<feed xmlns="http://www.w3.org/2005/Atom"><title>fritzm.github.io</title><link href="http://fritzm.github.io/" rel="alternate"></link><link href="http://fritzm.github.io/feeds/pdp-11.atom.xml" rel="self"></link><id>http://fritzm.github.io/</id><updated>2016-05-08T00:00:00-07:00</updated><entry><title>PDP-11/45: Initial Power On!</title><link href="http://fritzm.github.io/initial-power-on.html" rel="alternate"></link><published>2016-05-08T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-05-08:initial-power-on.html</id><summary type="html">&lt;p&gt;Beeped out the new harness to check for shorts or incorrect pins, then plugged in just the H742s and fired it up.  All
+the DC regulator modules seem to be working, and I was able to trim them up to nominal voltages at the CPU end of the
+harness.  The indicator lamps on all but one of the DC regulators seem to be burned out, though, so I put some new lamps
+on order (at last for the +5V regulators; a modern equivalent for the -15V regulators is tougher to find).&lt;/p&gt;
+&lt;p&gt;Given that success, I plugged in the CPU side of the harness, took a deep breath, and powered on!  Hmmm.  No detonations
+or smoke, but all data/address/mode lights lit (see below), which is not right...  Front panel lamp test and data
+address mode switches and indicators are working though at least.&lt;/p&gt;
+&lt;p&gt;Some investigation on the backplane turned up no +5V to slots 10 though 15, which could be part of the problem.  Ah,
+that's what the mysterious clipped red wire soldered to the backplane might have been about (visible in the top right
+&lt;a href="http://fritzm.github.io/images/pdp11/kb11a-backplane.jpg"&gt;here&lt;/a&gt;...)  Sure enough, some inspection shows the corresponding trace on
+the backplane looks burnt!  I could hack this red wire into my new harness I guess, but I'd rather remove it and try to
+repair the board trace with a shunt.  So the backplane will have to come out.  I guess that's what I get for not
+investigating the weird red wire and for not beeping out the power distribution on the backplane before mounting
+and populating it...&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://fritzm.github.io/images/pdp11/initial-power-on.jpg"&gt;&lt;img class='image-process-thumb' src='/images/pdp11/initial-power-on.jpg'/&gt;&lt;/a&gt;&lt;/p&gt;</summary><category term="Retro-Computing"></category><category term="PDP-11"></category></entry><entry><title>PDP-11/45: Power Harness, continued</title><link href="http://fritzm.github.io/power-harness-2.html" rel="alternate"></link><published>2016-04-23T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-04-23:power-harness-2.html</id><summary type="html">&lt;p&gt;Moved the power modules and partial harness back over to the racks today, got everything remounted, finished and
+dressed the backplane terminations, and completed the inter-H742 connections.&lt;/p&gt;
+&lt;p&gt;I did not do the runs for the backplane memory to the lower H742, as I do not have any backplane memory.  I probably
+won't ever have any, either: these memory options are specialized to the 11/45, are quite rare, and only cover part of
+the available address space.  Additionally, they would require me to track down the details of a backplane ECO to do
+the corresponding parts of the harness correctly.  The core and MOS memory that I do actually have are all system-unit
+options anyway.&lt;/p&gt;
+&lt;p&gt;Here are some pics of the in-rack wiring in progress, and a couple views of the finished harness.  If you add up
+the capacity of the DC modules, you'll see that an 11/45 like mine (with floating point) is provisioned with +5V at 100
 [sic] amps, and -15V at 20 amps.  That's no joke of a power supply...&lt;/p&gt;
 &lt;p&gt;&lt;a href="http://fritzm.github.io/images/pdp11/harness-progress.jpg"&gt;&lt;img class='image-process-thumb' src='/images/pdp11/harness-progress.jpg'/&gt;&lt;/a&gt;
 &lt;a href="http://fritzm.github.io/images/pdp11/harness-complete.jpg"&gt;&lt;img class='image-process-thumb' src='/images/pdp11/harness-complete.jpg'/&gt;&lt;/a&gt;
-&lt;a href="http://fritzm.github.io/images/pdp11/power-supplies.jpg"&gt;&lt;img class='image-process-thumb' src='/images/pdp11/power-supplies.jpg'/&gt;&lt;/a&gt;&lt;/p&gt;</summary><category term="Retro-Computing"></category><category term="PDP-11"></category></entry><entry><title>PDP-11/45: Power Harness</title><link href="http://fritzm.github.io/power-harness.html" rel="alternate"></link><published>2016-04-17T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-04-17:power-harness.html</id><summary type="html">&lt;p&gt;The main bit I'm missing for the PDP-11/45 is the power distribution harness; somewhere over the years this was
-misplaced, or maybe I accidentally gave it away with some excess PDP-11/40 parts somewhere along the way.  In any case,
-I haven't had any luck tracking one of these down (made extra difficult by the fact that my 11/45 is an early model
-which requires a slightly different harness than more recent models), so I'll have to build one myself from scratch.&lt;/p&gt;
+&lt;a href="http://fritzm.github.io/images/pdp11/power-supplies.jpg"&gt;&lt;img class='image-process-thumb' src='/images/pdp11/power-supplies.jpg'/&gt;&lt;/a&gt;&lt;/p&gt;</summary><category term="Retro-Computing"></category><category term="PDP-11"></category></entry><entry><title>PDP-11/45: Power Harness</title><link href="http://fritzm.github.io/power-harness.html" rel="alternate"></link><published>2016-04-17T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-04-17:power-harness.html</id><summary type="html">&lt;p&gt;The main bit I'm missing from the 11/45 is the power distribution harness; somewhere over the years this was
+misplaced, or maybe I accidentally gave it away along with some excess 11/40 parts.  In any case, I haven't had any
+luck tracking one of these down (made extra difficult by the fact that my 11/45 is an early model which requires a
+slightly different harness than more recent models), so I'll have to build one myself from scratch.&lt;/p&gt;
 &lt;p&gt;Luckily the required harness is pretty well documented in the engineering print sets.  The crimp pins are standard
-Mate-n-Lok still in production.  Some of the connectors are out of production, but they weren't too hard to track down.&lt;/p&gt;
+Mate-n-Lok still in production.  Some of the connectors are out of production, but they haven't been too hard to
+track down.&lt;/p&gt;
 &lt;p&gt;Here are some pictures of the amassed wire of appropriate guages and colors, connectors, crimp pins, and the start of
-the harness built out from the upper H742 on the bench:&lt;/p&gt;
+the harness build on the bench:&lt;/p&gt;
 &lt;p&gt;&lt;a href="http://fritzm.github.io/images/pdp11/harness-parts.jpg"&gt;&lt;img class='image-process-thumb' src='/images/pdp11/harness-parts.jpg'/&gt;&lt;/a&gt;
 &lt;a href="http://fritzm.github.io/images/pdp11/harness-bench.jpg"&gt;&lt;img class='image-process-thumb' src='/images/pdp11/harness-bench.jpg'/&gt;&lt;/a&gt;&lt;/p&gt;</summary><category term="Retro-Computing"></category><category term="PDP-11"></category></entry><entry><title>PDP-11/45: Some parts from eBay</title><link href="http://fritzm.github.io/ebay-parts.html" rel="alternate"></link><published>2016-04-09T11:25:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-04-09:ebay-parts.html</id><summary type="html">&lt;p&gt;I've been keeping an eye on eBay and have collected a few more goodies: a DD11-D nine-slot expansion backplane, a fully
 populated (128K x 18bit) MS11-L MOS memory board, and a couple of replacement BC08-R cables for connecting the console
