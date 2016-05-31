@@ -40,71 +40,40 @@
 <div class="content">
 <div class="row">
 <div class="span9">
-<h1>Archives</h1>
-<table class="table">
-<tbody>
-<tr>
-<td>30 May 2016</td>
-<td><a href="http://fritzm.github.io/power-fixes.html">PDP-11/45: Power fixes and CPU debug</a></td>
-</tr>
-<tr>
-<td>08 May 2016</td>
-<td><a href="http://fritzm.github.io/initial-power-on.html">PDP-11/45: Initial Power On!</a></td>
-</tr>
-<tr>
-<td>23 Apr 2016</td>
-<td><a href="http://fritzm.github.io/power-harness-2.html">PDP-11/45: Power Harness, continued</a></td>
-</tr>
-<tr>
-<td>17 Apr 2016</td>
-<td><a href="http://fritzm.github.io/power-harness.html">PDP-11/45: Power Harness</a></td>
-</tr>
-<tr>
-<td>09 Apr 2016</td>
-<td><a href="http://fritzm.github.io/ebay-parts.html">PDP-11/45: Some parts from eBay</a></td>
-</tr>
-<tr>
-<td>03 Jan 2016</td>
-<td><a href="http://fritzm.github.io/vt52.html">PDP-11/45: VT52</a></td>
-</tr>
-<tr>
-<td>03 Jul 2015</td>
-<td><a href="http://fritzm.github.io/backplane-and-logic.html">PDP-11/45: CPU Backplane and logic</a></td>
-</tr>
-<tr>
-<td>21 Jun 2015</td>
-<td><a href="http://fritzm.github.io/panel-and-742s.html">PDP-11/45: H742s and front panel</a></td>
-</tr>
-<tr>
-<td>07 Jun 2015</td>
-<td><a href="http://fritzm.github.io/fans-and-h742s.html">PDP-11/45: AC power and cooling</a></td>
-</tr>
-<tr>
-<td>23 May 2015</td>
-<td><a href="http://fritzm.github.io/power-controllers.html">PDP-11/45: H742 power control boards</a></td>
-</tr>
-<tr>
-<td>11 Apr 2015</td>
-<td><a href="http://fritzm.github.io/corrosion.html">PDP-11/45: Teardown and corrosion remediation</a></td>
-</tr>
-<tr>
-<td>29 Mar 2015</td>
-<td><a href="http://fritzm.github.io/861.html">PDP-11/45: 861 AC power control</a></td>
-</tr>
-<tr>
-<td>15 Mar 2015</td>
-<td><a href="http://fritzm.github.io/begin-again.html">PDP-11/45: Begin Again</a></td>
-</tr>
-<tr>
-<td>02 Dec 2014</td>
-<td><a href="http://fritzm.github.io/jsfiddle-test.html">three.js and JSFiddle</a></td>
-</tr>
-<tr>
-<td>01 Dec 2014</td>
-<td><a href="http://fritzm.github.io/moebius.html">Moebious transformation animated GIFs</a></td>
-</tr>
-</tbody>
-</table>
+<div class="article">
+<div class="content-title">
+<h1>PDP-11/45: Power fixes and CPU debug</h1>
+Mon 30 May 2016
+
+by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+</div>
+<div><p>Connected up the aforementioned red wire hack to the new power harness, and verified +5V to slots 10 through 15.
+Console is no longer all address and data lights on, but basic console load address / examine / deposit operations are
+still not working.  A random assortment of address lines seem stuck, different on each power cycle.  About the only
+thing that reliably functions from the console is loading the two highest address bits from the switches, immediately
+after a reset.  Pulled the floating point unit, un-jumpered the DD11 expansion backplane, and removed all peripherals
+except the MR11 diode ROM; same (broken) behavior...</p>
+<p>Scoped all the DC voltages, and did not notice any glitches.  Pulled the H742s for some bench work: verified AC LO and
+DC LO signaling on both units, replaced a broken Mate-n-Lok connector on one of the units, blew out dust from all the 5V
+regulators and replaced their indicator bulbs with modern equivalent (CM7381). Sourced and put on order a modern
+equivalent (OL-6003BP) for the indicator bulbs on the -15V regulators.</p>
+<p>Next steps will be to verify various Unibus signals on the backplane, then maybe play some swap games with CPU card
+spares to see if I can get closer to a working console as a starting point.  All I have time for this weekend, though; sorry nothing new to see so no new pictures this time!</p></div>
+<hr>
+<h2>Comments</h2>
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'fritzm'; 
+    var disqus_title = 'PDP-11/45: Power fixes and CPU debug';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</hr></div>
 </div>
 <div class="span3">
 <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
