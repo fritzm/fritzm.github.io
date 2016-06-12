@@ -42,38 +42,38 @@
 <div class="span9">
 <div class="article">
 <div class="content-title">
-<h1>PDP-11/45: CPU debug II</h1>
-Sun 05 June 2016
+<h1>PDP-11/45: KM11 replica and CPU debug III</h1>
+Sat 11 June 2016
 
 by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
 </div>
-<div><p>Received and installed the replacement lamps for the -15V regulators.  Pic below shows what the power supply looks
-like with all the lamps functioning.</p>
-<p>Verified backplane DC voltages and ripple currents again, and re-trimmed all the DC regulators.  Verified AC LO and
-DC LO de-asserted and free of glitches.  Found some harness wiring mistakes to the DD11 expansion backplane; corrected these.</p>
-<p>Tried some CPU board-swaps looking for a quick win, but broken console behavior didn't change significantly with
-different boards.</p>
-<p>Investigated the timing generator board, and found that the crystal oscillator wasn't oscillating.  Tracked this down
-to inductor L1 which looked as if it had been partially sheared away from the board at some point during installation/removal/storage.  Repaired this.  Success!  Able to load addresses from the front console now. Switches are mirrored
-in the BR when halted in console.</p>
-<p>Address bit 0 seems stuck.  Swapped PDR from spare board back to the original.  Can now examine and modify the
-light/switch register, and examine the contents of the MR11 ROM.</p>
-<p>Jumpered the DD11 expansion backplane back in, and slotted in the MS11-L memory.  Limited success: can modify and
-examine memory for example near address <code>001000</code>, but cannot modify low memory addresses.  In some ranges, can only
-modify every other word.  Also, PC seems stuck at <code>022000</code>.</p>
-<p>At this point, I could really use a KM11 maintenance board set.  These are pretty hard to get a hold of, but a few
-folks on the web have built their own reproductions.  I put in a PCB order to ExpressPCB with a KM11 layout by Tom
-Uban (desribed <a href="http://www.ubanproductions.com/museum.html">here</a>), and also put parts on order to stuff it.</p>
-<p>Also, figuring I'll need to be going deeper into the CPU debug, I found and bought an
-<a href="http://www.ebay.com/itm/142004889393">HP1662A logic analyzer</a> on eBay, for about the same money as the KM11 PCB and
-parts!</p>
-<p><a href="http://fritzm.github.io/images/pdp11/power-lights.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/power-lights.jpg"/></a></p></div>
+<div><p>Received the boards and components for the KM11 replica; stuffed and soldered, and it appears to work!  There are
+some photos below.  I can easily single-step microcode, clock states, and bus cycles now, which should really help
+with the CPU debug.</p>
+<p>Swapped DAP for a spare, and this has fixed the stuck PC issue.  Memory issues remain, but by choosing a working
+memory range, I can start to toggle in and attempt to execute very simple programs.</p>
+<p>The simplest possible program, unconditional branch to self, seems to execute correctly:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span></span>001000 000777         BR      .-2
+</pre></div>
+</td></tr></table>
+<p>A register to register data move test does not however:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span></span>001000 010203         MOV     R2,R3
+001002 000776         BR      .-4
+</pre></div>
+</td></tr></table>
+<p>Control flow is as expected, but the value that ends up in R3 seems to be negated.  Still, pretty good progress!
+Now that I can step machine states, the next step will be to put the DAP out on an extender card and start tracking
+down signals with a logic probe.</p>
+<p>The HP1662A logic analyzer from eBay has also arrived; should come in handy in investigating the memory issue.</p>
+<p><a href="http://fritzm.github.io/images/pdp11/km11.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/km11.jpg"/></a>
+<a href="http://fritzm.github.io/images/pdp11/km11-action.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/km11-action.jpg"/></a></p></div>
 <hr>
 <h2>Comments</h2>
 <div id="disqus_thread"></div>
 <script type="text/javascript">
     var disqus_shortname = 'fritzm'; 
-    var disqus_title = 'PDP-11/45: CPU debug II';
+    var disqus_title = 'PDP-11/45: KM11 replica and CPU debug III';
 
     (function() {
         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
