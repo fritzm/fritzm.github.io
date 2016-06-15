@@ -42,6 +42,30 @@
 <div class="span9">
 <div class="article">
 <div class="content-title">
+<a href="http://fritzm.github.io/cpu-debug-4.html"><h1>PDP-11/45: MS11-L and CPU debug IV</h1></a>
+Sun 12 June 2016
+
+by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+</div>
+<div><p>Made some progress on the inverted result after register-to-register move problem: with the help of the KM11, extender
+card, and a logic probe I was able to track down that signal ALUM L coming onto the DAP is not asserted when it should
+be for a MOV instruction.  This means the ALU is performing in arithmetic instead of logic mode and thus the incorrect
+result.</p>
+<p>I next moved the extender card over to GRA, where this signal originates from a subsidiary ROM, but unfortunately at
+that point the MS11-L memory behavior got even worse, putting and end to these experiments.  So I'll have to tackle
+that first...</p>
+<p>Moved the MR11 ROM over to the expansion backplane where the MS11-L resides, and it works fine there.  So it doesn't
+seem to be a bus wiring or jumper problem onto the expansion backplane.  Checked the power input pins on the backplane
+behind the MS11-L.  5V was a little low there; trimmed this up.  Probably need to clean or replace the Molex contacts
+on the power distribution board in the cabinet, as it seems a few mV are being shed there needlessly compared to the output of the same regulator on the main backplane, but things seem within stated tolerances for now.</p>
+<p>The -15V input to the MS11-L was missing entirely.  Removed the DD11 expansion backplane, and added jumpers between
+the battery backup supply inputs and the corresponding main supply inputs, per documentation.  Now have -15 to the
+MS11-L, but still no joy.</p>
+<p>Will need to go deeper into the MS11-L next time...</p></div>
+<hr/>
+</div>
+<div class="article">
+<div class="content-title">
 <a href="http://fritzm.github.io/cpu-debug-3.html"><h1>PDP-11/45: KM11 replica and CPU debug III</h1></a>
 Sat 11 June 2016
 
@@ -53,13 +77,13 @@ with the CPU debug.</p>
 <p>Swapped DAP for a spare, and this has fixed the stuck PC issue.  Memory issues remain, but by choosing a working
 memory range, I can start to toggle in and attempt to execute very simple programs.</p>
 <p>The simplest possible program, unconditional branch to self, seems to execute correctly:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span></span>001000 000777         BR      .-2
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span></span>001000 000777         BR      .-0
 </pre></div>
 </td></tr></table>
 <p>A register to register data move test does not however:</p>
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
 2</pre></div></td><td class="code"><div class="highlight"><pre><span></span>001000 010203         MOV     R2,R3
-001002 000776         BR      .-4
+001002 000776         BR      .-2
 </pre></div>
 </td></tr></table>
 <p>Control flow is as expected, but the value that ends up in R3 seems to be negated.  Still, pretty good progress!
@@ -238,24 +262,11 @@ the diodes in the ROM above (low word addresses at the top of the matrix, and le
 21
 22
 23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33</pre></div></td><td class="code"><div class="highlight"><pre><span></span>              <span class="o">;</span> <span class="nt">REGISTER</span> <span class="nt">ASSIGNMENTS</span><span class="o">:</span>
-       <span class="nt">000000</span> <span class="nt">R0</span><span class="o">=%</span><span class="nt">0</span>
-       <span class="nt">000001</span> <span class="nt">R1</span><span class="o">=%</span><span class="nt">1</span>
-              <span class="o">;</span>
-<span class="nt">173100</span> <span class="nt">013701</span>         <span class="nt">MOV</span>     <span class="o">@</span><span class="nn">#177570</span><span class="o">,</span><span class="nt">R1</span>     <span class="o">;</span><span class="nt">READ</span> <span class="nt">SWITCH</span> <span class="nt">REG</span> <span class="nt">FOR</span> <span class="o">....</span>
+24</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">173100</span> <span class="nt">013701</span>         <span class="nt">MOV</span>     <span class="o">@</span><span class="nn">#177570</span><span class="o">,</span><span class="nt">R1</span>     <span class="o">;</span><span class="nt">READ</span> <span class="nt">SWITCH</span> <span class="nt">REG</span> <span class="nt">FOR</span> <span class="o">....</span>
        <span class="nt">177570</span>
 <span class="nt">173104</span> <span class="nt">000005</span> <span class="nt">BEGIN</span><span class="o">:</span>  <span class="nt">RESET</span>                   <span class="o">;</span><span class="nt">FORCE</span> <span class="nt">CLEAR</span> <span class="nt">IF</span> <span class="nt">RETRY</span>
 <span class="nt">173106</span> <span class="nt">010100</span>         <span class="nt">MOV</span>     <span class="nt">R1</span><span class="o">,</span><span class="nt">R0</span>           <span class="o">;...</span><span class="nc">.DEVICE</span> <span class="nt">WC</span> <span class="nt">ADDRESS</span>
-<span class="nt">173110</span> <span class="nt">012710</span>         <span class="nt">MOV</span>     <span class="nn">#-256</span><span class="o">.,</span><span class="k">@R0</span>      <span class="p">;</span><span class="nt">SET</span> <span class="nt">TO</span> <span class="nt">READ</span> <span class="nt">256</span> <span class="nt">WORDS</span>
+<span class="nt">173110</span> <span class="nt">012710</span>         <span class="nt">MOV</span>     <span class="nn">#-256</span><span class="o">,</span><span class="k">@R0</span>       <span class="p">;</span><span class="nt">SET</span> <span class="nt">TO</span> <span class="nt">READ</span> <span class="nt">256</span> <span class="nt">WORDS</span>
        <span class="nt">177400</span>
 <span class="nt">173114</span> <span class="nt">020027</span>         <span class="nt">CMP</span>     <span class="nt">R0</span><span class="o">,</span><span class="nn">#177344</span>      <span class="o">;</span><span class="nt">IS</span> <span class="nt">IT</span> <span class="nt">DECTAPE</span><span class="o">?</span>
        <span class="nt">177344</span>
@@ -275,11 +286,6 @@ the diodes in the ROM above (low word addresses at the top of the matrix, and le
 <span class="nt">173152</span> <span class="nt">100754</span>         <span class="nt">BMI</span>     <span class="nt">BEGIN</span>           <span class="o">;</span><span class="nt">IF</span> <span class="nt">SO</span> <span class="nt">START</span> <span class="nt">OVER</span>
 <span class="nt">173154</span> <span class="nt">105010</span>         <span class="nt">CLRB</span>    <span class="k">@R0</span>             <span class="p">;</span><span class="nt">FOR</span> <span class="nt">DECTAPE</span><span class="o">,</span><span class="nt">STOP</span> <span class="nt">TRANSPORT</span>
 <span class="nt">173156</span> <span class="nt">000137</span>         <span class="nt">JMP</span>     <span class="o">@</span><span class="nn">#0</span>             <span class="o">;</span><span class="nt">GO</span> <span class="nt">TO</span> <span class="nt">ROUTINE</span> <span class="nt">LOADED</span>
-       <span class="nt">000000</span>
-       <span class="nt">000001</span>         <span class="nc">.END</span>
-
-<span class="nt">BEGIN</span>      <span class="nt">000004R</span>         <span class="nt">R0</span>    <span class="o">=%</span><span class="nt">000000</span>      <span class="nt">R1</span>    <span class="o">=</span><span class="nt">2000001</span>
-<span class="nt">START</span>      <span class="nt">000040R</span>         <span class="o">.</span>     <span class="o">=</span> <span class="nt">000062R</span>
 </pre></div>
 </td></tr></table>
 <p>Hmmm, the Pygments syntax hightlighting package used by my blog generator doesn't seem to grok MACRO-11; may have to
@@ -327,20 +333,6 @@ by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fr
 <a href="http://fritzm.github.io/images/pdp11/board-with-crystals.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/board-with-crystals.jpg"/></a>
 <a href="http://fritzm.github.io/images/pdp11/crystals.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/crystals.jpg"/></a>
 <a href="http://fritzm.github.io/images/pdp11/knuckles.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/knuckles.jpg"/></a></p></div>
-<hr/>
-</div>
-<div class="article">
-<div class="content-title">
-<a href="http://fritzm.github.io/panel-and-742s.html"><h1>PDP-11/45: H742s and front panel</h1></a>
-Sun 21 June 2015
-
-by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
-</div>
-<div><p>The H742 supplies are now back together, mounted in the cabinet, and wired through to the 861.  I've powered them up and run them for minutes at a time (without any DC regulator loads) and there have been no surprise detonations...</p>
-<p>The repainted cabinet side door has also been remounted.</p>
-<p>Spent some time on the front panel as well.  Removed the tubular lock and took a trip to the local locksmith to have a new key made up.  Replaced all the incandescent indicator lamps with the closest modern equivalent.  Panel is now remounted and it's starting to look like a real '11!</p>
-<p><a href="http://fritzm.github.io/images/pdp11/742s-mounted.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/742s-mounted.jpg"/></a>
-<a href="http://fritzm.github.io/images/pdp11/front-panel.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/front-panel.jpg"/></a></p></div>
 <hr/>
 </div>
 <div class="pagination">

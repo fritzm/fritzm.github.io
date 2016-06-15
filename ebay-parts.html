@@ -91,24 +91,11 @@ the diodes in the ROM above (low word addresses at the top of the matrix, and le
 21
 22
 23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33</pre></div></td><td class="code"><div class="highlight"><pre><span></span>              <span class="o">;</span> <span class="nt">REGISTER</span> <span class="nt">ASSIGNMENTS</span><span class="o">:</span>
-       <span class="nt">000000</span> <span class="nt">R0</span><span class="o">=%</span><span class="nt">0</span>
-       <span class="nt">000001</span> <span class="nt">R1</span><span class="o">=%</span><span class="nt">1</span>
-              <span class="o">;</span>
-<span class="nt">173100</span> <span class="nt">013701</span>         <span class="nt">MOV</span>     <span class="o">@</span><span class="nn">#177570</span><span class="o">,</span><span class="nt">R1</span>     <span class="o">;</span><span class="nt">READ</span> <span class="nt">SWITCH</span> <span class="nt">REG</span> <span class="nt">FOR</span> <span class="o">....</span>
+24</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">173100</span> <span class="nt">013701</span>         <span class="nt">MOV</span>     <span class="o">@</span><span class="nn">#177570</span><span class="o">,</span><span class="nt">R1</span>     <span class="o">;</span><span class="nt">READ</span> <span class="nt">SWITCH</span> <span class="nt">REG</span> <span class="nt">FOR</span> <span class="o">....</span>
        <span class="nt">177570</span>
 <span class="nt">173104</span> <span class="nt">000005</span> <span class="nt">BEGIN</span><span class="o">:</span>  <span class="nt">RESET</span>                   <span class="o">;</span><span class="nt">FORCE</span> <span class="nt">CLEAR</span> <span class="nt">IF</span> <span class="nt">RETRY</span>
 <span class="nt">173106</span> <span class="nt">010100</span>         <span class="nt">MOV</span>     <span class="nt">R1</span><span class="o">,</span><span class="nt">R0</span>           <span class="o">;...</span><span class="nc">.DEVICE</span> <span class="nt">WC</span> <span class="nt">ADDRESS</span>
-<span class="nt">173110</span> <span class="nt">012710</span>         <span class="nt">MOV</span>     <span class="nn">#-256</span><span class="o">.,</span><span class="k">@R0</span>      <span class="p">;</span><span class="nt">SET</span> <span class="nt">TO</span> <span class="nt">READ</span> <span class="nt">256</span> <span class="nt">WORDS</span>
+<span class="nt">173110</span> <span class="nt">012710</span>         <span class="nt">MOV</span>     <span class="nn">#-256</span><span class="o">,</span><span class="k">@R0</span>       <span class="p">;</span><span class="nt">SET</span> <span class="nt">TO</span> <span class="nt">READ</span> <span class="nt">256</span> <span class="nt">WORDS</span>
        <span class="nt">177400</span>
 <span class="nt">173114</span> <span class="nt">020027</span>         <span class="nt">CMP</span>     <span class="nt">R0</span><span class="o">,</span><span class="nn">#177344</span>      <span class="o">;</span><span class="nt">IS</span> <span class="nt">IT</span> <span class="nt">DECTAPE</span><span class="o">?</span>
        <span class="nt">177344</span>
@@ -128,11 +115,6 @@ the diodes in the ROM above (low word addresses at the top of the matrix, and le
 <span class="nt">173152</span> <span class="nt">100754</span>         <span class="nt">BMI</span>     <span class="nt">BEGIN</span>           <span class="o">;</span><span class="nt">IF</span> <span class="nt">SO</span> <span class="nt">START</span> <span class="nt">OVER</span>
 <span class="nt">173154</span> <span class="nt">105010</span>         <span class="nt">CLRB</span>    <span class="k">@R0</span>             <span class="p">;</span><span class="nt">FOR</span> <span class="nt">DECTAPE</span><span class="o">,</span><span class="nt">STOP</span> <span class="nt">TRANSPORT</span>
 <span class="nt">173156</span> <span class="nt">000137</span>         <span class="nt">JMP</span>     <span class="o">@</span><span class="nn">#0</span>             <span class="o">;</span><span class="nt">GO</span> <span class="nt">TO</span> <span class="nt">ROUTINE</span> <span class="nt">LOADED</span>
-       <span class="nt">000000</span>
-       <span class="nt">000001</span>         <span class="nc">.END</span>
-
-<span class="nt">BEGIN</span>      <span class="nt">000004R</span>         <span class="nt">R0</span>    <span class="o">=%</span><span class="nt">000000</span>      <span class="nt">R1</span>    <span class="o">=</span><span class="nt">2000001</span>
-<span class="nt">START</span>      <span class="nt">000040R</span>         <span class="o">.</span>     <span class="o">=</span> <span class="nt">000062R</span>
 </pre></div>
 </td></tr></table>
 <p>Hmmm, the Pygments syntax hightlighting package used by my blog generator doesn't seem to grok MACRO-11; may have to
