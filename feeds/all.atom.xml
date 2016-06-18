@@ -1,5 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>fritzm.github.io</title><link href="http://fritzm.github.io/" rel="alternate"></link><link href="http://fritzm.github.io/feeds/all.atom.xml" rel="self"></link><id>http://fritzm.github.io/</id><updated>2016-06-12T00:00:00-07:00</updated><entry><title>PDP-11/45: MS11-L and CPU debug IV</title><link href="http://fritzm.github.io/cpu-debug-4.html" rel="alternate"></link><published>2016-06-12T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-06-12:cpu-debug-4.html</id><summary type="html">&lt;p&gt;Made some progress on the inverted result after register-to-register move problem: with the help of the KM11, extender
+<feed xmlns="http://www.w3.org/2005/Atom"><title>fritzm.github.io</title><link href="http://fritzm.github.io/" rel="alternate"></link><link href="http://fritzm.github.io/feeds/all.atom.xml" rel="self"></link><id>http://fritzm.github.io/</id><updated>2016-06-18T00:00:00-07:00</updated><entry><title>PDP-11/45: MS11-L debug</title><link href="http://fritzm.github.io/ms11-debug.html" rel="alternate"></link><published>2016-06-18T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-06-18:ms11-debug.html</id><summary type="html">&lt;p&gt;After addressing the -15V problem on the MS11, most of the bad behaviors seem to have cleared up except a stuck (on)
+bit 6 in the first 16K words of address space (000000-077776).  Hooked up the new logic analyzer (pic below), and it
+has been very useful in troubleshooting the board -- can easily capture and inspect the timing of complete memory
+cycles.  Definitely worth the investment!&lt;/p&gt;
+&lt;p&gt;Using the analyzer, I was able to verify the refresh and chip select logic on the board, then track down the stuck bit
+to what seems to be a single failed DRAM chip (E96 on the MS11-L engineering drawings).  I'd like to test the entire
+card before ordering replacement parts, but need to set up address translation to get beyond the first two banks from
+the console.&lt;/p&gt;
+&lt;p&gt;Here is the address translation register setup that I used for testing.  This was followed by a deposit of 000001 to
+KT11 SR0 (777572) to enable translation.  KT11 SR2 was left all zeros to keep D space disabled.&lt;/p&gt;
+&lt;style&gt;
+.memlist { display: inline; border-collapse: collapse; margin-right: 1em; }
+.memlist caption { font-weight: bold; }
+.memlist tr:nth-child(even) { background-color: #f2f2f2; }
+.memlist th, .memlist td { padding: 5px; }
+.memlist td { border: 1px solid lightgray; font-family: "Courier" monospace; }
+&lt;/style&gt;
+
+&lt;table class="memlist"&gt;
+&lt;caption&gt;Kernel I PAR&lt;/caption&gt;
+&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;772340&lt;/td&gt;&lt;td&gt;001000&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;772342&lt;/td&gt;&lt;td&gt;002000&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;772344&lt;/td&gt;&lt;td&gt;003000&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;772346&lt;/td&gt;&lt;td&gt;004000&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;772350&lt;/td&gt;&lt;td&gt;005000&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;772352&lt;/td&gt;&lt;td&gt;006000&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;772354&lt;/td&gt;&lt;td&gt;007000&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;772356&lt;/td&gt;&lt;td&gt;007600&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;table class="memlist"&gt;
+&lt;caption&gt;Kernel I PDR&lt;/caption&gt;
+&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;772300&lt;/td&gt;&lt;td&gt;077406&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;772302&lt;/td&gt;&lt;td&gt;077406&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;772304&lt;/td&gt;&lt;td&gt;077406&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;772306&lt;/td&gt;&lt;td&gt;077406&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;772310&lt;/td&gt;&lt;td&gt;077406&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;772312&lt;/td&gt;&lt;td&gt;077406&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;772314&lt;/td&gt;&lt;td&gt;077406&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;772316&lt;/td&gt;&lt;td&gt;077406&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;This worked as expected according to panel PROG PHY and the logic analyzer, which means the KT11 option is at least
+working for kernel I space.  Tested each bank on the MS11 from the front panel using this setup, and uncovered that
+bank 4 bit 10 also has a stuck on condition.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://fritzm.github.io/images/pdp11/ms11-debug.jpg"&gt;&lt;img class='image-process-thumb' src='/images/pdp11/ms11-debug.jpg'/&gt;&lt;/a&gt;&lt;/p&gt;</summary><category term="Retro-Computing"></category><category term="PDP-11"></category></entry><entry><title>PDP-11/45: MS11-L and CPU debug IV</title><link href="http://fritzm.github.io/cpu-debug-4.html" rel="alternate"></link><published>2016-06-12T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-06-12:cpu-debug-4.html</id><summary type="html">&lt;p&gt;Made some progress on the inverted result after register-to-register move problem: with the help of the KM11, extender
 card, and a logic probe I was able to track down that signal ALUM L coming onto the DAP is not asserted when it should
 be for a MOV instruction.  This means the ALU is performing in arithmetic instead of logic mode and thus the incorrect
 result.&lt;/p&gt;
@@ -9,7 +58,8 @@ that first...&lt;/p&gt;
 &lt;p&gt;Moved the MR11 ROM over to the expansion backplane where the MS11-L resides, and it works fine there.  So it doesn't
 seem to be a bus wiring or jumper problem onto the expansion backplane.  Checked the power input pins on the backplane
 behind the MS11-L.  5V was a little low there; trimmed this up.  Probably need to clean or replace the Molex contacts
-on the power distribution board in the cabinet, as it seems a few mV are being shed there needlessly compared to the output of the same regulator on the main backplane, but things seem within stated tolerances for now.&lt;/p&gt;
+on the power distribution board in the cabinet, as it seems a few mV are being shed there needlessly compared to the
+output of the same regulator on the main backplane, but things seem within stated tolerances for now.&lt;/p&gt;
 &lt;p&gt;The -15V input to the MS11-L was missing entirely.  Removed the DD11 expansion backplane, and added jumpers between
 the battery backup supply inputs and the corresponding main supply inputs, per documentation.  Now have -15 to the
 MS11-L, but still no joy.&lt;/p&gt;
