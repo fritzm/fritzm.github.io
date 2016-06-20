@@ -42,21 +42,59 @@
 <div class="span9">
 <div class="article">
 <div class="content-title">
+<a href="http://fritzm.github.io/cpu-debug-5.html"><h1>PDP-11/45: CPU debug V -- chasing lights!</h1></a>
+Sun 19 June 2016
+
+by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+</div>
+<div><p>Tracked down the source of the inverted result after register-to-register move problem on GRA: outputs of the
+subsidiary ALU control ROM E74 on pins 6 and 7 are floating.  Will need some closer inspection to determine if this
+is a board fault or a chip fault.  In the meantime, I have a spare GRA which I had been reluctant to try because it
+has a "bad" sticker on it...  Decided to give it a try anyway, and it seems to be working much better than the one I
+have been debugging.</p>
+<p>Now have enough of the CPU debugged to toggle in and run a simple light chaser program:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">000000</span>  <span class="nt">013700</span>  <span class="nt">177570</span>  <span class="nt">L0</span><span class="o">:</span>     <span class="nt">MOV</span>     <span class="o">@</span><span class="nn">#177570</span><span class="o">,</span> <span class="nt">R0</span>    <span class="o">;</span><span class="nt">LOAD</span> <span class="nt">COUNT</span> <span class="nt">FROM</span> <span class="nt">SWITCH</span> <span class="nt">REGISTER</span>
+<span class="nt">000004</span>  <span class="nt">005300</span>          <span class="nt">L1</span><span class="o">:</span>     <span class="nt">DEC</span>     <span class="nt">R0</span>              <span class="o">;</span><span class="nt">COUNT</span> <span class="nt">DOWN</span>
+<span class="nt">000006</span>  <span class="nt">001376</span>                  <span class="nt">BNE</span>     <span class="nt">L1</span>              <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">UNTIL</span> <span class="nt">ZERO</span>
+<span class="nt">000010</span>  <span class="nt">006301</span>                  <span class="nt">ASL</span>     <span class="nt">R1</span>              <span class="o">;</span><span class="nt">SHIFT</span> <span class="nt">DISPLAY</span> <span class="nt">VALUE</span>
+<span class="nt">000012</span>  <span class="nt">001002</span>                  <span class="nt">BNE</span>     <span class="nt">L2</span>              <span class="o">;</span><span class="nt">SKIP</span> <span class="nt">AHEAD</span> <span class="nt">IF</span> <span class="nt">NOT</span> <span class="nt">SHIFTED</span> <span class="nt">OUT</span>
+<span class="nt">000014</span>  <span class="nt">012701</span>  <span class="nt">000001</span>          <span class="nt">MOV</span>     <span class="nn">#1</span><span class="o">,</span><span class="nt">R1</span>           <span class="o">;</span><span class="nt">ELSE</span> <span class="nt">RELOAD</span>
+<span class="nt">000020</span>  <span class="nt">010137</span>  <span class="nt">177570</span>  <span class="nt">L2</span><span class="o">:</span>     <span class="nt">MOV</span>     <span class="nt">R1</span><span class="o">,@</span><span class="nn">#177570</span>     <span class="o">;</span><span class="nt">STORE</span> <span class="nt">TO</span> <span class="nt">DISPLAY</span> <span class="nt">REGISTER</span>
+<span class="nt">000024</span>  <span class="nt">000765</span>                  <span class="nt">BR</span>      <span class="nt">L0</span>              <span class="o">;</span><span class="nt">REPEAT</span> <span class="nt">FROM</span> <span class="nt">THE</span> <span class="nt">TOP</span>
+</pre></div>
+</td></tr></table>
+<p><div class="videobox">
+<iframe allowfullscreen="" frameborder="0" height="390" mozallowfullscreen="" src="https://www.youtube.com/embed/ZhuzC9v3q-k" webkitallowfullscreen="" width="640">
+</iframe>
+</div></p></div>
+<hr/>
+</div>
+<div class="article">
+<div class="content-title">
 <a href="http://fritzm.github.io/ms11-debug.html"><h1>PDP-11/45: MS11-L debug</h1></a>
 Sat 18 June 2016
 
 by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
 </div>
 <div><p>After addressing the -15V problem on the MS11, most of the bad behaviors seem to have cleared up except a stuck (on)
-bit 6 in the first 16K words of address space (000000-077776).  Hooked up the new logic analyzer (pic below), and it
-has been very useful in troubleshooting the board -- can easily capture and inspect the timing of complete memory
-cycles.  Definitely worth the investment!</p>
+bit 6 in the first 16K words of address space (000000-077776).  Hooked up the new logic analyzer, and it has been very
+useful in troubleshooting the board -- can easily capture and inspect the timing of complete memory cycles.  Definitely
+worth the investment!</p>
 <p>Using the analyzer, I was able to verify the refresh and chip select logic on the board, then track down the stuck bit
 to what seems to be a single failed DRAM chip (E96 on the MS11-L engineering drawings).  I'd like to test the entire
 card before ordering replacement parts, but need to set up address translation to get beyond the first two banks from
 the console.</p>
 <p>Here is the address translation register setup that I used for testing.  This was followed by a deposit of 000001 to
-KT11 SR0 (777572) to enable translation.  KT11 SR2 was left all zeros to keep D space disabled.</p>
+KT11 SR0 (777572) to enable translation.  KT11 SR2 was left all zeros to keep D space disabled.  This setup allows
+console access to physical addresses in banks 1 through 7 by appropriate settings of virtual address bits 13 through
+15.  I wanted to reserve PAR7 to map I/O space, so I left out bank 0 since it was one of the two already tested.</p>
 <style>
 .memlist { display: inline; border-collapse: collapse; margin-right: 1em; }
 .memlist caption { font-weight: bold; }
@@ -90,10 +128,16 @@ KT11 SR0 (777572) to enable translation.  KT11 SR2 was left all zeros to keep D 
 <tr><td>772316</td><td>077406</td></tr>
 </tbody>
 </table>
-<p>This worked as expected according to panel PROG PHY and the logic analyzer, which means the KT11 option is at least
-working for kernel I space.  Tested each bank on the MS11 from the front panel using this setup, and uncovered that
-bank 4 bit 10 also has a stuck on condition.</p>
-<p><a href="http://fritzm.github.io/images/pdp11/ms11-debug.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/ms11-debug.jpg"/></a></p></div>
+<p>This worked as expected according to panel PROG PHY and the logic analyzer, so the KT11 option which I had not
+previously tested is at least working for kernel I space.  Tested each bank on the MS11 from the front panel using this
+setup, and uncovered that bank 4 bit 10 also has a stuck on condition.  Since bank 1 is working now, I can use that
+as work space for the time being in order to continue the CPU debug while awaiting some replacement DRAM chips in the
+mail.</p>
+<p>Pics here of the logic analyzer setup, and captured traces of a write and subsequent read to one of the misbehaving
+chips:</p>
+<p><a href="http://fritzm.github.io/images/pdp11/ms11-debug.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/ms11-debug.jpg"/></a>
+<a href="http://fritzm.github.io/images/pdp11/bad-dram-write.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/bad-dram-write.jpg"/></a>
+<a href="http://fritzm.github.io/images/pdp11/bad-dram-read.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/bad-dram-read.jpg"/></a></p></div>
 <hr/>
 </div>
 <div class="article">
@@ -170,11 +214,11 @@ in the BR when halted in console.</p>
 <p>Address bit 0 seems stuck.  Swapped PDR from spare board back to the original.  Can now examine and modify the
 light/switch register, and examine the contents of the MR11 ROM.</p>
 <p>Jumpered the DD11 expansion backplane back in, and slotted in the MS11-L memory.  Limited success: can modify and
-examine memory for example near address <code>001000</code>, but cannot modify low memory addresses.  In some ranges, can only
-modify every other word.  Also, PC seems stuck at <code>022000</code>.</p>
+examine memory for example near address 001000, but cannot modify low memory addresses.  In some ranges, can only
+modify every other word.  Also, PC seems stuck at 022000.</p>
 <p>At this point, I could really use a KM11 maintenance board set.  These are pretty hard to get a hold of, but a few
 folks on the web have built their own reproductions.  I put in a PCB order to ExpressPCB with a KM11 layout by Tom
-Uban (desribed <a href="http://www.ubanproductions.com/museum.html">here</a>), and also put parts on order to stuff it.</p>
+Uban (described <a href="http://www.ubanproductions.com/museum.html">here</a>), and also put parts on order to stuff it.</p>
 <p>Also, figuring I'll need to be going deeper into the CPU debug, I found and bought an
 <a href="http://www.ebay.com/itm/142004889393">HP1662A logic analyzer</a> on eBay, for about the same money as the KM11 PCB and
 parts!</p>
@@ -347,32 +391,6 @@ the diodes in the ROM above (low word addresses at the top of the matrix, and le
 </td></tr></table>
 <p>Hmmm, the Pygments syntax hightlighting package used by my blog generator doesn't seem to grok MACRO-11; may have to
 do something about that...</p></div>
-<hr/>
-</div>
-<div class="article">
-<div class="content-title">
-<a href="http://fritzm.github.io/vt52.html"><h1>PDP-11/45: VT52</h1></a>
-Sun 03 January 2016
-
-by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
-</div>
-<div><p>Spend some time reviving a VT52 that I intend to use with the PDP-11.  This was a pretty nice eBay find.  There was some
-oxidation and flakiness with the connectors to the chargen ROM daughter card (I remember this being typical
-of VT52s even back in the day).  A little more difficult to track down were some flaky solder joints around the clock
-chip.  But, everything else seems to be in pretty good shape and its working well now!  Here it is hooked up to a linux
-VM on my macbook, compiling some LSST code to generate some output as a test drive:</p>
-<p><a href="http://fritzm.github.io/images/pdp11/vt52.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/vt52.jpg"/></a></p>
-<p>Man, seeing that funky font again, with its non-descending-descenders, is really great!  Surprisingly, it doesn't seem
-to be available in digital format anywhere, unlike the later VT100 fonts, etc.  Try as I might, I couldn't seem to find
-the chargen ROM listing in any of the DEC documentation archives, either.</p>
-<p>Well, I do have a Digilent FPGA eval card and some level conversion chips laying around, so as a holiday hack project
-I put together a quick ROM scanner in Verlog, interfaced it to the VT52 chargen on a breadboard, and scanned out the
-contents.  Here's a picture of the scanner in action, and the produced output:</p>
-<p><a href="http://fritzm.github.io/images/pdp11/rom-scanner.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/rom-scanner.jpg"/></a></p>
-<p>The yellow-ish board on the right is the VT52 chargen.  The Verilog source for the scanner, the scanned data, and some
-preliminary attempts to convert the data to a few modern font formats are available on my github over at
-<a href="https://github.com/fritzm/vt52">https://github.com/fritzm/vt52</a>.  I need to learn some more about font formats to make some better font files; if I do
-I will update that repo.  Any help from fontophiles gladly accepted!</p></div>
 <hr/>
 </div>
 <div class="pagination">

@@ -1,14 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>fritzm.github.io</title><link href="http://fritzm.github.io/" rel="alternate"></link><link href="http://fritzm.github.io/feeds/all.atom.xml" rel="self"></link><id>http://fritzm.github.io/</id><updated>2016-06-18T00:00:00-07:00</updated><entry><title>PDP-11/45: MS11-L debug</title><link href="http://fritzm.github.io/ms11-debug.html" rel="alternate"></link><published>2016-06-18T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-06-18:ms11-debug.html</id><summary type="html">&lt;p&gt;After addressing the -15V problem on the MS11, most of the bad behaviors seem to have cleared up except a stuck (on)
-bit 6 in the first 16K words of address space (000000-077776).  Hooked up the new logic analyzer (pic below), and it
-has been very useful in troubleshooting the board -- can easily capture and inspect the timing of complete memory
-cycles.  Definitely worth the investment!&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>fritzm.github.io</title><link href="http://fritzm.github.io/" rel="alternate"></link><link href="http://fritzm.github.io/feeds/all.atom.xml" rel="self"></link><id>http://fritzm.github.io/</id><updated>2016-06-19T00:00:00-07:00</updated><entry><title>PDP-11/45: CPU debug V -- chasing lights!</title><link href="http://fritzm.github.io/cpu-debug-5.html" rel="alternate"></link><published>2016-06-19T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-06-19:cpu-debug-5.html</id><summary type="html">&lt;p&gt;Tracked down the source of the inverted result after register-to-register move problem on GRA: outputs of the
+subsidiary ALU control ROM E74 on pins 6 and 7 are floating.  Will need some closer inspection to determine if this
+is a board fault or a chip fault.  In the meantime, I have a spare GRA which I had been reluctant to try because it
+has a "bad" sticker on it...  Decided to give it a try anyway, and it seems to be working much better than the one I
+have been debugging.&lt;/p&gt;
+&lt;p&gt;Now have enough of the CPU debugged to toggle in and run a simple light chaser program:&lt;/p&gt;
+&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt;1
+2
+3
+4
+5
+6
+7
+8&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nt"&gt;000000&lt;/span&gt;  &lt;span class="nt"&gt;013700&lt;/span&gt;  &lt;span class="nt"&gt;177570&lt;/span&gt;  &lt;span class="nt"&gt;L0&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="o"&gt;@&lt;/span&gt;&lt;span class="nn"&gt;#177570&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;R0&lt;/span&gt;    &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;LOAD&lt;/span&gt; &lt;span class="nt"&gt;COUNT&lt;/span&gt; &lt;span class="nt"&gt;FROM&lt;/span&gt; &lt;span class="nt"&gt;SWITCH&lt;/span&gt; &lt;span class="nt"&gt;REGISTER&lt;/span&gt;
+&lt;span class="nt"&gt;000004&lt;/span&gt;  &lt;span class="nt"&gt;005300&lt;/span&gt;          &lt;span class="nt"&gt;L1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;DEC&lt;/span&gt;     &lt;span class="nt"&gt;R0&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;COUNT&lt;/span&gt; &lt;span class="nt"&gt;DOWN&lt;/span&gt;
+&lt;span class="nt"&gt;000006&lt;/span&gt;  &lt;span class="nt"&gt;001376&lt;/span&gt;                  &lt;span class="nt"&gt;BNE&lt;/span&gt;     &lt;span class="nt"&gt;L1&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;LOOP&lt;/span&gt; &lt;span class="nt"&gt;UNTIL&lt;/span&gt; &lt;span class="nt"&gt;ZERO&lt;/span&gt;
+&lt;span class="nt"&gt;000010&lt;/span&gt;  &lt;span class="nt"&gt;006301&lt;/span&gt;                  &lt;span class="nt"&gt;ASL&lt;/span&gt;     &lt;span class="nt"&gt;R1&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;SHIFT&lt;/span&gt; &lt;span class="nt"&gt;DISPLAY&lt;/span&gt; &lt;span class="nt"&gt;VALUE&lt;/span&gt;
+&lt;span class="nt"&gt;000012&lt;/span&gt;  &lt;span class="nt"&gt;001002&lt;/span&gt;                  &lt;span class="nt"&gt;BNE&lt;/span&gt;     &lt;span class="nt"&gt;L2&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;SKIP&lt;/span&gt; &lt;span class="nt"&gt;AHEAD&lt;/span&gt; &lt;span class="nt"&gt;IF&lt;/span&gt; &lt;span class="nt"&gt;NOT&lt;/span&gt; &lt;span class="nt"&gt;SHIFTED&lt;/span&gt; &lt;span class="nt"&gt;OUT&lt;/span&gt;
+&lt;span class="nt"&gt;000014&lt;/span&gt;  &lt;span class="nt"&gt;012701&lt;/span&gt;  &lt;span class="nt"&gt;000001&lt;/span&gt;          &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="nn"&gt;#1&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R1&lt;/span&gt;           &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;ELSE&lt;/span&gt; &lt;span class="nt"&gt;RELOAD&lt;/span&gt;
+&lt;span class="nt"&gt;000020&lt;/span&gt;  &lt;span class="nt"&gt;010137&lt;/span&gt;  &lt;span class="nt"&gt;177570&lt;/span&gt;  &lt;span class="nt"&gt;L2&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="nt"&gt;R1&lt;/span&gt;&lt;span class="o"&gt;,@&lt;/span&gt;&lt;span class="nn"&gt;#177570&lt;/span&gt;     &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;STORE&lt;/span&gt; &lt;span class="nt"&gt;TO&lt;/span&gt; &lt;span class="nt"&gt;DISPLAY&lt;/span&gt; &lt;span class="nt"&gt;REGISTER&lt;/span&gt;
+&lt;span class="nt"&gt;000024&lt;/span&gt;  &lt;span class="nt"&gt;000765&lt;/span&gt;                  &lt;span class="nt"&gt;BR&lt;/span&gt;      &lt;span class="nt"&gt;L0&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;REPEAT&lt;/span&gt; &lt;span class="nt"&gt;FROM&lt;/span&gt; &lt;span class="nt"&gt;THE&lt;/span&gt; &lt;span class="nt"&gt;TOP&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+
+&lt;p&gt;&lt;div class="videobox"&gt;
+                &lt;iframe width="640" height="390"
+                    src='https://www.youtube.com/embed/ZhuzC9v3q-k'
+                    frameborder='0' webkitAllowFullScreen mozallowfullscreen
+                    allowFullScreen&gt;
+                &lt;/iframe&gt;
+            &lt;/div&gt;&lt;/p&gt;</summary><category term="Retro-Computing"></category><category term="PDP-11"></category></entry><entry><title>PDP-11/45: MS11-L debug</title><link href="http://fritzm.github.io/ms11-debug.html" rel="alternate"></link><published>2016-06-18T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-06-18:ms11-debug.html</id><summary type="html">&lt;p&gt;After addressing the -15V problem on the MS11, most of the bad behaviors seem to have cleared up except a stuck (on)
+bit 6 in the first 16K words of address space (000000-077776).  Hooked up the new logic analyzer, and it has been very
+useful in troubleshooting the board -- can easily capture and inspect the timing of complete memory cycles.  Definitely
+worth the investment!&lt;/p&gt;
 &lt;p&gt;Using the analyzer, I was able to verify the refresh and chip select logic on the board, then track down the stuck bit
 to what seems to be a single failed DRAM chip (E96 on the MS11-L engineering drawings).  I'd like to test the entire
 card before ordering replacement parts, but need to set up address translation to get beyond the first two banks from
 the console.&lt;/p&gt;
 &lt;p&gt;Here is the address translation register setup that I used for testing.  This was followed by a deposit of 000001 to
-KT11 SR0 (777572) to enable translation.  KT11 SR2 was left all zeros to keep D space disabled.&lt;/p&gt;
+KT11 SR0 (777572) to enable translation.  KT11 SR2 was left all zeros to keep D space disabled.  This setup allows
+console access to physical addresses in banks 1 through 7 by appropriate settings of virtual address bits 13 through
+15.  I wanted to reserve PAR7 to map I/O space, so I left out bank 0 since it was one of the two already tested.&lt;/p&gt;
 &lt;style&gt;
 .memlist { display: inline; border-collapse: collapse; margin-right: 1em; }
 .memlist caption { font-weight: bold; }
@@ -45,10 +77,16 @@ KT11 SR0 (777572) to enable translation.  KT11 SR2 was left all zeros to keep D 
 &lt;/tbody&gt;
 &lt;/table&gt;
 
-&lt;p&gt;This worked as expected according to panel PROG PHY and the logic analyzer, which means the KT11 option is at least
-working for kernel I space.  Tested each bank on the MS11 from the front panel using this setup, and uncovered that
-bank 4 bit 10 also has a stuck on condition.&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://fritzm.github.io/images/pdp11/ms11-debug.jpg"&gt;&lt;img class='image-process-thumb' src='/images/pdp11/ms11-debug.jpg'/&gt;&lt;/a&gt;&lt;/p&gt;</summary><category term="Retro-Computing"></category><category term="PDP-11"></category></entry><entry><title>PDP-11/45: MS11-L and CPU debug IV</title><link href="http://fritzm.github.io/cpu-debug-4.html" rel="alternate"></link><published>2016-06-12T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-06-12:cpu-debug-4.html</id><summary type="html">&lt;p&gt;Made some progress on the inverted result after register-to-register move problem: with the help of the KM11, extender
+&lt;p&gt;This worked as expected according to panel PROG PHY and the logic analyzer, so the KT11 option which I had not
+previously tested is at least working for kernel I space.  Tested each bank on the MS11 from the front panel using this
+setup, and uncovered that bank 4 bit 10 also has a stuck on condition.  Since bank 1 is working now, I can use that
+as work space for the time being in order to continue the CPU debug while awaiting some replacement DRAM chips in the
+mail.&lt;/p&gt;
+&lt;p&gt;Pics here of the logic analyzer setup, and captured traces of a write and subsequent read to one of the misbehaving
+chips:&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://fritzm.github.io/images/pdp11/ms11-debug.jpg"&gt;&lt;img class='image-process-thumb' src='/images/pdp11/ms11-debug.jpg'/&gt;&lt;/a&gt;
+&lt;a href="http://fritzm.github.io/images/pdp11/bad-dram-write.jpg"&gt;&lt;img class='image-process-thumb' src='/images/pdp11/bad-dram-write.jpg'/&gt;&lt;/a&gt;
+&lt;a href="http://fritzm.github.io/images/pdp11/bad-dram-read.jpg"&gt;&lt;img class='image-process-thumb' src='/images/pdp11/bad-dram-read.jpg'/&gt;&lt;/a&gt;&lt;/p&gt;</summary><category term="Retro-Computing"></category><category term="PDP-11"></category></entry><entry><title>PDP-11/45: MS11-L and CPU debug IV</title><link href="http://fritzm.github.io/cpu-debug-4.html" rel="alternate"></link><published>2016-06-12T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-06-12:cpu-debug-4.html</id><summary type="html">&lt;p&gt;Made some progress on the inverted result after register-to-register move problem: with the help of the KM11, extender
 card, and a logic probe I was able to track down that signal ALUM L coming onto the DAP is not asserted when it should
 be for a MOV instruction.  This means the ALU is performing in arithmetic instead of logic mode and thus the incorrect
 result.&lt;/p&gt;
@@ -97,11 +135,11 @@ in the BR when halted in console.&lt;/p&gt;
 &lt;p&gt;Address bit 0 seems stuck.  Swapped PDR from spare board back to the original.  Can now examine and modify the
 light/switch register, and examine the contents of the MR11 ROM.&lt;/p&gt;
 &lt;p&gt;Jumpered the DD11 expansion backplane back in, and slotted in the MS11-L memory.  Limited success: can modify and
-examine memory for example near address &lt;code&gt;001000&lt;/code&gt;, but cannot modify low memory addresses.  In some ranges, can only
-modify every other word.  Also, PC seems stuck at &lt;code&gt;022000&lt;/code&gt;.&lt;/p&gt;
+examine memory for example near address 001000, but cannot modify low memory addresses.  In some ranges, can only
+modify every other word.  Also, PC seems stuck at 022000.&lt;/p&gt;
 &lt;p&gt;At this point, I could really use a KM11 maintenance board set.  These are pretty hard to get a hold of, but a few
 folks on the web have built their own reproductions.  I put in a PCB order to ExpressPCB with a KM11 layout by Tom
-Uban (desribed &lt;a href="http://www.ubanproductions.com/museum.html"&gt;here&lt;/a&gt;), and also put parts on order to stuff it.&lt;/p&gt;
+Uban (described &lt;a href="http://www.ubanproductions.com/museum.html"&gt;here&lt;/a&gt;), and also put parts on order to stuff it.&lt;/p&gt;
 &lt;p&gt;Also, figuring I'll need to be going deeper into the CPU debug, I found and bought an
 &lt;a href="http://www.ebay.com/itm/142004889393"&gt;HP1662A logic analyzer&lt;/a&gt; on eBay, for about the same money as the KM11 PCB and
 parts!&lt;/p&gt;
@@ -350,7 +388,7 @@ I will update that repo.  Any help from fontophiles gladly accepted!&lt;/p&gt;</
     mathjaxscript[(window.opera ? "innerHTML" : "text")] =
         "MathJax.Hub.Config({" +
         "    config: ['MMLorHTML.js']," +
-        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' }, Macros: {} }," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
         "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
         "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
         "    displayAlign: '"+ align +"'," +
