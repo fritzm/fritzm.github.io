@@ -40,95 +40,38 @@
 <div class="content">
 <div class="row">
 <div class="span9">
-<h1>Archives</h1>
-<table class="table">
-<tbody>
-<tr>
-<td>23 Jun 2016</td>
-<td><a href="http://fritzm.github.io/m9301-running.html">PDP-11/45: Running the M9301 console emulator</a></td>
-</tr>
-<tr>
-<td>19 Jun 2016</td>
-<td><a href="http://fritzm.github.io/cpu-debug-5.html">PDP-11/45: CPU debug V -- chasing lights!</a></td>
-</tr>
-<tr>
-<td>18 Jun 2016</td>
-<td><a href="http://fritzm.github.io/ms11-debug.html">PDP-11/45: MS11-L debug</a></td>
-</tr>
-<tr>
-<td>12 Jun 2016</td>
-<td><a href="http://fritzm.github.io/cpu-debug-4.html">PDP-11/45: MS11-L and CPU debug IV</a></td>
-</tr>
-<tr>
-<td>11 Jun 2016</td>
-<td><a href="http://fritzm.github.io/cpu-debug-3.html">PDP-11/45: KM11 replica and CPU debug III</a></td>
-</tr>
-<tr>
-<td>05 Jun 2016</td>
-<td><a href="http://fritzm.github.io/cpu-debug-2.html">PDP-11/45: CPU debug II</a></td>
-</tr>
-<tr>
-<td>30 May 2016</td>
-<td><a href="http://fritzm.github.io/power-fixes.html">PDP-11/45: Power fixes and CPU debug</a></td>
-</tr>
-<tr>
-<td>08 May 2016</td>
-<td><a href="http://fritzm.github.io/initial-power-on.html">PDP-11/45: Initial Power On!</a></td>
-</tr>
-<tr>
-<td>23 Apr 2016</td>
-<td><a href="http://fritzm.github.io/power-harness-2.html">PDP-11/45: Power Harness, continued</a></td>
-</tr>
-<tr>
-<td>17 Apr 2016</td>
-<td><a href="http://fritzm.github.io/power-harness.html">PDP-11/45: Power Harness</a></td>
-</tr>
-<tr>
-<td>09 Apr 2016</td>
-<td><a href="http://fritzm.github.io/ebay-parts.html">PDP-11/45: Some parts from eBay</a></td>
-</tr>
-<tr>
-<td>03 Jan 2016</td>
-<td><a href="http://fritzm.github.io/vt52.html">PDP-11/45: VT52</a></td>
-</tr>
-<tr>
-<td>03 Jul 2015</td>
-<td><a href="http://fritzm.github.io/backplane-and-logic.html">PDP-11/45: CPU Backplane and logic</a></td>
-</tr>
-<tr>
-<td>21 Jun 2015</td>
-<td><a href="http://fritzm.github.io/panel-and-742s.html">PDP-11/45: H742s and front panel</a></td>
-</tr>
-<tr>
-<td>07 Jun 2015</td>
-<td><a href="http://fritzm.github.io/fans-and-h742s.html">PDP-11/45: AC power and cooling</a></td>
-</tr>
-<tr>
-<td>23 May 2015</td>
-<td><a href="http://fritzm.github.io/power-controllers.html">PDP-11/45: H742 power control boards</a></td>
-</tr>
-<tr>
-<td>11 Apr 2015</td>
-<td><a href="http://fritzm.github.io/corrosion.html">PDP-11/45: Teardown and corrosion remediation</a></td>
-</tr>
-<tr>
-<td>29 Mar 2015</td>
-<td><a href="http://fritzm.github.io/861.html">PDP-11/45: 861 AC power control</a></td>
-</tr>
-<tr>
-<td>15 Mar 2015</td>
-<td><a href="http://fritzm.github.io/begin-again.html">PDP-11/45: Begin Again</a></td>
-</tr>
-<tr>
-<td>02 Dec 2014</td>
-<td><a href="http://fritzm.github.io/jsfiddle-test.html">three.js and JSFiddle</a></td>
-</tr>
-<tr>
-<td>01 Dec 2014</td>
-<td><a href="http://fritzm.github.io/moebius.html">Moebious transformation animated GIFs</a></td>
-</tr>
-</tbody>
-</table>
+<div class="article">
+<div class="content-title">
+<h1>PDP-11/45: Running the M9301 console emulator</h1>
+Thu 23 June 2016
+
+by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+</div>
+<div><p>Replacement DRAMs showed up.  Pulled and replaced the two faulty ones on the MS11.  Pic below -- you can see the
+replacements are socketed, and are the TI parts instead of the original ITT.  Full address space is working now!  Now
+that bank 0 is repaired, trap vectors can conceivably work.</p>
+<p>Jumpered and configured a DL11-E serial card for use as console, slotted in an M9301-YB bootstrap terminator, connected
+up the VT52, powered up, and off it goes straight to the console emulator!  That means the basic instruction set tests
+in the boot ROM are passing as well, which is great news.</p>
+<p>Next step will be to hook up PDP11GUI and load some more in-depth diagnostics, in order to shake out any
+remaining bugs with the CPU and memory system.  Will slot in the FPU at that point for testing and debug as well.</p>
+<p><a href="http://fritzm.github.io/images/pdp11/ms11-repaired.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/ms11-repaired.jpg"/></a>
+<a href="http://fritzm.github.io/images/pdp11/m9301-running.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/m9301-running.jpg"/></a></p></div>
+<hr>
+<h2>Comments</h2>
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'fritzm'; 
+    var disqus_title = 'PDP-11/45: Running the M9301 console emulator';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</hr></div>
 </div>
 <div class="span3">
 <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
