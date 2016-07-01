@@ -9,16 +9,17 @@
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
     <!--[if lt IE 9]>
-    <script src="/theme/html5.js"></script>
+    <script src="http://fritzm.github.io/theme/html5.js"></script>
     <![endif]-->
 
     <!-- Le styles -->
-    <link href="/theme/bootstrap.min.css" rel="stylesheet">
-    <link href="/theme/bootstrap.min.responsive.css" rel="stylesheet">
-    <link href="/theme/local.css" rel="stylesheet">
-    <link href="/theme/pygments.css" rel="stylesheet">
+    <link href="http://fritzm.github.io/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="http://fritzm.github.io/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="http://fritzm.github.io/theme/local.css" rel="stylesheet">
+    <link href="http://fritzm.github.io/theme/pygments.css" rel="stylesheet">
 
     <!-- So Firefox can bookmark->"abo this site" -->
+        <link href="feeds/all.atom.xml" rel="alternate" title="fritzm.github.io" type="application/atom+xml">
 
 </head>
 
@@ -34,7 +35,7 @@
              <span class="icon-bar"></span>
          </a>
 
-        <a class="brand" href="">fritzm.github.io</a>
+        <a class="brand" href="http://fritzm.github.io">fritzm.github.io</a>
 
         <div class="nav-collapse">
         <ul class="nav">
@@ -56,7 +57,7 @@
             <h1>PDP-11/45: VT52</h1>
 Sun 03 January 2016
 
-by <a class="url fn" href="/author/fritz-mueller.html">Fritz Mueller</a>
+by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
  
 
 
@@ -67,14 +68,14 @@ oxidation and flakiness with the connectors to the chargen ROM daughter card (I 
 of VT52s even back in the day).  A little more difficult to track down were some flaky solder joints around the clock
 chip.  But, everything else seems to be in pretty good shape and its working well now!  Here it is hooked up to a linux
 VM on my macbook, compiling some LSST code to generate some output as a test drive:</p>
-<p><a href="/images/pdp11/vt52.jpg"><img src='/thumbnails/pdp11/vt52_thumbnail_tall.jpg'/></a></p>
+<p><a href="http://fritzm.github.io/images/pdp11/vt52.jpg"><img src='/thumbnails/pdp11/vt52_thumbnail_tall.jpg'/></a></p>
 <p>Man, seeing that funky font again, with its non-descending-descenders, is really great!  Surprisingly, it doesn't seem
 to be available in digital format anywhere, unlike the later VT100 fonts, etc.  Try as I might, I couldn't seem to find
 the chargen ROM listing in any of the DEC documentation archives, either.</p>
 <p>Well, I do have a Digilent FPGA eval card and some level conversion chips laying around, so as a holiday hack project
 I put together a quick ROM scanner in Verlog, interfaced it to the VT52 chargen on a breadboard, and scanned out the
 contents.  Here's a picture of the scanner in action, and the produced output:</p>
-<p><a href="/images/pdp11/rom-scanner.jpg"><img src='/thumbnails/pdp11/rom-scanner_thumbnail_tall.jpg'/></a></p>
+<p><a href="http://fritzm.github.io/images/pdp11/rom-scanner.jpg"><img src='/thumbnails/pdp11/rom-scanner_thumbnail_tall.jpg'/></a></p>
 <p>The yellow-ish board on the right is the VT52 chargen.  The Verilog source for the scanner, the scanned data, and some
 preliminary attempts to convert the data to a few modern font formats are available on my github over at
 <a href="https://github.com/fritzm/vt52">https://github.com/fritzm/vt52</a>.  I need to learn some more about font formats to make some better font files; if I do
@@ -106,11 +107,12 @@ I will update that repo.  Any help from fontophiles gladly accepted!</p></div>
                 Site
                 </li>
             
-                <li><a href="/">Archives</a>
-                <li><a href="/tags.html">Tags</a>
+                <li><a href="http://fritzm.github.io/">Archives</a>
+                <li><a href="http://fritzm.github.io/tags.html">Tags</a>
 
 
 
+                <li><a href="http://fritzm.github.io/feeds/all.atom.xml" rel="alternate">Atom feed</a></li>
 
             </ul>
             </div>
@@ -122,9 +124,9 @@ I will update that repo.  Any help from fontophiles gladly accepted!</p></div>
                 Categories
                 </li>
                 
-                <li><a href="/category/math.html">Math</a></li>
-                <li><a href="/category/pdp-11.html">PDP-11</a></li>
-                <li><a href="/category/programming.html">Programming</a></li>
+                <li><a href="http://fritzm.github.io/category/math.html">Math</a></li>
+                <li><a href="http://fritzm.github.io/category/pdp-11.html">PDP-11</a></li>
+                <li><a href="http://fritzm.github.io/category/programming.html">Programming</a></li>
                    
             </ul>
             </div>
@@ -153,7 +155,7 @@ I will update that repo.  Any help from fontophiles gladly accepted!</p></div>
     </div>     </div> 
 <footer>
 <br />
-<p><a href="">fritzm.github.io</a> &copy; Fritz Mueller 2012</p>
+<p><a href="http://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2012</p>
 </footer>
 
 </div> <!-- /container -->

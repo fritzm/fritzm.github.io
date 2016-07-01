@@ -9,16 +9,17 @@
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
     <!--[if lt IE 9]>
-    <script src="/theme/html5.js"></script>
+    <script src="http://fritzm.github.io/theme/html5.js"></script>
     <![endif]-->
 
     <!-- Le styles -->
-    <link href="/theme/bootstrap.min.css" rel="stylesheet">
-    <link href="/theme/bootstrap.min.responsive.css" rel="stylesheet">
-    <link href="/theme/local.css" rel="stylesheet">
-    <link href="/theme/pygments.css" rel="stylesheet">
+    <link href="http://fritzm.github.io/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="http://fritzm.github.io/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="http://fritzm.github.io/theme/local.css" rel="stylesheet">
+    <link href="http://fritzm.github.io/theme/pygments.css" rel="stylesheet">
 
     <!-- So Firefox can bookmark->"abo this site" -->
+        <link href="feeds/all.atom.xml" rel="alternate" title="fritzm.github.io" type="application/atom+xml">
 
 </head>
 
@@ -34,7 +35,7 @@
              <span class="icon-bar"></span>
          </a>
 
-        <a class="brand" href="">fritzm.github.io</a>
+        <a class="brand" href="http://fritzm.github.io">fritzm.github.io</a>
 
         <div class="nav-collapse">
         <ul class="nav">
@@ -56,7 +57,7 @@
             <h1>PDP-11/45: Some parts from eBay</h1>
 Sat 09 April 2016
 
-by <a class="url fn" href="/author/fritz-mueller.html">Fritz Mueller</a>
+by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
  
 
 
@@ -70,7 +71,7 @@ the core memory systems I have on hand.  It will also be nice to run with a full
 terminators, grant continuity cards, the MS11-L memory, a DL11 serial interface, and an MR11-DB boostrap ROM.  I've gone
 ahead and slotted in the FPU in the first four slots, since the cleaned and refurbished CPU cabinet is probably the
 safest place to store them now.  Console cables are also installed:</p>
-<p><a href="/images/pdp11/boards-in-chassis-2.jpg"><img src='/thumbnails/pdp11/boards-in-chassis-2_thumbnail_tall.jpg'/></a></p>
+<p><a href="http://fritzm.github.io/images/pdp11/boards-in-chassis-2.jpg"><img src='/thumbnails/pdp11/boards-in-chassis-2_thumbnail_tall.jpg'/></a></p>
 <p>The MR11 ROM is an interesting bit, and probably worth a comment.  This is a 32-word diode-matrix ROM card.  The bits
 are physically laid out on the card (see pictures below); where there is a diode, there is a logical 1 bit and where
 there is the absence of a diode there is a logical 0 bit.  Typically the matrix would be loaded with a bootstrap program,
@@ -79,8 +80,8 @@ to save the operator from having to toggle it in from the console on each boot.<
 is a handwritten note attached from some engineer describing this.  The mod customizes the bootstrap to always load
 from an RK disk unit, to avoid having to toggle in the device address at boot.  I will probably revert this mod because
 I like having things in fairly stock/usual condition.</p>
-<p><a href="/images/pdp11/mr11-with-note.jpg"><img src='/thumbnails/pdp11/mr11-with-note_thumbnail_tall.jpg'/></a>
-<a href="/images/pdp11/mr11-bare.jpg"><img src='/thumbnails/pdp11/mr11-bare_thumbnail_tall.jpg'/></a></p>
+<p><a href="http://fritzm.github.io/images/pdp11/mr11-with-note.jpg"><img src='/thumbnails/pdp11/mr11-with-note_thumbnail_tall.jpg'/></a>
+<a href="http://fritzm.github.io/images/pdp11/mr11-bare.jpg"><img src='/thumbnails/pdp11/mr11-bare_thumbnail_tall.jpg'/></a></p>
 <p>For fun, here's the source listing of the stock bootstrap.  You can match the octal digits of the machine code against
 the diodes in the ROM above (low word addresses at the top of the matrix, and least-significant-bits on the left).</p>
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
@@ -162,11 +163,12 @@ do something about that...</p></div>
                 Site
                 </li>
             
-                <li><a href="/">Archives</a>
-                <li><a href="/tags.html">Tags</a>
+                <li><a href="http://fritzm.github.io/">Archives</a>
+                <li><a href="http://fritzm.github.io/tags.html">Tags</a>
 
 
 
+                <li><a href="http://fritzm.github.io/feeds/all.atom.xml" rel="alternate">Atom feed</a></li>
 
             </ul>
             </div>
@@ -178,9 +180,9 @@ do something about that...</p></div>
                 Categories
                 </li>
                 
-                <li><a href="/category/math.html">Math</a></li>
-                <li><a href="/category/pdp-11.html">PDP-11</a></li>
-                <li><a href="/category/programming.html">Programming</a></li>
+                <li><a href="http://fritzm.github.io/category/math.html">Math</a></li>
+                <li><a href="http://fritzm.github.io/category/pdp-11.html">PDP-11</a></li>
+                <li><a href="http://fritzm.github.io/category/programming.html">Programming</a></li>
                    
             </ul>
             </div>
@@ -209,7 +211,7 @@ do something about that...</p></div>
     </div>     </div> 
 <footer>
 <br />
-<p><a href="">fritzm.github.io</a> &copy; Fritz Mueller 2012</p>
+<p><a href="http://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2012</p>
 </footer>
 
 </div> <!-- /container -->
