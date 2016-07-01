@@ -1,53 +1,70 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<title>fritzm.github.io</title>
-<meta content="" name="description">
-<meta content="Fritz Mueller" name="author">
-<meta content="width=device-width, initial-scale=1.0" name="viewport">
-<!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
-<!--[if lt IE 9]>
-    <script src="http://fritzm.github.io/theme/html5.js"></script>
+    <meta charset="utf-8">
+    <title>fritzm.github.io</title>
+    <meta name="description" content="">
+    <meta name="author" content="Fritz Mueller">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+    <script src="/theme/html5.js"></script>
     <![endif]-->
-<!-- Le styles -->
-<link href="http://fritzm.github.io/theme/bootstrap.min.css" rel="stylesheet">
-<link href="http://fritzm.github.io/theme/bootstrap.min.responsive.css" rel="stylesheet">
-<link href="http://fritzm.github.io/theme/local.css" rel="stylesheet">
-<link href="http://fritzm.github.io/theme/pygments.css" rel="stylesheet">
-<!-- So Firefox can bookmark->"abo this site" -->
-<link href="feeds/all.atom.xml" rel="alternate" title="fritzm.github.io" type="application/atom+xml">
-</link></link></link></link></link></meta></meta></meta></meta></head>
+
+    <!-- Le styles -->
+    <link href="/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="/theme/local.css" rel="stylesheet">
+    <link href="/theme/pygments.css" rel="stylesheet">
+
+    <!-- So Firefox can bookmark->"abo this site" -->
+
+</head>
+
 <body>
+
 <div class="navbar">
-<div class="navbar-inner">
+    <div class="navbar-inner">
+    <div class="container">
+
+         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+         </a>
+
+        <a class="brand" href="">fritzm.github.io</a>
+
+        <div class="nav-collapse">
+        <ul class="nav">
+            
+        </ul>
+        </div>
+        
+    </div>
+    </div>
+</div>
+
 <div class="container">
-<a class="btn btn-navbar" data-target=".nav-collapse" data-toggle="collapse">
-<span class="icon-bar"></span>
-<span class="icon-bar"></span>
-<span class="icon-bar"></span>
-</a>
-<a class="brand" href="http://fritzm.github.io">fritzm.github.io</a>
-<div class="nav-collapse">
-<ul class="nav">
-</ul>
-</div>
-</div>
-</div>
-</div>
-<div class="container">
-<div class="content">
-<div class="row">
-<div class="span9">
-<div class="article">
-<div class="content-title">
-<a href="http://fritzm.github.io/ebay-parts.html"><h1>PDP-11/45: Some parts from eBay</h1></a>
+    <div class="content">
+    <div class="row">
+
+        <div class="span9">
+
+
+<div class='article'>
+    <div class="content-title">
+        <a href="/ebay-parts.html"><h1>PDP-11/45: Some parts from eBay</h1></a>
 Sat 09 April 2016
 
-by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
-</div>
-<div><p>I've been keeping an eye on eBay and have collected a few more goodies: a DD11-D nine-slot expansion backplane, a fully
+by <a class="url fn" href="/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+    </div>
+
+    <div><p>I've been keeping an eye on eBay and have collected a few more goodies: a DD11-D nine-slot expansion backplane, a fully
 populated (128K x 18bit) MS11-L MOS memory board, and a couple of replacement BC08-R cables for connecting the console
 to the CPU cards.  The MS11-L is a bit of a luxury; I am figuring it will be easier to deal with during bringup than
 the core memory systems I have on hand.  It will also be nice to run with a full address space.</p>
@@ -55,17 +72,17 @@ the core memory systems I have on hand.  It will also be nice to run with a full
 terminators, grant continuity cards, the MS11-L memory, a DL11 serial interface, and an MR11-DB boostrap ROM.  I've gone
 ahead and slotted in the FPU in the first four slots, since the cleaned and refurbished CPU cabinet is probably the
 safest place to store them now.  Console cables are also installed:</p>
-<p><a href="http://fritzm.github.io/images/pdp11/boards-in-chassis-2.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/boards-in-chassis-2.jpg"/></a></p>
+<p><a href="/images/pdp11/boards-in-chassis-2.jpg"><img src='/thumbnails/pdp11/boards-in-chassis-2_thumbnail_tall.jpg'/></a></p>
 <p>The MR11 ROM is an interesting bit, and probably worth a comment.  This is a 32-word diode-matrix ROM card.  The bits
 are physically laid out on the card (see pictures below); where there is a diode, there is a logical 1 bit and where
 there is the absence of a diode there is a logical 0 bit.  Typically the matrix would be loaded with a bootstrap program,
 to save the operator from having to toggle it in from the console on each boot.</p>
-<p>The program could be modified by pysically adding or removing diodes in the matrix.  My card has had such a mod; there
+<p>The program could be modified by physically adding or removing diodes in the matrix.  My card has had such a mod; there
 is a handwritten note attached from some engineer describing this.  The mod customizes the bootstrap to always load
 from an RK disk unit, to avoid having to toggle in the device address at boot.  I will probably revert this mod because
 I like having things in fairly stock/usual condition.</p>
-<p><a href="http://fritzm.github.io/images/pdp11/mr11-with-note.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/mr11-with-note.jpg"/></a>
-<a href="http://fritzm.github.io/images/pdp11/mr11-bare.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/mr11-bare.jpg"/></a></p>
+<p><a href="/images/pdp11/mr11-with-note.jpg"><img src='/thumbnails/pdp11/mr11-with-note_thumbnail_tall.jpg'/></a>
+<a href="/images/pdp11/mr11-bare.jpg"><img src='/thumbnails/pdp11/mr11-bare_thumbnail_tall.jpg'/></a></p>
 <p>For fun, here's the source listing of the stock bootstrap.  You can match the octal digits of the machine code against
 the diodes in the ROM above (low word addresses at the top of the matrix, and least-significant-bits on the left).</p>
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
@@ -117,188 +134,268 @@ the diodes in the ROM above (low word addresses at the top of the matrix, and le
 <span class="nt">173156</span> <span class="nt">000137</span>         <span class="nt">JMP</span>     <span class="o">@</span><span class="nn">#0</span>             <span class="o">;</span><span class="nt">GO</span> <span class="nt">TO</span> <span class="nt">ROUTINE</span> <span class="nt">LOADED</span>
 </pre></div>
 </td></tr></table>
-<p>Hmmm, the Pygments syntax hightlighting package used by my blog generator doesn't seem to grok MACRO-11; may have to
+
+<p>Hmmm, the Pygments syntax highlighting package used by my blog generator doesn't seem to grok MACRO-11; may have to
 do something about that...</p></div>
-<hr/>
+    <hr />
 </div>
-<div class="article">
-<div class="content-title">
-<a href="http://fritzm.github.io/vt52.html"><h1>PDP-11/45: VT52</h1></a>
+
+
+
+<div class='article'>
+    <div class="content-title">
+        <a href="/vt52.html"><h1>PDP-11/45: VT52</h1></a>
 Sun 03 January 2016
 
-by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
-</div>
-<div><p>Spend some time reviving a VT52 that I intend to use with the PDP-11.  This was a pretty nice eBay find.  There was some
+by <a class="url fn" href="/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+    </div>
+
+    <div><p>Spend some time reviving a VT52 that I intend to use with the PDP-11.  This was a pretty nice eBay find.  There was some
 oxidation and flakiness with the connectors to the chargen ROM daughter card (I remember this being typical
 of VT52s even back in the day).  A little more difficult to track down were some flaky solder joints around the clock
 chip.  But, everything else seems to be in pretty good shape and its working well now!  Here it is hooked up to a linux
 VM on my macbook, compiling some LSST code to generate some output as a test drive:</p>
-<p><a href="http://fritzm.github.io/images/pdp11/vt52.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/vt52.jpg"/></a></p>
+<p><a href="/images/pdp11/vt52.jpg"><img src='/thumbnails/pdp11/vt52_thumbnail_tall.jpg'/></a></p>
 <p>Man, seeing that funky font again, with its non-descending-descenders, is really great!  Surprisingly, it doesn't seem
 to be available in digital format anywhere, unlike the later VT100 fonts, etc.  Try as I might, I couldn't seem to find
 the chargen ROM listing in any of the DEC documentation archives, either.</p>
 <p>Well, I do have a Digilent FPGA eval card and some level conversion chips laying around, so as a holiday hack project
 I put together a quick ROM scanner in Verlog, interfaced it to the VT52 chargen on a breadboard, and scanned out the
 contents.  Here's a picture of the scanner in action, and the produced output:</p>
-<p><a href="http://fritzm.github.io/images/pdp11/rom-scanner.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/rom-scanner.jpg"/></a></p>
+<p><a href="/images/pdp11/rom-scanner.jpg"><img src='/thumbnails/pdp11/rom-scanner_thumbnail_tall.jpg'/></a></p>
 <p>The yellow-ish board on the right is the VT52 chargen.  The Verilog source for the scanner, the scanned data, and some
 preliminary attempts to convert the data to a few modern font formats are available on my github over at
 <a href="https://github.com/fritzm/vt52">https://github.com/fritzm/vt52</a>.  I need to learn some more about font formats to make some better font files; if I do
 I will update that repo.  Any help from fontophiles gladly accepted!</p></div>
-<hr/>
+    <hr />
 </div>
-<div class="article">
-<div class="content-title">
-<a href="http://fritzm.github.io/backplane-and-logic.html"><h1>PDP-11/45: CPU Backplane and logic</h1></a>
+
+
+
+<div class='article'>
+    <div class="content-title">
+        <a href="/backplane-and-logic.html"><h1>PDP-11/45: CPU Backplane and logic</h1></a>
 Fri 03 July 2015
 
-by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
-</div>
-<div><p>Mounted the CPU backplane, and slotted in the CPU and MMU logic cards.  The empty slots on the right are for the FPU -- I have those on hand but figure I'll wait to slot them until I've got the basic CPU up and running.</p>
+by <a class="url fn" href="/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+    </div>
+
+    <div><p>Mounted the CPU backplane, and slotted in the CPU and MMU logic cards.  The empty slots on the right are for the FPU -- I have those on hand but figure I'll wait to slot them until I've got the basic CPU up and running.</p>
 <p>One kind of interesting thing: the logic boards were stored vertically for several decades, and on some of the cards with plastic ribbon-cable connectors the plastic seems to have flaked and shed and fallen down the boards.  The flakey substance then grew some impressive crystals between some of the solder traces.  Scrubbed these out with some anhydrous IPA.</p>
 <p>A tip copied from a fellow restorer: Alconox detergent for removing grime from various plastic components.  Parts soaked overnight come out looking nearly new (here you can see the cleaned plastic card guides).</p>
 <p>Also pictured here are the characteristic bloody knuckles that are obtained whenever wrestling with PDP backplanes, logic cards, and terminators in close confines.  That really takes you back...</p>
-<p><a href="http://fritzm.github.io/images/pdp11/boards-in-chassis.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/boards-in-chassis.jpg"/></a>
-<a href="http://fritzm.github.io/images/pdp11/board-with-crystals.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/board-with-crystals.jpg"/></a>
-<a href="http://fritzm.github.io/images/pdp11/crystals.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/crystals.jpg"/></a>
-<a href="http://fritzm.github.io/images/pdp11/knuckles.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/knuckles.jpg"/></a></p></div>
-<hr/>
+<p><a href="/images/pdp11/boards-in-chassis.jpg"><img src='/thumbnails/pdp11/boards-in-chassis_thumbnail_tall.jpg'/></a>
+<a href="/images/pdp11/board-with-crystals.jpg"><img src='/thumbnails/pdp11/board-with-crystals_thumbnail_tall.jpg'/></a>
+<a href="/images/pdp11/crystals.jpg"><img src='/thumbnails/pdp11/crystals_thumbnail_tall.jpg'/></a>
+<a href="/images/pdp11/knuckles.jpg"><img src='/thumbnails/pdp11/knuckles_thumbnail_tall.jpg'/></a></p></div>
+    <hr />
 </div>
-<div class="article">
-<div class="content-title">
-<a href="http://fritzm.github.io/panel-and-742s.html"><h1>PDP-11/45: H742s and front panel</h1></a>
+
+
+
+<div class='article'>
+    <div class="content-title">
+        <a href="/panel-and-742s.html"><h1>PDP-11/45: H742s and front panel</h1></a>
 Sun 21 June 2015
 
-by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
-</div>
-<div><p>The H742 supplies are now back together, mounted in the cabinet, and wired through to the 861.  I've powered them up and run them for minutes at a time (without any DC regulator loads) and there have been no surprise detonations...</p>
+by <a class="url fn" href="/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+    </div>
+
+    <div><p>The H742 supplies are now back together, mounted in the cabinet, and wired through to the 861.  I've powered them up and run them for minutes at a time (without any DC regulator loads) and there have been no surprise detonations...</p>
 <p>The repainted cabinet side door has also been remounted.</p>
 <p>Spent some time on the front panel as well.  Removed the tubular lock and took a trip to the local locksmith to have a new key made up.  Replaced all the incandescent indicator lamps with the closest modern equivalent.  Panel is now remounted and it's starting to look like a real '11!</p>
-<p><a href="http://fritzm.github.io/images/pdp11/742s-mounted.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/742s-mounted.jpg"/></a>
-<a href="http://fritzm.github.io/images/pdp11/front-panel.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/front-panel.jpg"/></a></p></div>
-<hr/>
+<p><a href="/images/pdp11/742s-mounted.jpg"><img src='/thumbnails/pdp11/742s-mounted_thumbnail_tall.jpg'/></a>
+<a href="/images/pdp11/front-panel.jpg"><img src='/thumbnails/pdp11/front-panel_thumbnail_tall.jpg'/></a></p></div>
+    <hr />
 </div>
-<div class="article">
-<div class="content-title">
-<a href="http://fritzm.github.io/fans-and-h742s.html"><h1>PDP-11/45: AC power and cooling</h1></a>
+
+
+
+<div class='article'>
+    <div class="content-title">
+        <a href="/fans-and-h742s.html"><h1>PDP-11/45: AC power and cooling</h1></a>
 Sun 07 June 2015
 
-by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
-</div>
-<div><p>Spent a lot of time over a couple weekends cleaning and reconditioning all the muffin cooling fans for the CPU cabinet and power supplies.  As you can see in the photo below, there are a lot of these!  All reassembled now, and wired along with the back-of-cabinet power distribution board.  Also did a clean on the big box fan at the top of the rack, not seen here.</p>
+by <a class="url fn" href="/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+    </div>
+
+    <div><p>Spent a lot of time over a couple weekends cleaning and reconditioning all the muffin cooling fans for the CPU cabinet and power supplies.  As you can see in the photo below, there are a lot of these!  All reassembled now, and wired along with the back-of-cabinet power distribution board.  Also did a clean on the big box fan at the top of the rack, not seen here.</p>
 <p>I have also completely torn down the H742s to give them a thorough clean, touch up a few last corrosion spots, and replace the failing neon indicators.</p>
-<p><a href="http://fritzm.github.io/images/pdp11/chassis-with-fans.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/chassis-with-fans.jpg"/></a>
-<a href="http://fritzm.github.io/images/pdp11/742-rebuild.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/742-rebuild.jpg"/></a></p></div>
-<hr/>
+<p><a href="/images/pdp11/chassis-with-fans.jpg"><img src='/thumbnails/pdp11/chassis-with-fans_thumbnail_tall.jpg'/></a>
+<a href="/images/pdp11/742-rebuild.jpg"><img src='/thumbnails/pdp11/742-rebuild_thumbnail_tall.jpg'/></a></p></div>
+    <hr />
 </div>
-<div class="article">
-<div class="content-title">
-<a href="http://fritzm.github.io/power-controllers.html"><h1>PDP-11/45: H742 power control boards</h1></a>
+
+
+
+<div class='article'>
+    <div class="content-title">
+        <a href="/power-controllers.html"><h1>PDP-11/45: H742 power control boards</h1></a>
 Sat 23 May 2015
 
-by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+by <a class="url fn" href="/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+    </div>
+
+    <div><p>Found a little time to clean up and go through the power control boards for the H742 supplies.  They are looking pretty good.  Even the big electrolytics seem fine on first look.  These things were built with very high quality components, and they really seem to last and last.</p>
+<p><a href="/images/pdp11/pwr-ctrls.jpg"><img src='/thumbnails/pdp11/pwr-ctrls_thumbnail_tall.jpg'/></a></p></div>
+    <hr />
 </div>
-<div><p>Found a little time to clean up and go through the power control boards for the H742 supplies.  They are looking pretty good.  Even the big electrolytics seem fine on first look.  These things were built with very high quality components, and they really seem to last and last.</p>
-<p><a href="http://fritzm.github.io/images/pdp11/pwr-ctrls.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/pwr-ctrls.jpg"/></a></p></div>
-<hr/>
-</div>
-<div class="article">
-<div class="content-title">
-<a href="http://fritzm.github.io/corrosion.html"><h1>PDP-11/45: Teardown and corrosion remediation</h1></a>
+
+
+
+<div class='article'>
+    <div class="content-title">
+        <a href="/corrosion.html"><h1>PDP-11/45: Teardown and corrosion remediation</h1></a>
 Sat 11 April 2015
 
-by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
-</div>
-<div><p>Had a little more time to work on the PDP-11 this weekend.  Mostly going after some corrosion on the CPU cabinet and H742 power supplies.  Tore these down, sanded down the corroded bits, then hit with a satin finish Rustoleum rattle-can which dries to a reasonable approximation of the original powder-coat.</p>
+by <a class="url fn" href="/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+    </div>
+
+    <div><p>Had a little more time to work on the PDP-11 this weekend.  Mostly going after some corrosion on the CPU cabinet and H742 power supplies.  Tore these down, sanded down the corroded bits, then hit with a satin finish Rustoleum rattle-can which dries to a reasonable approximation of the original powder-coat.</p>
 <p>Neon indicators on the H742s are dim and flickery, so ordered some replacements for these, too.</p>
-<p><a href="http://fritzm.github.io/images/pdp11/h742-teardown.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/h742-teardown.jpg"/></a>
-<a href="http://fritzm.github.io/images/pdp11/h742-corrosion.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/h742-corrosion.jpg"/></a>
-<a href="http://fritzm.github.io/images/pdp11/cpu-cabinet.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/cpu-cabinet.jpg"/></a></p></div>
-<hr/>
+<p><a href="/images/pdp11/h742-teardown.jpg"><img src='/thumbnails/pdp11/h742-teardown_thumbnail_tall.jpg'/></a>
+<a href="/images/pdp11/h742-corrosion.jpg"><img src='/thumbnails/pdp11/h742-corrosion_thumbnail_tall.jpg'/></a>
+<a href="/images/pdp11/cpu-cabinet.jpg"><img src='/thumbnails/pdp11/cpu-cabinet_thumbnail_tall.jpg'/></a></p></div>
+    <hr />
 </div>
-<div class="article">
-<div class="content-title">
-<a href="http://fritzm.github.io/861.html"><h1>PDP-11/45: 861 AC power control</h1></a>
+
+
+
+<div class='article'>
+    <div class="content-title">
+        <a href="/861.html"><h1>PDP-11/45: 861 AC power control</h1></a>
 Sun 29 March 2015
 
-by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+by <a class="url fn" href="/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+    </div>
+
+    <div><p>Well, might as well start at the beginning with the AC power system, so here's the 861 power control.  In very good shape for some 40 year old kit!  The neon indicator lamps have gone, so I sourced the modern equivalent and put them on order.  Everything else is tight and clean:</p>
+<p><a href="/images/pdp11/861.jpg"><img src='/thumbnails/pdp11/861_thumbnail_tall.jpg'/></a></p></div>
+    <hr />
 </div>
-<div><p>Well, might as well start at the beginning with the AC power system, so here's the 861 power control.  In very good shape for some 40 year old kit!  The neon indicator lamps have gone, so I sourced the modern equivalent and put them on order.  Everything else is tight and clean:</p>
-<p><a href="http://fritzm.github.io/images/pdp11/861.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/861.jpg"/></a></p></div>
-<hr/>
-</div>
-<div class="article">
-<div class="content-title">
-<a href="http://fritzm.github.io/begin-again.html"><h1>PDP-11/45: Begin Again</h1></a>
+
+
+
+<div class='article'>
+    <div class="content-title">
+        <a href="/begin-again.html"><h1>PDP-11/45: Begin Again</h1></a>
 Sun 15 March 2015
 
-by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
-</div>
-<div><p>Back in the mid/late '80s, when I was hanging around CMU, a computer club member introduced me to the club's nearly forgotten hardware lab.  It was still stuffed with remnants of the earlier time-sharing age, including two or three full-cabinet PDP-11 systems with names like "Banshee" and "Centaur".  I thought these were the coolest -- CPUs you could see inside, and hack with a soldering iron and a wire wrap gun.  Real front panels with lights and toggles, and machine language programming as a physical activity.  For a kid fascinated with computers, it was great.  You couldn't get closer to the metal; you could quite literally get your head inside these machines.</p>
+by <a class="url fn" href="/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+    </div>
+
+    <div><p>Back in the mid/late '80s, when I was hanging around CMU, a computer club member introduced me to the club's nearly forgotten hardware lab.  It was still stuffed with remnants of the earlier time-sharing age, including two or three full-cabinet PDP-11 systems with names like "Banshee" and "Centaur".  I thought these were the coolest -- CPUs you could see inside, and hack with a soldering iron and a wire wrap gun.  Real front panels with lights and toggles, and machine language programming as a physical activity.  For a kid fascinated with computers, it was great.  You couldn't get closer to the metal; you could quite literally get your head inside these machines.</p>
 <p>I began spending off hours in the lab, puttering with the 11s and getting to know them.  Eventually, the club decided it was time to clean house and remove all of the older equipment.  Most stuff was scheduled to be hauled away to the dump, but I was welcome to anything I wanted to haul away myself in advance.  So I bothered some friends with a car, disassembled one of the 11/45s there ("Banshee" I believe) which seemed like the nicest thing, and hauled it off to my off-campus house.  There it resided in the basement with many other oddments for some years.</p>
 <p>Eventually, I ended up moving out to CA, and after some time the 11/45 CPU was disassembled and packed into moving boxes for the west coast as practically as possible, leaving all the bulkier parts behind.</p>
 <p>After a couple of years in CA, I happened on a decomissioned two-rack 11/40 system at Stanford, essentially free for the effort of hauling.  This had most of the missing cabinetry, power supplies, and peripherals needed to reconstruct the 11/45!  So I procurred this and added it to a growing west coast equipment stash.  And then real-life set in -- job changes, house moves, raising a kid...  Through all of that I held on to all the parts, vowing to "get to it someday".  I would pick through the stuff from time to time over the years, but never had the time to take the project very far.</p>
 <p>Well, now "someday" is here!  The kid is off to college and I've moved house once again, but this time I reserved some working space for the project and pulled all the parts so they are together and accessible.  So here we go...</p>
 <p>Here are a some pics from the first weekend: the two H960 racks that are the bones of the whole thing, some glamour shots of the processor backplane and the RK11-C disk controller, and my buddy Chris helping to remount the RK05 drives on their rails temporarily to keep them off the floor and out of harm's way:</p>
-<p><a href="http://fritzm.github.io/images/pdp11/racks.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/racks.jpg"/></a>
-<a href="http://fritzm.github.io/images/pdp11/kb11a-backplane.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/kb11a-backplane.jpg"/></a>
-<a href="http://fritzm.github.io/images/pdp11/rk11c.jpg"><img class="image-process-thumb" src="/images/pdp11/derivatives/thumb/rk11c.jpg"/></a>
-<a href="http://fritzm.github.io/images/pdp11/rk05-help.png"><img src="/images/pdp11/rk05-help.png"/></a></p></div>
-<hr/>
+<p><a href="/images/pdp11/racks.jpg"><img src='/thumbnails/pdp11/racks_thumbnail_tall.jpg'/></a>
+<a href="/images/pdp11/kb11a-backplane.jpg"><img src='/thumbnails/pdp11/kb11a-backplane_thumbnail_tall.jpg'/></a>
+<a href="/images/pdp11/rk11c.jpg"><img src='/thumbnails/pdp11/rk11c_thumbnail_tall.jpg'/></a>
+<a href="/images/pdp11/rk05-help.png"><img src='/thumbnails/pdp11/rk05-help_thumbnail_tall.png'/></a></p></div>
+    <hr />
 </div>
+
 <div class="pagination">
 <ul>
-<li class="prev"><a href="http://fritzm.github.io/tag/pdp-11.html">← Previous</a></li>
-<li class=""><a href="http://fritzm.github.io/tag/pdp-11.html">1</a></li>
-<li class="active"><a href="http://fritzm.github.io/tag/pdp-112.html">2</a></li>
-<li class="next disabled"><a href="#">→ Next</a></li>
+    <li class="prev"><a href="/tag/pdp-11.html">&larr; Previous</a></li>
+
+    <li class=""><a href="/tag/pdp-11.html">1</a></li>
+    <li class="active"><a href="/tag/pdp-112.html">2</a></li>
+
+    <li class="next disabled"><a href="#">&rarr; Next</a></li>
+
 </ul>
 </div>
-</div>
-<div class="span3">
-<div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
-<ul class="nav nav-list">
-<li class="nav-header"> 
+  
+        </div>
+        
+        <div class="span3">
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
                 Site
                 </li>
-<li><a href="http://fritzm.github.io/">Archives</a>
-<li><a href="http://fritzm.github.io/tags.html">Tags</a>
-<li><a href="http://fritzm.github.io/feeds/all.atom.xml" rel="alternate">Atom feed</a></li>
-</li></li></ul>
-</div>
-<div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
-<ul class="nav nav-list">
-<li class="nav-header"> 
+            
+                <li><a href="/">Archives</a>
+                <li><a href="/tags.html">Tags</a>
+
+
+
+
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
                 Categories
                 </li>
-<li><a href="http://fritzm.github.io/category/math.html">Math</a></li>
-<li><a href="http://fritzm.github.io/category/pdp-11.html">PDP-11</a></li>
-<li><a href="http://fritzm.github.io/category/programming.html">Programming</a></li>
-</ul>
-</div>
-<div class="social">
-<div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
-<ul class="nav nav-list">
-<li class="nav-header"> 
+                
+                <li><a href="/category/math.html">Math</a></li>
+                <li><a href="/category/pdp-11.html">PDP-11</a></li>
+                <li><a href="/category/programming.html">Programming</a></li>
+                   
+            </ul>
+            </div>
+
+
+
+
+            <div class="social">
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
                 Social
                 </li>
-<li><a href="http://facebook.com/fritzmueller">facebook</a></li>
-<li><a href="http://twitter.com/infrafritz">twitter</a></li>
-<li><a href="http://instagram.com/infrafritz">Instagram</a></li>
-<li><a href="http://www.linkedin.com/pub/fritz-mueller/a/679/62/">LinkedIn</a></li>
-<li><a href="http://jsfiddle.net/user/fritzm/fiddles/">JSFiddle</a></li>
-<li><a href="https://github.com/fritzm">GitHub</a></li>
-</ul>
-</div>
-</div>
-</div>
-</div> </div>
+           
+                <li><a href="http://facebook.com/fritzmueller">facebook</a></li>
+                <li><a href="http://twitter.com/infrafritz">twitter</a></li>
+                <li><a href="http://instagram.com/infrafritz">Instagram</a></li>
+                <li><a href="http://www.linkedin.com/pub/fritz-mueller/a/679/62/">LinkedIn</a></li>
+                <li><a href="http://jsfiddle.net/user/fritzm/fiddles/">JSFiddle</a></li>
+                <li><a href="https://github.com/fritzm">GitHub</a></li>
+            </ul>
+            </div>
+            </div>
+
+        </div>  
+    </div>     </div> 
 <footer>
-<br/>
-<p><a href="http://fritzm.github.io">fritzm.github.io</a> © Fritz Mueller 2012</p>
+<br />
+<p><a href="">fritzm.github.io</a> &copy; Fritz Mueller 2012</p>
 </footer>
+
 </div> <!-- /container -->
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-collapse.js"></script>
+ 
 </body>
 </html>
