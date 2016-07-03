@@ -1,5 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>fritzm.github.io</title><link href="http://fritzm.github.io/" rel="alternate"></link><link href="http://fritzm.github.io/feeds/pdp-11.atom.xml" rel="self"></link><id>http://fritzm.github.io/</id><updated>2016-06-26T00:00:00-07:00</updated><entry><title>PDP-11/45: Serial console and backplane SPC slots</title><link href="http://fritzm.github.io/serial-console.html" rel="alternate"></link><published>2016-06-26T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-06-26:serial-console.html</id><summary type="html">&lt;p&gt;Hit a snag on the way to getting PDP11GUI hooked up: while the M9301 console emulator was working fine with the VT52,
+<feed xmlns="http://www.w3.org/2005/Atom"><title>fritzm.github.io</title><link href="http://fritzm.github.io/" rel="alternate"></link><link href="http://fritzm.github.io/feeds/pdp-11.atom.xml" rel="self"></link><id>http://fritzm.github.io/</id><updated>2016-07-03T00:00:00-07:00</updated><entry><title>PDP-11/45: Diagnostics with PDP11GUI</title><link href="http://fritzm.github.io/diagnostics.html" rel="alternate"></link><published>2016-07-03T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-07-03:diagnostics.html</id><summary type="html">&lt;p&gt;Okay, now that serial is straightened out, on to running diagnostic tests via PDP11GUI.  PDP11GUI itself, as well as
+a thorough and useful database of DEC diagnostic programs, are available at &lt;a href="http://www.retrocmp.com/tools"&gt;http://www.retrocmp.com/tools&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Since my home computer is a MacBook, I had intended to run PDP11GUI under Wine.  I ran into a problem with this where
+PDP11GUI under Wine could not generate its pre-processed machine description temp file, seemingly because of some
+incompatible behavior wrt. multiple backslashes in pathnames.  Rather than fight with this too long, I just sprang for
+a Windows 10 license and installed a Windows 10 VM; it will come in handy for other Windows-only tools that have
+been tweaky to use under Wine as well.&lt;/p&gt;
+&lt;p&gt;With PDP11GUI up and running under Windows, results of the initial set of 11/45 CPU diagnostics were very encouraging!
+In summary:&lt;/p&gt;
+&lt;style&gt;
+.diaglist { display: inline; border-collapse: collapse; margin-right: 1em; }
+.diaglist caption { font-weight: bold; }
+.diaglist tr:nth-child(even) { background-color: #f2f2f2; }
+.diaglist th, .diaglist td { padding: 5px; }
+.diaglist td { border: 1px solid lightgray; font-family: "Courier", monospace; }
+&lt;/style&gt;
+
+&lt;table class="diaglist"&gt;
+&lt;thead&gt;
+&lt;tr&gt;&lt;th&gt;Diagnostic&lt;/th&gt;&lt;th&gt;BEL&lt;/th&gt;&lt;th&gt;Description&lt;/th&gt;&lt;th&gt;Status&lt;/th&gt;&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;CKBAB0.BIC&lt;/td&gt;&lt;td&gt;002562&lt;/td&gt;&lt;td&gt;SXT instruction&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;CKBBB0.BIC&lt;/td&gt;&lt;td&gt;003604&lt;/td&gt;&lt;td&gt;SOB instruction&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;CKBCB0.BIC&lt;/td&gt;&lt;td&gt;007410&lt;/td&gt;&lt;td&gt;XOR instruction&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;CKBDC0.BIC&lt;/td&gt;&lt;td&gt;007262&lt;/td&gt;&lt;td&gt;MARK instruction&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;CKBEC0.BIC&lt;/td&gt;&lt;td&gt;002212&lt;/td&gt;&lt;td&gt;RTI/RTT instructions&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;CKBFD0.BIC&lt;/td&gt;&lt;td&gt;002272&lt;/td&gt;&lt;td&gt;stack limit&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;CKBGB0.BIC&lt;/td&gt;&lt;td&gt;001446&lt;/td&gt;&lt;td&gt;SPL instruction&lt;/td&gt;&lt;td&gt;halt 001404&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;CKBHB0.BIC&lt;/td&gt;&lt;td&gt;003762&lt;/td&gt;&lt;td&gt;11/45 registers&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;CKBIB0.BIC&lt;/td&gt;&lt;td&gt;013746&lt;/td&gt;&lt;td&gt;ASH instruction&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;CKBJA0.BIC&lt;/td&gt;&lt;td&gt;014722&lt;/td&gt;&lt;td&gt;ASHC instruction&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;CKBKA0.BIC&lt;/td&gt;&lt;td&gt;014430&lt;/td&gt;&lt;td&gt;MUL instruction&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;CKBLA0.BIC&lt;/td&gt;&lt;td&gt;011574&lt;/td&gt;&lt;td&gt;DIV instruction&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;CKBME0.BIC&lt;/td&gt;&lt;td&gt;016000&lt;/td&gt;&lt;td&gt;11/45 traps&lt;/td&gt;&lt;td&gt;halt 005320&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;CKBNC0.BIC&lt;/td&gt;&lt;td&gt;004702&lt;/td&gt;&lt;td&gt;PIRQ instruction&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;CKBOA0.BIC&lt;/td&gt;&lt;td&gt;013640&lt;/td&gt;&lt;td&gt;11/45 states&lt;/td&gt;&lt;td&gt;halt 000610&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;Note that these tests are written to output an ASCII BEL to the console on each successful pass.  The terminal
+built in to PDP11GUI doesn't sound when given a BEL, however, so it is convenient to patch the BEL literal in the
+programs to a visible character (e.g. 000052, ASCII '*') before running them.  This may be done in the memory loader
+window in PDP11GUI after "Load" but before "Deposit all".  The patch address I identified for each diagnostic is
+listed in the table above as well for convenience.&lt;/p&gt;
+&lt;p&gt;So, out of this initial set of tests, only three halts to investigate.  I'll be posting more information here as I look
+further into these.&lt;/p&gt;
+&lt;p&gt;Regarding the backplane SPC issue discussed in the previous post: Marty from the vcfed.org forum did some investigation
+of his 11/45, and reports that he does have +15V (actually +12V on his system) distributed to pin CU1 on slots
+26-28.  It seems to be wired over from slot 15 on his system, but it is not clear whether this was a factory wire,
+an ECO, or a user mod.&lt;/p&gt;
+&lt;p&gt;Marty's 11/45 also has no power distributed to CA1 on this slots, so it's really looking to me like the reference
+to that on page 510 of the 11/45 maintenance manual is a misprint.  Thanks to Marty for checking all this out!  I'd be
+curious to hear from any other 11/45 owners out there regarding wiring of CU1 and CA1 on slots 26-28 in their systems.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://fritzm.github.io/images/pdp11/pdp11gui.jpg"&gt;&lt;img src='/images/pdp11/pdp11gui_thumbnail_tall.jpg'/&gt;&lt;/a&gt;&lt;/p&gt;</summary><category term="Retro-Computing"></category><category term="PDP-11"></category></entry><entry><title>PDP-11/45: Serial console and backplane SPC slots</title><link href="http://fritzm.github.io/serial-console.html" rel="alternate"></link><published>2016-06-26T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-06-26:serial-console.html</id><summary type="html">&lt;p&gt;Hit a snag on the way to getting PDP11GUI hooked up: while the M9301 console emulator was working fine with the VT52,
 I could not get serial communication to my laptop (MacBook Pro + Keyspan USA-19HS USB serial) to work as expected.  Some
 detective work showed that the voltages from the EIA output drivers on the DL11 were way out of whack (+3V for mark,
 which should have been a negative voltage).  Somehow the VT52 was able to still make sense out of this signaling,
@@ -102,7 +156,7 @@ console access to physical addresses in banks 1 through 7 by appropriate setting
 .memlist caption { font-weight: bold; }
 .memlist tr:nth-child(even) { background-color: #f2f2f2; }
 .memlist th, .memlist td { padding: 5px; }
-.memlist td { border: 1px solid lightgray; font-family: "Courier" monospace; }
+.memlist td { border: 1px solid lightgray; font-family: "Courier", monospace; }
 &lt;/style&gt;
 
 &lt;table class="memlist"&gt;

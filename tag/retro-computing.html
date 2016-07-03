@@ -56,6 +56,77 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="http://fritzm.github.io/diagnostics.html"><h1>PDP-11/45: Diagnostics with PDP11GUI</h1></a>
+Sun 03 July 2016
+
+by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+    </div>
+
+    <div><p>Okay, now that serial is straightened out, on to running diagnostic tests via PDP11GUI.  PDP11GUI itself, as well as
+a thorough and useful database of DEC diagnostic programs, are available at <a href="http://www.retrocmp.com/tools">http://www.retrocmp.com/tools</a>.</p>
+<p>Since my home computer is a MacBook, I had intended to run PDP11GUI under Wine.  I ran into a problem with this where
+PDP11GUI under Wine could not generate its pre-processed machine description temp file, seemingly because of some
+incompatible behavior wrt. multiple backslashes in pathnames.  Rather than fight with this too long, I just sprang for
+a Windows 10 license and installed a Windows 10 VM; it will come in handy for other Windows-only tools that have
+been tweaky to use under Wine as well.</p>
+<p>With PDP11GUI up and running under Windows, results of the initial set of 11/45 CPU diagnostics were very encouraging!
+In summary:</p>
+<style>
+.diaglist { display: inline; border-collapse: collapse; margin-right: 1em; }
+.diaglist caption { font-weight: bold; }
+.diaglist tr:nth-child(even) { background-color: #f2f2f2; }
+.diaglist th, .diaglist td { padding: 5px; }
+.diaglist td { border: 1px solid lightgray; font-family: "Courier", monospace; }
+</style>
+
+<table class="diaglist">
+<thead>
+<tr><th>Diagnostic</th><th>BEL</th><th>Description</th><th>Status</th></tr>
+</thead>
+<tbody>
+<tr><td>CKBAB0.BIC</td><td>002562</td><td>SXT instruction</td><td>pass</td></tr>
+<tr><td>CKBBB0.BIC</td><td>003604</td><td>SOB instruction</td><td>pass</td></tr>
+<tr><td>CKBCB0.BIC</td><td>007410</td><td>XOR instruction</td><td>pass</td></tr>
+<tr><td>CKBDC0.BIC</td><td>007262</td><td>MARK instruction</td><td>pass</td></tr>
+<tr><td>CKBEC0.BIC</td><td>002212</td><td>RTI/RTT instructions</td><td>pass</td></tr>
+<tr><td>CKBFD0.BIC</td><td>002272</td><td>stack limit</td><td>pass</td></tr>
+<tr><td>CKBGB0.BIC</td><td>001446</td><td>SPL instruction</td><td>halt 001404</td></tr>
+<tr><td>CKBHB0.BIC</td><td>003762</td><td>11/45 registers</td><td>pass</td></tr>
+<tr><td>CKBIB0.BIC</td><td>013746</td><td>ASH instruction</td><td>pass</td></tr>
+<tr><td>CKBJA0.BIC</td><td>014722</td><td>ASHC instruction</td><td>pass</td></tr>
+<tr><td>CKBKA0.BIC</td><td>014430</td><td>MUL instruction</td><td>pass</td></tr>
+<tr><td>CKBLA0.BIC</td><td>011574</td><td>DIV instruction</td><td>pass</td></tr>
+<tr><td>CKBME0.BIC</td><td>016000</td><td>11/45 traps</td><td>halt 005320</td></tr>
+<tr><td>CKBNC0.BIC</td><td>004702</td><td>PIRQ instruction</td><td>pass</td></tr>
+<tr><td>CKBOA0.BIC</td><td>013640</td><td>11/45 states</td><td>halt 000610</td></tr>
+</tbody>
+</table>
+
+<p>Note that these tests are written to output an ASCII BEL to the console on each successful pass.  The terminal
+built in to PDP11GUI doesn't sound when given a BEL, however, so it is convenient to patch the BEL literal in the
+programs to a visible character (e.g. 000052, ASCII '*') before running them.  This may be done in the memory loader
+window in PDP11GUI after "Load" but before "Deposit all".  The patch address I identified for each diagnostic is
+listed in the table above as well for convenience.</p>
+<p>So, out of this initial set of tests, only three halts to investigate.  I'll be posting more information here as I look
+further into these.</p>
+<p>Regarding the backplane SPC issue discussed in the previous post: Marty from the vcfed.org forum did some investigation
+of his 11/45, and reports that he does have +15V (actually +12V on his system) distributed to pin CU1 on slots
+26-28.  It seems to be wired over from slot 15 on his system, but it is not clear whether this was a factory wire,
+an ECO, or a user mod.</p>
+<p>Marty's 11/45 also has no power distributed to CA1 on this slots, so it's really looking to me like the reference
+to that on page 510 of the 11/45 maintenance manual is a misprint.  Thanks to Marty for checking all this out!  I'd be
+curious to hear from any other 11/45 owners out there regarding wiring of CU1 and CA1 on slots 26-28 in their systems.</p>
+<p><a href="http://fritzm.github.io/images/pdp11/pdp11gui.jpg"><img src='/images/pdp11/pdp11gui_thumbnail_tall.jpg'/></a></p></div>
+    <hr />
+</div>
+
+
+
+<div class='article'>
+    <div class="content-title">
         <a href="http://fritzm.github.io/serial-console.html"><h1>PDP-11/45: Serial console and backplane SPC slots</h1></a>
 Sun 26 June 2016
 
@@ -219,7 +290,7 @@ console access to physical addresses in banks 1 through 7 by appropriate setting
 .memlist caption { font-weight: bold; }
 .memlist tr:nth-child(even) { background-color: #f2f2f2; }
 .memlist th, .memlist td { padding: 5px; }
-.memlist td { border: 1px solid lightgray; font-family: "Courier" monospace; }
+.memlist td { border: 1px solid lightgray; font-family: "Courier", monospace; }
 </style>
 
 <table class="memlist">
@@ -430,41 +501,13 @@ and populating it...</p>
     <hr />
 </div>
 
-
-
-<div class='article'>
-    <div class="content-title">
-        <a href="http://fritzm.github.io/power-harness-2.html"><h1>PDP-11/45: Power Harness, continued</h1></a>
-Sat 23 April 2016
-
-by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
-    </div>
-
-    <div><p>Moved the power modules and partial harness back over to the racks today, got everything remounted, finished and
-dressed the backplane terminations, and completed the inter-H742 connections.</p>
-<p>I did not do the runs for the backplane memory to the lower H742, as I do not have any backplane memory.  I probably
-won't ever have any, either: these memory options are specialized to the 11/45, are quite rare, and only cover part of
-the available address space.  Additionally, they would require me to track down the details of a backplane ECO to do
-the corresponding parts of the harness correctly.  The core and MOS memory that I do actually have are all system-unit
-options anyway.</p>
-<p>Here are some pics of the in-rack wiring in progress, and a couple views of the finished harness.  If you add up
-the capacity of the DC modules, you'll see that an 11/45 like mine (with floating point) is provisioned with +5V at 100
-[sic] amps, and -15V at 20 amps.  That's no joke of a power supply...</p>
-<p><a href="http://fritzm.github.io/images/pdp11/harness-progress.jpg"><img src='/images/pdp11/harness-progress_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/harness-complete.jpg"><img src='/images/pdp11/harness-complete_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/power-supplies.jpg"><img src='/images/pdp11/power-supplies_thumbnail_tall.jpg'/></a></p></div>
-    <hr />
-</div>
-
 <div class="pagination">
 <ul>
     <li class="prev disabled"><a href="#">&larr; Previous</a></li>
 
     <li class="active"><a href="http://fritzm.github.io/tag/retro-computing.html">1</a></li>
     <li class=""><a href="http://fritzm.github.io/tag/retro-computing2.html">2</a></li>
+    <li class=""><a href="http://fritzm.github.io/tag/retro-computing3.html">3</a></li>
 
     <li class="next"><a href="http://fritzm.github.io/tag/retro-computing2.html">Next &rarr;</a></li>
 
