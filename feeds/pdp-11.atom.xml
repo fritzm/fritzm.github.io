@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>fritzm.github.io</title><link href="http://fritzm.github.io/" rel="alternate"></link><link href="http://fritzm.github.io/feeds/pdp-11.atom.xml" rel="self"></link><id>http://fritzm.github.io/</id><updated>2016-07-02T00:00:00-07:00</updated><entry><title>PDP-11/45: Serial console and backplane SPC slots</title><link href="http://fritzm.github.io/serial-console.html" rel="alternate"></link><published>2016-07-02T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-07-02:serial-console.html</id><summary type="html">&lt;p&gt;Hit a snag on the way to getting PDP11GUI hooked up: while the M9301 console emulator was working fine with the VT52,
+<feed xmlns="http://www.w3.org/2005/Atom"><title>fritzm.github.io</title><link href="http://fritzm.github.io/" rel="alternate"></link><link href="http://fritzm.github.io/feeds/pdp-11.atom.xml" rel="self"></link><id>http://fritzm.github.io/</id><updated>2016-06-26T00:00:00-07:00</updated><entry><title>PDP-11/45: Serial console and backplane SPC slots</title><link href="http://fritzm.github.io/serial-console.html" rel="alternate"></link><published>2016-06-26T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-06-26:serial-console.html</id><summary type="html">&lt;p&gt;Hit a snag on the way to getting PDP11GUI hooked up: while the M9301 console emulator was working fine with the VT52,
 I could not get serial communication to my laptop (MacBook Pro + Keyspan USA-19HS USB serial) to work as expected.  Some
 detective work showed that the voltages from the EIA output drivers on the DL11 were way out of whack (+3V for mark,
 which should have been a negative voltage).  Somehow the VT52 was able to still make sense out of this signaling,
@@ -17,15 +17,15 @@ anywhere out there.&lt;/p&gt;
 &lt;p&gt;One other curiosity of these SPC slots that came up while investigating this: the power distribution table in
 the 11/45 maintenance manual, EK-11045-MM-007, page 510, implies that +15V should be distributed to the SPC slots on
 CA1.  This is suspicious to me (maybe a typo?) because all other SPC pinouts that I have seen use this pin and CB1
-as NPR/NPG.  And in checking my backplane, there is no power distribution to those pins.  But slots 27 and 28 (Unibus B)
-do have their CA1s bridged to to one another, and their CB1s bridged to one another, with what look like factory
-installed wire wraps.  This also seems unusual for NPR/NPG.  So, some mysteries about these slots...&lt;/p&gt;
+as NPR in/out.  And in checking my backplane, there is no power distribution to those pins.  But slots 27 and 28
+(Unibus B) do have their CA1 pins bridged to one another, and their CB1 pins bridged to one another, with what look like
+factory installed wire wraps.  This also seems unusual for NPR/NPG.  So, some mysteries remain about these slots...&lt;/p&gt;
 &lt;p&gt;In other news, the clock oscillator on the VT52 has given out, so that's down now until I can find a replacement.  They
-are out of production now and aren't easy to track down, but I have a couple leads.&lt;/p&gt;
-&lt;p&gt;Also, I pulled the suspected failed subsidiary ALU control ROM, tested it in isolation, and verified that it was indeed
-failed.  This card is just a spare for me, but I'd like to go ahead and repair it since the fault was isolated.  With
+are out of production and aren't easy to track down, but I do have one lead to follow so far.&lt;/p&gt;
+&lt;p&gt;Also, I pulled the suspected failed subsidiary ALU control ROM, tested it in isolation, and verified that it had indeed
+failed.  This card is just a spare for me, but I'd like to go ahead and repair it since the fault is isolated.  With
 some help from the classiccmp mailing list (thanks guys!) I have a recommendation for some vintage PROM programmers to
-stalk on eBay and some compatible parts that would allow me to blow a replacement part and make the repair.&lt;/p&gt;</summary><category term="Retro-Computing"></category><category term="PDP-11"></category></entry><entry><title>PDP-11/45: Running the M9301 console emulator</title><link href="http://fritzm.github.io/m9301-running.html" rel="alternate"></link><published>2016-06-23T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-06-23:m9301-running.html</id><summary type="html">&lt;p&gt;Replacement DRAMs showed up.  Pulled and replaced the two faulty ones on the MS11.  Pic below -- you can see the
+stalk on eBay, and some compatible parts, that would allow me to blow a replacement and make the repair.&lt;/p&gt;</summary><category term="Retro-Computing"></category><category term="PDP-11"></category></entry><entry><title>PDP-11/45: Running the M9301 console emulator</title><link href="http://fritzm.github.io/m9301-running.html" rel="alternate"></link><published>2016-06-23T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-06-23:m9301-running.html</id><summary type="html">&lt;p&gt;Replacement DRAMs showed up.  Pulled and replaced the two faulty ones on the MS11.  Pic below -- you can see the
 replacements are socketed, and are the TI parts instead of the original ITT.  Full address space is working now!  Now
 that bank 0 is repaired, trap vectors can conceivably work.&lt;/p&gt;
 &lt;p&gt;Jumpered and configured a DL11-E serial card for use as console, slotted in an M9301-YB bootstrap terminator, connected
@@ -64,7 +64,28 @@ have been debugging.&lt;/p&gt;
                     frameborder='0' webkitAllowFullScreen mozallowfullscreen
                     allowFullScreen&gt;
                 &lt;/iframe&gt;
-            &lt;/div&gt;&lt;/p&gt;</summary><category term="Retro-Computing"></category><category term="PDP-11"></category></entry><entry><title>PDP-11/45: MS11-L debug</title><link href="http://fritzm.github.io/ms11-debug.html" rel="alternate"></link><published>2016-06-18T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-06-18:ms11-debug.html</id><summary type="html">&lt;p&gt;After addressing the -15V problem on the MS11, most of the bad behaviors seem to have cleared up except a stuck (on)
+            &lt;/div&gt;&lt;/p&gt;
+&lt;p&gt;Some notes on the program and video above since I've received some questions:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;The listing here is shown assembled at location 000000, but the program is relocatable and can be toggled in at any
+convenient address (000000, on top of the trap vectors, probably isn't the best choice!)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Data display should be on "DISPLAY REGISTER" to see the chase.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;The front panel toggles are loaded into a counter to control the speed of the chase.  Without some of the most
+significant bits set the chase may go too fast to see, especially on older 11's with incandescent indicators.  All
+toggles off is a special case: this will be the slowest chase, since as written the counter wraps around when
+decremented before being checked for zero.  The video has toggles 15 and 14 up.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;If you look at the address lights in the video, you can see that I ran this program from address 100000.  This was
+because at the time I had a fault in the first 16KW of memory on my MS11-L so I couldn't execute any code at lower
+addresses.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;</summary><category term="Retro-Computing"></category><category term="PDP-11"></category></entry><entry><title>PDP-11/45: MS11-L debug</title><link href="http://fritzm.github.io/ms11-debug.html" rel="alternate"></link><published>2016-06-18T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-06-18:ms11-debug.html</id><summary type="html">&lt;p&gt;After addressing the -15V problem on the MS11, most of the bad behaviors seem to have cleared up except a stuck (on)
 bit 6 in the first 16K words of address space (000000-077776).  Hooked up the new logic analyzer, and it has been very
 useful in troubleshooting the board -- can easily capture and inspect the timing of complete memory cycles.  Definitely
 worth the investment!&lt;/p&gt;
