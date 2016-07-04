@@ -51,7 +51,7 @@ of his 11/45, and reports that he does have +15V (actually +12V on his system) d
 26-28.  It seems to be wired over from slot 15 on his system, but it is not clear whether this was a factory wire,
 an ECO, or a user mod.&lt;/p&gt;
 &lt;p&gt;Marty's 11/45 also has no power distributed to CA1 on this slots, so it's really looking to me like the reference
-to that on page 510 of the 11/45 maintenance manual is a misprint.  Thanks to Marty for checking all this out!  I'd be
+to that on page 5-10 of the 11/45 maintenance manual is a misprint.  Thanks to Marty for checking all this out!  I'd be
 curious to hear from any other 11/45 owners out there regarding wiring of CU1 and CA1 on slots 26-28 in their systems.&lt;/p&gt;
 &lt;p&gt;&lt;a href="http://fritzm.github.io/images/pdp11/pdp11gui.jpg"&gt;&lt;img src='/images/pdp11/pdp11gui_thumbnail_tall.jpg'/&gt;&lt;/a&gt;&lt;/p&gt;</summary><category term="Retro-Computing"></category><category term="PDP-11"></category></entry><entry><title>PDP-11/45: Serial console and backplane SPC slots</title><link href="http://fritzm.github.io/serial-console.html" rel="alternate"></link><published>2016-06-26T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-06-26:serial-console.html</id><summary type="html">&lt;p&gt;Hit a snag on the way to getting PDP11GUI hooked up: while the M9301 console emulator was working fine with the VT52,
 I could not get serial communication to my laptop (MacBook Pro + Keyspan USA-19HS USB serial) to work as expected.  Some
@@ -69,7 +69,7 @@ perhaps added to these slots in subsequent revisions or via an ECO?  I'd like to
 later revision 11/45 backplanes, and/or a comprehensive list of KB11-A ECOs, but so far haven't seen traces of either
 anywhere out there.&lt;/p&gt;
 &lt;p&gt;One other curiosity of these SPC slots that came up while investigating this: the power distribution table in
-the 11/45 maintenance manual, EK-11045-MM-007, page 510, implies that +15V should be distributed to the SPC slots on
+the 11/45 maintenance manual, EK-11045-MM-007, page 5-10, implies that +15V should be distributed to the SPC slots on
 CA1.  This is suspicious to me (maybe a typo?) because all other SPC pinouts that I have seen use this pin and CB1
 as NPR in/out.  And in checking my backplane, there is no power distribution to those pins.  But slots 27 and 28
 (Unibus B) do have their CA1 pins bridged to one another, and their CB1 pins bridged to one another, with what look like
