@@ -52,10 +52,47 @@
     <div class="row">
 
         <div class="span9">
-    <h1>Authors on fritzm.github.io</h1>
+    <div class='article'>
+        <div class="content-title">
+            <h1>PDP-11/45: Diagnostics II</h1>
+Mon 04 July 2016
 
-    <ul>        <li><a href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a> (24)</li>
-    </ul>
+by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+        </div>
+	
+        <div><p>Investigated some of the halted diagnostics a bit today.  CKBGB0 (SPL instruction test) was halting at 001404.
+Looking at the sources, the diagnostic was waiting at this point for a transmit interrupt from the DL11 that didn't
+seem to be arriving. Some troubleshooting turned up that the vector address on my DL11 was jumpered incorrectly.  Fixed this, and the diagnostic now passes.</p>
+<p>CKBME0 (11/45 traps test) is a bit more complicated.  The halt address of 005320 here indicates that the floating
+point coprocessor is detected but not trapping per design.  Pulled the floating point cards for now; the diagnostic
+now runs through several passes successfully, but regularly hangs up at 013640.  Hitting the halt
+switch when it is hung up displays 000342 in the address lights, then with a couple continues it will start up again,
+run a bunch more passes, but sooner or later hang up at 013640 again with the same behavior.  This behavior is a
+little more difficult to decode because the diagnostic itself is more complicated, and also the binary available from
+classicmp is a later revision than the available source code so the addresses don't quite match up.  So I'll need to
+spend a little more time reading the diagnostic sources and examining the disassembly in PDP11GUI to make sense of this
+one.  And it looks like there will be some downstream work to debug the floating point unit as well; I haven't studied
+its design yet at all.</p></div>
+	
+        <hr>
+
+        <h2>Comments</h2>
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'fritzm'; 
+    var disqus_title = 'PDP-11/45: Diagnostics II';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
         </div>
 
         <div class="span3">

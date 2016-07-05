@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>fritzm.github.io</title><link href="http://fritzm.github.io/" rel="alternate"></link><link href="http://fritzm.github.io/feeds/all.atom.xml" rel="self"></link><id>http://fritzm.github.io/</id><updated>2016-07-03T00:00:00-07:00</updated><entry><title>PDP-11/45: Diagnostics with PDP11GUI</title><link href="http://fritzm.github.io/diagnostics.html" rel="alternate"></link><published>2016-07-03T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-07-03:diagnostics.html</id><summary type="html">&lt;p&gt;Okay, now that serial is straightened out, on to running diagnostic tests via PDP11GUI.  PDP11GUI itself, as well as
+<feed xmlns="http://www.w3.org/2005/Atom"><title>fritzm.github.io</title><link href="http://fritzm.github.io/" rel="alternate"></link><link href="http://fritzm.github.io/feeds/all.atom.xml" rel="self"></link><id>http://fritzm.github.io/</id><updated>2016-07-04T00:00:00-07:00</updated><entry><title>PDP-11/45: Diagnostics II</title><link href="http://fritzm.github.io/diagnostics-2.html" rel="alternate"></link><published>2016-07-04T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-07-04:diagnostics-2.html</id><summary type="html">&lt;p&gt;Investigated some of the halted diagnostics a bit today.  CKBGB0 (SPL instruction test) was halting at 001404.
+Looking at the sources, the diagnostic was waiting at this point for a transmit interrupt from the DL11 that didn't
+seem to be arriving. Some troubleshooting turned up that the vector address on my DL11 was jumpered incorrectly.  Fixed this, and the diagnostic now passes.&lt;/p&gt;
+&lt;p&gt;CKBME0 (11/45 traps test) is a bit more complicated.  The halt address of 005320 here indicates that the floating
+point coprocessor is detected but not trapping per design.  Pulled the floating point cards for now; the diagnostic
+now runs through several passes successfully, but regularly hangs up at 013640.  Hitting the halt
+switch when it is hung up displays 000342 in the address lights, then with a couple continues it will start up again,
+run a bunch more passes, but sooner or later hang up at 013640 again with the same behavior.  This behavior is a
+little more difficult to decode because the diagnostic itself is more complicated, and also the binary available from
+classicmp is a later revision than the available source code so the addresses don't quite match up.  So I'll need to
+spend a little more time reading the diagnostic sources and examining the disassembly in PDP11GUI to make sense of this
+one.  And it looks like there will be some downstream work to debug the floating point unit as well; I haven't studied
+its design yet at all.&lt;/p&gt;</summary><category term="Retro-Computing"></category><category term="PDP-11"></category></entry><entry><title>PDP-11/45: Diagnostics with PDP11GUI</title><link href="http://fritzm.github.io/diagnostics.html" rel="alternate"></link><published>2016-07-03T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-07-03:diagnostics.html</id><summary type="html">&lt;p&gt;Okay, now that serial is straightened out, on to running diagnostic tests via PDP11GUI.  PDP11GUI itself, as well as
 a thorough and useful database of DEC diagnostic programs, are available at &lt;a href="http://www.retrocmp.com/tools"&gt;http://www.retrocmp.com/tools&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Since my home computer is a MacBook, I had intended to run PDP11GUI under Wine.  I ran into a problem with this where
 PDP11GUI under Wine could not generate its pre-processed machine description temp file, seemingly because of some
