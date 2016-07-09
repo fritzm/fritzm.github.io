@@ -1,5 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>fritzm.github.io</title><link href="http://fritzm.github.io/" rel="alternate"></link><link href="http://fritzm.github.io/feeds/pdp-11.atom.xml" rel="self"></link><id>http://fritzm.github.io/</id><updated>2016-07-04T00:00:00-07:00</updated><entry><title>PDP-11/45: Diagnostics II</title><link href="http://fritzm.github.io/diagnostics-2.html" rel="alternate"></link><published>2016-07-04T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-07-04:diagnostics-2.html</id><summary type="html">&lt;p&gt;Investigated some of the halted diagnostics a bit today.  CKBGB0 (SPL instruction test) was halting at 001404.
+<feed xmlns="http://www.w3.org/2005/Atom"><title>fritzm.github.io</title><link href="http://fritzm.github.io/" rel="alternate"></link><link href="http://fritzm.github.io/feeds/pdp-11.atom.xml" rel="self"></link><id>http://fritzm.github.io/</id><updated>2016-07-09T00:00:00-07:00</updated><entry><title>PDP-11/45: Diagnostics III - CKBME0</title><link href="http://fritzm.github.io/diagnostics-3.html" rel="alternate"></link><published>2016-07-09T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-07-09:diagnostics-3.html</id><summary type="html">&lt;p&gt;Okay, digging into the CKBME0 traps diagnostic now in more detail.  Here I've transcribed the source of the failing
+test from the older available diagnostic listing, then re-assembled it at the address matching the more modern
+binary.  This makes it a little easier to follow along while debugging the newer binary:&lt;/p&gt;
+&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt; 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nt"&gt;013604&lt;/span&gt; &lt;span class="nt"&gt;000230&lt;/span&gt;                          &lt;span class="nt"&gt;SPL&lt;/span&gt;     &lt;span class="nt"&gt;0&lt;/span&gt;               &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;SET&lt;/span&gt; &lt;span class="nt"&gt;PRIORITY&lt;/span&gt; &lt;span class="nt"&gt;LEVEL&lt;/span&gt; &lt;span class="nt"&gt;0&lt;/span&gt;
+&lt;span class="nt"&gt;013606&lt;/span&gt; &lt;span class="nt"&gt;012706&lt;/span&gt;  &lt;span class="nt"&gt;000500&lt;/span&gt;                  &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="nn"&gt;#STKPTR&lt;/span&gt;&lt;span class="o"&gt;,%&lt;/span&gt;&lt;span class="nt"&gt;6&lt;/span&gt;      &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;SET&lt;/span&gt; &lt;span class="nt"&gt;STACK&lt;/span&gt; &lt;span class="nt"&gt;PTR&lt;/span&gt;
+&lt;span class="nt"&gt;013612&lt;/span&gt; &lt;span class="nt"&gt;012737&lt;/span&gt;  &lt;span class="nt"&gt;013650&lt;/span&gt;  &lt;span class="nt"&gt;000064&lt;/span&gt;          &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="nn"&gt;#TTY7A&lt;/span&gt;&lt;span class="o"&gt;,@&lt;/span&gt;&lt;span class="nn"&gt;#TPVEC&lt;/span&gt;  &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;LOAD&lt;/span&gt; &lt;span class="nt"&gt;TTY&lt;/span&gt; &lt;span class="nt"&gt;INTERRUPT&lt;/span&gt; &lt;span class="nt"&gt;VECTOR&lt;/span&gt;
+&lt;span class="nt"&gt;013620&lt;/span&gt; &lt;span class="nt"&gt;012737&lt;/span&gt;  &lt;span class="nt"&gt;013644&lt;/span&gt;  &lt;span class="nt"&gt;000014&lt;/span&gt;          &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="nn"&gt;#TTY7B&lt;/span&gt;&lt;span class="o"&gt;,@&lt;/span&gt;&lt;span class="nn"&gt;#BPTVEC&lt;/span&gt; &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;LOAD&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;T&amp;#39;&lt;/span&gt; &lt;span class="nt"&gt;BIT&lt;/span&gt; &lt;span class="nt"&gt;TRAP&lt;/span&gt; &lt;span class="nt"&gt;VECTOR&lt;/span&gt;
+&lt;span class="nt"&gt;013626&lt;/span&gt; &lt;span class="nt"&gt;005002&lt;/span&gt;                          &lt;span class="nt"&gt;CLR&lt;/span&gt;     &lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="nt"&gt;2&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;CLEAR&lt;/span&gt; &lt;span class="nt"&gt;INDICATOR&lt;/span&gt;
+&lt;span class="nt"&gt;013630&lt;/span&gt; &lt;span class="nt"&gt;052737&lt;/span&gt;  &lt;span class="nt"&gt;000100&lt;/span&gt;  &lt;span class="nt"&gt;177564&lt;/span&gt;          &lt;span class="nt"&gt;BIS&lt;/span&gt;     &lt;span class="nn"&gt;#100&lt;/span&gt;&lt;span class="o"&gt;,@&lt;/span&gt;&lt;span class="nn"&gt;#TTCSR&lt;/span&gt;    &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;ALLOW&lt;/span&gt; &lt;span class="nt"&gt;INTERRUPT&lt;/span&gt; &lt;span class="nt"&gt;INTERRUPT&lt;/span&gt; &lt;span class="nt"&gt;OCCURS&lt;/span&gt; &lt;span class="nt"&gt;AFTER&lt;/span&gt;
+                                                               &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;THIS&lt;/span&gt; &lt;span class="nt"&gt;INSTRUCTION&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt; &lt;span class="nt"&gt;BEFORE&lt;/span&gt; &lt;span class="nt"&gt;NEXT&lt;/span&gt;
+&lt;span class="nt"&gt;013636&lt;/span&gt; &lt;span class="nt"&gt;000001&lt;/span&gt;                  &lt;span class="nt"&gt;WAIT1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;  &lt;span class="nt"&gt;WAIT&lt;/span&gt;                    &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;WAIT&lt;/span&gt; &lt;span class="nt"&gt;FOR&lt;/span&gt; &lt;span class="nt"&gt;AN&lt;/span&gt; &lt;span class="nt"&gt;INTERRUPT&lt;/span&gt;
+&lt;span class="nt"&gt;013640&lt;/span&gt; &lt;span class="nt"&gt;005202&lt;/span&gt;                          &lt;span class="nt"&gt;INC&lt;/span&gt;     &lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="nt"&gt;2&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;INCREMENT&lt;/span&gt; &lt;span class="nt"&gt;INDICATOR&lt;/span&gt;
+&lt;span class="nt"&gt;013642&lt;/span&gt; &lt;span class="nt"&gt;000000&lt;/span&gt;                          &lt;span class="nt"&gt;HLT&lt;/span&gt;                     &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;ERROR&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt; &lt;span class="nt"&gt;NO&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;T&amp;#39;&lt;/span&gt; &lt;span class="nt"&gt;TRAP&lt;/span&gt; &lt;span class="nt"&gt;AFTER&lt;/span&gt; &lt;span class="nt"&gt;INTERRUPT&lt;/span&gt;
+&lt;span class="nt"&gt;013644&lt;/span&gt; &lt;span class="nt"&gt;000000&lt;/span&gt;                  &lt;span class="nt"&gt;TTY7B&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;  &lt;span class="nt"&gt;HLT&lt;/span&gt;                     &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;ERROR&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;T&amp;#39;&lt;/span&gt; &lt;span class="nt"&gt;BIT&lt;/span&gt; &lt;span class="nt"&gt;TRAPPED&lt;/span&gt; &lt;span class="nt"&gt;OUT&lt;/span&gt; &lt;span class="nt"&gt;OF&lt;/span&gt; &lt;span class="nt"&gt;WAIT&lt;/span&gt;
+&lt;span class="nt"&gt;013646&lt;/span&gt; &lt;span class="nt"&gt;000424&lt;/span&gt;                          &lt;span class="nt"&gt;BR&lt;/span&gt;      &lt;span class="nt"&gt;TTY7EX&lt;/span&gt;          &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;EXIT&lt;/span&gt; &lt;span class="nt"&gt;TEST&lt;/span&gt;
+&lt;span class="nt"&gt;013650&lt;/span&gt; &lt;span class="nt"&gt;012737&lt;/span&gt;  &lt;span class="nt"&gt;000040&lt;/span&gt;  &lt;span class="nt"&gt;177566&lt;/span&gt;  &lt;span class="nt"&gt;TTY7A&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;  &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="nn"&gt;#40&lt;/span&gt;&lt;span class="o"&gt;,@&lt;/span&gt;&lt;span class="nn"&gt;#177566&lt;/span&gt;    &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;TYPE&lt;/span&gt; &lt;span class="nt"&gt;SPACE&lt;/span&gt; &lt;span class="nt"&gt;CHAR&lt;/span&gt;
+&lt;span class="nt"&gt;013656&lt;/span&gt; &lt;span class="nt"&gt;012737&lt;/span&gt;  &lt;span class="nt"&gt;013674&lt;/span&gt;  &lt;span class="nt"&gt;000064&lt;/span&gt;          &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="nn"&gt;#TTY7C&lt;/span&gt;&lt;span class="o"&gt;,@&lt;/span&gt;&lt;span class="nn"&gt;#TPVEC&lt;/span&gt;  &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;REPOSITION&lt;/span&gt; &lt;span class="nt"&gt;TTY&lt;/span&gt; &lt;span class="nt"&gt;INT&lt;/span&gt; &lt;span class="nt"&gt;VECTOR&lt;/span&gt;
+&lt;span class="nt"&gt;013664&lt;/span&gt; &lt;span class="nt"&gt;012766&lt;/span&gt;  &lt;span class="nt"&gt;000020&lt;/span&gt;  &lt;span class="nt"&gt;000002&lt;/span&gt;          &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="nn"&gt;#20&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;2&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nt"&gt;6&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;        &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;PUT&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;T&amp;#39;&lt;/span&gt; &lt;span class="nt"&gt;BIT&lt;/span&gt; &lt;span class="nt"&gt;IN&lt;/span&gt; &lt;span class="nt"&gt;RETURN&lt;/span&gt; &lt;span class="nt"&gt;STATUS&lt;/span&gt;
+&lt;span class="nt"&gt;013672&lt;/span&gt; &lt;span class="nt"&gt;000006&lt;/span&gt;                          &lt;span class="nt"&gt;RTT&lt;/span&gt;                     &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;RETURN&lt;/span&gt; &lt;span class="nt"&gt;TO&lt;/span&gt; &lt;span class="nt"&gt;WAIT&lt;/span&gt; &lt;span class="nt"&gt;WITH&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;T&amp;#39;&lt;/span&gt; &lt;span class="nt"&gt;BIT&lt;/span&gt; &lt;span class="nt"&gt;SET&lt;/span&gt;
+                                                               &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;AND&lt;/span&gt; &lt;span class="nt"&gt;WAIT&lt;/span&gt; &lt;span class="nt"&gt;FOR&lt;/span&gt; &lt;span class="nt"&gt;TTY&lt;/span&gt; &lt;span class="nt"&gt;INTERRUPT&lt;/span&gt; &lt;span class="nt"&gt;WHEN&lt;/span&gt; &lt;span class="nt"&gt;NULL&lt;/span&gt;
+                                                               &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;CHARACTER&lt;/span&gt; &lt;span class="nt"&gt;IS&lt;/span&gt; &lt;span class="nt"&gt;TYPED&lt;/span&gt;
+&lt;span class="nt"&gt;013674&lt;/span&gt; &lt;span class="nt"&gt;012737&lt;/span&gt;  &lt;span class="nt"&gt;013716&lt;/span&gt;  &lt;span class="nt"&gt;000014&lt;/span&gt;  &lt;span class="nt"&gt;TTY7C&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;  &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="nn"&gt;#TTY7D&lt;/span&gt;&lt;span class="o"&gt;,@&lt;/span&gt;&lt;span class="nn"&gt;#BPTVEC&lt;/span&gt; &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;REPOINT&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;T&amp;#39;&lt;/span&gt; &lt;span class="nt"&gt;BIT&lt;/span&gt; &lt;span class="nt"&gt;TRAP&lt;/span&gt; &lt;span class="nt"&gt;VECTOR&lt;/span&gt; &lt;span class="nt"&gt;AFTER&lt;/span&gt;
+                                                               &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;TTY&lt;/span&gt; &lt;span class="nt"&gt;HAS&lt;/span&gt; &lt;span class="nt"&gt;INTERRUPTED&lt;/span&gt;
+&lt;span class="nt"&gt;013702&lt;/span&gt; &lt;span class="nt"&gt;005037&lt;/span&gt;  &lt;span class="nt"&gt;177564&lt;/span&gt;                  &lt;span class="nt"&gt;CLR&lt;/span&gt;     &lt;span class="o"&gt;@&lt;/span&gt;&lt;span class="nn"&gt;#TTCSR&lt;/span&gt;         &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;DISABLE&lt;/span&gt; &lt;span class="nt"&gt;INTERRUPT&lt;/span&gt; &lt;span class="nt"&gt;ENABLE&lt;/span&gt;
+&lt;span class="nt"&gt;013706&lt;/span&gt; &lt;span class="nt"&gt;012737&lt;/span&gt;  &lt;span class="nt"&gt;000015&lt;/span&gt;  &lt;span class="nt"&gt;177566&lt;/span&gt;          &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="nn"&gt;#15&lt;/span&gt;&lt;span class="o"&gt;,@&lt;/span&gt;&lt;span class="nn"&gt;#177566&lt;/span&gt;
+&lt;span class="nt"&gt;013714&lt;/span&gt; &lt;span class="nt"&gt;000006&lt;/span&gt;                          &lt;span class="nt"&gt;RTT&lt;/span&gt;                     &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;RETURN&lt;/span&gt; &lt;span class="nt"&gt;TO&lt;/span&gt; &lt;span class="nt"&gt;INST&lt;/span&gt; &lt;span class="nt"&gt;FOLLOWING&lt;/span&gt; &lt;span class="nt"&gt;WAIT&lt;/span&gt; &lt;span class="nt"&gt;WITH&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;T&amp;#39;&lt;/span&gt;
+                                                               &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;BIT&lt;/span&gt; &lt;span class="nt"&gt;SET&lt;/span&gt;
+&lt;span class="nt"&gt;013716&lt;/span&gt; &lt;span class="nt"&gt;000240&lt;/span&gt;                  &lt;span class="nt"&gt;TTY7D&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;  &lt;span class="nt"&gt;NOP&lt;/span&gt;
+&lt;span class="nt"&gt;013720&lt;/span&gt; &lt;span class="nt"&gt;012737&lt;/span&gt;  &lt;span class="nt"&gt;000016&lt;/span&gt;  &lt;span class="nt"&gt;000014&lt;/span&gt;  &lt;span class="nt"&gt;TTY7EX&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="nn"&gt;#BPTVEC&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="nt"&gt;2&lt;/span&gt;&lt;span class="o"&gt;,@&lt;/span&gt;&lt;span class="nn"&gt;#BPTVEC&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;RESTORE&lt;/span&gt; &lt;span class="nt"&gt;VECTORS&lt;/span&gt; &lt;span class="nt"&gt;TO&lt;/span&gt; &lt;span class="nt"&gt;HALT&lt;/span&gt; &lt;span class="nt"&gt;AT&lt;/span&gt;
+&lt;span class="nt"&gt;013726&lt;/span&gt; &lt;span class="nt"&gt;012737&lt;/span&gt;  &lt;span class="nt"&gt;000066&lt;/span&gt;  &lt;span class="nt"&gt;000064&lt;/span&gt;          &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="nn"&gt;#66&lt;/span&gt;&lt;span class="o"&gt;,@&lt;/span&gt;&lt;span class="nn"&gt;#TPVEC&lt;/span&gt;     &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;VECTOR&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="nt"&gt;2&lt;/span&gt;
+&lt;span class="nt"&gt;013734&lt;/span&gt; &lt;span class="nt"&gt;005302&lt;/span&gt;                          &lt;span class="nt"&gt;DEC&lt;/span&gt;     &lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="nt"&gt;2&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;CHECK&lt;/span&gt; &lt;span class="nt"&gt;INDICATOR&lt;/span&gt;
+&lt;span class="nt"&gt;013736&lt;/span&gt; &lt;span class="nt"&gt;001401&lt;/span&gt;                          &lt;span class="nt"&gt;BEQ&lt;/span&gt;     &lt;span class="o"&gt;.+&lt;/span&gt;&lt;span class="nt"&gt;4&lt;/span&gt;
+&lt;span class="nt"&gt;013740&lt;/span&gt; &lt;span class="nt"&gt;000000&lt;/span&gt;                          &lt;span class="nt"&gt;HLT&lt;/span&gt;                     &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;ERROR&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt; &lt;span class="nt"&gt;DID&lt;/span&gt; &lt;span class="nt"&gt;NOT&lt;/span&gt; &lt;span class="nt"&gt;DO&lt;/span&gt; &lt;span class="nt"&gt;INC&lt;/span&gt; &lt;span class="nt"&gt;INST&lt;/span&gt; &lt;span class="nt"&gt;AFTER&lt;/span&gt; &lt;span class="nt"&gt;INTERRUPT&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+
+&lt;p&gt;This test seems to be designed to return from an interrupt handler to a WAIT instruction, with the T bit set in
+the PSW and a serial xmit interrupt pending.  It verifies that the WAIT still "waits" in this circumstance.  It also
+verifies that a trace trap &lt;em&gt;does&lt;/em&gt; occur after the immediately following INC instruction when the xmit interrupt
+subsequently terminates the WAIT.&lt;/p&gt;
+&lt;p&gt;One potential problem with this test concerns the apparent assumption that enabling the xmit interrupt will cause an
+immediate trap before the subsequent WAIT instruction.  This is true if the serial transmitter is empty, but if the
+transmitter is ever full/busy when this code is entered this assumption may not hold.  Not sure yet if this will ever
+be a problem for this test given the surrounding code.&lt;/p&gt;
+&lt;p&gt;In any case, as currently written this routine fails about %50 of the time on my 11/45 currently.  The failure mode
+is that the processor sits at the WAIT instruction, (address display 013640, PC+2).  Intervention with the
+console halt switch (halt then back to enabl) breaks the WAIT microcode loop; console cont then takes us to the halt
+at 013740 (address display 013742, PC+2).&lt;/p&gt;
+&lt;p&gt;The fact that the routine is tailing out through the halt at 013740 without hitting the halts at 013642 or 013644 is
+interesting; this implies that the second serial xmit interrupt to TTY7C has executed.  This is verified by examining
+the break trap from the console after the test hangs up on the WAIT -- in the failure case, it is already reset to
+point to TTY7D.  So the failure mode seems to be that the return from the second xmit interrupt sometimes goes to the
+WAIT instead of the subsequent INC.&lt;/p&gt;
+&lt;p&gt;Here is the microcode flow around the WAIT instruction.  The horizontal line across the top is the A fork:&lt;/p&gt;
+&lt;p&gt;&lt;img src='/images/pdp11/wait-microcode.png'/&gt;&lt;/p&gt;
+&lt;p&gt;Using the KM11, in the failure case I can see the microcode looping through states WAT.00, WAT.20, WAT.30, WAT.11,
+which seems normal for a WAIT with the T bit set.  I have also verified that executing a WAIT &lt;em&gt;without&lt;/em&gt; the T bit set
+loops through states WAT.00 and WAT.10.&lt;/p&gt;
+&lt;p&gt;Lastly, running on the RC maintenance clock at about half the usual clock frequency makes the failure case happen
+almost 100% of the time.&lt;/p&gt;
+&lt;p&gt;Next I'll be needing to learn more about the BRQ logic, and in particular the mechanism by which the second xmit
+interrupt nominally causes INTRF to be asserted.  Understanding that should lead me to some things to check with the
+logic probe and analyzer...&lt;/p&gt;</summary><category term="Retro-Computing"></category><category term="PDP-11"></category></entry><entry><title>PDP-11/45: Diagnostics II</title><link href="http://fritzm.github.io/diagnostics-2.html" rel="alternate"></link><published>2016-07-04T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-07-04:diagnostics-2.html</id><summary type="html">&lt;p&gt;Investigated some of the halted diagnostics a bit today.  CKBGB0 (SPL instruction test) was halting at 001404.
 Looking at the sources, the diagnostic was waiting at this point for a transmit interrupt from the DL11 that didn't
 seem to be arriving. Some troubleshooting turned up that the vector address on my DL11 was jumpered incorrectly.  Fixed this, and the diagnostic now passes.&lt;/p&gt;
 &lt;p&gt;CKBME0 (11/45 traps test) is a bit more complicated.  The halt address of 005320 here indicates that the floating
@@ -25,7 +116,7 @@ In summary:&lt;/p&gt;
 .diaglist caption { font-weight: bold; }
 .diaglist tr:nth-child(even) { background-color: #f2f2f2; }
 .diaglist th, .diaglist td { padding: 5px; }
-.diaglist td { border: 1px solid lightgray; font-family: "Courier", monospace; }
+.diaglist td { border: 1px solid lightgray; font-family: Menlo,Consolas,monospace; }
 &lt;/style&gt;
 
 &lt;table class="diaglist"&gt;
@@ -168,7 +259,7 @@ console access to physical addresses in banks 1 through 7 by appropriate setting
 .memlist caption { font-weight: bold; }
 .memlist tr:nth-child(even) { background-color: #f2f2f2; }
 .memlist th, .memlist td { padding: 5px; }
-.memlist td { border: 1px solid lightgray; font-family: "Courier", monospace; }
+.memlist td { border: 1px solid lightgray; font-family: Menlo,Consolas,monospace; }
 &lt;/style&gt;
 
 &lt;table class="memlist"&gt;
