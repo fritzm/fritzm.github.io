@@ -1,5 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>fritzm.github.io</title><link href="http://fritzm.github.io/" rel="alternate"></link><link href="http://fritzm.github.io/feeds/pdp-11.atom.xml" rel="self"></link><id>http://fritzm.github.io/</id><updated>2016-07-09T00:00:00-07:00</updated><entry><title>PDP-11/45: Diagnostics III - CKBME0</title><link href="http://fritzm.github.io/diagnostics-3.html" rel="alternate"></link><published>2016-07-09T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-07-09:diagnostics-3.html</id><summary type="html">&lt;p&gt;Okay, digging into the CKBME0 traps diagnostic now in more detail.  Here I've transcribed the source of the failing
+<feed xmlns="http://www.w3.org/2005/Atom"><title>fritzm.github.io</title><link href="http://fritzm.github.io/" rel="alternate"></link><link href="http://fritzm.github.io/feeds/pdp-11.atom.xml" rel="self"></link><id>http://fritzm.github.io/</id><updated>2016-07-17T00:00:00-07:00</updated><entry><title>PDP-11/45: Diagnostics IV - CKBME0</title><link href="http://fritzm.github.io/diagnostics-4.html" rel="alternate"></link><published>2016-07-17T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-07-17:diagnostics-4.html</id><summary type="html">&lt;p&gt;Some progress with the CKBME0 diagnostic mentioned previously.  It seems the concern with how the test behaves wrt.
+preconditions of the serial interface was well founded.&lt;/p&gt;
+&lt;p&gt;In order to debug more easily, I extracted the failing test and built a small loop around it, with a pass counter
+and display register update, etc.  In the original test suite, a RESET instruction is executed immediately prior to
+the failing test, and it takes some time to come around the failing test on each pass, so I included a RESET and
+a delay loop in my test code as well.  I then got failure modes and rates consistent with the original test suite.&lt;/p&gt;
+&lt;p&gt;The experiments previously described had indicated timing sensitivity (e.g. running on the RC maintenance clock at 50%
+clock speed changed the pass failure rate from ~50% to 100%) so I began to think more seriously about timing
+between the processor and the serial card, and how the time taken to circulate the entire suite of tests could affect
+the precondition of the serial interface when entering the test in subsequent passes.  A re-read of the DL11
+documentation showed that the transmit data is also double-buffered; if the transmit shift register is empty, a
+character written to the output buffer will be latched to the transmit shift register causing the output buffer to
+go ready again almost immediately.&lt;/p&gt;
+&lt;p&gt;I inserted the following code before the BIS/WAIT sequence in the original diagnostic (listed previously), which
+establishes consistent preconditions (shift register full, buffer empty) before the BIS.  Success rate went to 100%:&lt;/p&gt;
+&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt;1
+2
+3&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;        &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="nn"&gt;#40&lt;/span&gt;&lt;span class="o"&gt;,@&lt;/span&gt;&lt;span class="nn"&gt;#177566&lt;/span&gt;    &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;ENSURE&lt;/span&gt; &lt;span class="nt"&gt;XMIT&lt;/span&gt; &lt;span class="nt"&gt;SHIFT&lt;/span&gt; &lt;span class="nt"&gt;REGISTER&lt;/span&gt; &lt;span class="nt"&gt;HAS&lt;/span&gt; &lt;span class="nt"&gt;SOMETHING&lt;/span&gt; &lt;span class="nt"&gt;TO&lt;/span&gt; &lt;span class="nt"&gt;CHEW&lt;/span&gt; &lt;span class="nt"&gt;ON&lt;/span&gt;
+&lt;span class="nt"&gt;L0&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;TSTB&lt;/span&gt;    &lt;span class="o"&gt;@&lt;/span&gt;&lt;span class="nn"&gt;#TTCSR&lt;/span&gt;         &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;CHECK&lt;/span&gt; &lt;span class="nt"&gt;XMIT&lt;/span&gt; &lt;span class="nt"&gt;BUFFER&lt;/span&gt;
+        &lt;span class="nt"&gt;BPL&lt;/span&gt;     &lt;span class="nt"&gt;L0&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;LOOP&lt;/span&gt; &lt;span class="nt"&gt;UNTIL&lt;/span&gt; &lt;span class="nt"&gt;READY&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;ENSURES&lt;/span&gt; &lt;span class="nt"&gt;INT&lt;/span&gt; &lt;span class="nt"&gt;IMMEDIATELY&lt;/span&gt; &lt;span class="nt"&gt;AFTER&lt;/span&gt; &lt;span class="nt"&gt;BIS&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+
+&lt;p&gt;I then further verified that the original diagnostic suite passes 100% if I turn the M7800 down to 1200 Baud.  Worth
+noting when trying to run these older diagnostics!&lt;/p&gt;</summary><category term="Retro-Computing"></category><category term="PDP-11"></category></entry><entry><title>PDP-11/45: VT52 repair</title><link href="http://fritzm.github.io/vt52-repair.html" rel="alternate"></link><published>2016-07-16T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-07-16:vt52-repair.html</id><summary type="html">&lt;p&gt;Replacement oscillator arrived for the VT52, so spent some time getting it back going again.  Things got &lt;em&gt;much&lt;/em&gt; better
+with a stable timing chain, but some glitchiness remained -- tracked this down to the socketed microcode ROMS which
+just required a reseat.&lt;/p&gt;
+&lt;p&gt;Here you can see the new oscillator fitted (silver rectangular can with tie-wrap).  The microcode ROMS are the four
+socketed chips towards the right in the picture.  Interestingly, the schematic I have calls for 8 ROMS of half the size
+of the ones that are in here, and indeed you can see the unpopulated spaces for these on the board.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://fritzm.github.io/images/pdp11/vt52-repair.jpg"&gt;&lt;img src='/images/pdp11/vt52-repair_thumbnail_tall.jpg'/&gt;&lt;/a&gt;&lt;/p&gt;</summary><category term="Retro-Computing"></category><category term="PDP-11"></category></entry><entry><title>PDP-11/45: Diagnostics III - CKBME0</title><link href="http://fritzm.github.io/diagnostics-3.html" rel="alternate"></link><published>2016-07-09T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-07-09:diagnostics-3.html</id><summary type="html">&lt;p&gt;Okay, digging into the CKBME0 traps diagnostic now in more detail.  Here I've transcribed the source of the failing
 test from the older available diagnostic listing, then re-assembled it at the address matching the more modern
 binary.  This makes it a little easier to follow along while debugging the newer binary:&lt;/p&gt;
 &lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt; 1

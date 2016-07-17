@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>fritzm.github.io</title>
+    <meta name="description" content="">
+    <meta name="author" content="Fritz Mueller">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+    <script src="http://fritzm.github.io/theme/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="http://fritzm.github.io/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="http://fritzm.github.io/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="http://fritzm.github.io/theme/local.css" rel="stylesheet">
+    <link href="http://fritzm.github.io/theme/pygments.css" rel="stylesheet">
+
+    <!-- So Firefox can bookmark->"abo this site" -->
+        <link href="feeds/all.atom.xml" rel="alternate" title="fritzm.github.io" type="application/atom+xml">
+
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="navbar-inner">
+    <div class="container">
+
+         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+         </a>
+
+        <a class="brand" href="http://fritzm.github.io">fritzm.github.io</a>
+
+        <div class="nav-collapse">
+        <ul class="nav">
+
+        </ul>
+        </div>
+
+    </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="content">
+    <div class="row">
+
+        <div class="span9">
+    <div class='article'>
+        <div class="content-title">
+            <h1>PDP-11/45: Diagnostics IV - CKBME0</h1>
+Sun 17 July 2016
+
+by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+        </div>
+	
+        <div><p>Some progress with the CKBME0 diagnostic mentioned previously.  It seems the concern with how the test behaves wrt.
+preconditions of the serial interface was well founded.</p>
+<p>In order to debug more easily, I extracted the failing test and built a small loop around it, with a pass counter
+and display register update, etc.  In the original test suite, a RESET instruction is executed immediately prior to
+the failing test, and it takes some time to come around the failing test on each pass, so I included a RESET and
+a delay loop in my test code as well.  I then got failure modes and rates consistent with the original test suite.</p>
+<p>The experiments previously described had indicated timing sensitivity (e.g. running on the RC maintenance clock at 50%
+clock speed changed the pass failure rate from ~50% to 100%) so I began to think more seriously about timing
+between the processor and the serial card, and how the time taken to circulate the entire suite of tests could affect
+the precondition of the serial interface when entering the test in subsequent passes.  A re-read of the DL11
+documentation showed that the transmit data is also double-buffered; if the transmit shift register is empty, a
+character written to the output buffer will be latched to the transmit shift register causing the output buffer to
+go ready again almost immediately.</p>
+<p>I inserted the following code before the BIS/WAIT sequence in the original diagnostic (listed previously), which
+establishes consistent preconditions (shift register full, buffer empty) before the BIS.  Success rate went to 100%:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span></span>        <span class="nt">MOV</span>     <span class="nn">#40</span><span class="o">,@</span><span class="nn">#177566</span>    <span class="o">;</span><span class="nt">ENSURE</span> <span class="nt">XMIT</span> <span class="nt">SHIFT</span> <span class="nt">REGISTER</span> <span class="nt">HAS</span> <span class="nt">SOMETHING</span> <span class="nt">TO</span> <span class="nt">CHEW</span> <span class="nt">ON</span>
+<span class="nt">L0</span><span class="o">:</span>     <span class="nt">TSTB</span>    <span class="o">@</span><span class="nn">#TTCSR</span>         <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">XMIT</span> <span class="nt">BUFFER</span>
+        <span class="nt">BPL</span>     <span class="nt">L0</span>              <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">UNTIL</span> <span class="nt">READY</span><span class="o">,</span> <span class="nt">ENSURES</span> <span class="nt">INT</span> <span class="nt">IMMEDIATELY</span> <span class="nt">AFTER</span> <span class="nt">BIS</span>
+</pre></div>
+</td></tr></table>
+
+<p>I then further verified that the original diagnostic suite passes 100% if I turn the M7800 down to 1200 Baud.  Worth
+noting when trying to run these older diagnostics!</p></div>
+	
+        <hr>
+
+        <h2>Comments</h2>
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'fritzm'; 
+    var disqus_title = 'PDP-11/45: Diagnostics IV - CKBME0';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+        </div>
+
+        <div class="span3">
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header">
+                Site
+                </li>
+
+                <li><a href="http://fritzm.github.io/">Archives</a>
+                <li><a href="http://fritzm.github.io/tags.html">Tags</a>
+
+
+
+                <li><a href="http://fritzm.github.io/feeds/all.atom.xml" rel="alternate" type="application/atom+xml">Atom feed</a></li>
+
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header">
+                Categories
+                </li>
+
+                <li><a href="http://fritzm.github.io/category/math.html">Math</a></li>
+                <li><a href="http://fritzm.github.io/category/pdp-11.html">PDP-11</a></li>
+                <li><a href="http://fritzm.github.io/category/programming.html">Programming</a></li>
+            </ul>
+            </div>
+
+
+
+
+            <div class="social">
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header">
+                Social
+                </li>
+
+                <li><a href="http://facebook.com/fritzmueller">facebook</a></li>
+                <li><a href="http://twitter.com/infrafritz">twitter</a></li>
+                <li><a href="http://instagram.com/infrafritz">Instagram</a></li>
+                <li><a href="http://www.linkedin.com/pub/fritz-mueller/a/679/62/">LinkedIn</a></li>
+                <li><a href="http://jsfiddle.net/user/fritzm/fiddles/">JSFiddle</a></li>
+                <li><a href="https://github.com/fritzm">GitHub</a></li>
+            </ul>
+            </div>
+            </div>
+
+        </div>     </div>     </div> 
+<footer>
+<br />
+<p><a href="http://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2012</p>
+</footer>
+
+</div> <!-- /container -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-collapse.js"></script>
+</body>
+</html>
