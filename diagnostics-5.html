@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>fritzm.github.io</title>
+    <meta name="description" content="">
+    <meta name="author" content="Fritz Mueller">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+    <script src="http://fritzm.github.io/theme/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="http://fritzm.github.io/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="http://fritzm.github.io/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="http://fritzm.github.io/theme/local.css" rel="stylesheet">
+    <link href="http://fritzm.github.io/theme/pygments.css" rel="stylesheet">
+
+    <!-- So Firefox can bookmark->"abo this site" -->
+        <link href="feeds/all.atom.xml" rel="alternate" title="fritzm.github.io" type="application/atom+xml">
+
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="navbar-inner">
+    <div class="container">
+
+         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+         </a>
+
+        <a class="brand" href="http://fritzm.github.io">fritzm.github.io</a>
+
+        <div class="nav-collapse">
+        <ul class="nav">
+
+        </ul>
+        </div>
+
+    </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="content">
+    <div class="row">
+
+        <div class="span9">
+    <div class='article'>
+        <div class="content-title">
+            <h1>PDP-11/45: Diagnostics V - D0AA0-D0MA0, CKBOA0</h1>
+Sun 31 July 2016
+
+by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+        </div>
+	
+        <div><p>The day gig has been keeping me pretty busy for the last couple of weeks, but had some time to work on the PDP-11
+again this weekend, so here's an update.</p>
+<p>Looking a little deeper at the diagnostics database over on retrocmp.com, I realized that I had skipped the entire
+set of generic 11-family "D0" tests.  Downloaded and ran these via PDP11GUI and they all passed.  BEL character
+patch locations, as described previously, are summarized here for future reference:</p>
+<style>
+.diaglist { display: inline; border-collapse: collapse; margin-right: 1em; }
+.diaglist caption { font-weight: bold; }
+.diaglist tr:nth-child(even) { background-color: #f2f2f2; }
+.diaglist th, .diaglist td { padding: 5px; }
+.diaglist td { border: 1px solid lightgray; font-family: Menlo,Consolas,monospace; }
+</style>
+
+<table class="diaglist">
+<thead>
+<tr><th>Diagnostic</th><th>BEL</th><th>Description</th><th>Status</th></tr>
+</thead>
+<tbody>
+<tr><td>D0AA0.BIN</td><td>016370</td><td>Branch</td><td>pass</td></tr>
+<tr><td>D0BA0.BIN</td><td>004336</td><td>Con branch</td><td>pass</td></tr>
+<tr><td>D0CA0.BIN</td><td>005526</td><td>Unary</td><td>pass</td></tr>
+<tr><td>D0DA0.BIN</td><td>016370</td><td>Binary</td><td>pass</td></tr>
+<tr><td>D0EA0.BIN</td><td>010562</td><td>Rotate/shift</td><td>pass</td></tr>
+<tr><td>D0FA0.BIN</td><td>017224</td><td>CMP equality</td><td>pass</td></tr>
+<tr><td>D0GA0.BIN</td><td>013650</td><td>CMP non-equality</td><td>pass</td></tr>
+<tr><td>D0HA0.BIN</td><td>013434</td><td>Move</td><td>pass</td></tr>
+<tr><td>D0IA0.BIN</td><td>014126</td><td>Bit set clear test</td><td>pass</td></tr>
+<tr><td>D0JA0.BIN</td><td>007472</td><td>Add</td><td>pass</td></tr>
+<tr><td>D0KA0.BIN</td><td>007124</td><td>Subtract</td><td>pass</td></tr>
+<tr><td>D0LA0.BIN</td><td>015722</td><td>Jump</td><td>pass</td></tr>
+<tr><td>D0MA0.BIN</td><td>003250</td><td>JSR RTS RTI</td><td>pass</td></tr>
+</tbody>
+</table>
+
+<p>Of the "CKB" series of tests, CKBOA0 (11/45 states) is the only one I that is not yet passing.  Looking into
+this a little further, the first failing sub-test is T65:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">010540</span> <span class="nt">010701</span>                  <span class="nt">T65</span><span class="o">:</span>    <span class="nt">SCOPE</span>                    <span class="o">;</span>
+<span class="nt">010542</span> <span class="nt">012737</span>  <span class="nt">030000</span>  <span class="nt">177776</span>          <span class="nt">MOV</span>     <span class="nn">#PUM</span><span class="o">,@</span><span class="nn">#PSW</span>       <span class="o">;</span><span class="nt">KERNEL</span> <span class="nt">MODE</span><span class="o">,</span> <span class="nt">PREV</span> <span class="nt">USER</span> <span class="nt">MODE</span>
+<span class="nt">010550</span> <span class="nt">012706</span>  <span class="nt">000500</span>                  <span class="nt">MOV</span>     <span class="nn">#KPTR</span><span class="o">,</span><span class="nt">KSP</span>        <span class="o">;</span><span class="nt">SET</span> <span class="nt">KERNEL</span> <span class="nt">STACK</span> <span class="nt">POINTER</span>
+<span class="nt">010554</span> <span class="nt">012716</span>  <span class="nt">000700</span>                  <span class="nt">MOV</span>     <span class="nn">#UPTR</span><span class="o">,(</span><span class="nt">KSP</span><span class="o">)</span>
+<span class="nt">010560</span> <span class="nt">106606</span>                          <span class="nt">MTPD</span>    <span class="nt">USP</span>              <span class="o">;</span><span class="nt">SET</span> <span class="nt">USER</span> <span class="nt">STATCK</span> <span class="nt">POINTER</span>
+<span class="nt">010562</span> <span class="nt">005067</span>  <span class="nt">170110</span>                  <span class="nt">CLR</span>     <span class="nt">UPTR-2</span>
+<span class="nt">010566</span> <span class="nt">052737</span>  <span class="nt">140000</span>  <span class="nt">177776</span>          <span class="nt">BIS</span>     <span class="nn">#UM</span><span class="o">,@</span><span class="nn">#PSW</span>        <span class="o">;</span><span class="nt">USER</span> <span class="nt">MODE</span><span class="o">,</span> <span class="nt">PREV</span> <span class="nt">USER</span> <span class="nt">MODE</span>
+<span class="nt">010574</span> <span class="nt">106506</span>                          <span class="nt">MFPD</span>    <span class="nt">USP</span>              <span class="o">;</span><span class="nt">PUSH</span> <span class="nt">USER</span> <span class="nt">STACK</span> <span class="nt">POINTER</span> <span class="nt">ONTO</span> <span class="nt">USER</span> <span class="nt">STACK</span>
+<span class="nt">010576</span> <span class="nt">042737</span>  <span class="nt">140000</span>  <span class="nt">177776</span>          <span class="nt">BIC</span>     <span class="nn">#UM</span><span class="o">,@</span><span class="nn">#PSW</span>        <span class="o">;</span><span class="nt">KERNEL</span> <span class="nt">MODE</span><span class="o">,</span> <span class="nt">PREV</span> <span class="nt">USER</span> <span class="nt">MODE</span>
+<span class="nt">010604</span> <span class="nt">106506</span>                          <span class="nt">MFPD</span>    <span class="nt">USP</span>              <span class="o">;</span><span class="nt">PUSH</span> <span class="nt">USER</span> <span class="nt">STACK</span> <span class="nt">POINTER</span> <span class="nt">ONTO</span> <span class="nt">KERNEL</span> <span class="nt">STACK</span>
+<span class="nt">010606</span> <span class="nt">022716</span>  <span class="nt">000676</span>                  <span class="nt">CMP</span>     <span class="nn">#UPTR-2</span><span class="o">,(</span><span class="nt">KSP</span><span class="o">)</span>    <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">THAT</span> <span class="nt">USER</span> <span class="nt">STACK</span> <span class="nt">POINTER</span> <span class="nt">WAS</span>
+<span class="nt">010612</span> <span class="nt">001401</span>                          <span class="nt">BEQ</span>     <span class="o">.+</span><span class="nt">4</span>              <span class="o">;</span><span class="nt">PUSHED</span> <span class="nt">PROPERLY</span> <span class="o">(</span><span class="nt">ONCE</span><span class="o">)</span>
+<span class="nt">010614</span> <span class="nt">000000</span>                          <span class="nt">HLT</span>                      <span class="o">;</span><span class="nt">ERROR</span><span class="o">!</span>
+<span class="nt">010616</span> <span class="nt">022767</span>  <span class="nt">000700</span>  <span class="nt">170052</span>          <span class="nt">CMP</span>     <span class="nn">#UPTR</span><span class="o">,</span><span class="nt">UPTR-2</span>     <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">THAT</span> <span class="nt">USER</span> <span class="nt">STACK</span> <span class="nt">POINTER</span> <span class="nt">IS</span> <span class="nt">ON</span> <span class="nt">THE</span>
+<span class="nt">010624</span> <span class="nt">001401</span>                          <span class="nt">BEQ</span>     <span class="o">.+</span><span class="nt">4</span>              <span class="o">;</span><span class="nt">USERS</span> <span class="nt">STACK</span>
+<span class="nt">010626</span> <span class="nt">000000</span>                          <span class="nt">HLT</span>                      <span class="o">;</span><span class="nt">ERROR</span><span class="o">!</span>
+</pre></div>
+</td></tr></table>
+
+<p>This runs amok on the MFPD instruction at 010574, which should push the user stack pointer onto the user stack.
+Instead, the user stack pointer is pushed to memory at an incorrect address; 010676 instead of 000676.  This actually
+overwrites subsequent test code. Since the value pushed is 000700, a hard-coded loop is created that prevents the
+test from completing the pass even if resumed from halt.</p>
+<p>The relevant states in the microcode flow here are MFP.80, MFP.90, and MFP.10:</p>
+<p><img src='/images/pdp11/mfpd-microcode.png'/></p>
+<p>Stopping at T2 of MFP.10 using the KM11, I can see that the correct value 000700 was fetched to DR (as displayed by
+the console address lights), but the incorrect value of 010676 is appearing at the output of the ALU/shifter (as
+displayed by the console data lights when set to data paths).  Throwing the DAP card out on extenders and taking
+a look around with a logic probe revealed that the errant bit 12 is sourcing from the ALU.  At each slice of the ALU,
+function selectors S3-S0 are correct, CIN is correct, and overall B-mux constant value "2" is correct.  The errant bit
+is arriving to the ALU from the A-mux...</p>
+<p>Chasing this upstream, A-mux selectors S1,S0 are correct, but the bad bit arrives to the mux input on GRAH SR12.  Hmmm,
+maybe this is one of the things the "BAD" sticker on the GRA is referring to...  Next step is to throw the GRA on
+the extender, and chase the signal back towards SR and the register files.  However, here I hit a snag: the M9301
+monitor does not run correctly when the GRA is on the extender!  That's pretty weird.  Some investigation with the
+KM11 and some hand-toggled instructions revealed that at least the Z status bit is not set correctly/reliably when
+the card is on the extender.  Some of the Z bit logic lives on the GRA also, so I can take a look at that, but I am
+now out of time for this weekend.  Next time!</p>
+<p>A few other miscellaneous notes in wrap-up:</p>
+<ul>
+<li>
+<p>I have been running with the spare GRA marked "BAD" because the first GRA I was using turned out to have a failed ALU
+subsidiary PROM.  In the meantime I tracked down a PROM programmer and some compatible parts on eBay -- these should
+arrive sometime this week at which point I should be able to repair the original board and give it another try.</p>
+</li>
+<li>
+<p>The uPB feature of my home-brew KM11 really doesn't work quite right.  It often stops the machine at the requested
+micro-state but on the wrong instruction (skipping the first occurrence of the target state seemingly).  This caused
+me a great deal of confusion today, as I was stepping through flows at a different program location than I had assumed,
+until I finally noticed the address lights on the console.</p>
+</li>
+<li>
+<p>ESC key on the VT52 is non-functional, making it impractical to use for RT11.  The key mechanism looks okay from the
+top (thanks for more helpful advice from the vcfed forum!).  I think I'll need to pull the keyboard PCB and re-flow the
+solder on the affected mechanism as a next step.</p>
+</li>
+<li>
+<p>Looking forward to checking out Vintage Computer Fest West sometime next weekend!</p>
+</li>
+</ul></div>
+	
+        <hr>
+
+        <h2>Comments</h2>
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'fritzm'; 
+    var disqus_title = 'PDP-11/45: Diagnostics V - D0AA0-D0MA0, CKBOA0';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+        </div>
+
+        <div class="span3">
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header">
+                Site
+                </li>
+
+                <li><a href="http://fritzm.github.io/">Archives</a>
+                <li><a href="http://fritzm.github.io/tags.html">Tags</a>
+
+
+
+                <li><a href="http://fritzm.github.io/feeds/all.atom.xml" rel="alternate" type="application/atom+xml">Atom feed</a></li>
+
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header">
+                Categories
+                </li>
+
+                <li><a href="http://fritzm.github.io/category/math.html">Math</a></li>
+                <li><a href="http://fritzm.github.io/category/pdp-11.html">PDP-11</a></li>
+                <li><a href="http://fritzm.github.io/category/programming.html">Programming</a></li>
+            </ul>
+            </div>
+
+
+
+
+            <div class="social">
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header">
+                Social
+                </li>
+
+                <li><a href="http://facebook.com/fritzmueller">facebook</a></li>
+                <li><a href="http://twitter.com/infrafritz">twitter</a></li>
+                <li><a href="http://instagram.com/infrafritz">Instagram</a></li>
+                <li><a href="http://www.linkedin.com/pub/fritz-mueller/a/679/62/">LinkedIn</a></li>
+                <li><a href="http://jsfiddle.net/user/fritzm/fiddles/">JSFiddle</a></li>
+                <li><a href="https://github.com/fritzm">GitHub</a></li>
+            </ul>
+            </div>
+            </div>
+
+        </div>     </div>     </div> 
+<footer>
+<br />
+<p><a href="http://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2012</p>
+</footer>
+
+</div> <!-- /container -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-collapse.js"></script>
+</body>
+</html>

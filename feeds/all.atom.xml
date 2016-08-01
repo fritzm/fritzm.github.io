@@ -1,5 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>fritzm.github.io</title><link href="http://fritzm.github.io/" rel="alternate"></link><link href="http://fritzm.github.io/feeds/all.atom.xml" rel="self"></link><id>http://fritzm.github.io/</id><updated>2016-07-17T00:00:00-07:00</updated><entry><title>PDP-11/45: Diagnostics IV - CKBME0</title><link href="http://fritzm.github.io/diagnostics-4.html" rel="alternate"></link><published>2016-07-17T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-07-17:diagnostics-4.html</id><summary type="html">&lt;p&gt;Some progress with the CKBME0 diagnostic mentioned previously.  It seems the concern with how the test behaves wrt.
+<feed xmlns="http://www.w3.org/2005/Atom"><title>fritzm.github.io</title><link href="http://fritzm.github.io/" rel="alternate"></link><link href="http://fritzm.github.io/feeds/all.atom.xml" rel="self"></link><id>http://fritzm.github.io/</id><updated>2016-07-31T00:00:00-07:00</updated><entry><title>PDP-11/45: Diagnostics V - D0AA0-D0MA0, CKBOA0</title><link href="http://fritzm.github.io/diagnostics-5.html" rel="alternate"></link><published>2016-07-31T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-07-31:diagnostics-5.html</id><summary type="html">&lt;p&gt;The day gig has been keeping me pretty busy for the last couple of weeks, but had some time to work on the PDP-11
+again this weekend, so here's an update.&lt;/p&gt;
+&lt;p&gt;Looking a little deeper at the diagnostics database over on retrocmp.com, I realized that I had skipped the entire
+set of generic 11-family "D0" tests.  Downloaded and ran these via PDP11GUI and they all passed.  BEL character
+patch locations, as described previously, are summarized here for future reference:&lt;/p&gt;
+&lt;style&gt;
+.diaglist { display: inline; border-collapse: collapse; margin-right: 1em; }
+.diaglist caption { font-weight: bold; }
+.diaglist tr:nth-child(even) { background-color: #f2f2f2; }
+.diaglist th, .diaglist td { padding: 5px; }
+.diaglist td { border: 1px solid lightgray; font-family: Menlo,Consolas,monospace; }
+&lt;/style&gt;
+
+&lt;table class="diaglist"&gt;
+&lt;thead&gt;
+&lt;tr&gt;&lt;th&gt;Diagnostic&lt;/th&gt;&lt;th&gt;BEL&lt;/th&gt;&lt;th&gt;Description&lt;/th&gt;&lt;th&gt;Status&lt;/th&gt;&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;D0AA0.BIN&lt;/td&gt;&lt;td&gt;016370&lt;/td&gt;&lt;td&gt;Branch&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;D0BA0.BIN&lt;/td&gt;&lt;td&gt;004336&lt;/td&gt;&lt;td&gt;Con branch&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;D0CA0.BIN&lt;/td&gt;&lt;td&gt;005526&lt;/td&gt;&lt;td&gt;Unary&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;D0DA0.BIN&lt;/td&gt;&lt;td&gt;016370&lt;/td&gt;&lt;td&gt;Binary&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;D0EA0.BIN&lt;/td&gt;&lt;td&gt;010562&lt;/td&gt;&lt;td&gt;Rotate/shift&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;D0FA0.BIN&lt;/td&gt;&lt;td&gt;017224&lt;/td&gt;&lt;td&gt;CMP equality&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;D0GA0.BIN&lt;/td&gt;&lt;td&gt;013650&lt;/td&gt;&lt;td&gt;CMP non-equality&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;D0HA0.BIN&lt;/td&gt;&lt;td&gt;013434&lt;/td&gt;&lt;td&gt;Move&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;D0IA0.BIN&lt;/td&gt;&lt;td&gt;014126&lt;/td&gt;&lt;td&gt;Bit set clear test&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;D0JA0.BIN&lt;/td&gt;&lt;td&gt;007472&lt;/td&gt;&lt;td&gt;Add&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;D0KA0.BIN&lt;/td&gt;&lt;td&gt;007124&lt;/td&gt;&lt;td&gt;Subtract&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;D0LA0.BIN&lt;/td&gt;&lt;td&gt;015722&lt;/td&gt;&lt;td&gt;Jump&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;D0MA0.BIN&lt;/td&gt;&lt;td&gt;003250&lt;/td&gt;&lt;td&gt;JSR RTS RTI&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;Of the "CKB" series of tests, CKBOA0 (11/45 states) is the only one I that is not yet passing.  Looking into
+this a little further, the first failing sub-test is T65:&lt;/p&gt;
+&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt; 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nt"&gt;010540&lt;/span&gt; &lt;span class="nt"&gt;010701&lt;/span&gt;                  &lt;span class="nt"&gt;T65&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;    &lt;span class="nt"&gt;SCOPE&lt;/span&gt;                    &lt;span class="o"&gt;;&lt;/span&gt;
+&lt;span class="nt"&gt;010542&lt;/span&gt; &lt;span class="nt"&gt;012737&lt;/span&gt;  &lt;span class="nt"&gt;030000&lt;/span&gt;  &lt;span class="nt"&gt;177776&lt;/span&gt;          &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="nn"&gt;#PUM&lt;/span&gt;&lt;span class="o"&gt;,@&lt;/span&gt;&lt;span class="nn"&gt;#PSW&lt;/span&gt;       &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;KERNEL&lt;/span&gt; &lt;span class="nt"&gt;MODE&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;PREV&lt;/span&gt; &lt;span class="nt"&gt;USER&lt;/span&gt; &lt;span class="nt"&gt;MODE&lt;/span&gt;
+&lt;span class="nt"&gt;010550&lt;/span&gt; &lt;span class="nt"&gt;012706&lt;/span&gt;  &lt;span class="nt"&gt;000500&lt;/span&gt;                  &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="nn"&gt;#KPTR&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;KSP&lt;/span&gt;        &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;SET&lt;/span&gt; &lt;span class="nt"&gt;KERNEL&lt;/span&gt; &lt;span class="nt"&gt;STACK&lt;/span&gt; &lt;span class="nt"&gt;POINTER&lt;/span&gt;
+&lt;span class="nt"&gt;010554&lt;/span&gt; &lt;span class="nt"&gt;012716&lt;/span&gt;  &lt;span class="nt"&gt;000700&lt;/span&gt;                  &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="nn"&gt;#UPTR&lt;/span&gt;&lt;span class="o"&gt;,(&lt;/span&gt;&lt;span class="nt"&gt;KSP&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;span class="nt"&gt;010560&lt;/span&gt; &lt;span class="nt"&gt;106606&lt;/span&gt;                          &lt;span class="nt"&gt;MTPD&lt;/span&gt;    &lt;span class="nt"&gt;USP&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;SET&lt;/span&gt; &lt;span class="nt"&gt;USER&lt;/span&gt; &lt;span class="nt"&gt;STATCK&lt;/span&gt; &lt;span class="nt"&gt;POINTER&lt;/span&gt;
+&lt;span class="nt"&gt;010562&lt;/span&gt; &lt;span class="nt"&gt;005067&lt;/span&gt;  &lt;span class="nt"&gt;170110&lt;/span&gt;                  &lt;span class="nt"&gt;CLR&lt;/span&gt;     &lt;span class="nt"&gt;UPTR-2&lt;/span&gt;
+&lt;span class="nt"&gt;010566&lt;/span&gt; &lt;span class="nt"&gt;052737&lt;/span&gt;  &lt;span class="nt"&gt;140000&lt;/span&gt;  &lt;span class="nt"&gt;177776&lt;/span&gt;          &lt;span class="nt"&gt;BIS&lt;/span&gt;     &lt;span class="nn"&gt;#UM&lt;/span&gt;&lt;span class="o"&gt;,@&lt;/span&gt;&lt;span class="nn"&gt;#PSW&lt;/span&gt;        &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;USER&lt;/span&gt; &lt;span class="nt"&gt;MODE&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;PREV&lt;/span&gt; &lt;span class="nt"&gt;USER&lt;/span&gt; &lt;span class="nt"&gt;MODE&lt;/span&gt;
+&lt;span class="nt"&gt;010574&lt;/span&gt; &lt;span class="nt"&gt;106506&lt;/span&gt;                          &lt;span class="nt"&gt;MFPD&lt;/span&gt;    &lt;span class="nt"&gt;USP&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;PUSH&lt;/span&gt; &lt;span class="nt"&gt;USER&lt;/span&gt; &lt;span class="nt"&gt;STACK&lt;/span&gt; &lt;span class="nt"&gt;POINTER&lt;/span&gt; &lt;span class="nt"&gt;ONTO&lt;/span&gt; &lt;span class="nt"&gt;USER&lt;/span&gt; &lt;span class="nt"&gt;STACK&lt;/span&gt;
+&lt;span class="nt"&gt;010576&lt;/span&gt; &lt;span class="nt"&gt;042737&lt;/span&gt;  &lt;span class="nt"&gt;140000&lt;/span&gt;  &lt;span class="nt"&gt;177776&lt;/span&gt;          &lt;span class="nt"&gt;BIC&lt;/span&gt;     &lt;span class="nn"&gt;#UM&lt;/span&gt;&lt;span class="o"&gt;,@&lt;/span&gt;&lt;span class="nn"&gt;#PSW&lt;/span&gt;        &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;KERNEL&lt;/span&gt; &lt;span class="nt"&gt;MODE&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;PREV&lt;/span&gt; &lt;span class="nt"&gt;USER&lt;/span&gt; &lt;span class="nt"&gt;MODE&lt;/span&gt;
+&lt;span class="nt"&gt;010604&lt;/span&gt; &lt;span class="nt"&gt;106506&lt;/span&gt;                          &lt;span class="nt"&gt;MFPD&lt;/span&gt;    &lt;span class="nt"&gt;USP&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;PUSH&lt;/span&gt; &lt;span class="nt"&gt;USER&lt;/span&gt; &lt;span class="nt"&gt;STACK&lt;/span&gt; &lt;span class="nt"&gt;POINTER&lt;/span&gt; &lt;span class="nt"&gt;ONTO&lt;/span&gt; &lt;span class="nt"&gt;KERNEL&lt;/span&gt; &lt;span class="nt"&gt;STACK&lt;/span&gt;
+&lt;span class="nt"&gt;010606&lt;/span&gt; &lt;span class="nt"&gt;022716&lt;/span&gt;  &lt;span class="nt"&gt;000676&lt;/span&gt;                  &lt;span class="nt"&gt;CMP&lt;/span&gt;     &lt;span class="nn"&gt;#UPTR-2&lt;/span&gt;&lt;span class="o"&gt;,(&lt;/span&gt;&lt;span class="nt"&gt;KSP&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;    &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;CHECK&lt;/span&gt; &lt;span class="nt"&gt;THAT&lt;/span&gt; &lt;span class="nt"&gt;USER&lt;/span&gt; &lt;span class="nt"&gt;STACK&lt;/span&gt; &lt;span class="nt"&gt;POINTER&lt;/span&gt; &lt;span class="nt"&gt;WAS&lt;/span&gt;
+&lt;span class="nt"&gt;010612&lt;/span&gt; &lt;span class="nt"&gt;001401&lt;/span&gt;                          &lt;span class="nt"&gt;BEQ&lt;/span&gt;     &lt;span class="o"&gt;.+&lt;/span&gt;&lt;span class="nt"&gt;4&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;PUSHED&lt;/span&gt; &lt;span class="nt"&gt;PROPERLY&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nt"&gt;ONCE&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;span class="nt"&gt;010614&lt;/span&gt; &lt;span class="nt"&gt;000000&lt;/span&gt;                          &lt;span class="nt"&gt;HLT&lt;/span&gt;                      &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;ERROR&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;
+&lt;span class="nt"&gt;010616&lt;/span&gt; &lt;span class="nt"&gt;022767&lt;/span&gt;  &lt;span class="nt"&gt;000700&lt;/span&gt;  &lt;span class="nt"&gt;170052&lt;/span&gt;          &lt;span class="nt"&gt;CMP&lt;/span&gt;     &lt;span class="nn"&gt;#UPTR&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;UPTR-2&lt;/span&gt;     &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;CHECK&lt;/span&gt; &lt;span class="nt"&gt;THAT&lt;/span&gt; &lt;span class="nt"&gt;USER&lt;/span&gt; &lt;span class="nt"&gt;STACK&lt;/span&gt; &lt;span class="nt"&gt;POINTER&lt;/span&gt; &lt;span class="nt"&gt;IS&lt;/span&gt; &lt;span class="nt"&gt;ON&lt;/span&gt; &lt;span class="nt"&gt;THE&lt;/span&gt;
+&lt;span class="nt"&gt;010624&lt;/span&gt; &lt;span class="nt"&gt;001401&lt;/span&gt;                          &lt;span class="nt"&gt;BEQ&lt;/span&gt;     &lt;span class="o"&gt;.+&lt;/span&gt;&lt;span class="nt"&gt;4&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;USERS&lt;/span&gt; &lt;span class="nt"&gt;STACK&lt;/span&gt;
+&lt;span class="nt"&gt;010626&lt;/span&gt; &lt;span class="nt"&gt;000000&lt;/span&gt;                          &lt;span class="nt"&gt;HLT&lt;/span&gt;                      &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;ERROR&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+
+&lt;p&gt;This runs amok on the MFPD instruction at 010574, which should push the user stack pointer onto the user stack.
+Instead, the user stack pointer is pushed to memory at an incorrect address; 010676 instead of 000676.  This actually
+overwrites subsequent test code. Since the value pushed is 000700, a hard-coded loop is created that prevents the
+test from completing the pass even if resumed from halt.&lt;/p&gt;
+&lt;p&gt;The relevant states in the microcode flow here are MFP.80, MFP.90, and MFP.10:&lt;/p&gt;
+&lt;p&gt;&lt;img src='/images/pdp11/mfpd-microcode.png'/&gt;&lt;/p&gt;
+&lt;p&gt;Stopping at T2 of MFP.10 using the KM11, I can see that the correct value 000700 was fetched to DR (as displayed by
+the console address lights), but the incorrect value of 010676 is appearing at the output of the ALU/shifter (as
+displayed by the console data lights when set to data paths).  Throwing the DAP card out on extenders and taking
+a look around with a logic probe revealed that the errant bit 12 is sourcing from the ALU.  At each slice of the ALU,
+function selectors S3-S0 are correct, CIN is correct, and overall B-mux constant value "2" is correct.  The errant bit
+is arriving to the ALU from the A-mux...&lt;/p&gt;
+&lt;p&gt;Chasing this upstream, A-mux selectors S1,S0 are correct, but the bad bit arrives to the mux input on GRAH SR12.  Hmmm,
+maybe this is one of the things the "BAD" sticker on the GRA is referring to...  Next step is to throw the GRA on
+the extender, and chase the signal back towards SR and the register files.  However, here I hit a snag: the M9301
+monitor does not run correctly when the GRA is on the extender!  That's pretty weird.  Some investigation with the
+KM11 and some hand-toggled instructions revealed that at least the Z status bit is not set correctly/reliably when
+the card is on the extender.  Some of the Z bit logic lives on the GRA also, so I can take a look at that, but I am
+now out of time for this weekend.  Next time!&lt;/p&gt;
+&lt;p&gt;A few other miscellaneous notes in wrap-up:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;I have been running with the spare GRA marked "BAD" because the first GRA I was using turned out to have a failed ALU
+subsidiary PROM.  In the meantime I tracked down a PROM programmer and some compatible parts on eBay -- these should
+arrive sometime this week at which point I should be able to repair the original board and give it another try.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;The uPB feature of my home-brew KM11 really doesn't work quite right.  It often stops the machine at the requested
+micro-state but on the wrong instruction (skipping the first occurrence of the target state seemingly).  This caused
+me a great deal of confusion today, as I was stepping through flows at a different program location than I had assumed,
+until I finally noticed the address lights on the console.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;ESC key on the VT52 is non-functional, making it impractical to use for RT11.  The key mechanism looks okay from the
+top (thanks for more helpful advice from the vcfed forum!).  I think I'll need to pull the keyboard PCB and re-flow the
+solder on the affected mechanism as a next step.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Looking forward to checking out Vintage Computer Fest West sometime next weekend!&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;</summary><category term="Retro-Computing"></category><category term="PDP-11"></category></entry><entry><title>PDP-11/45: Diagnostics IV - CKBME0</title><link href="http://fritzm.github.io/diagnostics-4.html" rel="alternate"></link><published>2016-07-17T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-07-17:diagnostics-4.html</id><summary type="html">&lt;p&gt;Some progress with the CKBME0 diagnostic mentioned previously.  It seems the concern with how the test behaves wrt.
 preconditions of the serial interface was well founded.&lt;/p&gt;
 &lt;p&gt;In order to debug more easily, I extracted the failing test and built a small loop around it, with a pass counter
 and display register update, etc.  In the original test suite, a RESET instruction is executed immediately prior to
@@ -22,8 +132,8 @@ establishes consistent preconditions (shift register full, buffer empty) before 
 &lt;/pre&gt;&lt;/div&gt;
 &lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 
-&lt;p&gt;I then further verified that the original diagnostic suite passes 100% if I turn the M7800 down to 1200 Baud.  Worth
-noting when trying to run these older diagnostics!&lt;/p&gt;</summary><category term="Retro-Computing"></category><category term="PDP-11"></category></entry><entry><title>PDP-11/45: VT52 repair</title><link href="http://fritzm.github.io/vt52-repair.html" rel="alternate"></link><published>2016-07-16T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-07-16:vt52-repair.html</id><summary type="html">&lt;p&gt;Replacement oscillator arrived for the VT52, so spent some time getting it back going again.  Things got &lt;em&gt;much&lt;/em&gt; better
+&lt;p&gt;I then further verified that the unmodified original diagnostic suite passes 100% if I turn the M7800 down to 4800
+Baud.  Worth noting when trying to run these older diagnostics!&lt;/p&gt;</summary><category term="Retro-Computing"></category><category term="PDP-11"></category></entry><entry><title>PDP-11/45: VT52 repair</title><link href="http://fritzm.github.io/vt52-repair.html" rel="alternate"></link><published>2016-07-16T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-07-16:vt52-repair.html</id><summary type="html">&lt;p&gt;Replacement oscillator arrived for the VT52, so spent some time getting it back going again.  Things got &lt;em&gt;much&lt;/em&gt; better
 with a stable timing chain, but some glitchiness remained -- tracked this down to the socketed microcode ROMS which
 just required a reseat.&lt;/p&gt;
 &lt;p&gt;Here you can see the new oscillator fitted (silver rectangular can with tie-wrap).  The microcode ROMS are the four
