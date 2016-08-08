@@ -56,6 +56,80 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="http://fritzm.github.io/ms11-debug.html"><h1>PDP-11/45: MS11-L debug</h1></a>
+Sat 18 June 2016
+
+by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+    </div>
+
+    <div><p>After addressing the -15V problem on the MS11, most of the bad behaviors seem to have cleared up except a stuck (on)
+bit 6 in the first 16K words of address space (000000-077776).  Hooked up the new logic analyzer, and it has been very
+useful in troubleshooting the board -- can easily capture and inspect the timing of complete memory cycles.  Definitely
+worth the investment!</p>
+<p>Using the analyzer, I was able to verify the refresh and chip select logic on the board, then track down the stuck bit
+to what seems to be a single failed DRAM chip (E96 on the MS11-L engineering drawings).  I'd like to test the entire
+card before ordering replacement parts, but need to set up address translation to get beyond the first two banks from
+the console.</p>
+<p>Here is the address translation register setup that I used for testing.  This was followed by a deposit of 000001 to
+KT11 SR0 (777572) to enable translation.  KT11 SR3 was left all zeros to keep D space disabled.  This setup allows
+console access to physical addresses in banks 1 through 7 by appropriate settings of virtual address bits 13 through
+15.  I wanted to reserve PAR7 to map I/O space, so I left out bank 0 since it was one of the two already tested.</p>
+<style>
+.memlist { display: inline; border-collapse: collapse; margin-right: 1em; }
+.memlist caption { font-weight: bold; }
+.memlist tr:nth-child(even) { background-color: #f2f2f2; }
+.memlist th, .memlist td { padding: 5px; }
+.memlist td { border: 1px solid lightgray; font-family: Menlo,Consolas,monospace; }
+</style>
+
+<table class="memlist">
+<caption>Kernel I PAR</caption>
+<tbody>
+<tr><td>772340</td><td>001000</td></tr>
+<tr><td>772342</td><td>002000</td></tr>
+<tr><td>772344</td><td>003000</td></tr>
+<tr><td>772346</td><td>004000</td></tr>
+<tr><td>772350</td><td>005000</td></tr>
+<tr><td>772352</td><td>006000</td></tr>
+<tr><td>772354</td><td>007000</td></tr>
+<tr><td>772356</td><td>007600</td></tr>
+</tbody>
+</table>
+
+<table class="memlist">
+<caption>Kernel I PDR</caption>
+<tbody>
+<tr><td>772300</td><td>077406</td></tr>
+<tr><td>772302</td><td>077406</td></tr>
+<tr><td>772304</td><td>077406</td></tr>
+<tr><td>772306</td><td>077406</td></tr>
+<tr><td>772310</td><td>077406</td></tr>
+<tr><td>772312</td><td>077406</td></tr>
+<tr><td>772314</td><td>077406</td></tr>
+<tr><td>772316</td><td>077406</td></tr>
+</tbody>
+</table>
+
+<p>This worked as expected according to panel PROG PHY and the logic analyzer, so the KT11 option which I had not
+previously tested is at least working for kernel I space.  Tested each bank on the MS11 from the front panel using this
+setup, and uncovered that bank 4 bit 10 also has a stuck on condition.  Since bank 1 is working now, I can use that
+as work space for the time being in order to continue the CPU debug while awaiting some replacement DRAM chips in the
+mail.</p>
+<p>Pics here of the logic analyzer setup, and captured traces of a write and subsequent read to one of the misbehaving
+chips:</p>
+<p><a href="http://fritzm.github.io/images/pdp11/ms11-debug.jpg"><img src='/images/pdp11/ms11-debug_thumbnail_tall.jpg'/></a>
+<a href="http://fritzm.github.io/images/pdp11/bad-dram-write.jpg"><img src='/images/pdp11/bad-dram-write_thumbnail_tall.jpg'/></a>
+<a href="http://fritzm.github.io/images/pdp11/bad-dram-read.jpg"><img src='/images/pdp11/bad-dram-read_thumbnail_tall.jpg'/></a></p></div>
+    <hr />
+</div>
+
+
+
+<div class='article'>
+    <div class="content-title">
         <a href="http://fritzm.github.io/cpu-debug-4.html"><h1>PDP-11/45: MS11-L and CPU debug IV</h1></a>
 Sun 12 June 2016
 
@@ -394,30 +468,6 @@ contents.  Here's a picture of the scanner in action, and the produced output:</
 preliminary attempts to convert the data to a few modern font formats are available on my github over at
 <a href="https://github.com/fritzm/vt52">https://github.com/fritzm/vt52</a>.  I need to learn some more about font formats to make some better font files; if I do
 I will update that repo.  Any help from fontophiles gladly accepted!</p></div>
-    <hr />
-</div>
-
-
-
-<div class='article'>
-    <div class="content-title">
-        <a href="http://fritzm.github.io/backplane-and-logic.html"><h1>PDP-11/45: CPU Backplane and logic</h1></a>
-Fri 03 July 2015
-
-by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
-    </div>
-
-    <div><p>Mounted the CPU backplane, and slotted in the CPU and MMU logic cards.  The empty slots on the right are for the FPU -- I have those on hand but figure I'll wait to slot them until I've got the basic CPU up and running.</p>
-<p>One kind of interesting thing: the logic boards were stored vertically for several decades, and on some of the cards with plastic ribbon-cable connectors the plastic seems to have flaked and shed and fallen down the boards.  The flakey substance then grew some impressive crystals between some of the solder traces.  Scrubbed these out with some anhydrous IPA.</p>
-<p>A tip copied from a fellow restorer: Alconox detergent for removing grime from various plastic components.  Parts soaked overnight come out looking nearly new (here you can see the cleaned plastic card guides).</p>
-<p>Also pictured here are the characteristic bloody knuckles that are obtained whenever wrestling with PDP backplanes, logic cards, and terminators in close confines.  That really takes you back...</p>
-<p><a href="http://fritzm.github.io/images/pdp11/boards-in-chassis.jpg"><img src='/images/pdp11/boards-in-chassis_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/board-with-crystals.jpg"><img src='/images/pdp11/board-with-crystals_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/crystals.jpg"><img src='/images/pdp11/crystals_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/knuckles.jpg"><img src='/images/pdp11/knuckles_thumbnail_tall.jpg'/></a></p></div>
     <hr />
 </div>
 
