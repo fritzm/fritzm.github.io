@@ -1,5 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>fritzm.github.io</title><link href="http://fritzm.github.io/" rel="alternate"></link><link href="http://fritzm.github.io/feeds/pdp-11.atom.xml" rel="self"></link><id>http://fritzm.github.io/</id><updated>2016-08-07T00:00:00-07:00</updated><entry><title>PDP-11/45: Diagnostics VI - GRA ALU PROM repair</title><link href="http://fritzm.github.io/diagnostics-6.html" rel="alternate"></link><published>2016-08-07T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-08-07:diagnostics-6.html</id><summary type="html">&lt;p&gt;Data I/O Series 22 PROM programmer from eBay showed up, as well as some unprogrammed Signetics 82S123.  Punched in the
+<feed xmlns="http://www.w3.org/2005/Atom"><title>fritzm.github.io</title><link href="http://fritzm.github.io/" rel="alternate"></link><link href="http://fritzm.github.io/feeds/pdp-11.atom.xml" rel="self"></link><id>http://fritzm.github.io/</id><updated>2016-08-13T00:00:00-07:00</updated><entry><title>PDP-11/45: Diagnostics VII - KT11 MMU</title><link href="http://fritzm.github.io/diagnostics-7.html" rel="alternate"></link><published>2016-08-13T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-08-13:diagnostics-7.html</id><summary type="html">&lt;p&gt;Moving on to the KT11 MMU: running the first diagnostic in the CKT suite, got error reports at 010340, 010560, and
+011000.  Consulted the diagnostic listings, and these particular tests have to do with D-space translations from
+kernel, supervisor, and user modes.  The D-space logic is largely on module SSR, so I swapped this out for a spare.
+After that, I was able to pass the full suite of basic MMU tests:&lt;/p&gt;
+&lt;style&gt;
+.diaglist { display: inline; border-collapse: collapse; margin-right: 1em; }
+.diaglist caption { font-weight: bold; }
+.diaglist tr:nth-child(even) { background-color: #f2f2f2; }
+.diaglist th, .diaglist td { padding: 5px; }
+.diaglist td { border: 1px solid lightgray; font-family: Menlo,Consolas,monospace; }
+&lt;/style&gt;
+
+&lt;table class="diaglist"&gt;
+&lt;thead&gt;
+&lt;tr&gt;&lt;th&gt;Diagnostic&lt;/th&gt;&lt;th&gt;BEL&lt;/th&gt;&lt;th&gt;Description&lt;/th&gt;&lt;th&gt;Status&lt;/th&gt;&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;CKTAB0.BIC&lt;/td&gt;&lt;td&gt;017412&lt;/td&gt;&lt;td&gt;KT11-C basic logic part 1&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;CKTBC0.BIC&lt;/td&gt;&lt;td&gt;015674&lt;/td&gt;&lt;td&gt;KT11-C basic logic part 2&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;CKTCA0.BIC&lt;/td&gt;&lt;td&gt;023304&lt;/td&gt;&lt;td&gt;KT11-C access keys&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;CKTDA0.BIC&lt;/td&gt;&lt;td&gt;016360&lt;/td&gt;&lt;td&gt;KT11-C MTPD and MTPI&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;CKTEB0.BIC&lt;/td&gt;&lt;td&gt;015310&lt;/td&gt;&lt;td&gt;KT11-C MFPD and MFPI&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;CKTFD0.BIC&lt;/td&gt;&lt;td&gt;016422&lt;/td&gt;&lt;td&gt;KT11-C aborts&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;Put the failing SSE module in the repair queue along with the other failed spares I've identified along the way, and
+will return to troubleshoot/repair it later.  For now, things are looking pretty good with the CPU!  I still need to
+run and pass the more heavyweight diagnostics: the 11/45 instruction exerciser, KT11 exerciser, and MS11-L exerciser.
+All three of these still seem to have halts, but they are quite complicated diagnostics in comparison to the rest,
+making use of additional peripherals, etc.  I'll need to study these a bit before I can be sure I am using them
+correctly.  I have also skipped the power fail diagnostics for now as I will need to restore some core memory in order
+for these to work correctly.&lt;/p&gt;
+&lt;p&gt;Next up will be to work on the FPU...&lt;/p&gt;</summary><category term="Retro-Computing"></category><category term="PDP-11"></category></entry><entry><title>PDP-11/45: Diagnostics VI - GRA ALU PROM repair</title><link href="http://fritzm.github.io/diagnostics-6.html" rel="alternate"></link><published>2016-08-07T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-08-07:diagnostics-6.html</id><summary type="html">&lt;p&gt;Data I/O Series 22 PROM programmer from eBay showed up, as well as some unprogrammed Signetics 82S123.  Punched in the
 subsidiary ALU control ROM contents from the listing on GRAK in the 11/45 engineering drawings and burnt a new PROM.
 Put a socket and the new PROM in place of the failed part on my original GRA, slotted it into the CPU, and success!
 Diagnostic CKBOA0 now passes.  I will probably return to the other faulty GRA at a later point, as it is partially
