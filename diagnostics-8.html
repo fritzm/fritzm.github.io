@@ -52,10 +52,42 @@
     <div class="row">
 
         <div class="span9">
-    <h1>Authors on fritzm.github.io</h1>
+    <div class='article'>
+        <div class="content-title">
+            <h1>PDP-11/45: Diagnostics VIII - FP11 FPU</h1>
+Sat 03 September 2016
 
-    <ul>        <li><a href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a> (33)</li>
-    </ul>
+by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+        </div>
+	
+        <div><p>Slotted in FP11 spares that I hadn't tried previously, and this has produced some improved results -- returning to
+diagnostic CKBME0 (11/45 traps) this now passes with the floating point installed.  Additionally, diagnostic
+CFPAB0 passes.</p>
+<p>CFPBB0 and CFPCD0, however, are failing.  Unfortunately, the source code for these is not available in the PDP-11
+diagnostics database at retrocmp.  The names of the diagnostics tell which instructions they are testing, though.
+CFPBB0 is annotated as testing the STST instruction.  Rather than work through disassembling the rather lengthy
+diagnostics, I'll probably just write some simple test programs around the STST instruction for next time.  In the
+meantime, I'll do some reading on the FP11 in preparation for microcode-step debug.</p></div>
+	
+        <hr>
+
+        <h2>Comments</h2>
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'fritzm'; 
+    var disqus_title = 'PDP-11/45: Diagnostics VIII - FP11 FPU';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
         </div>
 
         <div class="span3">

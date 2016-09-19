@@ -1,5 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>fritzm.github.io</title><link href="http://fritzm.github.io/" rel="alternate"></link><link href="http://fritzm.github.io/feeds/pdp-11.atom.xml" rel="self"></link><id>http://fritzm.github.io/</id><updated>2016-08-13T00:00:00-07:00</updated><entry><title>PDP-11/45: Diagnostics VII - KT11 MMU</title><link href="http://fritzm.github.io/diagnostics-7.html" rel="alternate"></link><published>2016-08-13T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-08-13:diagnostics-7.html</id><summary type="html">&lt;p&gt;Moving on to the KT11 MMU: running the first diagnostic in the CKT suite, got error reports at 010340, 010560, and
+<feed xmlns="http://www.w3.org/2005/Atom"><title>fritzm.github.io</title><link href="http://fritzm.github.io/" rel="alternate"></link><link href="http://fritzm.github.io/feeds/pdp-11.atom.xml" rel="self"></link><id>http://fritzm.github.io/</id><updated>2016-09-18T00:00:00-07:00</updated><entry><title>PDP-11/45: H720E teardown and inspection</title><link href="http://fritzm.github.io/h770e-teardown.html" rel="alternate"></link><published>2016-09-18T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-09-18:h770e-teardown.html</id><summary type="html">&lt;p&gt;Started in on the H720E power supply that is part of RK05 storage system.  Just initial teardown, cleaning, and
+inspection for obviously failed parts.  Looks pretty good, though there is a lot of dust and grime because this
+unit lost its top cover plate somewhere over the years (I'll have to build some sort of replacement).&lt;/p&gt;
+&lt;p&gt;There are a couple of 22,000 mFD 50v electrolytic caps here that I'll try reforming before hitting them at full power,
+since they've been sitting idle for upwards of 30yrs!  Also, one obviously leaking 330 mfd axial on regulator board, so
+I'll replace this and all its identical twins.  Parts on order...&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://fritzm.github.io/images/pdp11/h720e-breakdown.jpg"&gt;&lt;img src='/images/pdp11/h720e-breakdown_thumbnail_tall.jpg'/&gt;&lt;/a&gt;
+&lt;a href="http://fritzm.github.io/images/pdp11/h720e-leaking-cap.jpg"&gt;&lt;img src='/images/pdp11/h720e-leaking-cap_thumbnail_tall.jpg'/&gt;&lt;/a&gt;&lt;/p&gt;</summary><category term="Retro-Computing"></category><category term="PDP-11"></category></entry><entry><title>PDP-11/45: Diagnostics IX - FP11 FPU, cont.</title><link href="http://fritzm.github.io/diagnostics-9.html" rel="alternate"></link><published>2016-09-10T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-09-10:diagnostics-9.html</id><summary type="html">&lt;p&gt;Did a lot of reading on the FP11 design.  A few interesting notes that are buried in the maintenance manual:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;When debugging FP11 microcode with a KM11 in single-microstep mode, the 11/45 front panel microcode display shows
+the address of the &lt;em&gt;next&lt;/em&gt; microinstruction, NOT the current microinstruction.  This is because the stop-point for
+single microinstruction is at a point between T2 and T3, just &lt;em&gt;after&lt;/em&gt; the next microinstruction addr has been
+calculated.  This is different behavior than the 11/45 CPU front panel microaddress display.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;There's a note in the maintenance manual that explicitly cautions that when using extender boards for debug, the
+RC maintenance clock should be used, and set with period &amp;gt;50ns.  I had not been doing similar while debugging the
+KB11-A CPU, and maybe this explains the occasional different behavior I'd see when throwing boards out on extenders...
+In particular, I had seen this when debugging a spare CPU GRA; next time I return to that board I will try the CPU
+RC clock.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Okay, so here's my first simple test program for STST:&lt;/p&gt;
+&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt;1
+2
+3
+4
+5
+6
+7
+8
+9&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nt"&gt;000000&lt;/span&gt;                          &lt;span class="nt"&gt;AC0&lt;/span&gt;&lt;span class="o"&gt;=%&lt;/span&gt;&lt;span class="nt"&gt;0&lt;/span&gt;
+&lt;span class="nt"&gt;000000&lt;/span&gt;                          &lt;span class="nc"&gt;.ASECT&lt;/span&gt;
+&lt;span class="nt"&gt;001000&lt;/span&gt;                          &lt;span class="o"&gt;.=&lt;/span&gt;&lt;span class="nt"&gt;1000&lt;/span&gt;
+&lt;span class="nt"&gt;001000&lt;/span&gt;  &lt;span class="nt"&gt;170127&lt;/span&gt;  &lt;span class="nt"&gt;044000&lt;/span&gt;  &lt;span class="nt"&gt;START&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;  &lt;span class="nt"&gt;LDFPS&lt;/span&gt;   &lt;span class="nn"&gt;#044000&lt;/span&gt;         &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;FID&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="nt"&gt;FIUV&lt;/span&gt;
+&lt;span class="nt"&gt;001004&lt;/span&gt;  &lt;span class="nt"&gt;172467&lt;/span&gt;  &lt;span class="nt"&gt;000004&lt;/span&gt;          &lt;span class="nt"&gt;LDF&lt;/span&gt;     &lt;span class="nt"&gt;NEGZ&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;AC0&lt;/span&gt;        &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;LOAD&lt;/span&gt; &lt;span class="nt"&gt;A&lt;/span&gt; &lt;span class="nt"&gt;MINUS-ZERO&lt;/span&gt;
+&lt;span class="nt"&gt;001010&lt;/span&gt;  &lt;span class="nt"&gt;170300&lt;/span&gt;                  &lt;span class="nt"&gt;STST&lt;/span&gt;    &lt;span class="nt"&gt;R0&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;STORE&lt;/span&gt; &lt;span class="nt"&gt;FEC&lt;/span&gt; &lt;span class="nt"&gt;TO&lt;/span&gt; &lt;span class="nt"&gt;R0&lt;/span&gt;
+&lt;span class="nt"&gt;001012&lt;/span&gt;  &lt;span class="nt"&gt;000000&lt;/span&gt;                  &lt;span class="nt"&gt;HALT&lt;/span&gt;
+&lt;span class="nt"&gt;001014&lt;/span&gt;  &lt;span class="nt"&gt;100000&lt;/span&gt;  &lt;span class="nt"&gt;000000&lt;/span&gt;  &lt;span class="nt"&gt;NEGZ&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;   &lt;span class="nc"&gt;.WORD&lt;/span&gt;   &lt;span class="nt"&gt;100000&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;000000&lt;/span&gt;   &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;MINUS-ZERO&lt;/span&gt;
+&lt;span class="nt"&gt;001000&lt;/span&gt;                          &lt;span class="nc"&gt;.END&lt;/span&gt;    &lt;span class="nt"&gt;START&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+
+&lt;p&gt;This would be expected to produce the 000014 "Floating Undefined Variable" (minus-zero) exception code in R0, but I see
+an incorrect value of 177417.  Using the KM11 on the FPU shows the -0 trap and STST microstate flow is per expectation.&lt;/p&gt;
+&lt;p&gt;Put the FRL out on the extender and started stepping the microcode, examining the state of the pins at the AC register
+file along the way.  In the -0 trap flow, the FEC code 000014 presented (inverted) at TRP.50 via the EALU, and
+subsequently retrieved at TRP.60 looks correct. However, the value presented at TRP.70 via QR, BR, and the FALU does
+not.  Out of time this weekend; Will have to chase signals back through those paths next time!&lt;/p&gt;
+&lt;p&gt;&lt;img src='/images/pdp11/minus-zero-microcode.png'/&gt;&lt;/p&gt;</summary><category term="Retro-Computing"></category><category term="PDP-11"></category></entry><entry><title>PDP-11/45: Diagnostics VIII - FP11 FPU</title><link href="http://fritzm.github.io/diagnostics-8.html" rel="alternate"></link><published>2016-09-03T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-09-03:diagnostics-8.html</id><summary type="html">&lt;p&gt;Slotted in FP11 spares that I hadn't tried previously, and this has produced some improved results -- returning to
+diagnostic CKBME0 (11/45 traps) this now passes with the floating point installed.  Additionally, diagnostic
+CFPAB0 passes.&lt;/p&gt;
+&lt;p&gt;CFPBB0 and CFPCD0, however, are failing.  Unfortunately, the source code for these is not available in the PDP-11
+diagnostics database at retrocmp.  The names of the diagnostics tell which instructions they are testing, though.
+CFPBB0 is annotated as testing the STST instruction.  Rather than work through disassembling the rather lengthy
+diagnostics, I'll probably just write some simple test programs around the STST instruction for next time.  In the
+meantime, I'll do some reading on the FP11 in preparation for microcode-step debug.&lt;/p&gt;</summary><category term="Retro-Computing"></category><category term="PDP-11"></category></entry><entry><title>PDP-11/45: Diagnostics VII - KT11 MMU</title><link href="http://fritzm.github.io/diagnostics-7.html" rel="alternate"></link><published>2016-08-13T00:00:00-07:00</published><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-08-13:diagnostics-7.html</id><summary type="html">&lt;p&gt;Moving on to the KT11 MMU: running the first diagnostic in the CKT suite, got error reports at 010340, 010560, and
 011000.  Consulted the diagnostic listings, and these particular tests have to do with D-space translations from
 kernel, supervisor, and user modes.  The D-space logic is largely on module SSR, so I swapped this out for a spare.
 After that, I was able to pass the full suite of basic MMU tests:&lt;/p&gt;
