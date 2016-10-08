@@ -182,7 +182,7 @@ patch locations, as described previously, are summarized here for future referen
 &lt;tr&gt;&lt;th&gt;Diagnostic&lt;/th&gt;&lt;th&gt;BEL&lt;/th&gt;&lt;th&gt;Description&lt;/th&gt;&lt;th&gt;Status&lt;/th&gt;&lt;/tr&gt;
 &lt;/thead&gt;
 &lt;tbody&gt;
-&lt;tr&gt;&lt;td&gt;D0AA0.BIN&lt;/td&gt;&lt;td&gt;016370&lt;/td&gt;&lt;td&gt;Branch&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;D0AA0.BIN&lt;/td&gt;&lt;td&gt;014212&lt;/td&gt;&lt;td&gt;Branch&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td&gt;D0BA0.BIN&lt;/td&gt;&lt;td&gt;004336&lt;/td&gt;&lt;td&gt;Con branch&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td&gt;D0CA0.BIN&lt;/td&gt;&lt;td&gt;005526&lt;/td&gt;&lt;td&gt;Unary&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td&gt;D0DA0.BIN&lt;/td&gt;&lt;td&gt;016370&lt;/td&gt;&lt;td&gt;Binary&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
