@@ -63,6 +63,8 @@ robustly now.  Of the FP11 diagnostics, the following now pass:&lt;/p&gt;
 &lt;tr&gt;&lt;td&gt;CFPAB0.BIC&lt;/td&gt;&lt;td&gt;LDFPS,STFPS,SETI,SETL,SETF,SETD,CFCC&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td&gt;CFPBB0.BIC&lt;/td&gt;&lt;td&gt;STST&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td&gt;CFPCD0.BIC&lt;/td&gt;&lt;td&gt;LDF,LDD,STF,STD&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;CFPHB0.BIC&lt;/td&gt;&lt;td&gt;CLR,TST,ABS,NEG&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;CFPKB0.BIC&lt;/td&gt;&lt;td&gt;LDEXP&lt;/td&gt;&lt;td&gt;pass&lt;/td&gt;&lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 
