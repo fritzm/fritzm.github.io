@@ -56,6 +56,113 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="http://fritzm.github.io/diagnostics-3.html"><h1>PDP-11/45: Diagnostics III - CKBME0</h1></a>
+Sat 09 July 2016
+
+by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+    </div>
+
+    <div><p>Okay, digging into the CKBME0 traps diagnostic now in more detail.  Here I've transcribed the source of the failing
+test from the older available diagnostic listing, then re-assembled it at the address matching the more modern
+binary.  This makes it a little easier to follow along while debugging the newer binary:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">013604</span> <span class="nt">000230</span>                          <span class="nt">SPL</span>     <span class="nt">0</span>               <span class="o">;</span><span class="nt">SET</span> <span class="nt">PRIORITY</span> <span class="nt">LEVEL</span> <span class="nt">0</span>
+<span class="nt">013606</span> <span class="nt">012706</span>  <span class="nt">000500</span>                  <span class="nt">MOV</span>     <span class="nn">#STKPTR</span><span class="o">,%</span><span class="nt">6</span>      <span class="o">;</span><span class="nt">SET</span> <span class="nt">STACK</span> <span class="nt">PTR</span>
+<span class="nt">013612</span> <span class="nt">012737</span>  <span class="nt">013650</span>  <span class="nt">000064</span>          <span class="nt">MOV</span>     <span class="nn">#TTY7A</span><span class="o">,@</span><span class="nn">#TPVEC</span>  <span class="o">;</span><span class="nt">LOAD</span> <span class="nt">TTY</span> <span class="nt">INTERRUPT</span> <span class="nt">VECTOR</span>
+<span class="nt">013620</span> <span class="nt">012737</span>  <span class="nt">013644</span>  <span class="nt">000014</span>          <span class="nt">MOV</span>     <span class="nn">#TTY7B</span><span class="o">,@</span><span class="nn">#BPTVEC</span> <span class="o">;</span><span class="nt">LOAD</span> <span class="s1">&#39;T&#39;</span> <span class="nt">BIT</span> <span class="nt">TRAP</span> <span class="nt">VECTOR</span>
+<span class="nt">013626</span> <span class="nt">005002</span>                          <span class="nt">CLR</span>     <span class="o">%</span><span class="nt">2</span>              <span class="o">;</span><span class="nt">CLEAR</span> <span class="nt">INDICATOR</span>
+<span class="nt">013630</span> <span class="nt">052737</span>  <span class="nt">000100</span>  <span class="nt">177564</span>          <span class="nt">BIS</span>     <span class="nn">#100</span><span class="o">,@</span><span class="nn">#TTCSR</span>    <span class="o">;</span><span class="nt">ALLOW</span> <span class="nt">INTERRUPT</span> <span class="nt">INTERRUPT</span> <span class="nt">OCCURS</span> <span class="nt">AFTER</span>
+                                                               <span class="o">;</span><span class="nt">THIS</span> <span class="nt">INSTRUCTION</span> <span class="o">&amp;</span> <span class="nt">BEFORE</span> <span class="nt">NEXT</span>
+<span class="nt">013636</span> <span class="nt">000001</span>                  <span class="nt">WAIT1</span><span class="o">:</span>  <span class="nt">WAIT</span>                    <span class="o">;</span><span class="nt">WAIT</span> <span class="nt">FOR</span> <span class="nt">AN</span> <span class="nt">INTERRUPT</span>
+<span class="nt">013640</span> <span class="nt">005202</span>                          <span class="nt">INC</span>     <span class="o">%</span><span class="nt">2</span>              <span class="o">;</span><span class="nt">INCREMENT</span> <span class="nt">INDICATOR</span>
+<span class="nt">013642</span> <span class="nt">000000</span>                          <span class="nt">HLT</span>                     <span class="o">;</span><span class="nt">ERROR</span><span class="o">!</span> <span class="nt">NO</span> <span class="s1">&#39;T&#39;</span> <span class="nt">TRAP</span> <span class="nt">AFTER</span> <span class="nt">INTERRUPT</span>
+<span class="nt">013644</span> <span class="nt">000000</span>                  <span class="nt">TTY7B</span><span class="o">:</span>  <span class="nt">HLT</span>                     <span class="o">;</span><span class="nt">ERROR</span><span class="o">!</span> <span class="s1">&#39;T&#39;</span> <span class="nt">BIT</span> <span class="nt">TRAPPED</span> <span class="nt">OUT</span> <span class="nt">OF</span> <span class="nt">WAIT</span>
+<span class="nt">013646</span> <span class="nt">000424</span>                          <span class="nt">BR</span>      <span class="nt">TTY7EX</span>          <span class="o">;</span><span class="nt">EXIT</span> <span class="nt">TEST</span>
+<span class="nt">013650</span> <span class="nt">012737</span>  <span class="nt">000040</span>  <span class="nt">177566</span>  <span class="nt">TTY7A</span><span class="o">:</span>  <span class="nt">MOV</span>     <span class="nn">#40</span><span class="o">,@</span><span class="nn">#177566</span>    <span class="o">;</span><span class="nt">TYPE</span> <span class="nt">SPACE</span> <span class="nt">CHAR</span>
+<span class="nt">013656</span> <span class="nt">012737</span>  <span class="nt">013674</span>  <span class="nt">000064</span>          <span class="nt">MOV</span>     <span class="nn">#TTY7C</span><span class="o">,@</span><span class="nn">#TPVEC</span>  <span class="o">;</span><span class="nt">REPOSITION</span> <span class="nt">TTY</span> <span class="nt">INT</span> <span class="nt">VECTOR</span>
+<span class="nt">013664</span> <span class="nt">012766</span>  <span class="nt">000020</span>  <span class="nt">000002</span>          <span class="nt">MOV</span>     <span class="nn">#20</span><span class="o">,</span><span class="nt">2</span><span class="o">(</span><span class="nt">6</span><span class="o">)</span>        <span class="o">;</span><span class="nt">PUT</span> <span class="s1">&#39;T&#39;</span> <span class="nt">BIT</span> <span class="nt">IN</span> <span class="nt">RETURN</span> <span class="nt">STATUS</span>
+<span class="nt">013672</span> <span class="nt">000006</span>                          <span class="nt">RTT</span>                     <span class="o">;</span><span class="nt">RETURN</span> <span class="nt">TO</span> <span class="nt">WAIT</span> <span class="nt">WITH</span> <span class="s1">&#39;T&#39;</span> <span class="nt">BIT</span> <span class="nt">SET</span>
+                                                               <span class="o">;</span><span class="nt">AND</span> <span class="nt">WAIT</span> <span class="nt">FOR</span> <span class="nt">TTY</span> <span class="nt">INTERRUPT</span> <span class="nt">WHEN</span> <span class="nt">NULL</span>
+                                                               <span class="o">;</span><span class="nt">CHARACTER</span> <span class="nt">IS</span> <span class="nt">TYPED</span>
+<span class="nt">013674</span> <span class="nt">012737</span>  <span class="nt">013716</span>  <span class="nt">000014</span>  <span class="nt">TTY7C</span><span class="o">:</span>  <span class="nt">MOV</span>     <span class="nn">#TTY7D</span><span class="o">,@</span><span class="nn">#BPTVEC</span> <span class="o">;</span><span class="nt">REPOINT</span> <span class="s1">&#39;T&#39;</span> <span class="nt">BIT</span> <span class="nt">TRAP</span> <span class="nt">VECTOR</span> <span class="nt">AFTER</span>
+                                                               <span class="o">;</span><span class="nt">TTY</span> <span class="nt">HAS</span> <span class="nt">INTERRUPTED</span>
+<span class="nt">013702</span> <span class="nt">005037</span>  <span class="nt">177564</span>                  <span class="nt">CLR</span>     <span class="o">@</span><span class="nn">#TTCSR</span>         <span class="o">;</span><span class="nt">DISABLE</span> <span class="nt">INTERRUPT</span> <span class="nt">ENABLE</span>
+<span class="nt">013706</span> <span class="nt">012737</span>  <span class="nt">000015</span>  <span class="nt">177566</span>          <span class="nt">MOV</span>     <span class="nn">#15</span><span class="o">,@</span><span class="nn">#177566</span>
+<span class="nt">013714</span> <span class="nt">000006</span>                          <span class="nt">RTT</span>                     <span class="o">;</span><span class="nt">RETURN</span> <span class="nt">TO</span> <span class="nt">INST</span> <span class="nt">FOLLOWING</span> <span class="nt">WAIT</span> <span class="nt">WITH</span> <span class="s1">&#39;T&#39;</span>
+                                                               <span class="o">;</span><span class="nt">BIT</span> <span class="nt">SET</span>
+<span class="nt">013716</span> <span class="nt">000240</span>                  <span class="nt">TTY7D</span><span class="o">:</span>  <span class="nt">NOP</span>
+<span class="nt">013720</span> <span class="nt">012737</span>  <span class="nt">000016</span>  <span class="nt">000014</span>  <span class="nt">TTY7EX</span><span class="o">:</span> <span class="nt">MOV</span>     <span class="nn">#BPTVEC</span><span class="o">+</span><span class="nt">2</span><span class="o">,@</span><span class="nn">#BPTVEC</span><span class="o">;</span><span class="nt">RESTORE</span> <span class="nt">VECTORS</span> <span class="nt">TO</span> <span class="nt">HALT</span> <span class="nt">AT</span>
+<span class="nt">013726</span> <span class="nt">012737</span>  <span class="nt">000066</span>  <span class="nt">000064</span>          <span class="nt">MOV</span>     <span class="nn">#66</span><span class="o">,@</span><span class="nn">#TPVEC</span>     <span class="o">;</span><span class="nt">VECTOR</span> <span class="o">+</span><span class="nt">2</span>
+<span class="nt">013734</span> <span class="nt">005302</span>                          <span class="nt">DEC</span>     <span class="o">%</span><span class="nt">2</span>              <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">INDICATOR</span>
+<span class="nt">013736</span> <span class="nt">001401</span>                          <span class="nt">BEQ</span>     <span class="o">.+</span><span class="nt">4</span>
+<span class="nt">013740</span> <span class="nt">000000</span>                          <span class="nt">HLT</span>                     <span class="o">;</span><span class="nt">ERROR</span><span class="o">!</span> <span class="nt">DID</span> <span class="nt">NOT</span> <span class="nt">DO</span> <span class="nt">INC</span> <span class="nt">INST</span> <span class="nt">AFTER</span> <span class="nt">INTERRUPT</span>
+</pre></div>
+</td></tr></table>
+
+<p>This test seems to be designed to return from an interrupt handler to a WAIT instruction, with the T bit set in
+the PSW and a serial xmit interrupt pending.  It verifies that the WAIT still "waits" in this circumstance.  It also
+verifies that a trace trap <em>does</em> occur after the immediately following INC instruction when the xmit interrupt
+subsequently terminates the WAIT.</p>
+<p>One potential problem with this test concerns the apparent assumption that enabling the xmit interrupt will cause an
+immediate trap before the subsequent WAIT instruction.  This is true if the serial transmitter is empty, but if the
+transmitter is ever full/busy when this code is entered this assumption may not hold.  Not sure yet if this will ever
+be a problem for this test given the surrounding code.</p>
+<p>In any case, as currently written this routine fails about 50% of the time on my 11/45.  The failure mode
+is that the processor sits at the WAIT instruction, (address display 013640, PC+2).  Intervention with the
+console halt switch (halt then back to enabl) breaks the WAIT microcode loop; console cont then takes us to the halt
+at 013740 (address display 013742, PC+2).</p>
+<p>The fact that the routine is tailing out through the halt at 013740 without hitting the halts at 013642 or 013644 is
+interesting; this implies that the second serial xmit interrupt to TTY7C has executed.  This is verified by examining
+the break trap from the console after the test hangs up on the WAIT -- in the failure case, it is already reset to
+point to TTY7D.  So the failure mode seems to be that the return from the second xmit interrupt sometimes goes to the
+WAIT instead of the subsequent INC.</p>
+<p>Here is the microcode flow around the WAIT instruction.  The horizontal line across the top is the A fork:</p>
+<p><img src='/images/pdp11/wait-microcode.png'/></p>
+<p>Using the KM11, in the failure case I can see the T bit set and the microcode looping through states WAT.00, WAT.20, WAT.30, WAT.11, which seems expected.  I have also verified that executing a WAIT <em>without</em> the T bit set
+loops through states WAT.00 and WAT.10.</p>
+<p>Lastly, running on the RC maintenance clock at about half the usual clock frequency makes the failure case happen
+almost 100% of the time.</p>
+<p>Next I'll be needing to learn more about the BRQ logic, and in particular the mechanism by which the second xmit
+interrupt nominally causes INTRF to be asserted.  Understanding that should lead me to some things to check with the
+logic probe and analyzer...</p></div>
+    <hr />
+</div>
+
+
+
+<div class='article'>
+    <div class="content-title">
         <a href="http://fritzm.github.io/diagnostics-2.html"><h1>PDP-11/45: Diagnostics II</h1></a>
 Mon 04 July 2016
 
@@ -468,34 +575,6 @@ Uban (described <a href="http://www.ubanproductions.com/museum.html">here</a>), 
 <a href="http://www.ebay.com/itm/142004889393">HP1662A logic analyzer</a> on eBay, for about the same money as the KM11 PCB and
 parts!</p>
 <p><a href="http://fritzm.github.io/images/pdp11/power-lights.jpg"><img src='/images/pdp11/power-lights_thumbnail_tall.jpg'/></a></p></div>
-    <hr />
-</div>
-
-
-
-<div class='article'>
-    <div class="content-title">
-        <a href="http://fritzm.github.io/power-fixes.html"><h1>PDP-11/45: Power fixes and CPU debug</h1></a>
-Mon 30 May 2016
-
-by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
-    </div>
-
-    <div><p>Connected up the aforementioned red wire hack to the new power harness, and verified +5V to slots 10 through 15.
-Console is no longer all address and data lights on, but basic console load address / examine / deposit operations are
-still not working.  A random assortment of address lines seem stuck, different on each power cycle.  About the only
-thing that reliably functions from the console is loading the two highest address bits from the switches, immediately
-after a reset.  Pulled the floating point unit, un-jumpered the DD11 expansion backplane, and removed all peripherals
-except the MR11 diode ROM; same (broken) behavior...</p>
-<p>Scoped all the DC voltages, and did not notice any glitches.  Pulled the H742s for some bench work: verified AC LO and
-DC LO signaling on both units, replaced a broken Mate-n-Lok connector on one of the units, blew out dust from all the 5V
-regulators and replaced their indicator bulbs with modern equivalent (CM7381). Sourced and put on order a modern
-equivalent (OL-6003BP) for the indicator bulbs on the -15V regulators.</p>
-<p>Next steps will be to verify various Unibus signals on the backplane, then maybe play some swap games with CPU card
-spares to see if I can get closer to a working console as a starting point.  All I have time for this weekend, though; sorry nothing new to see so no new pictures this time!</p></div>
     <hr />
 </div>
 

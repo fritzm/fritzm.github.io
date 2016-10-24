@@ -1,5 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>fritzm.github.io</title><link href="http://fritzm.github.io/" rel="alternate"></link><link href="http://fritzm.github.io/feeds/pdp-11.atom.xml" rel="self"></link><id>http://fritzm.github.io/</id><updated>2016-10-01T00:00:00-07:00</updated><entry><title>PDP-11/45: Diagnostics X - FP11 FPU, cont.</title><link href="http://fritzm.github.io/diagnostics-10.html" rel="alternate"></link><published>2016-10-01T00:00:00-07:00</published><updated>2016-10-01T00:00:00-07:00</updated><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-10-01:diagnostics-10.html</id><summary type="html">&lt;p&gt;Okay, here's the dig in on the FP11 STST diagnostic failure.  As detailed previously, I'd been seeing an
+<feed xmlns="http://www.w3.org/2005/Atom"><title>fritzm.github.io</title><link href="http://fritzm.github.io/" rel="alternate"></link><link href="http://fritzm.github.io/feeds/pdp-11.atom.xml" rel="self"></link><id>http://fritzm.github.io/</id><updated>2016-10-16T00:00:00-07:00</updated><entry><title>PDP-11/45: Diagnostics XI - FP11 FPU, cont.</title><link href="http://fritzm.github.io/diagnostics-11.html" rel="alternate"></link><published>2016-10-16T00:00:00-07:00</published><updated>2016-10-16T00:00:00-07:00</updated><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-10-16:diagnostics-11.html</id><summary type="html">&lt;p&gt;Wrote some small test programs to investigate FP add/subtract.  Turns out that single-precision add/subtract
+workS fine, but double-precision results come back with some erroneous bits set in the fraction.
+Here's the test code I ended up using for troublshooting -- when executed on my machine, bits 24 and 25
+end up incorrectly set in the result at D3:&lt;/p&gt;
+&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt; 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;        &lt;span class="nt"&gt;000000&lt;/span&gt;                          &lt;span class="nt"&gt;AC0&lt;/span&gt;&lt;span class="o"&gt;=%&lt;/span&gt;&lt;span class="nt"&gt;0&lt;/span&gt;
+        &lt;span class="nt"&gt;000001&lt;/span&gt;                          &lt;span class="nt"&gt;AC1&lt;/span&gt;&lt;span class="o"&gt;=%&lt;/span&gt;&lt;span class="nt"&gt;1&lt;/span&gt;
+        &lt;span class="nt"&gt;000000&lt;/span&gt;                          &lt;span class="nc"&gt;.ASECT&lt;/span&gt;
+        &lt;span class="nt"&gt;001000&lt;/span&gt;                          &lt;span class="o"&gt;.=&lt;/span&gt;&lt;span class="nt"&gt;1000&lt;/span&gt;
+&lt;span class="nt"&gt;001000&lt;/span&gt;  &lt;span class="nt"&gt;170011&lt;/span&gt;                  &lt;span class="nt"&gt;START&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;  &lt;span class="nt"&gt;SETD&lt;/span&gt;                &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;SET&lt;/span&gt; &lt;span class="nt"&gt;DOUBLE&lt;/span&gt; &lt;span class="nt"&gt;PRECISION&lt;/span&gt; &lt;span class="nt"&gt;MODE&lt;/span&gt;
+&lt;span class="nt"&gt;001002&lt;/span&gt;  &lt;span class="nt"&gt;172467&lt;/span&gt;  &lt;span class="nt"&gt;000014&lt;/span&gt;                  &lt;span class="nt"&gt;LDD&lt;/span&gt;     &lt;span class="nt"&gt;D1&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;AC0&lt;/span&gt;      &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;FETCH&lt;/span&gt; &lt;span class="nt"&gt;FIRST&lt;/span&gt; &lt;span class="nt"&gt;ADDEND&lt;/span&gt; &lt;span class="nt"&gt;FROM&lt;/span&gt; &lt;span class="nt"&gt;D1&lt;/span&gt;
+&lt;span class="nt"&gt;001006&lt;/span&gt;  &lt;span class="nt"&gt;172567&lt;/span&gt;  &lt;span class="nt"&gt;000020&lt;/span&gt;                  &lt;span class="nt"&gt;LDD&lt;/span&gt;     &lt;span class="nt"&gt;D2&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;AC1&lt;/span&gt;      &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;FETCH&lt;/span&gt; &lt;span class="nt"&gt;SECOND&lt;/span&gt; &lt;span class="nt"&gt;ADDEND&lt;/span&gt; &lt;span class="nt"&gt;FROM&lt;/span&gt; &lt;span class="nt"&gt;D2&lt;/span&gt;
+&lt;span class="nt"&gt;001012&lt;/span&gt;  &lt;span class="nt"&gt;172100&lt;/span&gt;                          &lt;span class="nt"&gt;ADDD&lt;/span&gt;    &lt;span class="nt"&gt;AC0&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;AC1&lt;/span&gt;     &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;ADD&lt;/span&gt; &lt;span class="nt"&gt;THEM&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nt"&gt;RESULT&lt;/span&gt; &lt;span class="nt"&gt;IN&lt;/span&gt; &lt;span class="nt"&gt;AC1&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;span class="nt"&gt;001014&lt;/span&gt;  &lt;span class="nt"&gt;174167&lt;/span&gt;  &lt;span class="nt"&gt;000022&lt;/span&gt;                  &lt;span class="nt"&gt;STD&lt;/span&gt;     &lt;span class="nt"&gt;AC1&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;D3&lt;/span&gt;      &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;STORE&lt;/span&gt; &lt;span class="nt"&gt;RESULT&lt;/span&gt; &lt;span class="nt"&gt;TO&lt;/span&gt; &lt;span class="nt"&gt;D3&lt;/span&gt;
+&lt;span class="nt"&gt;001020&lt;/span&gt;  &lt;span class="nt"&gt;000000&lt;/span&gt;                          &lt;span class="nt"&gt;HALT&lt;/span&gt;
+&lt;span class="nt"&gt;001022&lt;/span&gt;  &lt;span class="nt"&gt;040200&lt;/span&gt;  &lt;span class="nt"&gt;000000&lt;/span&gt;  &lt;span class="nt"&gt;000000&lt;/span&gt;  &lt;span class="nt"&gt;D1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nc"&gt;.WORD&lt;/span&gt;   &lt;span class="nt"&gt;040000&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;000000&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;000000&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;000000&lt;/span&gt; &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;0&lt;/span&gt;&lt;span class="nc"&gt;.5&lt;/span&gt;
+&lt;span class="nt"&gt;001030&lt;/span&gt;  &lt;span class="nt"&gt;000000&lt;/span&gt;
+&lt;span class="nt"&gt;001032&lt;/span&gt;  &lt;span class="nt"&gt;040200&lt;/span&gt;  &lt;span class="nt"&gt;000000&lt;/span&gt;  &lt;span class="nt"&gt;000000&lt;/span&gt;  &lt;span class="nt"&gt;D2&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nc"&gt;.WORD&lt;/span&gt;   &lt;span class="nt"&gt;040000&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;000000&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;000000&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;000000&lt;/span&gt; &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;0&lt;/span&gt;&lt;span class="nc"&gt;.5&lt;/span&gt;
+&lt;span class="nt"&gt;001040&lt;/span&gt;  &lt;span class="nt"&gt;000000&lt;/span&gt;
+&lt;span class="nt"&gt;001042&lt;/span&gt;  &lt;span class="nt"&gt;000000&lt;/span&gt;  &lt;span class="nt"&gt;000000&lt;/span&gt;  &lt;span class="nt"&gt;000000&lt;/span&gt;  &lt;span class="nt"&gt;D3&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nc"&gt;.WORD&lt;/span&gt;   &lt;span class="nt"&gt;000000&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;000000&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;000000&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;000000&lt;/span&gt;
+&lt;span class="nt"&gt;001050&lt;/span&gt;  &lt;span class="nt"&gt;000000&lt;/span&gt;
+        &lt;span class="nt"&gt;001000&lt;/span&gt;                          &lt;span class="nc"&gt;.END&lt;/span&gt;    &lt;span class="nt"&gt;START&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+
+&lt;p&gt;So, the usual procedure: KM11 in the floating point slot, and FRL (where these bits are handled) out on
+extenders.  First step is to verify the microcode sequencing with the KM11 and front panel, and it looks good.
+In particular, the FPU is sequencing through states ADD.04 and ADD.06 per expectation for double-precision, branching correctly for non-zero operands, and taking the equal exponents branch through ADD.24 (refer to
+page FLOWS 8 of the FP11 engineering drawings).&lt;/p&gt;
+&lt;p&gt;Next, stopped in state ADD.38, where the fraction addition occurs, and scanned the inputs and outputs of
+all the 74181 bitslice ALUS with a logic probe. Bit 28 of the A input to the FALU (E16 pin 2, refer to page
+FRLJ of the FP11 engineering drawings) is incorrectly set.  This is arriving via the AR register.&lt;/p&gt;
+&lt;p&gt;The value in the AR register is originally fetched from the register scratchpad, then flows through QR, BR,
+and the FALU during microstates ADD.04, ADD.06, and ADD.02.  Some more stepping and logic probe work showed
+that the fraction values are correct along these paths through these states.  So it looks like the AR itself
+may be at fault.&lt;/p&gt;
+&lt;p&gt;Set up the logic analyzer with a chip-clip, and it looks like E15, a 74194 shift-register that holds bits
+28-31 of AR, is indeed be faulty:&lt;/p&gt;
+&lt;p&gt;&lt;img src='/images/pdp11/bad-ar.jpg'/&gt;&lt;/p&gt;
+&lt;p&gt;Here we can see what should be a broadside load: positive CLK edge, S0 and S1 both asserted, and inputs of
+all zeros.  But the output sticks brokenly at 8.  Pulled this shift register, soldered in a socket, and put
+a replacement and some spares on order.  All for now, until the parts arrive.&lt;/p&gt;</summary><category term="Retro-Computing"></category><category term="PDP-11"></category></entry><entry><title>PDP-11/45: Diagnostics X - FP11 FPU, cont.</title><link href="http://fritzm.github.io/diagnostics-10.html" rel="alternate"></link><published>2016-10-01T00:00:00-07:00</published><updated>2016-10-01T00:00:00-07:00</updated><author><name>Fritz Mueller</name></author><id>tag:fritzm.github.io,2016-10-01:diagnostics-10.html</id><summary type="html">&lt;p&gt;Okay, here's the dig in on the FP11 STST diagnostic failure.  As detailed previously, I'd been seeing an
 incorrect FEC after executing a small test program to generate a minus-zero condition.  I'd verified that
 the microcode sequence was per expectation, and that the correct FEC was being stored and retrieved from
 AC7[1:0] in microstates TRP.50 and the start of TRP.60.&lt;/p&gt;

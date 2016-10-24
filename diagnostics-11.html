@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>fritzm.github.io</title>
+    <meta name="description" content="">
+    <meta name="author" content="Fritz Mueller">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+    <script src="http://fritzm.github.io/theme/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="http://fritzm.github.io/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="http://fritzm.github.io/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="http://fritzm.github.io/theme/local.css" rel="stylesheet">
+    <link href="http://fritzm.github.io/theme/pygments.css" rel="stylesheet">
+
+    <!-- So Firefox can bookmark->"abo this site" -->
+        <link href="feeds/all.atom.xml" rel="alternate" title="fritzm.github.io" type="application/atom+xml">
+
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="navbar-inner">
+    <div class="container">
+
+         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+         </a>
+
+        <a class="brand" href="http://fritzm.github.io">fritzm.github.io</a>
+
+        <div class="nav-collapse">
+        <ul class="nav">
+
+        </ul>
+        </div>
+
+    </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="content">
+    <div class="row">
+
+        <div class="span9">
+    <div class='article'>
+        <div class="content-title">
+            <h1>PDP-11/45: Diagnostics XI - FP11 FPU, cont.</h1>
+Sun 16 October 2016
+
+by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+        </div>
+	
+        <div><p>Wrote some small test programs to investigate FP add/subtract.  Turns out that single-precision add/subtract
+workS fine, but double-precision results come back with some erroneous bits set in the fraction.
+Here's the test code I ended up using for troublshooting -- when executed on my machine, bits 24 and 25
+end up incorrectly set in the result at D3:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17</pre></div></td><td class="code"><div class="highlight"><pre><span></span>        <span class="nt">000000</span>                          <span class="nt">AC0</span><span class="o">=%</span><span class="nt">0</span>
+        <span class="nt">000001</span>                          <span class="nt">AC1</span><span class="o">=%</span><span class="nt">1</span>
+        <span class="nt">000000</span>                          <span class="nc">.ASECT</span>
+        <span class="nt">001000</span>                          <span class="o">.=</span><span class="nt">1000</span>
+<span class="nt">001000</span>  <span class="nt">170011</span>                  <span class="nt">START</span><span class="o">:</span>  <span class="nt">SETD</span>                <span class="o">;</span><span class="nt">SET</span> <span class="nt">DOUBLE</span> <span class="nt">PRECISION</span> <span class="nt">MODE</span>
+<span class="nt">001002</span>  <span class="nt">172467</span>  <span class="nt">000014</span>                  <span class="nt">LDD</span>     <span class="nt">D1</span><span class="o">,</span><span class="nt">AC0</span>      <span class="o">;</span><span class="nt">FETCH</span> <span class="nt">FIRST</span> <span class="nt">ADDEND</span> <span class="nt">FROM</span> <span class="nt">D1</span>
+<span class="nt">001006</span>  <span class="nt">172567</span>  <span class="nt">000020</span>                  <span class="nt">LDD</span>     <span class="nt">D2</span><span class="o">,</span><span class="nt">AC1</span>      <span class="o">;</span><span class="nt">FETCH</span> <span class="nt">SECOND</span> <span class="nt">ADDEND</span> <span class="nt">FROM</span> <span class="nt">D2</span>
+<span class="nt">001012</span>  <span class="nt">172100</span>                          <span class="nt">ADDD</span>    <span class="nt">AC0</span><span class="o">,</span><span class="nt">AC1</span>     <span class="o">;</span><span class="nt">ADD</span> <span class="nt">THEM</span> <span class="o">(</span><span class="nt">RESULT</span> <span class="nt">IN</span> <span class="nt">AC1</span><span class="o">)</span>
+<span class="nt">001014</span>  <span class="nt">174167</span>  <span class="nt">000022</span>                  <span class="nt">STD</span>     <span class="nt">AC1</span><span class="o">,</span><span class="nt">D3</span>      <span class="o">;</span><span class="nt">STORE</span> <span class="nt">RESULT</span> <span class="nt">TO</span> <span class="nt">D3</span>
+<span class="nt">001020</span>  <span class="nt">000000</span>                          <span class="nt">HALT</span>
+<span class="nt">001022</span>  <span class="nt">040200</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D1</span><span class="o">:</span>     <span class="nc">.WORD</span>   <span class="nt">040000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span> <span class="o">;</span><span class="nt">0</span><span class="nc">.5</span>
+<span class="nt">001030</span>  <span class="nt">000000</span>
+<span class="nt">001032</span>  <span class="nt">040200</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D2</span><span class="o">:</span>     <span class="nc">.WORD</span>   <span class="nt">040000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span> <span class="o">;</span><span class="nt">0</span><span class="nc">.5</span>
+<span class="nt">001040</span>  <span class="nt">000000</span>
+<span class="nt">001042</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D3</span><span class="o">:</span>     <span class="nc">.WORD</span>   <span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span>
+<span class="nt">001050</span>  <span class="nt">000000</span>
+        <span class="nt">001000</span>                          <span class="nc">.END</span>    <span class="nt">START</span>
+</pre></div>
+</td></tr></table>
+
+<p>So, the usual procedure: KM11 in the floating point slot, and FRL (where these bits are handled) out on
+extenders.  First step is to verify the microcode sequencing with the KM11 and front panel, and it looks good.
+In particular, the FPU is sequencing through states ADD.04 and ADD.06 per expectation for double-precision, branching correctly for non-zero operands, and taking the equal exponents branch through ADD.24 (refer to
+page FLOWS 8 of the FP11 engineering drawings).</p>
+<p>Next, stopped in state ADD.38, where the fraction addition occurs, and scanned the inputs and outputs of
+all the 74181 bitslice ALUS with a logic probe. Bit 28 of the A input to the FALU (E16 pin 2, refer to page
+FRLJ of the FP11 engineering drawings) is incorrectly set.  This is arriving via the AR register.</p>
+<p>The value in the AR register is originally fetched from the register scratchpad, then flows through QR, BR,
+and the FALU during microstates ADD.04, ADD.06, and ADD.02.  Some more stepping and logic probe work showed
+that the fraction values are correct along these paths through these states.  So it looks like the AR itself
+may be at fault.</p>
+<p>Set up the logic analyzer with a chip-clip, and it looks like E15, a 74194 shift-register that holds bits
+28-31 of AR, is indeed be faulty:</p>
+<p><img src='/images/pdp11/bad-ar.jpg'/></p>
+<p>Here we can see what should be a broadside load: positive CLK edge, S0 and S1 both asserted, and inputs of
+all zeros.  But the output sticks brokenly at 8.  Pulled this shift register, soldered in a socket, and put
+a replacement and some spares on order.  All for now, until the parts arrive.</p></div>
+	
+        <hr>
+
+        <h2>Comments</h2>
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'fritzm'; 
+    var disqus_title = 'PDP-11/45: Diagnostics XI - FP11 FPU, cont.';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+        </div>
+
+        <div class="span3">
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header">
+                Site
+                </li>
+
+                <li><a href="http://fritzm.github.io/">Archives</a>
+                <li><a href="http://fritzm.github.io/tags.html">Tags</a>
+
+
+
+                <li><a href="http://fritzm.github.io/feeds/all.atom.xml" rel="alternate" type="application/atom+xml">Atom feed</a></li>
+
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header">
+                Categories
+                </li>
+
+                <li><a href="http://fritzm.github.io/category/math.html">Math</a></li>
+                <li><a href="http://fritzm.github.io/category/pdp-11.html">PDP-11</a></li>
+                <li><a href="http://fritzm.github.io/category/programming.html">Programming</a></li>
+            </ul>
+            </div>
+
+
+
+
+            <div class="social">
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header">
+                Social
+                </li>
+
+                <li><a href="http://facebook.com/fritzmueller">facebook</a></li>
+                <li><a href="http://twitter.com/infrafritz">twitter</a></li>
+                <li><a href="http://instagram.com/infrafritz">Instagram</a></li>
+                <li><a href="http://www.linkedin.com/pub/fritz-mueller/a/679/62/">LinkedIn</a></li>
+                <li><a href="http://jsfiddle.net/user/fritzm/fiddles/">JSFiddle</a></li>
+                <li><a href="https://github.com/fritzm">GitHub</a></li>
+            </ul>
+            </div>
+            </div>
+
+        </div>     </div>     </div> 
+<footer>
+<br />
+<p><a href="http://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2012</p>
+</footer>
+
+</div> <!-- /container -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-collapse.js"></script>
+</body>
+</html>
