@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>fritzm.github.io</title>
+    <meta name="description" content="">
+    <meta name="author" content="Fritz Mueller">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+    <script src="http://fritzm.github.io/theme/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="http://fritzm.github.io/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="http://fritzm.github.io/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="http://fritzm.github.io/theme/local.css" rel="stylesheet">
+    <link href="http://fritzm.github.io/theme/pygments.css" rel="stylesheet">
+
+    <!-- So Firefox can bookmark->"abo this site" -->
+        <link href="feeds/all.rss.xml" rel="alternate" title="fritzm.github.io" type="application/rss+xml">
+
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="navbar-inner">
+    <div class="container">
+
+         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+         </a>
+
+        <a class="brand" href="http://fritzm.github.io">fritzm.github.io</a>
+
+        <div class="nav-collapse">
+        <ul class="nav">
+
+        </ul>
+        </div>
+
+    </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="content">
+    <div class="row">
+
+        <div class="span9">
+    <div class='article'>
+        <div class="content-title">
+            <h1>PDP-11/45: Diagnostics XIV - CPU, MMU, FPU Complete!</h1>
+Mon 16 January 2017
+
+by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+        </div>
+	
+        <div><p>Okay, after socketing in the replacement 74H10 and reseating a few boards, the output from the floating 
+point diagnostic now looks correct:</p>
+<p><span style="font-size: x-small; font-family: monospace; white-space: pre; display: block; line-height: normal; font-weight: bold;">................ ................ ................ ................ .........11..... .........11..... .........11..... .........11.....
+................ ................ ................ ................ ..........11.... ..........11.... ..........11.... ..........11....
+................ ................ ................ ................ ...........11... ...........11... ...........11... ...........11...
+................ ................ ................ ................ ............11.. ............11.. ............11.. ............11..
+................ ................ ................ ................ .............11. .............11. .............11. .............11.
+................ ................ ................ ................ ..............11 ..............11 ..............11 ..............11
+................ ................ ................ ................ ...............1 1..............1 1..............1 1..............1
+.......111...... ................ ................ ................ ................ 11.............. 11.............. 11..............
+.......1111..... ................ ................ ................ ................ .11............. .11............. .11.............
+..........11.... ................ ................ ................ ................ ..11............ ..11............ ..11............
+...........11... ................ ................ ................ ................ ...11........... ...11........... ...11...........
+............11.. ................ ................ ................ ................ ....11.......... ....11.......... ....11..........
+.............11. ................ ................ ................ ................ .....11......... .....11......... .....11.........
+..............11 ................ ................ ................ ................ ......11........ ......11........ ......11........
+...............1 1............... ................ ................ ................ .......11....... .......11....... .......11.......
+................ 11.............. ................ ................ ................ ........11...... ........11...... ........11......
+................ .11............. ................ ................ ................ .........11..... .........11..... .........11.....
+................ ..11............ ................ ................ ................ ..........11.... ..........11.... ..........11....
+................ ...11........... ................ ................ ................ ...........11... ...........11... ...........11...
+................ ....11.......... ................ ................ ................ ............11.. ............11.. ............11..
+................ .....11......... ................ ................ ................ .............11. .............11. .............11.
+................ ......11........ ................ ................ ................ ..............11 ..............11 ..............11
+................ .......11....... ................ ................ ................ ...............1 1..............1 1..............1
+.......111...... ........11...... ................ ................ ................ ................ 11.............. 11..............
+.......1111..... .........11..... ................ ................ ................ ................ .11............. .11.............
+..........11.... ..........11.... ................ ................ ................ ................ ..11............ ..11............
+...........11... ...........11... ................ ................ ................ ................ ...11........... ...11...........
+............11.. ............11.. ................ ................ ................ ................ ....11.......... ....11..........
+.............11. .............11. ................ ................ ................ ................ .....11......... .....11.........
+..............11 ..............11 ................ ................ ................ ................ ......11........ ......11........
+...............1 1..............1 1............... ................ ................ ................ .......11....... .......11.......
+................ 11.............. 11.............. ................ ................ ................ ........11...... ........11......
+................ .11............. .11............. ................ ................ ................ .........11..... .........11.....
+................ ..11............ ..11............ ................ ................ ................ ..........11.... ..........11....
+................ ...11........... ...11........... ................ ................ ................ ...........11... ...........11...
+................ ....11.......... ....11.......... ................ ................ ................ ............11.. ............11..
+................ .....11......... .....11......... ................ ................ ................ .............11. .............11.
+................ ......11........ ......11........ ................ ................ ................ ..............11 ..............11
+................ .......11....... .......11....... ................ ................ ................ ...............1 1..............1
+.......111...... ........11...... ........11...... ................ ................ ................ ................ 11..............
+.......1111..... .........11..... .........11..... ................ ................ ................ ................ .11.............
+..........11.... ..........11.... ..........11.... ................ ................ ................ ................ ..11............
+...........11... ...........11... ...........11... ................ ................ ................ ................ ...11...........
+............11.. ............11.. ............11.. ................ ................ ................ ................ ....11..........
+.............11. .............11. .............11. ................ ................ ................ ................ .....11.........
+..............11 ..............11 ..............11 ................ ................ ................ ................ ......11........
+...............1 1..............1 1..............1 1............... ................ ................ ................ .......11.......
+................ 11.............. 11.............. 11.............. ................ ................ ................ ........11......
+................ .11............. .11............. .11............. ................ ................ ................ .........11.....
+................ ..11............ ..11............ ..11............ ................ ................ ................ ..........11....
+................ ...11........... ...11........... ...11........... ................ ................ ................ ...........11...
+................ ....11.......... ....11.......... ....11.......... ................ ................ ................ ............11..
+................ .....11......... .....11......... .....11......... ................ ................ ................ .............11.
+................ ......11........ ......11........ ......11........ ................ ................ ................ ..............11
+................ .......11....... .......11....... .......11....... ................ ................ ................ ...............1
+.......111...... ........11...... ........11...... ........11...... ................ ................ ................ ................
+.......1111..... .........11..... .........11..... .........11..... ................ ................ ................ ................
+.........11..... .........11..... .........11..... .........11..... ................ ................ ................ ................</span></p>
+<p>With this fix, <strong>the machine is now reliably passing the complete suite of CPU, MMU, and FPU diagnostics</strong> 
+-- a real milestone!  I also loaded paper tape BASIC via PDP11GUI, swapped the console over to my VT100, and
+played around for a little bit.  Working well, and gratifying to see the machine actually running some
+software other than diagnostics.</p>
+<p>So, now, on to the RK11/RK05 storage subsystem for real.  I retrieved the rest of the cabinetry,
+cleaned and reassembled it, and inspected and cleaned the cabinet-top 860 power controller in the second
+cabinet.  This had the usual dead neon indicator and a blown fuse, but was otherwise in good shape.  At first
+I was puzzled by the relay in the 860 not engaging, but after looking at the schematic is was clear that a
+jumper plug on J4 connecting pins 1 and 2 was required.  I recalled seeing one such banging around loose
+in my spare parts box -- so that's where that came from!  Cleaned up the cabinet-top fan in the second
+cabinet as well.</p>
+<p>I have been running the machine off a GFCI quad box behind my washer/dryer, but at this point there is enough
+leakage through filter caps in the various power supplies that the GFCI has started to trip from time to time.
+Took a pause to rewire the box -- left two of the outlets GFCI protected for the washer/dryer, and rewired two
+as non-protected for use with the PDP-11.</p>
+<p><a href="http://fritzm.github.io/images/pdp11/cabinets.jpg"><img src='/images/pdp11/cabinets_thumbnail_tall.jpg'/></a>
+<a href="http://fritzm.github.io/images/pdp11/basic.jpg"><img src='/images/pdp11/basic_thumbnail_tall.jpg'/></a></p></div>
+	
+        <hr>
+
+        <h2>Comments</h2>
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'fritzm'; 
+    var disqus_title = 'PDP-11/45: Diagnostics XIV - CPU, MMU, FPU Complete!';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+        </div>
+
+        <div class="span3">
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header">
+                Site
+                </li>
+
+                <li><a href="http://fritzm.github.io/">Archives</a>
+                <li><a href="http://fritzm.github.io/tags.html">Tags</a>
+
+
+
+                <li><a href="http://fritzm.github.io/feeds/all.rss.xml" rel="alternate" type="application/rss+xml">RSS feed</a></li>
+
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header">
+                Categories
+                </li>
+
+                <li><a href="http://fritzm.github.io/category/math.html">Math</a></li>
+                <li><a href="http://fritzm.github.io/category/pdp-11.html">PDP-11</a></li>
+                <li><a href="http://fritzm.github.io/category/programming.html">Programming</a></li>
+            </ul>
+            </div>
+
+
+
+
+            <div class="social">
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header">
+                Social
+                </li>
+
+                <li><a href="http://facebook.com/fritzmueller">facebook</a></li>
+                <li><a href="http://twitter.com/infrafritz">twitter</a></li>
+                <li><a href="http://instagram.com/infrafritz">Instagram</a></li>
+                <li><a href="http://www.linkedin.com/pub/fritz-mueller/a/679/62/">LinkedIn</a></li>
+                <li><a href="http://jsfiddle.net/user/fritzm/fiddles/">JSFiddle</a></li>
+                <li><a href="https://github.com/fritzm">GitHub</a></li>
+            </ul>
+            </div>
+            </div>
+
+        </div>     </div>     </div> 
+<footer>
+<br />
+<p><a href="http://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2012</p>
+</footer>
+
+</div> <!-- /container -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-collapse.js"></script>
+</body>
+</html>

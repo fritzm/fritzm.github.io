@@ -54,8 +54,8 @@
         <div class="span9">
     <div class='article'>
         <div class="content-title">
-            <h1>PDP-11/45: Power fixes and CPU debug</h1>
-Mon 30 May 2016
+            <h1>PDP-11/45: H720E teardown and inspection</h1>
+Sun 18 September 2016
 
 by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
  
@@ -63,19 +63,14 @@ by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fr
 
         </div>
 	
-        <div><p>Connected up the aforementioned red wire hack to the new power harness, and verified +5V to slots 10 through 15.
-Console is no longer all address and data lights on, but basic console load address / examine / deposit operations are
-still not working.  A random assortment of address lines seem stuck, different on each power cycle.  About the only
-thing that reliably functions from the console is loading the two highest address bits from the switches, immediately
-after a reset.  Pulled the floating point unit, un-jumpered the DD11 expansion backplane, and removed all peripherals
-except the MR11 diode ROM; same (broken) behavior...</p>
-<p>Scoped all the DC voltages, and did not notice any glitches.  Pulled the H742s for some bench work: verified AC LO and
-DC LO signaling on both units, replaced a broken Mate-n-Lok connector on one of the units, blew out dust from all the 5V
-regulators and replaced their indicator bulbs with modern equivalent (CM7381). Sourced and put on order a modern
-equivalent (OL-6003BP) for the indicator bulbs on the -15V regulators.</p>
-<p>Next steps will be to verify various Unibus signals on the backplane, then maybe play some swap games with CPU card
-spares to see if I can get closer to a working console as a starting point.  All I have time for this weekend, though;
-sorry nothing new to see so no new pictures this time!</p></div>
+        <div><p>Started in on the H720E power supply that is part of RK05 storage system.  Just initial teardown, cleaning, and
+inspection for obviously failed parts.  Looks pretty good, though there is a lot of dust and grime because this
+unit lost its top cover plate somewhere over the years (I'll have to build some sort of replacement).</p>
+<p>There are a couple of 22,000 mFD 50v electrolytic caps here that I'll try reforming before hitting them at full power,
+since they've been sitting idle for upwards of 30yrs!  Also, one obviously leaking 330 mfd axial on regulator board, so
+I'll replace this and all its identical twins.  Parts on order...</p>
+<p><a href="http://fritzm.github.io/images/pdp11/h720e-breakdown.jpg"><img src='/images/pdp11/h720e-breakdown_thumbnail_tall.jpg'/></a>
+<a href="http://fritzm.github.io/images/pdp11/h720e-leaking-cap.jpg"><img src='/images/pdp11/h720e-leaking-cap_thumbnail_tall.jpg'/></a></p></div>
 	
         <hr>
 
@@ -83,7 +78,7 @@ sorry nothing new to see so no new pictures this time!</p></div>
 <div id="disqus_thread"></div>
 <script type="text/javascript">
     var disqus_shortname = 'fritzm'; 
-    var disqus_title = 'PDP-11/45: Power fixes and CPU debug';
+    var disqus_title = 'PDP-11/45: H720E teardown and inspection';
 
     (function() {
         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
