@@ -56,6 +56,30 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="http://fritzm.github.io/diagnostics-6.html"><h1>PDP-11/45: Diagnostics VI - GRA ALU PROM repair</h1></a>
+Sun 07 August 2016
+
+by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+    </div>
+
+    <div><p>Data I/O Series 22 PROM programmer from eBay showed up, as well as some unprogrammed Signetics 82S123.  Punched in the
+subsidiary ALU control ROM contents from the listing on GRAK in the 11/45 engineering drawings and burnt a new PROM.
+Put a socket and the new PROM in place of the failed part on my original GRA, slotted it into the CPU, and success!
+Diagnostic CKBOA0 now passes.  I will probably return to the other faulty GRA at a later point, as it is partially
+diagnosed and I like to have spares working and ready to go.</p>
+<p>Next time I'll be moving on to the CKT series of tests for the KT11 memory management cards...</p>
+<p><a href="http://fritzm.github.io/images/pdp11/prom-programmer.jpg"><img src='/images/pdp11/prom-programmer_thumbnail_tall.jpg'/></a>
+<a href="http://fritzm.github.io/images/pdp11/alu-prom-replaced.jpg"><img src='/images/pdp11/alu-prom-replaced_thumbnail_tall.jpg'/></a></p></div>
+    <hr />
+</div>
+
+
+
+<div class='article'>
+    <div class="content-title">
         <a href="http://fritzm.github.io/diagnostics-5.html"><h1>PDP-11/45: Diagnostics V - D0AA0-D0MA0, CKBOA0</h1></a>
 Sun 31 July 2016
 
@@ -584,80 +608,6 @@ because at the time I had a fault in the first 16KW of memory on my MS11-L so I 
 addresses.</p>
 </li>
 </ul></div>
-    <hr />
-</div>
-
-
-
-<div class='article'>
-    <div class="content-title">
-        <a href="http://fritzm.github.io/ms11-debug.html"><h1>PDP-11/45: MS11-L debug</h1></a>
-Sat 18 June 2016
-
-by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
-    </div>
-
-    <div><p>After addressing the -15V problem on the MS11, most of the bad behaviors seem to have cleared up except a stuck (on)
-bit 6 in the first 16K words of address space (000000-077776).  Hooked up the new logic analyzer, and it has been very
-useful in troubleshooting the board -- can easily capture and inspect the timing of complete memory cycles.  Definitely
-worth the investment!</p>
-<p>Using the analyzer, I was able to verify the refresh and chip select logic on the board, then track down the stuck bit
-to what seems to be a single failed DRAM chip (E96 on the MS11-L engineering drawings).  I'd like to test the entire
-card before ordering replacement parts, but need to set up address translation to get beyond the first two banks from
-the console.</p>
-<p>Here is the address translation register setup that I used for testing.  This was followed by a deposit of 000001 to
-KT11 SR0 (777572) to enable translation.  KT11 SR3 was left all zeros to keep D space disabled.  This setup allows
-console access to physical addresses in banks 1 through 7 by appropriate settings of virtual address bits 13 through
-15.  I wanted to reserve PAR7 to map I/O space, so I left out bank 0 since it was one of the two already tested.</p>
-<style>
-.memlist { display: inline; border-collapse: collapse; margin-right: 1em; }
-.memlist caption { font-weight: bold; }
-.memlist tr:nth-child(even) { background-color: #f2f2f2; }
-.memlist th, .memlist td { padding: 5px; }
-.memlist td { border: 1px solid lightgray; font-family: Menlo,Consolas,monospace; }
-</style>
-
-<table class="memlist">
-<caption>Kernel I PAR</caption>
-<tbody>
-<tr><td>772340</td><td>001000</td></tr>
-<tr><td>772342</td><td>002000</td></tr>
-<tr><td>772344</td><td>003000</td></tr>
-<tr><td>772346</td><td>004000</td></tr>
-<tr><td>772350</td><td>005000</td></tr>
-<tr><td>772352</td><td>006000</td></tr>
-<tr><td>772354</td><td>007000</td></tr>
-<tr><td>772356</td><td>007600</td></tr>
-</tbody>
-</table>
-
-<table class="memlist">
-<caption>Kernel I PDR</caption>
-<tbody>
-<tr><td>772300</td><td>077406</td></tr>
-<tr><td>772302</td><td>077406</td></tr>
-<tr><td>772304</td><td>077406</td></tr>
-<tr><td>772306</td><td>077406</td></tr>
-<tr><td>772310</td><td>077406</td></tr>
-<tr><td>772312</td><td>077406</td></tr>
-<tr><td>772314</td><td>077406</td></tr>
-<tr><td>772316</td><td>077406</td></tr>
-</tbody>
-</table>
-
-<p>This worked as expected according to panel PROG PHY and the logic analyzer, so the KT11 option which I had not
-previously tested is at least working for kernel I space.  Tested each bank on the MS11 from the front panel using this
-setup, and uncovered that bank 4 bit 10 also has a stuck on condition.  Since bank 1 is working now, I can use that
-as work space for the time being in order to continue the CPU debug while awaiting some replacement DRAM chips in the
-mail.</p>
-<p>Pics here of the logic analyzer setup, and captured traces of a write and subsequent read to one of the misbehaving
-chips:</p>
-<p><a href="http://fritzm.github.io/images/pdp11/ms11-debug.jpg"><img src='/images/pdp11/ms11-debug_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/bad-dram-write.jpg"><img src='/images/pdp11/bad-dram-write_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/bad-dram-read.jpg"><img src='/images/pdp11/bad-dram-read_thumbnail_tall.jpg'/></a></p></div>
     <hr />
 </div>
 

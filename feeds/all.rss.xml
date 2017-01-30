@@ -1,5 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0"><channel><title>fritzm.github.io</title><link>http://fritzm.github.io/</link><description></description><lastBuildDate>Mon, 16 Jan 2017 00:00:00 -0800</lastBuildDate><item><title>PDP-11/45: Diagnostics XIV - CPU, MMU, FPU Complete!</title><link>http://fritzm.github.io/diagnostics-14.html</link><description>&lt;p&gt;Okay, after socketing in the replacement 74H10 and reseating a few boards, the output from the floating 
+<rss version="2.0"><channel><title>fritzm.github.io</title><link>http://fritzm.github.io/</link><description></description><lastBuildDate>Sun, 29 Jan 2017 00:00:00 -0800</lastBuildDate><item><title>PDP-11/45: RK11</title><link>http://fritzm.github.io/rk11.html</link><description>&lt;p&gt;Finished up the cleanup and rebuild of the H720E for the RK11-C controller: reformed the big electrolytics
+over a couple of days, and swapped out the tantalum filters on the regulator board (one of which had started
+to leak) for some replacements.  Tantalums of the correct form and value are crazy expensive, and since these
+caps (C11-C17, C23) are banked resevoirs on the regulated rails their exact values are not critical.  Went 
+with some aluminum electrolytics instead that worked out to a little more aggregate capacity on each bank.&lt;/p&gt;
+&lt;p&gt;My H720E is missing its top cover plate, so there was about 40 years worth of accumulated dust in there -- a
+lot to clean up!  I'm not sure if the cover was customarily left off to facilitate cooling of the regulator
+board, or if it is just genuinely missing.  Will see if the forums/lists have any wisdom here.  Should not be
+hard to fab a replacement if it is really supposed to be there.&lt;/p&gt;
+&lt;p&gt;Routed the inter-cabinet power control wiring, racked the RK11, and cabled everything up.  This included
+moving the M9301 bootstrap terminator over to slot 0, then rummaging through a box of BC11 bus cables for one
+that was both long enough and in decent enough shape to connect the CPU and the RK11.  Some of these bus 
+cables had period-correct labeling (see picture below :-))  Got a good tip off the cctalk mailing list
+(thanks, Jerry!) to drape the BC11 with a service loop from the top-rear of the CPU rack, thus avoiding any
+entanglement with the rack slides while moving the CPU cabinet in and out.&lt;/p&gt;
+&lt;p&gt;A 2000pF cap that was flown over the RK11 backplane (+5V to DR BUS DC LO L) had broken free of its pin 
+connectors; jury-rigged this with some arduino jumpers I had lying around, until I can track down some
+appropriate replacement connectors.&lt;/p&gt;
+&lt;p&gt;Good news is that after this the machine still booted the M9301 bootstrap, and was still able to run and
+pass diagnostics loaded via PDP11GUI.  So, Unibus still working with the BC11 cable in place and termination
+out at the RK11.&lt;/p&gt;
+&lt;p&gt;Started in with diagnostic ZRKJE0.BIC, which is the controller-only static test.  This indicated:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;REGISTER NOT CLEARED
+  PC   REGADD    RECVD
+002560  177416  040000
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This is the RKDB register, implemented two M203 R/S flip-flop modules in slots A21 and B21 (see sheet
+RK11-C-10 in the RK11-C engineering drawings).  Swapped these, and the stuck bit moved to the other half of
+of the register, so looks like failed gate.  Pulled, socketed, replaced, and diagnostic no longer reports
+any stuck bits.  Next diagnostic fail is:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;UNEXPECTED TIME OUT AT PC=004300
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This is test #21 of the diagnostic, testing controller reset.  Will need to do some reading up on the design
+of the controller and the diagnostic source to understand how to troubleshoot it further.  All for now!&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://fritzm.github.io/images/pdp11/720e-caps.jpg"&gt;&lt;img src='/images/pdp11/720e-caps_thumbnail_tall.jpg'/&gt;&lt;/a&gt;
+&lt;a href="http://fritzm.github.io/images/pdp11/rk11-racked.jpg"&gt;&lt;img src='/images/pdp11/rk11-racked_thumbnail_tall.jpg'/&gt;&lt;/a&gt;
+&lt;a href="http://fritzm.github.io/images/pdp11/bc11-good.jpg"&gt;&lt;img src='/images/pdp11/bc11-good_thumbnail_tall.jpg'/&gt;&lt;/a&gt;
+&lt;a href="http://fritzm.github.io/images/pdp11/rk11-back.jpg"&gt;&lt;img src='/images/pdp11/rk11-back_thumbnail_tall.jpg'/&gt;&lt;/a&gt;
+&lt;a href="http://fritzm.github.io/images/pdp11/m203.jpg"&gt;&lt;img src='/images/pdp11/m203_thumbnail_tall.jpg'/&gt;&lt;/a&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Fritz Mueller</dc:creator><pubDate>Sun, 29 Jan 2017 00:00:00 -0800</pubDate><guid isPermaLink="false">tag:fritzm.github.io,2017-01-29:/rk11.html</guid><category>Retro-Computing</category><category>PDP-11</category></item><item><title>PDP-11/45: Diagnostics XIV - CPU, MMU, FPU Complete!</title><link>http://fritzm.github.io/diagnostics-14.html</link><description>&lt;p&gt;Okay, after socketing in the replacement 74H10 and reseating a few boards, the output from the floating 
 point diagnostic now looks correct:&lt;/p&gt;
 &lt;p&gt;&lt;span style="font-size: x-small; font-family: monospace; white-space: pre; display: block; line-height: normal; font-weight: bold;"&gt;................ ................ ................ ................ .........11..... .........11..... .........11..... .........11.....
 ................ ................ ................ ................ ..........11.... ..........11.... ..........11.... ..........11....
