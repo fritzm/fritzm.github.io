@@ -56,6 +56,30 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="http://fritzm.github.io/diagnostics-8.html"><h1>PDP-11/45: Diagnostics VIII - FP11 FPU</h1></a>
+Sat 03 September 2016
+
+by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+    </div>
+
+    <div><p>Slotted in FP11 spares that I hadn't tried previously, and this has produced some improved results -- returning to
+diagnostic CKBME0 (11/45 traps) this now passes with the floating point installed.  Additionally, diagnostic
+CFPAB0 passes.</p>
+<p>CFPBB0 and CFPCD0, however, are failing.  Unfortunately, the source code for these is not available in the PDP-11
+diagnostics database at retrocmp.  The names of the diagnostics tell which instructions they are testing, though.
+CFPBB0 is annotated as testing the STST instruction.  Rather than work through disassembling the rather lengthy
+diagnostics, I'll probably just write some simple test programs around the STST instruction for next time.  In the
+meantime, I'll do some reading on the FP11 in preparation for microcode-step debug.</p></div>
+    <hr />
+</div>
+
+
+
+<div class='article'>
+    <div class="content-title">
         <a href="http://fritzm.github.io/diagnostics-7.html"><h1>PDP-11/45: Diagnostics VII - KT11 MMU</h1></a>
 Sat 13 August 2016
 
@@ -564,32 +588,6 @@ are out of production and aren't easy to track down, but I do have one lead to f
 failed.  This card is just a spare for me, but I'd like to go ahead and repair it since the fault is isolated.  With
 some help from the classiccmp mailing list (thanks guys!) I have a recommendation for some vintage PROM programmers to
 stalk on eBay, and some compatible parts, that would allow me to blow a replacement and make the repair.</p></div>
-    <hr />
-</div>
-
-
-
-<div class='article'>
-    <div class="content-title">
-        <a href="http://fritzm.github.io/m9301-running.html"><h1>PDP-11/45: Running the M9301 console emulator</h1></a>
-Thu 23 June 2016
-
-by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
-    </div>
-
-    <div><p>Replacement DRAMs showed up.  Pulled and replaced the two faulty ones on the MS11.  Pic below -- you can see the
-replacements are socketed, and are the TI parts instead of the original ITT.  Full address space is working now!  Now
-that bank 0 is repaired, trap vectors can conceivably work.</p>
-<p>Jumpered and configured a DL11-E serial card for use as console, slotted in an M9301-YB bootstrap terminator, connected
-up the VT52, powered up, and off it goes straight to the console emulator!  That means the basic instruction set tests
-in the boot ROM are passing as well, which is great news.</p>
-<p>Next step will be to hook up PDP11GUI and load some more in-depth diagnostics, in order to shake out any
-remaining bugs with the CPU and memory system.  Will slot in the FPU at that point for testing and debug as well.</p>
-<p><a href="http://fritzm.github.io/images/pdp11/ms11-repaired.jpg"><img src='/images/pdp11/ms11-repaired_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/m9301-running.jpg"><img src='/images/pdp11/m9301-running_thumbnail_tall.jpg'/></a></p></div>
     <hr />
 </div>
 

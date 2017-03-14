@@ -56,6 +56,47 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="http://fritzm.github.io/rk11-3.html"><h1>PDP-11/45: RK11 III</h1></a>
+Sun 26 February 2017
+
+by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+    </div>
+
+    <div><p>Okay, the M9202 bus jumper arrived, and like the 2-foot BC11 cable, the occasional timeouts go away when this
+is installed.  Hantek digital scope also arrived, so I decided to throw it on the backplane for a closer 
+look at the SSYN and timeout signals.  The results were pretty interesting.  Here's a capture of an RKCS
+access triggering a timeout glitch with the M902.  The yellow trace is BUS A SSYN L (taken from C12J1 on the 
+11/45 backplane), and the blue trace is UBCB TIMEOUT (1) H (taken from D12U1):</p>
+<p><img src='/images/pdp11/rkcs-timeout.jpg'/></p>
+<p>What's interesting is that with the M9202 in place, the SSYN waveform shape on RCKS accesses is <strong>not</strong> 
+significantly different -- and the timeout glitch ocurrs from time to time, but at a reduced amplitude:</p>
+<p><img src='/images/pdp11/rkcs-glitch.jpg'/></p>
+<p>If the problem had been one solely of lumped loads on the bus, I would have expected the fix to manifest
+as a waveform difference, and for the glitches to have disappeared.  These observations steered me back
+toward my original (less plausible?) supposition -- the the 74123 one-shot in the Unibus timeout logic in the
+CPU was flaky, and particularly sensitive for some reason to SSYN pulses of 568ns.  Adding some extra bus 
+length via a BC11 or the M9202 moves the timing by a nano or two off the troublesome period, and reduces the 
+magnitude of the glitches.</p>
+<p>So I went ahead and clipped out the suspect 74123, and put in a socket and a fresh part.  Bingo!  Timeout
+glitching was eliminated entirely.  Here's a trace after the 74123 was replaced.  This trace looks different 
+because with the timeout glitch fixed, I could no longer use it to trigger the scope -- instead I had to
+trigger on the trailing edge of SSYN.  The scope is in persistent mode, and the different waveforms are
+from RKCS and non-RKCS bus cycles.  In any case, the timeout glitching is now gone entirely:</p>
+<p><img src='/images/pdp11/rkcs-fixed.jpg'/></p>
+<p>So that's a nice result -- I think the new scope is going to be pretty useful.  The rather extreme sawtooth
+on the falling edge of SSYN on RKCS accesses still looks pretty bad to me, even though it is no longer
+triggering timeouts.  I might try swapping out the M105 address decoder on the RK11, which generates this
+signal, and see if the integrity here is improved.  All for now!</p></div>
+    <hr />
+</div>
+
+
+
+<div class='article'>
+    <div class="content-title">
         <a href="http://fritzm.github.io/rk11-2.html"><h1>PDP-11/45: RK11 II</h1></a>
 Mon 20 February 2017
 
@@ -965,30 +1006,6 @@ not.  Out of time this weekend; Will have to chase signals back through those pa
     <hr />
 </div>
 
-
-
-<div class='article'>
-    <div class="content-title">
-        <a href="http://fritzm.github.io/diagnostics-8.html"><h1>PDP-11/45: Diagnostics VIII - FP11 FPU</h1></a>
-Sat 03 September 2016
-
-by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
-    </div>
-
-    <div><p>Slotted in FP11 spares that I hadn't tried previously, and this has produced some improved results -- returning to
-diagnostic CKBME0 (11/45 traps) this now passes with the floating point installed.  Additionally, diagnostic
-CFPAB0 passes.</p>
-<p>CFPBB0 and CFPCD0, however, are failing.  Unfortunately, the source code for these is not available in the PDP-11
-diagnostics database at retrocmp.  The names of the diagnostics tell which instructions they are testing, though.
-CFPBB0 is annotated as testing the STST instruction.  Rather than work through disassembling the rather lengthy
-diagnostics, I'll probably just write some simple test programs around the STST instruction for next time.  In the
-meantime, I'll do some reading on the FP11 in preparation for microcode-step debug.</p></div>
-    <hr />
-</div>
-
 <div class="pagination">
 <ul>
     <li class="prev disabled"><a href="#">&larr; Previous</a></li>
@@ -997,6 +1014,7 @@ meantime, I'll do some reading on the FP11 in preparation for microcode-step deb
     <li class=""><a href="http://fritzm.github.io/index2.html">2</a></li>
     <li class=""><a href="http://fritzm.github.io/index3.html">3</a></li>
     <li class=""><a href="http://fritzm.github.io/index4.html">4</a></li>
+    <li class=""><a href="http://fritzm.github.io/index5.html">5</a></li>
 
     <li class="next"><a href="http://fritzm.github.io/index2.html">Next &rarr;</a></li>
 

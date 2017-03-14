@@ -52,10 +52,59 @@
     <div class="row">
 
         <div class="span9">
-    <h1>Authors on fritzm.github.io</h1>
+    <div class='article'>
+        <div class="content-title">
+            <h1>PDP-11/45: RK11 III</h1>
+Sun 26 February 2017
 
-    <ul>        <li><a href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a> (41)</li>
-    </ul>
+by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+        </div>
+	
+        <div><p>Okay, the M9202 bus jumper arrived, and like the 2-foot BC11 cable, the occasional timeouts go away when this
+is installed.  Hantek digital scope also arrived, so I decided to throw it on the backplane for a closer 
+look at the SSYN and timeout signals.  The results were pretty interesting.  Here's a capture of an RKCS
+access triggering a timeout glitch with the M902.  The yellow trace is BUS A SSYN L (taken from C12J1 on the 
+11/45 backplane), and the blue trace is UBCB TIMEOUT (1) H (taken from D12U1):</p>
+<p><img src='/images/pdp11/rkcs-timeout.jpg'/></p>
+<p>What's interesting is that with the M9202 in place, the SSYN waveform shape on RCKS accesses is <strong>not</strong> 
+significantly different -- and the timeout glitch ocurrs from time to time, but at a reduced amplitude:</p>
+<p><img src='/images/pdp11/rkcs-glitch.jpg'/></p>
+<p>If the problem had been one solely of lumped loads on the bus, I would have expected the fix to manifest
+as a waveform difference, and for the glitches to have disappeared.  These observations steered me back
+toward my original (less plausible?) supposition -- the the 74123 one-shot in the Unibus timeout logic in the
+CPU was flaky, and particularly sensitive for some reason to SSYN pulses of 568ns.  Adding some extra bus 
+length via a BC11 or the M9202 moves the timing by a nano or two off the troublesome period, and reduces the 
+magnitude of the glitches.</p>
+<p>So I went ahead and clipped out the suspect 74123, and put in a socket and a fresh part.  Bingo!  Timeout
+glitching was eliminated entirely.  Here's a trace after the 74123 was replaced.  This trace looks different 
+because with the timeout glitch fixed, I could no longer use it to trigger the scope -- instead I had to
+trigger on the trailing edge of SSYN.  The scope is in persistent mode, and the different waveforms are
+from RKCS and non-RKCS bus cycles.  In any case, the timeout glitching is now gone entirely:</p>
+<p><img src='/images/pdp11/rkcs-fixed.jpg'/></p>
+<p>So that's a nice result -- I think the new scope is going to be pretty useful.  The rather extreme sawtooth
+on the falling edge of SSYN on RKCS accesses still looks pretty bad to me, even though it is no longer
+triggering timeouts.  I might try swapping out the M105 address decoder on the RK11, which generates this
+signal, and see if the integrity here is improved.  All for now!</p></div>
+	
+        <hr>
+
+        <h2>Comments</h2>
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'fritzm'; 
+    var disqus_title = 'PDP-11/45: RK11 III';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
         </div>
 
         <div class="span3">

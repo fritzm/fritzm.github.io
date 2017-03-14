@@ -1,5 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0"><channel><title>fritzm.github.io</title><link>http://fritzm.github.io/</link><description></description><lastBuildDate>Mon, 20 Feb 2017 00:00:00 -0800</lastBuildDate><item><title>PDP-11/45: RK11 II</title><link>http://fritzm.github.io/rk11-2.html</link><description>&lt;p&gt;Okay, moving on with the RK11-C debug, the following bit of test code is modeled after that part of the
+<rss version="2.0"><channel><title>fritzm.github.io</title><link>http://fritzm.github.io/</link><description></description><lastBuildDate>Sun, 26 Feb 2017 00:00:00 -0800</lastBuildDate><item><title>PDP-11/45: RK11 III</title><link>http://fritzm.github.io/rk11-3.html</link><description>&lt;p&gt;Okay, the M9202 bus jumper arrived, and like the 2-foot BC11 cable, the occasional timeouts go away when this
+is installed.  Hantek digital scope also arrived, so I decided to throw it on the backplane for a closer 
+look at the SSYN and timeout signals.  The results were pretty interesting.  Here's a capture of an RKCS
+access triggering a timeout glitch with the M902.  The yellow trace is BUS A SSYN L (taken from C12J1 on the 
+11/45 backplane), and the blue trace is UBCB TIMEOUT (1) H (taken from D12U1):&lt;/p&gt;
+&lt;p&gt;&lt;img src='/images/pdp11/rkcs-timeout.jpg'/&gt;&lt;/p&gt;
+&lt;p&gt;What's interesting is that with the M9202 in place, the SSYN waveform shape on RCKS accesses is &lt;strong&gt;not&lt;/strong&gt; 
+significantly different -- and the timeout glitch ocurrs from time to time, but at a reduced amplitude:&lt;/p&gt;
+&lt;p&gt;&lt;img src='/images/pdp11/rkcs-glitch.jpg'/&gt;&lt;/p&gt;
+&lt;p&gt;If the problem had been one solely of lumped loads on the bus, I would have expected the fix to manifest
+as a waveform difference, and for the glitches to have disappeared.  These observations steered me back
+toward my original (less plausible?) supposition -- the the 74123 one-shot in the Unibus timeout logic in the
+CPU was flaky, and particularly sensitive for some reason to SSYN pulses of 568ns.  Adding some extra bus 
+length via a BC11 or the M9202 moves the timing by a nano or two off the troublesome period, and reduces the 
+magnitude of the glitches.&lt;/p&gt;
+&lt;p&gt;So I went ahead and clipped out the suspect 74123, and put in a socket and a fresh part.  Bingo!  Timeout
+glitching was eliminated entirely.  Here's a trace after the 74123 was replaced.  This trace looks different 
+because with the timeout glitch fixed, I could no longer use it to trigger the scope -- instead I had to
+trigger on the trailing edge of SSYN.  The scope is in persistent mode, and the different waveforms are
+from RKCS and non-RKCS bus cycles.  In any case, the timeout glitching is now gone entirely:&lt;/p&gt;
+&lt;p&gt;&lt;img src='/images/pdp11/rkcs-fixed.jpg'/&gt;&lt;/p&gt;
+&lt;p&gt;So that's a nice result -- I think the new scope is going to be pretty useful.  The rather extreme sawtooth
+on the falling edge of SSYN on RKCS accesses still looks pretty bad to me, even though it is no longer
+triggering timeouts.  I might try swapping out the M105 address decoder on the RK11, which generates this
+signal, and see if the integrity here is improved.  All for now!&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Fritz Mueller</dc:creator><pubDate>Sun, 26 Feb 2017 00:00:00 -0800</pubDate><guid isPermaLink="false">tag:fritzm.github.io,2017-02-26:/rk11-3.html</guid><category>Retro-Computing</category><category>PDP-11</category></item><item><title>PDP-11/45: RK11 II</title><link>http://fritzm.github.io/rk11-2.html</link><description>&lt;p&gt;Okay, moving on with the RK11-C debug, the following bit of test code is modeled after that part of the
 ZRKJE0 diagnotic that is trapping out:&lt;/p&gt;
 &lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt; 1
  2
