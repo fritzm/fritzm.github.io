@@ -6,7 +6,7 @@ access triggering a timeout glitch with the M902.  The yellow trace is BUS A SSY
 11/45 backplane), and the blue trace is UBCB TIMEOUT (1) H (taken from D12U1):&lt;/p&gt;
 &lt;p&gt;&lt;img src='/images/pdp11/rkcs-timeout.jpg'/&gt;&lt;/p&gt;
 &lt;p&gt;What's interesting is that with the M9202 in place, the SSYN waveform shape on RCKS accesses is &lt;strong&gt;not&lt;/strong&gt; 
-significantly different -- and the timeout glitch ocurrs from time to time, but at a reduced amplitude:&lt;/p&gt;
+significantly different -- and the timeout glitch still ocurrs from time to time, but at a reduced amplitude:&lt;/p&gt;
 &lt;p&gt;&lt;img src='/images/pdp11/rkcs-glitch.jpg'/&gt;&lt;/p&gt;
 &lt;p&gt;If the problem had been one solely of lumped loads on the bus, I would have expected the fix to manifest
 as a waveform difference, and for the glitches to have disappeared.  These observations steered me back
@@ -17,8 +17,8 @@ magnitude of the glitches.&lt;/p&gt;
 &lt;p&gt;So I went ahead and clipped out the suspect 74123, and put in a socket and a fresh part.  Bingo!  Timeout
 glitching was eliminated entirely.  Here's a trace after the 74123 was replaced.  This trace looks different 
 because with the timeout glitch fixed, I could no longer use it to trigger the scope -- instead I had to
-trigger on the trailing edge of SSYN.  The scope is in persistent mode, and the different waveforms are
-from RKCS and non-RKCS bus cycles.  In any case, the timeout glitching is now gone entirely:&lt;/p&gt;
+trigger on the trailing edge of SSYN, so we see both RKCS and non-RKCS bus cycles.  In any case, the timeout
+glitching is now gone:&lt;/p&gt;
 &lt;p&gt;&lt;img src='/images/pdp11/rkcs-fixed.jpg'/&gt;&lt;/p&gt;
 &lt;p&gt;So that's a nice result -- I think the new scope is going to be pretty useful.  The rather extreme sawtooth
 on the falling edge of SSYN on RKCS accesses still looks pretty bad to me, even though it is no longer
