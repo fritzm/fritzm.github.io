@@ -1,5 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0"><channel><title>fritzm.github.io - PDP-11</title><link>http://fritzm.github.io/</link><description></description><lastBuildDate>Sun, 26 Feb 2017 00:00:00 -0800</lastBuildDate><item><title>PDP-11/45: RK11 III</title><link>http://fritzm.github.io/rk11-3.html</link><description>&lt;p&gt;Okay, the M9202 bus jumper arrived, and like the 2-foot BC11 cable, the occasional timeouts go away when this
+<rss version="2.0"><channel><title>fritzm.github.io - PDP-11</title><link>http://fritzm.github.io/</link><description></description><lastBuildDate>Sun, 19 Mar 2017 00:00:00 -0700</lastBuildDate><item><title>PDP-11/45: RK05</title><link>http://fritzm.github.io/rk05.html</link><description>&lt;p&gt;Started going through the two RK05 drives.  Lots of work to remove and clean up all the decaying foam.
+Replaced the emergency head retract NiCd battery packs on both units.  They were both slightly leaky, but 
+luckily neither had made a big mess.&lt;/p&gt;
+&lt;p&gt;Air filter elbows are intact on both units, and still slightly flexible, though they do have a white
+powdery coating where the material is degenerating.  Cleaned up okay with some warm soapy water and a
+toothbrush.  I'm sure these will continue to decompose/decay, however, and in the long term having loose
+particulates develop inside the elbow seems a certain recipe for a head crash.  I may explore the possibility
+of 3D printing some sort of modern replacement for these.&lt;/p&gt;
+&lt;p&gt;Heads on the first unit look to be in decent shape, but some oxide buildup.  In the second unit, the 
+carriage was not parked, so the heads were in contact with each other.  They don't look damaged from a
+preliminary inspection, but this head pair has considerably more oxide.  Before and after cleaning shots of
+the upper and lower heads on the first unit below.&lt;/p&gt;
+&lt;p&gt;Pulled the H743 power supplies and reformed the larger electrolytics.  After this, both power supplies 
+powered up fine, though the -15V regulator on the first unit was trimmed very hot (-23 or so).  Trimmed this 
+down, put the supply back in the first unit and powered up.  Under load, the -15V regulator drooped to -8, 
+and a pico fuse on the +15V supply blew immediately.&lt;/p&gt;
+&lt;p&gt;Swapped in the -15V regulator from the second supply, which was not trimmed hot, and replaced the blown
+pico fuse.  Now under load the supply held without drooping, and the +15V pico did not reblow.  So looks
+like a bad -15V regulator.  Put a few 723 regulator ICs on order in advance of debugging this.&lt;/p&gt;
+&lt;p&gt;After getting the power supply in the first unit up and going, blower powers on, power indicator lights, and
+after about three seconds the door safety relay clunks and load indicator lights. Write protect indicator
+toggles with panel switch presses per expectation.  If the cartridge-on switch is depressed manually and the 
+load toggle is hit, the spindle motor spins up and runs smoothly.&lt;/p&gt;
+&lt;p&gt;There are some significant abrasions on the lower panel of the first unit under both the spindle and spindle
+motor axles.  It looks like a spacer button which is intended to hold off the lower panel has decayed; will
+need to improvise some sort of replacement.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://fritzm.github.io/images/pdp11/rk05.jpg"&gt;&lt;img src='/images/pdp11/rk05_thumbnail_tall.jpg'/&gt;&lt;/a&gt;
+&lt;a href="http://fritzm.github.io/images/pdp11/h743.jpg"&gt;&lt;img src='/images/pdp11/h743_thumbnail_tall.jpg'/&gt;&lt;/a&gt;
+&lt;a href="http://fritzm.github.io/images/pdp11/rk05-lower-before.jpg"&gt;&lt;img src='/images/pdp11/rk05-lower-before_thumbnail_tall.jpg'/&gt;&lt;/a&gt;
+&lt;a href="http://fritzm.github.io/images/pdp11/rk05-lower-after.jpg"&gt;&lt;img src='/images/pdp11/rk05-lower-after_thumbnail_tall.jpg'/&gt;&lt;/a&gt;
+&lt;a href="http://fritzm.github.io/images/pdp11/rk05-upper-before.jpg"&gt;&lt;img src='/images/pdp11/rk05-upper-before_thumbnail_tall.jpg'/&gt;&lt;/a&gt;
+&lt;a href="http://fritzm.github.io/images/pdp11/rk05-upper-after.jpg"&gt;&lt;img src='/images/pdp11/rk05-upper-after_thumbnail_tall.jpg'/&gt;&lt;/a&gt;
+&lt;a href="http://fritzm.github.io/images/pdp11/lower-cover-abrasions.jpg"&gt;&lt;img src='/images/pdp11/lower-cover-abrasions_thumbnail_tall.jpg'/&gt;&lt;/a&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Fritz Mueller</dc:creator><pubDate>Sun, 19 Mar 2017 00:00:00 -0700</pubDate><guid isPermaLink="false">tag:fritzm.github.io,2017-03-19:/rk05.html</guid><category>Retro-Computing</category><category>PDP-11</category></item><item><title>PDP-11/45: RK11 III</title><link>http://fritzm.github.io/rk11-3.html</link><description>&lt;p&gt;Okay, the M9202 bus jumper arrived, and like the 2-foot BC11 cable, the occasional timeouts go away when this
 is installed.  Hantek digital scope also arrived, so I decided to throw it on the backplane for a closer 
 look at the SSYN and timeout signals.  The results were pretty interesting.  Here's a capture of an RKCS
 access triggering a timeout glitch with the M902.  The yellow trace is BUS A SSYN L (taken from C12J1 on the 
