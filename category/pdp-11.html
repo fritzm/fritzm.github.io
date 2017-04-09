@@ -56,6 +56,109 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="http://fritzm.github.io/rk05-2.html"><h1>PDP-11/45: RK05 II - Head Load and Servo Calibration</h1></a>
+Sun 09 April 2017
+
+by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+    </div>
+
+    <div><p>Okay, disassembled and cleaned a few RK05 cartidges, following advice from the vcfed forum and cctalk
+mailing list (cleanroom gloves and wipes, 99% anyhydrous isoprop).  Was surprised to find foam inside
+the hub on the disks (see pic below) but folks on vcfed advise that it is high-density polyeurethane
+and not subject to decay to the same extent as the other DEC foams, so I left it be.</p>
+<p>Mounted one of the cleaned packs, and let it spin in the drive for a few hours with head load disabled
+in order to get a good flush on the air filtration system, let the various bearings on the drive loosen up,
+and make sure the replacement head retract batteries got a good charge.  Drive ran quiet and balanced.</p>
+<p>After that, took a deep breath and let the heads load -- no crash!  Proceeded to work through the dynamic
+off-line calibration procedure for the head positioning servo system.  This involves jumpering the control
+electronics on the drive to strobe simulated cylinder addresses from the sector counter.  That provides
+a convenient source of oscillating seeks that can be used to calibrate the servos.  Video here shows head
+load, a four cylinder oscillating seek, and a scope trace of the resulting sine position output of the electro-optical carriage position sensor:</p>
+<p><span class="videobox">
+                <iframe width="640" height="390"
+                    src='https://www.youtube.com/embed/b6p2ri-uM9c?rel=0'
+                    frameborder='0' webkitAllowFullScreen mozallowfullscreen
+                    allowFullScreen>
+                </iframe>
+            </span></p>
+<p>Surprisingly, after about thirty years of non-operation, all of the servo calibration was within specified
+error bars, so no adjustments were necessary!  At this point I decided to go for broke, cabled the drive
+to the RK11-C controller and attempted a boot.  Some cncouraging front panel indicator activity, but soon
+halted with a seek error flagged in RKER.  Not too surprising.</p>
+<p>Okay, on to debugging the drive online with the controller, then. Worked up the following test code, inspired
+by something in one of the RK05 SPI workbooks.  This reads two cylinder addresses from the high and low
+bytes of the front panel switches, and instructs the controller to instruct the drive to seek alternately
+between them:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23</pre></div></td><td class="code"><div class="highlight"><pre><span></span>        <span class="nt">177570</span>                          <span class="nt">SW</span><span class="o">=</span><span class="nt">177570</span>
+        <span class="nt">177400</span>                          <span class="nt">RKDS</span><span class="o">=</span><span class="nt">177400</span>
+        <span class="nt">177404</span>                          <span class="nt">RKCS</span><span class="o">=</span><span class="nt">177404</span>
+        <span class="nt">177412</span>                          <span class="nt">RKDA</span><span class="o">=</span><span class="nt">177412</span>
+<span class="nt">000000</span>                                  <span class="p">.</span><span class="nc">ASECT</span>
+        <span class="nt">001000</span>                          <span class="o">.=</span><span class="nt">1000</span>
+<span class="nt">001000</span>  <span class="nt">012706</span>  <span class="nt">000700</span>          <span class="nt">START</span><span class="o">:</span>  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">700</span><span class="o">,</span><span class="nt">SP</span>         <span class="o">;</span><span class="nt">INIT</span> <span class="nt">STACK</span> <span class="nt">POINTER</span>
+<span class="nt">001004</span>  <span class="nt">013700</span>  <span class="nt">177570</span>          <span class="nt">L0</span><span class="o">:</span>     <span class="nt">MOV</span>     <span class="o">@</span><span class="p">#</span><span class="nn">SW</span><span class="o">,</span><span class="nt">R0</span>         <span class="o">;</span><span class="nt">RETRIEVE</span> <span class="nt">SWITCHES</span>
+<span class="nt">001010</span>  <span class="nt">000300</span>                          <span class="nt">SWAB</span>    <span class="nt">R0</span>              <span class="o">;</span><span class="nt">LOWER</span> <span class="nt">SWITCHES</span> <span class="nt">TO</span> <span class="nt">UPPER</span>
+<span class="nt">001012</span>  <span class="nt">004767</span>  <span class="nt">000012</span>                  <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">SEEK</span>         <span class="o">;</span><span class="nt">DO</span> <span class="nt">THE</span> <span class="nt">SEEK</span>
+<span class="nt">001016</span>  <span class="nt">013700</span>  <span class="nt">177570</span>                  <span class="nt">MOV</span>     <span class="o">@</span><span class="p">#</span><span class="nn">SW</span><span class="o">,</span><span class="nt">R0</span>         <span class="o">;</span><span class="nt">RETRIEVE</span> <span class="nt">SWITCHES</span>
+<span class="nt">001022</span>  <span class="nt">004767</span>  <span class="nt">000002</span>                  <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">SEEK</span>         <span class="o">;</span><span class="nt">DO</span> <span class="nt">THE</span> <span class="nt">SEEK</span>
+<span class="nt">001026</span>  <span class="nt">000766</span>                          <span class="nt">BR</span>      <span class="nt">L0</span>              <span class="o">;</span><span class="nt">START</span> <span class="nt">OVER</span>
+<span class="nt">001030</span>  <span class="nt">042700</span>  <span class="nt">000377</span>          <span class="nt">SEEK</span><span class="o">:</span>   <span class="nt">BIC</span>     <span class="p">#</span><span class="nn">377</span><span class="o">,</span><span class="nt">R0</span>         <span class="o">;</span><span class="nt">MASK</span> <span class="nt">OFF</span> <span class="nt">LOWER</span> <span class="nt">BYTE</span>
+<span class="nt">001034</span>  <span class="nt">072027</span>  <span class="nt">177775</span>                  <span class="nt">ASH</span>     <span class="p">#</span><span class="nn">-3</span><span class="o">,</span><span class="nt">R0</span>          <span class="o">;</span><span class="nt">SHIFT</span> <span class="nt">OVER</span> <span class="nt">TO</span> <span class="nt">CYL</span> <span class="nt">ADDRESS</span>
+<span class="nt">001040</span>  <span class="nt">105737</span>  <span class="nt">177404</span>          <span class="nt">L1</span><span class="o">:</span>     <span class="nt">TSTB</span>    <span class="o">@</span><span class="p">#</span><span class="nn">RKCS</span>          <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">RKCS</span> <span class="nt">RDY</span> <span class="nt">BIT</span>
+<span class="nt">001044</span>  <span class="nt">100375</span>                          <span class="nt">BPL</span>     <span class="nt">L1</span>              <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">IF</span> <span class="nt">BUSY</span>
+<span class="nt">001046</span>  <span class="nt">032737</span>  <span class="nt">000100</span>  <span class="nt">177400</span>  <span class="nt">L2</span><span class="o">:</span>     <span class="nt">BIT</span>     <span class="p">#</span><span class="nn">100</span><span class="o">,@</span><span class="p">#</span><span class="nn">RKDS</span>     <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">RKDS</span> <span class="nt">ARDY</span> <span class="nt">BIT</span>
+<span class="nt">001054</span>  <span class="nt">001774</span>                          <span class="nt">BEQ</span>     <span class="nt">L2</span>              <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">IF</span> <span class="nt">BUSY</span>
+<span class="nt">001056</span>  <span class="nt">010037</span>  <span class="nt">177412</span>                  <span class="nt">MOV</span>     <span class="nt">R0</span><span class="o">,@</span><span class="p">#</span><span class="nn">RKDA</span>       <span class="o">;</span><span class="nt">WRITE</span> <span class="nt">SEEK</span> <span class="nt">TARGET</span> <span class="nt">TO</span> <span class="nt">RKDA</span>
+<span class="nt">001062</span>  <span class="nt">012737</span>  <span class="nt">000011</span>  <span class="nt">177404</span>          <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">11</span><span class="o">,@</span><span class="p">#</span><span class="nn">RKCS</span>      <span class="o">;</span><span class="nt">WRITE</span> <span class="nt">SEEK</span> <span class="nt">CMD</span> <span class="o">+</span> <span class="nt">GO</span> <span class="nt">TO</span> <span class="nt">RKCS</span>
+<span class="nt">001070</span>  <span class="nt">000207</span>                          <span class="nt">RTS</span>     <span class="nt">PC</span>              <span class="o">;</span><span class="nt">RETURN</span> <span class="nt">TO</span> <span class="nt">CALLER</span>
+        <span class="nt">001000</span>                          <span class="p">.</span><span class="nc">END</span>    <span class="nt">START</span>
+</pre></div>
+</td></tr></table>
+
+<p>At first this code was generating no seek activity on the drive.  Decided to try swapping out the BC11-A
+drive cable, and that produced some limited success -- drive seeks, but some bits of the cylinder address
+are still apparently not making it across the cable.</p>
+<p>The BC11-A cables are problematic.  They seem flaky and fragile, and many of my spares seem bad.  Any given
+cable may beep out fine on the bench, and yet fail consistently in use...  It looks like what's up next is a
+voyage through my box of spares, swapping in cables looking for one that works reliably.  Failing that, I'll
+need work on some sort of modern replacement, since original BC11-A in good shape are getting hard to find.
+It will be sad if at the end of this journey I can't boot the machine for mere lack of a good cable between
+the drives and controller!</p>
+<p><a href="http://fritzm.github.io/images/pdp11/rk05-cartridge-foam.jpg"><img src='/images/pdp11/rk05-cartridge-foam_thumbnail_tall.jpg'/></a>
+<a href="http://fritzm.github.io/images/pdp11/rk05-running.jpg"><img src='/images/pdp11/rk05-running_thumbnail_tall.jpg'/></a>
+<a href="http://fritzm.github.io/images/pdp11/BC11-woes.jpg"><img src='/images/pdp11/BC11-woes_thumbnail_tall.jpg'/></a></p></div>
+    <hr />
+</div>
+
+
+
+<div class='article'>
+    <div class="content-title">
         <a href="http://fritzm.github.io/rk11-4.html"><h1>PDP-11/45: RK11 IV</h1></a>
 Sat 01 April 2017
 
@@ -901,93 +1004,6 @@ like it is indeed faulty:</p>
 <p>Here we can see what should be a broadside load: positive CLK edge, S0 and S1 both asserted, and inputs of
 all zeros.  But the output sticks brokenly at 8.  Pulled this shift register, soldered in a socket, and put
 a replacement and a couple of spares on order.  All for now, until the parts arrive.</p></div>
-    <hr />
-</div>
-
-
-
-<div class='article'>
-    <div class="content-title">
-        <a href="http://fritzm.github.io/diagnostics-10.html"><h1>PDP-11/45: Diagnostics X - FP11 FPU, cont.</h1></a>
-Sat 01 October 2016
-
-by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
-    </div>
-
-    <div><p>Okay, here's the dig in on the FP11 STST diagnostic failure.  As detailed previously, I'd been seeing an
-incorrect FEC after executing a small test program to generate a minus-zero condition.  I'd verified that
-the microcode sequence was per expectation, and that the correct FEC was being stored and retrieved from
-AC7[1:0] in microstates TRP.50 and the start of TRP.60.</p>
-<p>The end of TCP.60 and all of state TRP.70 are used to move the FEC and FEA from AC7[1:0] to AC7[3:2] via QR
-and BR, and something was going awry here.  Since the nominal FEC is octal 14, I decided just to trace the
-four least significant bits.  Consulting the engineering drawings, the nominal flow of these bits through
-logic on the FRL during these states would be:</p>
-<style>
-.logiclist { display: inline; border-collapse: collapse; margin-right: 1em; }
-.logiclist caption { font-weight: bold; }
-.logiclist tr:nth-child(4n+2), .logiclist tr:nth-child(4n+3) { background-color: #f2f2f2; }
-.logiclist .microstate { background-color: #ffffff; }
-.logiclist th, .logiclist td { padding: 5px; }
-.logiclist td { border: 1px solid lightgray; font-family: Menlo,Consolas,monospace; }
-</style>
-
-<table class="logiclist">
-<thead>
-<tr><th>Function</th><th>Package</th><th>Dir</th><th colspan="4">Pin:Level</th><th>Microstate</th></tr>
-</thead>
-<tbody>
-<tr><td>ACi&lt;03:00&gt;</td><td>E85</td><td>out</td><td>11:H</td><td>9:H</td><td>7:L</td><td>5:L</td><td class="microstate" rowspan="2">TRP.60 (2)</td></tr>
-<tr><td>QR&lt;06:03&gt;</td><td>E74</td><td>in</td><td>3:H</td><td>4:H</td><td>5:L</td><td>6:L</td></tr>
-<tr><td></td><td></td><td>out</td><td>15:H</td><td>14:H</td><td>13:L</td><td>12:L</td><td class="microstate" rowspan="14">TRP.70 (3)</td></tr>
-<tr><td>BR&lt;07:04&gt;</td><td>E75</td><td>in</td><td>13:H</td><td>12:H</td><td>4:L</td><td></td></tr>
-<tr><td></td><td></td><td>out</td><td>15:H</td><td>10:H</td><td>2:L</td><td></td></tr>
-<tr><td>BR&lt;03:00&gt;</td><td>E87</td><td>in</td><td></td><td></td><td></td><td>5:L</td></tr>
-<tr><td></td><td></td><td>out</td><td></td><td></td><td></td><td>7:L</td></tr>
-<tr><td>FALU&lt;07:04&gt;</td><td>E77</td><td>in</td><td>20:H</td><td>22:H</td><td>1:L</td><td></td></tr>
-<tr><td></td><td></td><td>out</td><td>11:L</td><td>10:L</td><td>9:H</td><td></td></tr>
-<tr><td>FALU&lt;03:00&gt;</td><td>E89</td><td>in</td><td></td><td></td><td></td><td>18:L</td></tr>
-<tr><td></td><td></td><td>out</td><td></td><td></td><td></td><td>13:H</td></tr>
-<tr><td>ACMX&lt;03:02&gt;</td><td>E83</td><td>in</td><td>13:L</td><td>3:L</td><td></td><td></td></tr>
-<tr><td></td><td></td><td>out</td><td>9:L</td><td>7:L</td><td></td><td></td></tr>
-<tr><td>ACMX&lt;01:00&gt;</td><td>E84</td><td>in</td><td></td><td></td><td>13:H</td><td>3:H</td></tr>
-<tr><td></td><td></td><td>out</td><td></td><td></td><td>9:H</td><td>7:H</td></tr>
-<tr><td>ACi&lt;03:00&gt;</td><td>E85</td><td>in</td><td>12:L</td><td>10:L</td><td>6:H</td><td>4:H</td></tr>
-</tbody>
-</table>
-
-<p>Note that the bit values are inverted here by the FALU, since the reigster file used on the FP11 has
-inverting outputs.</p>
-<p>Threw the FRL out on extenders and starting verifying the chart above with a logic probe.  Surprisingly,
-everything probed out correctly (?!)  Reset and ran the test program and verified that the bug had gone away.
-Hmmm...  My only guess here is that there was some dust or a whisker shorting some of the pins that I
-dislodged with the logic probe, or perhaps an oxidized board conection.  In any case, it seems to work
-robustly now.  Of the FP11 diagnostics, the following now pass:</p>
-<style>
-.diaglist { display: inline; border-collapse: collapse; margin-right: 1em; }
-.diaglist caption { font-weight: bold; }
-.diaglist tr:nth-child(even) { background-color: #f2f2f2; }
-.diaglist th, .diaglist td { padding: 5px; }
-.diaglist td { border: 1px solid lightgray; font-family: Menlo,Consolas,monospace; }
-</style>
-
-<table class="diaglist">
-<thead>
-<tr><th>Diagnostic</th><th>Description</th><th>Status</th></tr>
-</thead>
-<tbody>
-<tr><td>CFPAB0.BIC</td><td>LDFPS,STFPS,SETI,SETL,SETF,SETD,CFCC</td><td>pass</td></tr>
-<tr><td>CFPBB0.BIC</td><td>STST</td><td>pass</td></tr>
-<tr><td>CFPCD0.BIC</td><td>LDF,LDD,STF,STD</td><td>pass</td></tr>
-<tr><td>CFPHB0.BIC</td><td>CLR,TST,ABS,NEG</td><td>pass</td></tr>
-<tr><td>CFPKB0.BIC</td><td>LDEXP</td><td>pass</td></tr>
-</tbody>
-</table>
-
-<p>CFPDB0.BIC, which tests floating point adds/subtracts, is failing.  All for now -- on to debugging
-add/subtract next time...</p></div>
     <hr />
 </div>
 

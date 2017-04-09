@@ -1,5 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0"><channel><title>fritzm.github.io - PDP-11</title><link>http://fritzm.github.io/</link><description></description><lastBuildDate>Sat, 01 Apr 2017 00:00:00 -0700</lastBuildDate><item><title>PDP-11/45: RK11 IV</title><link>http://fritzm.github.io/rk11-4.html</link><description>&lt;p&gt;A quick note: rejumpered a spare M105 address decoder, and swapped it in for the one that was in the RK11.  SSYN waveform is greatly improved (see before/after shots below), so looks like a bad driver on 
+<rss version="2.0"><channel><title>fritzm.github.io - PDP-11</title><link>http://fritzm.github.io/</link><description></description><lastBuildDate>Sun, 09 Apr 2017 00:00:00 -0700</lastBuildDate><item><title>PDP-11/45: RK05 II - Head Load and Servo Calibration</title><link>http://fritzm.github.io/rk05-2.html</link><description>&lt;p&gt;Okay, disassembled and cleaned a few RK05 cartidges, following advice from the vcfed forum and cctalk
+mailing list (cleanroom gloves and wipes, 99% anyhydrous isoprop).  Was surprised to find foam inside
+the hub on the disks (see pic below) but folks on vcfed advise that it is high-density polyeurethane
+and not subject to decay to the same extent as the other DEC foams, so I left it be.&lt;/p&gt;
+&lt;p&gt;Mounted one of the cleaned packs, and let it spin in the drive for a few hours with head load disabled
+in order to get a good flush on the air filtration system, let the various bearings on the drive loosen up,
+and make sure the replacement head retract batteries got a good charge.  Drive ran quiet and balanced.&lt;/p&gt;
+&lt;p&gt;After that, took a deep breath and let the heads load -- no crash!  Proceeded to work through the dynamic
+off-line calibration procedure for the head positioning servo system.  This involves jumpering the control
+electronics on the drive to strobe simulated cylinder addresses from the sector counter.  That provides
+a convenient source of oscillating seeks that can be used to calibrate the servos.  Video here shows head
+load, a four cylinder oscillating seek, and a scope trace of the resulting sine position output of the electro-optical carriage position sensor:&lt;/p&gt;
+&lt;p&gt;&lt;span class="videobox"&gt;
+                &lt;iframe width="640" height="390"
+                    src='https://www.youtube.com/embed/b6p2ri-uM9c?rel=0'
+                    frameborder='0' webkitAllowFullScreen mozallowfullscreen
+                    allowFullScreen&gt;
+                &lt;/iframe&gt;
+            &lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Surprisingly, after about thirty years of non-operation, all of the servo calibration was within specified
+error bars, so no adjustments were necessary!  At this point I decided to go for broke, cabled the drive
+to the RK11-C controller and attempted a boot.  Some cncouraging front panel indicator activity, but soon
+halted with a seek error flagged in RKER.  Not too surprising.&lt;/p&gt;
+&lt;p&gt;Okay, on to debugging the drive online with the controller, then. Worked up the following test code, inspired
+by something in one of the RK05 SPI workbooks.  This reads two cylinder addresses from the high and low
+bytes of the front panel switches, and instructs the controller to instruct the drive to seek alternately
+between them:&lt;/p&gt;
+&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt; 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;        &lt;span class="nt"&gt;177570&lt;/span&gt;                          &lt;span class="nt"&gt;SW&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nt"&gt;177570&lt;/span&gt;
+        &lt;span class="nt"&gt;177400&lt;/span&gt;                          &lt;span class="nt"&gt;RKDS&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nt"&gt;177400&lt;/span&gt;
+        &lt;span class="nt"&gt;177404&lt;/span&gt;                          &lt;span class="nt"&gt;RKCS&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nt"&gt;177404&lt;/span&gt;
+        &lt;span class="nt"&gt;177412&lt;/span&gt;                          &lt;span class="nt"&gt;RKDA&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nt"&gt;177412&lt;/span&gt;
+&lt;span class="nt"&gt;000000&lt;/span&gt;                                  &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nc"&gt;ASECT&lt;/span&gt;
+        &lt;span class="nt"&gt;001000&lt;/span&gt;                          &lt;span class="o"&gt;.=&lt;/span&gt;&lt;span class="nt"&gt;1000&lt;/span&gt;
+&lt;span class="nt"&gt;001000&lt;/span&gt;  &lt;span class="nt"&gt;012706&lt;/span&gt;  &lt;span class="nt"&gt;000700&lt;/span&gt;          &lt;span class="nt"&gt;START&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;  &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;700&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;SP&lt;/span&gt;         &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;INIT&lt;/span&gt; &lt;span class="nt"&gt;STACK&lt;/span&gt; &lt;span class="nt"&gt;POINTER&lt;/span&gt;
+&lt;span class="nt"&gt;001004&lt;/span&gt;  &lt;span class="nt"&gt;013700&lt;/span&gt;  &lt;span class="nt"&gt;177570&lt;/span&gt;          &lt;span class="nt"&gt;L0&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="o"&gt;@&lt;/span&gt;&lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;SW&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R0&lt;/span&gt;         &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;RETRIEVE&lt;/span&gt; &lt;span class="nt"&gt;SWITCHES&lt;/span&gt;
+&lt;span class="nt"&gt;001010&lt;/span&gt;  &lt;span class="nt"&gt;000300&lt;/span&gt;                          &lt;span class="nt"&gt;SWAB&lt;/span&gt;    &lt;span class="nt"&gt;R0&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;LOWER&lt;/span&gt; &lt;span class="nt"&gt;SWITCHES&lt;/span&gt; &lt;span class="nt"&gt;TO&lt;/span&gt; &lt;span class="nt"&gt;UPPER&lt;/span&gt;
+&lt;span class="nt"&gt;001012&lt;/span&gt;  &lt;span class="nt"&gt;004767&lt;/span&gt;  &lt;span class="nt"&gt;000012&lt;/span&gt;                  &lt;span class="nt"&gt;JSR&lt;/span&gt;     &lt;span class="nt"&gt;PC&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;SEEK&lt;/span&gt;         &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;DO&lt;/span&gt; &lt;span class="nt"&gt;THE&lt;/span&gt; &lt;span class="nt"&gt;SEEK&lt;/span&gt;
+&lt;span class="nt"&gt;001016&lt;/span&gt;  &lt;span class="nt"&gt;013700&lt;/span&gt;  &lt;span class="nt"&gt;177570&lt;/span&gt;                  &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="o"&gt;@&lt;/span&gt;&lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;SW&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R0&lt;/span&gt;         &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;RETRIEVE&lt;/span&gt; &lt;span class="nt"&gt;SWITCHES&lt;/span&gt;
+&lt;span class="nt"&gt;001022&lt;/span&gt;  &lt;span class="nt"&gt;004767&lt;/span&gt;  &lt;span class="nt"&gt;000002&lt;/span&gt;                  &lt;span class="nt"&gt;JSR&lt;/span&gt;     &lt;span class="nt"&gt;PC&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;SEEK&lt;/span&gt;         &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;DO&lt;/span&gt; &lt;span class="nt"&gt;THE&lt;/span&gt; &lt;span class="nt"&gt;SEEK&lt;/span&gt;
+&lt;span class="nt"&gt;001026&lt;/span&gt;  &lt;span class="nt"&gt;000766&lt;/span&gt;                          &lt;span class="nt"&gt;BR&lt;/span&gt;      &lt;span class="nt"&gt;L0&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;START&lt;/span&gt; &lt;span class="nt"&gt;OVER&lt;/span&gt;
+&lt;span class="nt"&gt;001030&lt;/span&gt;  &lt;span class="nt"&gt;042700&lt;/span&gt;  &lt;span class="nt"&gt;000377&lt;/span&gt;          &lt;span class="nt"&gt;SEEK&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;   &lt;span class="nt"&gt;BIC&lt;/span&gt;     &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;377&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R0&lt;/span&gt;         &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;MASK&lt;/span&gt; &lt;span class="nt"&gt;OFF&lt;/span&gt; &lt;span class="nt"&gt;LOWER&lt;/span&gt; &lt;span class="nt"&gt;BYTE&lt;/span&gt;
+&lt;span class="nt"&gt;001034&lt;/span&gt;  &lt;span class="nt"&gt;072027&lt;/span&gt;  &lt;span class="nt"&gt;177775&lt;/span&gt;                  &lt;span class="nt"&gt;ASH&lt;/span&gt;     &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;-3&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R0&lt;/span&gt;          &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;SHIFT&lt;/span&gt; &lt;span class="nt"&gt;OVER&lt;/span&gt; &lt;span class="nt"&gt;TO&lt;/span&gt; &lt;span class="nt"&gt;CYL&lt;/span&gt; &lt;span class="nt"&gt;ADDRESS&lt;/span&gt;
+&lt;span class="nt"&gt;001040&lt;/span&gt;  &lt;span class="nt"&gt;105737&lt;/span&gt;  &lt;span class="nt"&gt;177404&lt;/span&gt;          &lt;span class="nt"&gt;L1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;TSTB&lt;/span&gt;    &lt;span class="o"&gt;@&lt;/span&gt;&lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;RKCS&lt;/span&gt;          &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;CHECK&lt;/span&gt; &lt;span class="nt"&gt;RKCS&lt;/span&gt; &lt;span class="nt"&gt;RDY&lt;/span&gt; &lt;span class="nt"&gt;BIT&lt;/span&gt;
+&lt;span class="nt"&gt;001044&lt;/span&gt;  &lt;span class="nt"&gt;100375&lt;/span&gt;                          &lt;span class="nt"&gt;BPL&lt;/span&gt;     &lt;span class="nt"&gt;L1&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;LOOP&lt;/span&gt; &lt;span class="nt"&gt;IF&lt;/span&gt; &lt;span class="nt"&gt;BUSY&lt;/span&gt;
+&lt;span class="nt"&gt;001046&lt;/span&gt;  &lt;span class="nt"&gt;032737&lt;/span&gt;  &lt;span class="nt"&gt;000100&lt;/span&gt;  &lt;span class="nt"&gt;177400&lt;/span&gt;  &lt;span class="nt"&gt;L2&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;BIT&lt;/span&gt;     &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;100&lt;/span&gt;&lt;span class="o"&gt;,@&lt;/span&gt;&lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;RKDS&lt;/span&gt;     &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;CHECK&lt;/span&gt; &lt;span class="nt"&gt;RKDS&lt;/span&gt; &lt;span class="nt"&gt;ARDY&lt;/span&gt; &lt;span class="nt"&gt;BIT&lt;/span&gt;
+&lt;span class="nt"&gt;001054&lt;/span&gt;  &lt;span class="nt"&gt;001774&lt;/span&gt;                          &lt;span class="nt"&gt;BEQ&lt;/span&gt;     &lt;span class="nt"&gt;L2&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;LOOP&lt;/span&gt; &lt;span class="nt"&gt;IF&lt;/span&gt; &lt;span class="nt"&gt;BUSY&lt;/span&gt;
+&lt;span class="nt"&gt;001056&lt;/span&gt;  &lt;span class="nt"&gt;010037&lt;/span&gt;  &lt;span class="nt"&gt;177412&lt;/span&gt;                  &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="nt"&gt;R0&lt;/span&gt;&lt;span class="o"&gt;,@&lt;/span&gt;&lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;RKDA&lt;/span&gt;       &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;WRITE&lt;/span&gt; &lt;span class="nt"&gt;SEEK&lt;/span&gt; &lt;span class="nt"&gt;TARGET&lt;/span&gt; &lt;span class="nt"&gt;TO&lt;/span&gt; &lt;span class="nt"&gt;RKDA&lt;/span&gt;
+&lt;span class="nt"&gt;001062&lt;/span&gt;  &lt;span class="nt"&gt;012737&lt;/span&gt;  &lt;span class="nt"&gt;000011&lt;/span&gt;  &lt;span class="nt"&gt;177404&lt;/span&gt;          &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;11&lt;/span&gt;&lt;span class="o"&gt;,@&lt;/span&gt;&lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;RKCS&lt;/span&gt;      &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;WRITE&lt;/span&gt; &lt;span class="nt"&gt;SEEK&lt;/span&gt; &lt;span class="nt"&gt;CMD&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="nt"&gt;GO&lt;/span&gt; &lt;span class="nt"&gt;TO&lt;/span&gt; &lt;span class="nt"&gt;RKCS&lt;/span&gt;
+&lt;span class="nt"&gt;001070&lt;/span&gt;  &lt;span class="nt"&gt;000207&lt;/span&gt;                          &lt;span class="nt"&gt;RTS&lt;/span&gt;     &lt;span class="nt"&gt;PC&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;RETURN&lt;/span&gt; &lt;span class="nt"&gt;TO&lt;/span&gt; &lt;span class="nt"&gt;CALLER&lt;/span&gt;
+        &lt;span class="nt"&gt;001000&lt;/span&gt;                          &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nc"&gt;END&lt;/span&gt;    &lt;span class="nt"&gt;START&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+
+&lt;p&gt;At first this code was generating no seek activity on the drive.  Decided to try swapping out the BC11-A
+drive cable, and that produced some limited success -- drive seeks, but some bits of the cylinder address
+are still apparently not making it across the cable.&lt;/p&gt;
+&lt;p&gt;The BC11-A cables are problematic.  They seem flaky and fragile, and many of my spares seem bad.  Any given
+cable may beep out fine on the bench, and yet fail consistently in use...  It looks like what's up next is a
+voyage through my box of spares, swapping in cables looking for one that works reliably.  Failing that, I'll
+need work on some sort of modern replacement, since original BC11-A in good shape are getting hard to find.
+It will be sad if at the end of this journey I can't boot the machine for mere lack of a good cable between
+the drives and controller!&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://fritzm.github.io/images/pdp11/rk05-cartridge-foam.jpg"&gt;&lt;img src='/images/pdp11/rk05-cartridge-foam_thumbnail_tall.jpg'/&gt;&lt;/a&gt;
+&lt;a href="http://fritzm.github.io/images/pdp11/rk05-running.jpg"&gt;&lt;img src='/images/pdp11/rk05-running_thumbnail_tall.jpg'/&gt;&lt;/a&gt;
+&lt;a href="http://fritzm.github.io/images/pdp11/BC11-woes.jpg"&gt;&lt;img src='/images/pdp11/BC11-woes_thumbnail_tall.jpg'/&gt;&lt;/a&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Fritz Mueller</dc:creator><pubDate>Sun, 09 Apr 2017 00:00:00 -0700</pubDate><guid isPermaLink="false">tag:fritzm.github.io,2017-04-09:/rk05-2.html</guid><category>Retro-Computing</category><category>PDP-11</category></item><item><title>PDP-11/45: RK11 IV</title><link>http://fritzm.github.io/rk11-4.html</link><description>&lt;p&gt;A quick note: rejumpered a spare M105 address decoder, and swapped it in for the one that was in the RK11.  SSYN waveform is greatly improved (see before/after shots below), so looks like a bad driver on 
 the original M105.&lt;/p&gt;
 &lt;p&gt;&lt;a href="http://fritzm.github.io/images/pdp11/rkcs-fixed.jpg"&gt;&lt;img src='/images/pdp11/rkcs-fixed_thumbnail_tall.jpg'/&gt;&lt;/a&gt;
 &lt;a href="http://fritzm.github.io/images/pdp11/rkcs-really-fixed.jpg"&gt;&lt;img src='/images/pdp11/rkcs-really-fixed_thumbnail_tall.jpg'/&gt;&lt;/a&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Fritz Mueller</dc:creator><pubDate>Sat, 01 Apr 2017 00:00:00 -0700</pubDate><guid isPermaLink="false">tag:fritzm.github.io,2017-04-01:/rk11-4.html</guid><category>Retro-Computing</category><category>PDP-11</category></item><item><title>PDP-11/45: RK05</title><link>http://fritzm.github.io/rk05.html</link><description>&lt;p&gt;Started going through the two RK05 drives.  Lots of work to remove and clean up all the decaying foam.
