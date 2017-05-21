@@ -1,5 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0"><channel><title>fritzm.github.io</title><link>http://fritzm.github.io/</link><description></description><lastBuildDate>Sun, 09 Apr 2017 00:00:00 -0700</lastBuildDate><item><title>PDP-11/45: RK05 II - Head Load and Servo Calibration</title><link>http://fritzm.github.io/rk05-2.html</link><description>&lt;p&gt;Okay, disassembled and cleaned a few RK05 cartidges, following advice from the vcfed forum and cctalk
+<rss version="2.0"><channel><title>fritzm.github.io</title><link>http://fritzm.github.io/</link><description></description><lastBuildDate>Sun, 14 May 2017 00:00:00 -0700</lastBuildDate><item><title>PDP-11/45: CPU debug VI - RK11 NPRs and first disk boot!</title><link>http://fritzm.github.io/cpu-degug-6.html</link><description>&lt;p&gt;Took a little of time to sort through BC11 cables to find a good one for drive interfacing, but in the end I
+found one that worked okay and got the seek tester code from the previous post working reliably.  At this
+point I mounted one of the recently cleaned RK05 packs, but found that the M9301 bootstrap would hang the bus
+on the first read operation.&lt;/p&gt;
+&lt;p&gt;A little scoping around on the RK11-C showed that it was asserting NPR to the processor, but never receiving
+NPG.  A quick check of NPG continuity on the backplane showed a missing jumper on one slot of my DD11-D.
+Wrapped this on, verified NPG continuity all the way out to the RK11, but still no joy.  Turns out the CPU
+is not asserting NPG at all.&lt;/p&gt;
+&lt;p&gt;Threw the CPU UBC card out on extenders and had a go at chasing though the NPG logic with a logic probe.
+Turns out to be a failed 8881 bus driver for NPG at the end of the line (E55 on KB11-A drawing UBCD). Pulled,
+socketed, replaced.&lt;/p&gt;
+&lt;p&gt;After this, the CPU was asserting NPG, but the signaling still looked a little squirrelly.  Turns out that
+there are jumpers (W1-W5) on the M9301 bootstrap terminator that need to be installed to provide grant 
+pull-ups when they are not otherwise provided internally by the processor (and the 11/45 is one such
+case).  After installing the jumpers, NPG signaling looked solid.&lt;/p&gt;
+&lt;p&gt;Tried mounting a booting a few packs.  Packs marked as having RT11 would run for a short while and then hang.
+But an RKDP pack &lt;em&gt;successfully booted!&lt;/em&gt;  Wow, that feels pretty good after about two years of working
+seriously on this restoration.  :-)&lt;/p&gt;
+&lt;p&gt;Going to stop here on a high note, and pick up trying to get a good RT11 boot next time.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://fritzm.github.io/images/pdp11/rkdp-boot.jpg"&gt;&lt;img src='/images/pdp11/rkdp-boot_thumbnail_tall.jpg'/&gt;&lt;/a&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Fritz Mueller</dc:creator><pubDate>Sun, 14 May 2017 00:00:00 -0700</pubDate><guid isPermaLink="false">tag:fritzm.github.io,2017-05-14:/cpu-degug-6.html</guid><category>Retro-Computing</category><category>PDP-11</category></item><item><title>PDP-11/45: RK05 II - Head Load and Servo Calibration</title><link>http://fritzm.github.io/rk05-2.html</link><description>&lt;p&gt;Okay, disassembled and cleaned a few RK05 cartidges, following advice from the vcfed forum and cctalk
 mailing list (cleanroom gloves and wipes, 99% anyhydrous isoprop).  Was surprised to find foam inside
 the hub on the disks (see pic below) but folks on vcfed advise that it is high-density polyeurethane
 and not subject to decay to the same extent as the other DEC foams, so I left it be.&lt;/p&gt;
@@ -1685,11 +1704,9 @@ I will update that repo.  Any help from fontophiles gladly accepted!&lt;/p&gt;</
     }
 
     var mathjaxscript = document.createElement('script');
-    var location_protocol = (false) ? 'https' : document.location.protocol;
-    if (location_protocol !== 'http' &amp;&amp; location_protocol !== 'https') location_protocol = 'https:';
     mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
     mathjaxscript.type = 'text/javascript';
-    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
     mathjaxscript[(window.opera ? "innerHTML" : "text")] =
         "MathJax.Hub.Config({" +
         "    config: ['MMLorHTML.js']," +
