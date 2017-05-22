@@ -56,6 +56,101 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="http://fritzm.github.io/diagnostics-12.html"><h1>PDP-11/45: Diagnostics XII - FP11 FPU, cont.</h1></a>
+Sun 30 October 2016
+
+by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+    </div>
+
+    <div><p>Some spare 74194 arrived in the mail; popped one in to the socket I had prepared at E15 on the FRL board,
+and the FP add/subtract problem is fixed.  The following FP11 diagnostics now pass:</p>
+<style>
+.diaglist { display: inline; border-collapse: collapse; margin-right: 1em; }
+.diaglist caption { font-weight: bold; }
+.diaglist tr:nth-child(even) { background-color: #f2f2f2; }
+.diaglist th, .diaglist td { padding: 5px; }
+.diaglist td { border: 1px solid lightgray; font-family: Menlo,Consolas,monospace; }
+</style>
+
+<table class="diaglist">
+<thead>
+<tr><th>Diagnostic</th><th>Description</th><th>Status</th></tr>
+</thead>
+<tbody>
+<tr><td>CFPAB0.BIC</td><td>LDFPS,STFPS,SETI,SETL,SETF,SETD,CFCC</td><td>pass</td></tr>
+<tr><td>CFPBB0.BIC</td><td>STST</td><td>pass</td></tr>
+<tr><td>CFPCD0.BIC</td><td>LDF,LDD,STF,STD</td><td>pass</td></tr>
+<tr><td>CFPDC0.BIC</td><td>ADDF,ADDD,SUBF,SUBD</td><td>pass</td></tr>
+<tr><td>CFPEB0.BIC</td><td>CMPF,CMPD</td><td>pass</td></tr>
+<tr><td>CFPFB0.BIC</td><td>MULF,MULD</td><td>pass</td></tr>
+<tr><td>CFPGC0.BIC</td><td>DIVF,DIVD</td><td>pass</td></tr>
+<tr><td>CFPHB0.BIC</td><td>CLR,TST,ABS,NEG</td><td>pass</td></tr>
+<tr><td>CFPIB0.BIC</td><td>LDCDF,LDCFD,STCFD,STCDF</td><td>pass</td></tr>
+<tr><td>CFPJB0.BIC</td><td>LDCJX,STCXJ</td><td>pass</td></tr>
+<tr><td>CFPKB0.BIC</td><td>LDEXP</td><td>pass</td></tr>
+<tr><td>CFPMB0.BIC</td><td>MAINT</td><td>pass</td></tr>
+</tbody>
+</table>
+
+<p>...which is almost everything.  The last failing diagnostic is CFPLB0, which tests MODF and MODD.  Set up
+a similar test program for this instruction:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20</pre></div></td><td class="code"><div class="highlight"><pre><span></span>        <span class="nt">000000</span>                          <span class="nt">AC0</span><span class="o">=%</span><span class="nt">0</span>
+        <span class="nt">000001</span>                          <span class="nt">AC1</span><span class="o">=%</span><span class="nt">1</span>
+<span class="nt">000000</span>                                  <span class="p">.</span><span class="nc">ASECT</span>
+        <span class="nt">001000</span>                          <span class="o">.=</span><span class="nt">1000</span>
+<span class="nt">001000</span>  <span class="nt">170011</span>                  <span class="nt">START</span><span class="o">:</span>  <span class="nt">SETD</span>                <span class="o">;</span><span class="nt">SET</span> <span class="nt">DOUBLE</span> <span class="nt">PRECISION</span> <span class="nt">MODE</span>
+<span class="nt">001002</span>  <span class="nt">172467</span>  <span class="nt">000020</span>                  <span class="nt">LDD</span>     <span class="nt">D1</span><span class="o">,</span><span class="nt">AC0</span>      <span class="o">;</span><span class="nt">FETCH</span> <span class="nt">FIRST</span> <span class="nt">OPERAND</span> <span class="nt">FROM</span> <span class="nt">D1</span>
+<span class="nt">001006</span>  <span class="nt">172567</span>  <span class="nt">000024</span>                  <span class="nt">LDD</span>     <span class="nt">D2</span><span class="o">,</span><span class="nt">AC1</span>      <span class="o">;</span><span class="nt">FETCH</span> <span class="nt">SECOND</span> <span class="nt">OPERAND</span> <span class="nt">FROM</span> <span class="nt">D2</span>
+<span class="nt">001012</span>  <span class="nt">171401</span>                          <span class="nt">MODD</span>    <span class="nt">AC1</span><span class="o">,</span><span class="nt">AC0</span>     <span class="o">;</span><span class="nt">MOD</span> <span class="o">(</span><span class="nt">FRAC</span> <span class="nt">IN</span> <span class="nt">AC0</span><span class="o">,</span> <span class="nt">INT</span> <span class="nt">IN</span> <span class="nt">AC1</span><span class="o">)</span>
+<span class="nt">001014</span>  <span class="nt">174067</span>  <span class="nt">000026</span>                  <span class="nt">STD</span>     <span class="nt">AC0</span><span class="o">,</span><span class="nt">D3</span>      <span class="o">;</span><span class="nt">STORE</span> <span class="nt">FRAC</span> <span class="nt">TO</span> <span class="nt">D3</span>
+<span class="nt">001020</span>  <span class="nt">174167</span>  <span class="nt">000032</span>                  <span class="nt">STD</span>     <span class="nt">AC1</span><span class="o">,</span><span class="nt">D4</span>      <span class="o">;</span><span class="nt">STORE</span> <span class="nt">INT</span> <span class="nt">TO</span> <span class="nt">D4</span>
+<span class="nt">001024</span>  <span class="nt">000000</span>                          <span class="nt">HALT</span>
+<span class="nt">001026</span>  <span class="nt">040200</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D1</span><span class="o">:</span>     <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">040200</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span> <span class="o">;</span><span class="nt">1</span><span class="p">.</span><span class="nc">0</span>
+<span class="nt">001034</span>  <span class="nt">000000</span>
+<span class="nt">001036</span>  <span class="nt">040300</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D2</span><span class="o">:</span>     <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">040300</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span> <span class="o">;</span><span class="nt">1</span><span class="p">.</span><span class="nc">5</span>
+<span class="nt">001044</span>  <span class="nt">000000</span>
+<span class="nt">001046</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D3</span><span class="o">:</span>     <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span>
+<span class="nt">001054</span>  <span class="nt">000000</span>
+<span class="nt">001056</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D4</span><span class="o">:</span>     <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span>
+<span class="nt">001064</span>  <span class="nt">000000</span>
+        <span class="nt">001000</span>                          <span class="p">.</span><span class="nc">END</span>    <span class="nt">START</span>
+</pre></div>
+</td></tr></table>
+
+<p>This does show a problem: after exection, the integer result at D4 seems correct, but the fractional result
+in D3 is incorrect (037777 177777 177777 177777).  Verified the correct microflow with the KM11.</p>
+<p>Stopped in microstate MOD.22, and examined ALUs on FRL where the fractional result is masked.  ALU function
+selects (for A &amp; ~B) and B inputs (all zeros for mask) look correct throughout.  A inputs, however,
+are all ones except the least significant bit, which seems incorrect.  All for now -- will dig a little deeper on the microcode flows and follow up on this lead next time...</p></div>
+    <hr />
+</div>
+
+
+
+<div class='article'>
+    <div class="content-title">
         <a href="http://fritzm.github.io/diagnostics-11.html"><h1>PDP-11/45: Diagnostics XI - FP11 FPU, cont.</h1></a>
 Sun 23 October 2016
 
@@ -560,29 +655,6 @@ establishes consistent preconditions (shift register full, buffer empty) before 
 
 <p>I then further verified that the unmodified original diagnostic suite passes 100% if I turn the M7800 down to 4800
 Baud.  Worth noting when trying to run these older diagnostics!</p></div>
-    <hr />
-</div>
-
-
-
-<div class='article'>
-    <div class="content-title">
-        <a href="http://fritzm.github.io/vt52-repair.html"><h1>PDP-11/45: VT52 repair</h1></a>
-Sat 16 July 2016
-
-by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
-    </div>
-
-    <div><p>Replacement oscillator arrived for the VT52, so spent some time getting it back going again.  Things got <em>much</em> better
-with a stable timing chain, but some glitchiness remained -- tracked this down to the socketed microcode ROMS which
-just required a reseat.</p>
-<p>Here you can see the new oscillator fitted (silver rectangular can with tie-wrap).  The microcode ROMS are the four
-socketed chips towards the right in the picture.  Interestingly, the schematic I have calls for 8 ROMS of half the size
-of the ones that are in here, and indeed you can see the unpopulated spaces for these on the board.</p>
-<p><a href="http://fritzm.github.io/images/pdp11/vt52-repair.jpg"><img src='/images/pdp11/vt52-repair_thumbnail_tall.jpg'/></a></p></div>
     <hr />
 </div>
 
