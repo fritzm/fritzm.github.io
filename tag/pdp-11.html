@@ -56,6 +56,46 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="http://fritzm.github.io/rk11-6.html"><h1>PDP-11/45: RK11 VI - "Pole" and Interrupt Issues</h1></a>
+Thu 08 June 2017
+
+by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+    </div>
+
+    <div><p>Replaced the failed 7401 in the RKDA to RKDB data path, and verified that the RKDB stuck bit 11 problem was
+fixed.  Ran the system for another couple hours to rewrite a fresh RT11 pack, then another problem developed:
+read operations would successfully obtain the bus, but would never complete.</p>
+<p>Some investigation with a KM11 on the RK11 controller showed that POLE was now incorrectly asserted 
+continuously (did they mean "poll"?). Tracked this down to a failed 7420 (E1 on the M141 at A26, sheet 
+RK11-C-12). Replaced, and reads were working again. I guess with a machine this age there is going to be a
+lot of this sort of thing where marginal parts give up after a few hours of use.  Hopefully after some 
+prolonged operation things will settle down a little bit...</p>
+<p>In any case, <em>still</em> unable to boot any of my RT11 packs.  I Decided to step back and run MAINDEC diagnostic
+ZRKK. This is the RK11 dynamic diagnostic that destructively modifies a pack, and I had not previously run it 
+-- I had just optimistically jumped to trying to boot existing packs after the drive restore and calibration.
+The diagnostic ran successfully for a while, through various format and read and write tests over the whole
+pack (encouraging!), then hung up consistently on test 35 (octal), which tests whether the RK11 interrupts
+the processor correctly when IDE is set.</p>
+<p>So it could be the case that my RT11 boots hang up when they first start trying to make use of interrupts. 
+Verified that I can run MAINDEC ZKWA, which tests interrupts from the KW11-L line clock, so interrupt 
+fielding in the CPU looks good.</p>
+<p>Re-ran MAINDEC ZRKK, and noted that the CPU is waiting in micro-state BRK.00 (154) on page FLOWS 12 of the
+engineering drawings. This state has a wait for Unibus INTR to be asserted, so it looks like a problem with
+interrupt signaling on the RK11 side.</p>
+<p>I have a bit of travel coming up, so I probably won't get back to this for a week or two. But the next 
+sensible step I think will be to work with a logic analyzer on the backplane of the RK11, slot A6 where the
+M7820 interrupt control flipchip goes, and see what is/isn't happening with the interrupt signaling on that
+end. I suspect there will probably be a failed IC on the M7820.</p></div>
+    <hr />
+</div>
+
+
+
+<div class='article'>
+    <div class="content-title">
         <a href="http://fritzm.github.io/rk11-5.html"><h1>PDP-11/45: RK11 V - Checksum issues</h1></a>
 Sun 21 May 2017
 
@@ -582,334 +622,6 @@ Took a pause to rewire the box -- left two of the outlets GFCI protected for the
 as non-protected for use with the PDP-11.</p>
 <p><a href="http://fritzm.github.io/images/pdp11/cabinets.jpg"><img src='/images/pdp11/cabinets_thumbnail_tall.jpg'/></a>
 <a href="http://fritzm.github.io/images/pdp11/basic.jpg"><img src='/images/pdp11/basic_thumbnail_tall.jpg'/></a></p></div>
-    <hr />
-</div>
-
-
-
-<div class='article'>
-    <div class="content-title">
-        <a href="http://fritzm.github.io/diagnostics-13.html"><h1>PDP-11/45: Diagnostics XIII - FP11 FPU, cont.</h1></a>
-Thu 24 November 2016
-
-by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
-    </div>
-
-    <div><p>Have been looking into the FP11 MOD problem in spare moments of the past few weeks, but haven't written up
-an account of the progress, so this will be a bit of a catch-up article.</p>
-<p>Having now studied the design of this thing in more depth, there are a few things I find interesting:</p>
-<ul>
-<li>
-<p>The inner loops of the multiplication, division, and floating-point normalization algorithms on the FP11
-are not implemented in microcode, but rather as "hardware subroutines".  Microcode does all the setup of
-the various internal registers and counters, then pauses while the hardware runs the inner loop, then picks up
-again to mediate rounding, masking, exceptions, etc. afterward.</p>
-</li>
-<li>
-<p>The multiplication implementation uses an interesting algorithm called "skipping over ones and zeros",
-described in section 5.3.1 of the FP11 maintenance manual.  This reduces the number of time-consuming
-additions needed on average.  It works along the lines of a familiar mental shortcut: suppose you had to
-multiply some number X by 999.  Rather than multiply X by 9 three times and shift and add them all up, you
-would probably just take X * 1,000 and subtract off X * 1.  The key observation is that you can do this
-for any contiguous string of 9s in the multiplier: subtract the multiplicand from the partial product at
-the place value where the string begins, then add the multiplicand at one past place value where the string
-ends.  The FP11 implements the binary equivalent of this with a small state machine (comprised of flip-flops
-MR1, MR0, and STRG1) which identifies strings of contiguous 1s and invokes ALU subtractions and additions on
-the boundaries as the multiplier is shifted through.</p>
-</li>
-<li>
-<p>Debugging techniques: a KM11 in single-clock-transition mode may be used to step within the hardware
-subroutines, as they are driven off the main FP11 clock.  It can be a lot of switch presses to step through
-an entire multiply (120 or so clock transitions at least for a double-precision multiply, and typically
-more because each necessary intermediate add/subtract adds eight clock transitions!) and this gets to be
-pretty tedious and error-prone.  A logic analyzer is very useful here to capture a visualization of an entire
-multiplication at one go, and enable counting off clock transitions needed to get to something you'd
-like to take a closer look at with a logic probe.  Alternatively, if your FP11 is working well enough to
-run maintenance instructions, there are software techniques that can prematurely terminate the hardware
-subroutines and also give some useful visibility into the intermediate states.</p>
-</li>
-</ul>
-<p>I opted to try out the software techniques to see if I could get more information on the (mis)behavior in
-my FP11 order to focus my hardware troubleshooting.  The following program came in handy.  This is based off
-some example code in the FP11 maintenance manual, though I elaborated it slightly with a binary printout
-routine:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55
-56
-57
-58
-59
-60
-61
-62
-63
-64
-65
-66
-67
-68
-69
-70
-71
-72
-73
-74
-75
-76
-77
-78
-79
-80
-81
-82
-83
-84
-85</pre></div></td><td class="code"><div class="highlight"><pre><span></span>        <span class="nt">000000</span>                          <span class="nt">AC0</span><span class="o">=%</span><span class="nt">0</span>
-        <span class="nt">000001</span>                          <span class="nt">AC1</span><span class="o">=%</span><span class="nt">1</span>
-        <span class="nt">000002</span>                          <span class="nt">AC2</span><span class="o">=%</span><span class="nt">2</span>
-        <span class="nt">177560</span>                          <span class="nt">SERIAL</span><span class="o">=</span><span class="nt">177560</span>
-        <span class="nt">170006</span>                          <span class="nt">MRS</span><span class="o">=</span><span class="nt">170006</span>
-<span class="nt">000000</span>                                  <span class="p">.</span><span class="nc">ASECT</span>
-        <span class="nt">001000</span>                          <span class="o">.=</span><span class="nt">1000</span>
-<span class="nt">001000</span>  <span class="nt">170127</span>  <span class="nt">040220</span>          <span class="nt">START</span><span class="o">:</span>  <span class="nt">LDFPS</span>   <span class="p">#</span><span class="nn">40220</span>          <span class="o">;</span><span class="nt">DISABLE</span> <span class="nt">INTS</span><span class="o">,</span> <span class="nt">SET</span> <span class="nt">DBL</span> <span class="nt">AND</span> <span class="nt">MAINT</span> <span class="nt">MODE</span>
-<span class="nt">001004</span>  <span class="nt">172667</span>  <span class="nt">000316</span>                  <span class="nt">LDD</span>     <span class="nt">MLYR</span><span class="o">,</span><span class="nt">AC2</span>        <span class="o">;</span><span class="nt">LOAD</span> <span class="nt">MULTIPLIER</span> <span class="nt">IN</span> <span class="nt">AC2</span>
-<span class="nt">001010</span>  <span class="nt">012703</span>  <span class="nt">000230</span>                  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">230</span><span class="o">,</span><span class="nt">R3</span>         <span class="o">;</span><span class="nt">R3</span> <span class="nt">GETS</span> <span class="nt">OCTAL</span> <span class="nt">230</span> <span class="o">(</span><span class="nt">FRAC</span> <span class="nt">MUL</span> <span class="nt">MICROSTATE</span><span class="o">)</span>
-<span class="nt">001014</span>  <span class="nt">170003</span>                          <span class="nt">LDUB</span>                    <span class="o">;</span><span class="nt">LOAD</span> <span class="nt">R3</span> <span class="nt">TO</span> <span class="nt">MBR</span>
-<span class="nt">001016</span>  <span class="nt">012702</span>  <span class="nt">177564</span>                  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">SERIAL</span><span class="o">+</span><span class="nt">4</span><span class="o">,</span><span class="nt">R2</span>    <span class="o">;</span><span class="nt">SERIAL</span> <span class="nt">XMIT</span> <span class="nt">BASE</span> <span class="nt">TO</span> <span class="nt">R2</span>
-<span class="nt">001022</span>  <span class="nt">012762</span>  <span class="nt">000015</span>  <span class="nt">000002</span>          <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">15</span><span class="o">,</span><span class="nt">2</span><span class="o">(</span><span class="nt">R2</span><span class="o">)</span>       <span class="o">;</span><span class="nt">OUTPUT</span> <span class="s1">&#39;\R&#39;</span>
-<span class="nt">001030</span>  <span class="nt">105712</span>                          <span class="nt">TSTB</span>    <span class="o">(</span><span class="nt">R2</span><span class="o">)</span>            <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">XMIT</span> <span class="nt">CLEAR</span>
-<span class="nt">001032</span>  <span class="nt">100376</span>                          <span class="nt">BPL</span>     <span class="p">.</span><span class="nc">-2</span>             <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">UNTIL</span> <span class="nt">SO</span>
-<span class="nt">001034</span>  <span class="nt">012762</span>  <span class="nt">000012</span>  <span class="nt">000002</span>          <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">12</span><span class="o">,</span><span class="nt">2</span><span class="o">(</span><span class="nt">R2</span><span class="o">)</span>       <span class="o">;</span><span class="nt">OUTPUT</span> <span class="s1">&#39;\N&#39;</span>
-<span class="nt">001042</span>  <span class="nt">105712</span>                          <span class="nt">TSTB</span>    <span class="o">(</span><span class="nt">R2</span><span class="o">)</span>            <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">XMIT</span> <span class="nt">CLEAR</span>
-<span class="nt">001044</span>  <span class="nt">100376</span>                          <span class="nt">BPL</span>     <span class="p">.</span><span class="nc">-2</span>             <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">UNTIL</span> <span class="nt">SO</span>
-<span class="nt">001046</span>  <span class="nt">005004</span>                          <span class="nt">CLR</span>     <span class="nt">R4</span>              <span class="o">;</span><span class="nt">R4</span> <span class="nt">HOLDS</span> <span class="nt">SC</span> <span class="nt">VALUE</span>
-<span class="nt">001050</span>  <span class="nt">005204</span>                  <span class="nt">NXTMUL</span><span class="o">:</span> <span class="nt">INC</span>     <span class="nt">R4</span>              <span class="o">;</span><span class="nt">INCREMENT</span> <span class="nt">SC</span>
-<span class="nt">001052</span>  <span class="nt">170004</span>                          <span class="nt">LDSC</span>                    <span class="o">;</span><span class="nt">LOAD</span> <span class="nt">1S</span> <span class="nt">COMPLEMENT</span> <span class="nt">OF</span> <span class="nt">R4</span> <span class="nt">INTO</span> <span class="nt">SC</span>
-<span class="nt">001054</span>  <span class="nt">012705</span>  <span class="nt">001356</span>          <span class="nt">LSTMUL</span><span class="o">:</span> <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">QR</span><span class="o">+</span><span class="nt">10</span><span class="o">,</span><span class="nt">R5</span>       <span class="o">;</span><span class="nt">SET</span> <span class="nt">R5</span> <span class="nt">PAST</span> <span class="nt">END</span> <span class="nt">OF</span> <span class="nt">STORAGE</span> <span class="nt">TABLE</span>
-<span class="nt">001060</span>  <span class="nt">172567</span>  <span class="nt">000232</span>                  <span class="nt">LDD</span>     <span class="nt">MCND</span><span class="o">,</span><span class="nt">AC1</span>        <span class="o">;</span><span class="nt">LOAD</span> <span class="nt">MULTIPLICAND</span> <span class="nt">INTO</span> <span class="nt">AC1</span>
-<span class="nt">001064</span>  <span class="nt">171102</span>                          <span class="nt">MULD</span>    <span class="nt">AC2</span><span class="o">,</span><span class="nt">AC1</span>         <span class="o">;</span><span class="nt">DO</span> <span class="nt">PARTIAL</span> <span class="nt">MULTIPLY</span>
-<span class="nt">001066</span>  <span class="nt">170007</span>                          <span class="nt">STQ0</span>                    <span class="o">;</span><span class="nt">TRANSFER</span> <span class="nt">QR</span> <span class="nt">TO</span> <span class="nt">AC0</span>
-<span class="nt">001070</span>  <span class="nt">174045</span>                          <span class="nt">STD</span>     <span class="nt">AC0</span><span class="o">,</span><span class="nt">-</span><span class="o">(</span><span class="nt">R5</span><span class="o">)</span>       <span class="o">;</span><span class="nt">STORE</span> <span class="nt">QR</span> <span class="nt">IN</span> <span class="nt">TABLE</span>
-<span class="nt">001072</span>  <span class="nt">042715</span>  <span class="nt">177600</span>                  <span class="nt">BIC</span>     <span class="p">#</span><span class="nn">177600</span><span class="o">,(</span><span class="nt">R5</span><span class="o">)</span>    <span class="o">;</span><span class="nt">CLEAR</span> <span class="nt">OFF</span> <span class="nt">SIGN</span> <span class="nt">AND</span> <span class="nt">EXPONENT</span>
-<span class="nt">001076</span>  <span class="nt">170005</span>                          <span class="nt">STA0</span>                    <span class="o">;</span><span class="nt">TRANSFER</span> <span class="nt">AR</span> <span class="nt">TO</span> <span class="nt">AC0</span>
-<span class="nt">001100</span>  <span class="nt">174045</span>                          <span class="nt">STD</span>     <span class="nt">AC0</span><span class="o">,</span><span class="nt">-</span><span class="o">(</span><span class="nt">R5</span><span class="o">)</span>       <span class="o">;</span><span class="nt">STORE</span> <span class="nt">AR</span> <span class="nt">IN</span> <span class="nt">TABLE</span>
-<span class="nt">001102</span>  <span class="nt">042715</span>  <span class="nt">177600</span>                  <span class="nt">BIC</span>     <span class="p">#</span><span class="nn">177600</span><span class="o">,(</span><span class="nt">R5</span><span class="o">)</span>    <span class="o">;</span><span class="nt">CLEAR</span> <span class="nt">OFF</span> <span class="nt">SIGN</span> <span class="nt">AND</span> <span class="nt">EXPONENT</span>
-<span class="nt">001106</span>  <span class="nt">170006</span>                          <span class="nt">MRS</span>                     <span class="o">;</span><span class="nt">SHIFT</span> <span class="nt">AR</span> <span class="nt">AND</span> <span class="nt">QR</span> <span class="nt">RIGHT</span> <span class="nt">ONE</span> <span class="nt">PLACE</span>
-<span class="nt">001110</span>  <span class="nt">170006</span>                          <span class="nt">MRS</span>                     <span class="o">;</span><span class="nt">SHIFT</span> <span class="nt">AR</span> <span class="nt">AND</span> <span class="nt">QR</span> <span class="nt">RIGHT</span> <span class="nt">ONE</span> <span class="nt">PLACE</span>
-<span class="nt">001112</span>  <span class="nt">170007</span>                          <span class="nt">STQ0</span>                    <span class="o">;</span><span class="nt">TRANSFER</span> <span class="nt">QR</span> <span class="nt">TO</span> <span class="nt">AC0</span>
-<span class="nt">001114</span>  <span class="nt">174067</span>  <span class="nt">000236</span>                  <span class="nt">STD</span>     <span class="nt">AC0</span><span class="o">,</span><span class="nt">TEMP</span>        <span class="o">;</span><span class="nt">STORE</span> <span class="nt">QR</span> <span class="nt">IN</span> <span class="nt">TEMP</span>
-<span class="nt">001120</span>  <span class="nt">016703</span>  <span class="nt">000232</span>                  <span class="nt">MOV</span>     <span class="nt">TEMP</span><span class="o">,</span><span class="nt">R3</span>         <span class="o">;</span><span class="nt">FETCH</span> <span class="nt">MSW</span> <span class="nt">OF</span> <span class="nt">QR</span> <span class="nt">TO</span> <span class="nt">R3</span>
-<span class="nt">001124</span>  <span class="nt">042703</span>  <span class="nt">177600</span>                  <span class="nt">BIC</span>     <span class="p">#</span><span class="nn">177600</span><span class="o">,</span><span class="nt">R3</span>      <span class="o">;</span><span class="nt">CLEAR</span> <span class="nt">OFF</span> <span class="nt">SIGN</span> <span class="nt">AND</span> <span class="nt">EXPONENT</span>
-<span class="nt">001130</span>  <span class="nt">006303</span>                          <span class="nt">ASL</span>     <span class="nt">R3</span>              <span class="o">;</span><span class="nt">SHIFT</span> <span class="nt">MSBS</span> <span class="nt">OF</span> <span class="nt">QR</span> <span class="nt">ONE</span> <span class="nt">PLACE</span> <span class="nt">LEFT</span>
-<span class="nt">001132</span>  <span class="nt">006303</span>                          <span class="nt">ASL</span>     <span class="nt">R3</span>              <span class="o">;</span><span class="nt">SHIFT</span> <span class="nt">MSBS</span> <span class="nt">OF</span> <span class="nt">QR</span> <span class="nt">ONE</span> <span class="nt">PLACE</span> <span class="nt">LEFT</span>
-<span class="nt">001134</span>  <span class="nt">050365</span>  <span class="nt">000010</span>                  <span class="nt">BIS</span>     <span class="nt">R3</span><span class="o">,</span><span class="nt">10</span><span class="o">(</span><span class="nt">R5</span><span class="o">)</span>       <span class="o">;</span><span class="nt">SET</span> <span class="nt">QR59</span> <span class="nt">AND</span> <span class="nt">QR58</span> <span class="nt">IN</span> <span class="nt">TABLE</span>
-<span class="nt">001140</span>  <span class="nt">170005</span>                          <span class="nt">STA0</span>                    <span class="o">;</span><span class="nt">TRANSFER</span> <span class="nt">AR</span> <span class="nt">TO</span> <span class="nt">AC0</span>
-<span class="nt">001142</span>  <span class="nt">174067</span>  <span class="nt">000210</span>                  <span class="nt">STD</span>     <span class="nt">AC0</span><span class="o">,</span><span class="nt">TEMP</span>        <span class="o">;</span><span class="nt">STORE</span> <span class="nt">AR</span> <span class="nt">IN</span> <span class="nt">TEMP</span>
-<span class="nt">001146</span>  <span class="nt">016703</span>  <span class="nt">000204</span>                  <span class="nt">MOV</span>     <span class="nt">TEMP</span><span class="o">,</span><span class="nt">R3</span>         <span class="o">;</span><span class="nt">FETCH</span> <span class="nt">MSW</span> <span class="nt">OF</span> <span class="nt">AR</span> <span class="nt">TO</span> <span class="nt">R3</span>
-<span class="nt">001152</span>  <span class="nt">042703</span>  <span class="nt">177600</span>                  <span class="nt">BIC</span>     <span class="p">#</span><span class="nn">177600</span><span class="o">,</span><span class="nt">R3</span>      <span class="o">;</span><span class="nt">CLEAR</span> <span class="nt">OFF</span> <span class="nt">SIGN</span> <span class="nt">AND</span> <span class="nt">EXPONENT</span>
-<span class="nt">001156</span>  <span class="nt">006303</span>                          <span class="nt">ASL</span>     <span class="nt">R3</span>              <span class="o">;</span><span class="nt">SHIFT</span> <span class="nt">MSBS</span> <span class="nt">OF</span> <span class="nt">AR</span> <span class="nt">ONE</span> <span class="nt">PLACE</span> <span class="nt">LEFT</span>
-<span class="nt">001160</span>  <span class="nt">006303</span>                          <span class="nt">ASL</span>     <span class="nt">R3</span>              <span class="o">;</span><span class="nt">SHIFT</span> <span class="nt">MSBS</span> <span class="nt">OF</span> <span class="nt">AR</span> <span class="nt">ONE</span> <span class="nt">PLACE</span> <span class="nt">LEFT</span>
-<span class="nt">001162</span>  <span class="nt">050315</span>                          <span class="nt">BIS</span>     <span class="nt">R3</span><span class="o">,(</span><span class="nt">R5</span><span class="o">)</span>         <span class="o">;</span><span class="nt">SET</span> <span class="nt">AR59</span> <span class="nt">AND</span> <span class="nt">AR58</span> <span class="nt">IN</span> <span class="nt">TABLE</span>
-<span class="nt">001164</span>  <span class="nt">012705</span>  <span class="nt">001336</span>                  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">AR</span><span class="o">,</span><span class="nt">R5</span>          <span class="o">;</span><span class="nt">GET</span> <span class="nt">ADDRESS</span> <span class="nt">OF</span> <span class="nt">FIRST</span> <span class="nt">QUAD</span> <span class="nt">FOR</span> <span class="nt">PRINTING</span>
-<span class="nt">001170</span>  <span class="nt">012700</span>  <span class="nt">000010</span>                  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">10</span><span class="o">,</span><span class="nt">R0</span>          <span class="o">;</span><span class="nt">R0</span> <span class="nt">COUNTS</span> <span class="nt">8</span> <span class="nt">WORDS</span> <span class="nt">IN</span> <span class="nt">TWO</span> <span class="nt">QUADS</span>
-<span class="nt">001174</span>  <span class="nt">012503</span>                  <span class="nt">LWORD</span><span class="o">:</span>  <span class="nt">MOV</span>     <span class="o">(</span><span class="nt">R5</span><span class="o">)+,</span><span class="nt">R3</span>        <span class="o">;</span><span class="nt">FETCH</span> <span class="nt">NEXT</span> <span class="nt">WORD</span> <span class="nt">OF</span> <span class="nt">QUAD</span>
-<span class="nt">001176</span>  <span class="nt">012701</span>  <span class="nt">000020</span>                  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">20</span><span class="o">,</span><span class="nt">R1</span>          <span class="o">;</span><span class="nt">R1</span> <span class="nt">COUNTS</span> <span class="nt">16</span> <span class="nt">BITS</span> <span class="nt">IN</span> <span class="nt">WORD</span>
-<span class="nt">001202</span>  <span class="nt">006103</span>                  <span class="nt">LBIT</span><span class="o">:</span>   <span class="nt">ROL</span>     <span class="nt">R3</span>              <span class="o">;</span><span class="nt">ROTATE</span><span class="o">,</span> <span class="nt">HIGH</span> <span class="nt">BIT</span> <span class="nt">GOES</span> <span class="nt">TO</span> <span class="nt">CARRY</span>
-<span class="nt">001204</span>  <span class="nt">103405</span>                          <span class="nt">BCS</span>     <span class="nt">LBIT1</span>           <span class="o">;</span><span class="nt">SKIP</span> <span class="nt">AHEAD</span> <span class="nt">IF</span> <span class="nt">CARRY</span> <span class="nt">SET</span>
-<span class="nt">001206</span>  <span class="nt">012762</span>  <span class="nt">000056</span>  <span class="nt">000002</span>          <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">56</span><span class="o">,</span><span class="nt">2</span><span class="o">(</span><span class="nt">R2</span><span class="o">)</span>       <span class="o">;</span><span class="nt">OTHERWISE</span> <span class="nt">OUTPUT</span> <span class="s1">&#39;.&#39;</span>
-<span class="nt">001214</span>  <span class="nt">000167</span>  <span class="nt">000006</span>                  <span class="nt">JMP</span>     <span class="nt">LBIT2</span>           <span class="o">;</span><span class="nt">AND</span> <span class="nt">SKIP</span> <span class="nt">AHEAD</span>
-<span class="nt">001220</span>  <span class="nt">012762</span>  <span class="nt">000061</span>  <span class="nt">000002</span>  <span class="nt">LBIT1</span><span class="o">:</span>  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">61</span><span class="o">,</span><span class="nt">2</span><span class="o">(</span><span class="nt">R2</span><span class="o">)</span>       <span class="o">;</span><span class="nt">OUTPUT</span> <span class="s1">&#39;1&#39;</span>
-<span class="nt">001226</span>  <span class="nt">105712</span>                  <span class="nt">LBIT2</span><span class="o">:</span>  <span class="nt">TSTB</span>    <span class="o">(</span><span class="nt">R2</span><span class="o">)</span>            <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">XMIT</span> <span class="nt">CLEAR</span>
-<span class="nt">001230</span>  <span class="nt">100376</span>                          <span class="nt">BPL</span>     <span class="p">.</span><span class="nc">-2</span>             <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">UNTIL</span> <span class="nt">SO</span>
-<span class="nt">001232</span>  <span class="nt">077115</span>                          <span class="nt">SOB</span>     <span class="nt">R1</span><span class="o">,</span><span class="nt">LBIT</span>         <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">OVER</span> <span class="nt">BITS</span> <span class="nt">IN</span> <span class="nt">WORD</span>
-<span class="nt">001234</span>  <span class="nt">012762</span>  <span class="nt">000040</span>  <span class="nt">000002</span>          <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">40</span><span class="o">,</span><span class="nt">2</span><span class="o">(</span><span class="nt">R2</span><span class="o">)</span>       <span class="o">;</span><span class="nt">OUTPUT</span> <span class="s1">&#39; &#39;</span> <span class="nt">TO</span> <span class="nt">SEPARATE</span> <span class="nt">WORDS</span>
-<span class="nt">001242</span>  <span class="nt">105712</span>                          <span class="nt">TSTB</span>    <span class="o">(</span><span class="nt">R2</span><span class="o">)</span>            <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">XMIT</span> <span class="nt">CLEAR</span>
-<span class="nt">001244</span>  <span class="nt">100376</span>                          <span class="nt">BPL</span>     <span class="p">.</span><span class="nc">-2</span>             <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">UNTIL</span> <span class="nt">SO</span>
-<span class="nt">001246</span>  <span class="nt">077026</span>                          <span class="nt">SOB</span>     <span class="nt">R0</span><span class="o">,</span><span class="nt">LWORD</span>        <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">OVER</span> <span class="nt">WORDS</span> <span class="nt">IN</span> <span class="nt">QUAD</span>
-<span class="nt">001250</span>  <span class="nt">012762</span>  <span class="nt">000015</span>  <span class="nt">000002</span>          <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">15</span><span class="o">,</span><span class="nt">2</span><span class="o">(</span><span class="nt">R2</span><span class="o">)</span>       <span class="o">;</span><span class="nt">OUTPUT</span> <span class="s1">&#39;\R&#39;</span>
-<span class="nt">001256</span>  <span class="nt">105712</span>                          <span class="nt">TSTB</span>    <span class="o">(</span><span class="nt">R2</span><span class="o">)</span>            <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">XMIT</span> <span class="nt">CLEAR</span>
-<span class="nt">001260</span>  <span class="nt">100376</span>                          <span class="nt">BPL</span>     <span class="p">.</span><span class="nc">-2</span>             <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">UNTIL</span> <span class="nt">SO</span>
-<span class="nt">001262</span>  <span class="nt">012762</span>  <span class="nt">000012</span>  <span class="nt">000002</span>          <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">12</span><span class="o">,</span><span class="nt">2</span><span class="o">(</span><span class="nt">R2</span><span class="o">)</span>       <span class="o">;</span><span class="nt">OUTPUT</span> <span class="s1">&#39;\N&#39;</span>
-<span class="nt">001270</span>  <span class="nt">105712</span>                          <span class="nt">TSTB</span>    <span class="o">(</span><span class="nt">R2</span><span class="o">)</span>            <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">XMIT</span> <span class="nt">CLEAR</span>
-<span class="nt">001272</span>  <span class="nt">100376</span>                          <span class="nt">BPL</span>     <span class="p">.</span><span class="nc">-2</span>             <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">UNTIL</span> <span class="nt">SO</span>
-<span class="nt">001274</span>  <span class="nt">020427</span>  <span class="nt">000071</span>                  <span class="nt">CMP</span>     <span class="nt">R4</span><span class="o">,</span><span class="p">#</span><span class="nn">71</span>          <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">PASSES</span> <span class="nt">AGAINST</span> <span class="nt">57</span>
-<span class="nt">001300</span>  <span class="nt">100663</span>                          <span class="nt">BMI</span>     <span class="nt">NXTMUL</span>          <span class="o">;</span><span class="nt">LESS</span><span class="o">:</span> <span class="nt">DO</span> <span class="nt">NEXT</span> <span class="nt">PASS</span>
-<span class="nt">001302</span>  <span class="nt">001402</span>                          <span class="nt">BEQ</span>     <span class="nt">LSTPAS</span>          <span class="o">;</span><span class="nt">EQUAL</span><span class="o">:</span> <span class="nt">DO</span> <span class="nt">LAST</span> <span class="nt">PASS</span>
-<span class="nt">001304</span>  <span class="nt">000167</span>  <span class="nt">171470</span>                  <span class="nt">JMP</span>     <span class="nt">173000</span>          <span class="o">;</span><span class="nt">GREATER</span><span class="o">:</span> <span class="nt">RETURN</span> <span class="nt">TO</span> <span class="nt">M9301</span> <span class="nt">MONITOR</span>
-<span class="nt">001310</span>  <span class="nt">005204</span>                  <span class="nt">LSTPAS</span><span class="o">:</span> <span class="nt">INC</span>     <span class="nt">R4</span>              <span class="o">;</span><span class="nt">INDICATE</span> <span class="nt">58TH</span> <span class="nt">PASS</span>
-<span class="nt">001312</span>  <span class="nt">000167</span>  <span class="nt">177536</span>                  <span class="nt">JMP</span>     <span class="nt">LSTMUL</span>          <span class="o">;</span><span class="nt">DO</span> <span class="nt">LAST</span> <span class="nt">PASS</span> <span class="nt">WITHOUT</span> <span class="nt">LOADING</span> <span class="nt">SC</span>
-<span class="nt">001316</span>  <span class="nt">040200</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">MCND</span><span class="o">:</span>   <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">040200</span><span class="o">,</span> <span class="nt">000000</span><span class="o">,</span> <span class="nt">000000</span><span class="o">,</span> <span class="nt">000000</span>
-<span class="nt">001324</span>  <span class="nt">000000</span>
-<span class="nt">001326</span>  <span class="nt">040300</span>  <span class="nt">000300</span>  <span class="nt">000300</span>  <span class="nt">MLYR</span><span class="o">:</span>   <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">040300</span><span class="o">,</span> <span class="nt">000300</span><span class="o">,</span> <span class="nt">000300</span><span class="o">,</span> <span class="nt">000300</span>
-<span class="nt">001334</span>  <span class="nt">000300</span>
-<span class="nt">001336</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">AR</span><span class="o">:</span>     <span class="p">.</span><span class="nc">FLT4</span>   <span class="nt">0</span>
-<span class="nt">001344</span>  <span class="nt">000000</span>
-<span class="nt">001346</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">QR</span><span class="o">:</span>     <span class="p">.</span><span class="nc">FLT4</span>   <span class="nt">0</span>
-<span class="nt">001354</span>  <span class="nt">000000</span>
-<span class="nt">001356</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">TEMP</span><span class="o">:</span>   <span class="p">.</span><span class="nc">FLT4</span>   <span class="nt">0</span>
-<span class="nt">001364</span>  <span class="nt">000000</span>
-        <span class="nt">001000</span>                          <span class="p">.</span><span class="nc">END</span>    <span class="nt">START</span>
-</pre></div>
-</td></tr></table>
-
-<p>The idea here is to use the LDUB (load micro-break) and LDSC (load step-counter) maintenance instructions to
-cause a multiplication to halt partway through.  STA0 and STQ0 (store AR, store QR) instructions, in
-conjunction with the MRS (maintenance right shift) instruction, allow retrieval of the internal fraction
-registers which are then printed out to the serial console.  This is done repetitively, stopping each time
-one step further on, so the progression of the internal states of AR and QR over the course of the entire
-multiply may be observed.</p>
-<p>A quick aside here on tooling: since I don't currently have any storage or an OS running on my PDP-11, I load
-and execute diagnostics with PDP11GUI to an M9301 boot monitor over a serial connection.  This requires
-program binaries in LDA (absolute loader) format.  For non-trivial MACRO-11 programs I have found it most
-convenient to use the actual vintage toolchain under RT11 in the simh simulator, because the assembler and
-linker provided with PDP11GUI have some limitations.  I copy files in and out via the simulated paper tape
-reader/punch.  This is also how I produce the MACRO-11 listings seen on this blog.</p>
-<p>Okay, back to the program above, running this on my machine very clearly illustrates the malfunction.  Here's
-what the output looks like:</p>
-<p><span style="font-size: x-small; font-family: monospace; white-space: pre; display: block; line-height: normal; font-weight: bold;">................ ................ ................ ................ .........11..... .........11..... .........11..... .........11.....
-................ ................ ................ ................ ..........11.... ..........11.... ..........11.... ..........11....
-................ ................ ................ ................ ...........11... ...........11... ...........11... ...........11...
-................ ................ ................ ................ ............11.. ............11.. ............11.. ............11..
-................ ................ ................ ................ .............11. .............11. .............11. .............11.
-................ ................ ................ ................ ..............11 ..............11 ..............11 ..............11
-................ ................ ................ ................ ...............1 1..............1 1..............1 1..............1
-.......11.111111 1111111111111111 1111111111111111 1111111111111111 ................ 11.............. 11.............. 11..............
-.......111.11111 1111111111111111 1111111111111111 1111111111111111 ................ .11............. .11............. .11.............
-..........1.1111 1111111111111111 1111111111111111 1111111111111111 ................ ..11............ ..11............ ..11............
-...........1.111 1111111111111111 1111111111111111 1111111111111111 ................ ...11........... ...11........... ...11...........
-............1.11 1111111111111111 1111111111111111 1111111111111111 ................ ....11.......... ....11.......... ....11..........
-.............1.1 1111111111111111 1111111111111111 1111111111111111 ................ .....11......... .....11......... .....11.........
-..............1. 1111111111111111 1111111111111111 1111111111111111 ................ ......11........ ......11........ ......11........
-...............1 .111111111111111 1111111111111111 1111111111111111 ................ .......11....... .......11....... .......11.......
-................ 1.11111111111111 1111111111111111 1111111111111111 ................ ........11...... ........11...... ........11......
-................ .1.1111111111111 1111111111111111 1111111111111111 ................ .........11..... .........11..... .........11.....
-................ ..1.111111111111 1111111111111111 1111111111111111 ................ ..........11.... ..........11.... ..........11....
-................ ...1.11111111111 1111111111111111 1111111111111111 ................ ...........11... ...........11... ...........11...
-................ ....1.1111111111 1111111111111111 1111111111111111 ................ ............11.. ............11.. ............11..
-................ .....1.111111111 1111111111111111 1111111111111111 ................ .............11. .............11. .............11.
-................ ......1.11111111 1111111111111111 1111111111111111 ................ ..............11 ..............11 ..............11
-................ .......1.1111111 1111111111111111 1111111111111111 ................ ...............1 1..............1 1..............1
-.......111...... ........1.111111 1111111111111111 1111111111111111 ................ ................ 11.............. 11..............
-.......1111..... .........1.11111 1111111111111111 1111111111111111 ................ ................ .11............. .11.............
-..........11.... ..........1.1111 1111111111111111 1111111111111111 ................ ................ ..11............ ..11............
-...........11... ...........1.111 1111111111111111 1111111111111111 ................ ................ ...11........... ...11...........
-............11.. ............1.11 1111111111111111 1111111111111111 ................ ................ ....11.......... ....11..........
-.............11. .............1.1 1111111111111111 1111111111111111 ................ ................ .....11......... .....11.........
-..............11 ..............1. 1111111111111111 1111111111111111 ................ ................ ......11........ ......11........
-...............1 1..............1 .111111111111111 1111111111111111 ................ ................ .......11....... .......11.......
-................ 11.............. 1.11111111111111 1111111111111111 ................ ................ ........11...... ........11......
-................ .11............. .1.1111111111111 1111111111111111 ................ ................ .........11..... .........11.....
-................ ..11............ ..1.111111111111 1111111111111111 ................ ................ ..........11.... ..........11....
-................ ...11........... ...1.11111111111 1111111111111111 ................ ................ ...........11... ...........11...
-................ ....11.......... ....1.1111111111 1111111111111111 ................ ................ ............11.. ............11..
-................ .....11......... .....1.111111111 1111111111111111 ................ ................ .............11. .............11.
-................ ......11........ ......1.11111111 1111111111111111 ................ ................ ..............11 ..............11
-................ .......11....... .......1.1111111 1111111111111111 ................ ................ ...............1 1..............1
-.......111...... ........11...... ........1.111111 1111111111111111 ................ ................ ................ 11..............
-.......1111..... .........11..... .........1.11111 1111111111111111 ................ ................ ................ .11.............
-..........11.... ..........11.... ..........1.1111 1111111111111111 ................ ................ ................ ..11............
-...........11... ...........11... ...........1.111 1111111111111111 ................ ................ ................ ...11...........
-............11.. ............11.. ............1.11 1111111111111111 ................ ................ ................ ....11..........
-.............11. .............11. .............1.1 1111111111111111 ................ ................ ................ .....11.........
-..............11 ..............11 ..............1. 1111111111111111 ................ ................ ................ ......11........
-...............1 1..............1 1..............1 .111111111111111 ................ ................ ................ .......11.......
-................ 11.............. 11.............. 1.11111111111111 ................ ................ ................ ........11......
-................ .11............. .11............. .1.1111111111111 ................ ................ ................ .........11.....
-................ ..11............ ..11............ ..1.111111111111 ................ ................ ................ ..........11....
-................ ...11........... ...11........... ...1.11111111111 ................ ................ ................ ...........11...
-................ ....11.......... ....11.......... ....1.1111111111 ................ ................ ................ ............11..
-................ .....11......... .....11......... .....1.111111111 ................ ................ ................ .............11.
-................ ......11........ ......11........ ......1.11111111 ................ ................ ................ ..............11
-................ .......11....... .......11....... .......1.1111111 ................ ................ ................ ...............1
-.......111...... ........11...... ........11...... ........1.111111 ................ ................ ................ ................
-.......1111..... .........11..... .........11..... .........1.11111 ................ ................ ................ ................
-.........11..... .........11..... .........11..... .........1.11111 ................ ................ ................ ................</span></p>
-<p>The left half of the output above shows the contents of AR throughout the progress of the multiply, and the
-right half shows the contents of QR.  The most significant 57 bits of each are shown, right justified in a
-64-bit field.</p>
-<p>In the FP11, as the multiplication proceeds, the multiplicand is held constant, while the multiplier (in QR)
-and partial product (in AR) are successively right shifted.  The bits of the multiplier involved in the
-skip-over-ones-and-zeros sate macheine are QR3 and QR2.  QR3 is the rightmost bit shown above.  QR2, to its
-right, is not retrievable by software and thus not shown.</p>
-<p>Since the multiplicand in the sample code is 1.0, the result left in AR (bottom row of left half) should be
-identical with the initial value of the multiplier in QR (top row of right half), but clearly something is
-amiss with the least significant bits of the result.  We can also see that things go awry as the first
-string off consecutive 1s starts through the state machine (adjusting the values in the test program shows
-that this is always the case).  So this looks like an issue with the state machine or the FALU control
-signals that derive from it.  Taking a look with the logic analyzer shows this:</p>
-<p><img src='/images/pdp11/multiply-trace.jpg'/></p>
-<p>This is a portion of the multiply dealing with the a string of two consecutive 1s on the multiplier.
-The clocking and state machine state bits look correct (note that AR clocks falling edges).
-A four-cycle pause is inserted in the AR clock whenever the state-machine dictates either an add
-or a subtract is to occur, in order to allow for propagation time through the ALUs.  The AR and ALU function
-selects  also look correct: AR 1 for shift, 3 for load, and ALU 6 for subtract, 9 for add.  Marker X here
-should be clocking in a subtraction at the start of the string, followed by two shifts, then an add at
-marker O at the end of the string.</p>
-<p>But the ALU CIN control signal looks incorrect -- it is held high throughout the multiply, but should be
-driven low for the subtraction at marker X.  This means the ALU function actually being selected is A-B-1
-instead of A-B, which would produce the results seen above (the first subtract borrows an extra 1 all the
-way across the partial product, then subsequent subtracts borrow from the resulting 1s on the right).
-So it looks like the logic that generates CIN needs a look:</p>
-<p><img src='/images/pdp11/cin-logic.png'/></p>
-<p>Stepping through the multiply with the KM11 in single-clock-transition mode, arriving at the first
-subtract, FRMH MUL SUB L is asserted low to pin 3 of E21, but pin 6 does not go high.  Looks like a
-failed gate; pulled the part, put in a socket, and put a replacement 74H10 on order.  All for now!</p></div>
     <hr />
 </div>
 

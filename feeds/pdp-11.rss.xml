@@ -1,5 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0"><channel><title>fritzm.github.io - PDP-11</title><link>http://fritzm.github.io/</link><description></description><lastBuildDate>Sun, 21 May 2017 00:00:00 -0700</lastBuildDate><item><title>PDP-11/45: RK11 V - Checksum issues</title><link>http://fritzm.github.io/rk11-5.html</link><description>&lt;p&gt;Decided to use the disk utilities provided in PDP11GUI to write a fresh RT11 pack.  PDP11GUI successfully
+<rss version="2.0"><channel><title>fritzm.github.io - PDP-11</title><link>http://fritzm.github.io/</link><description></description><lastBuildDate>Thu, 08 Jun 2017 00:00:00 -0700</lastBuildDate><item><title>PDP-11/45: RK11 VI - "Pole" and Interrupt Issues</title><link>http://fritzm.github.io/rk11-6.html</link><description>&lt;p&gt;Replaced the failed 7401 in the RKDA to RKDB data path, and verified that the RKDB stuck bit 11 problem was
+fixed.  Ran the system for another couple hours to rewrite a fresh RT11 pack, then another problem developed:
+read operations would successfully obtain the bus, but would never complete.&lt;/p&gt;
+&lt;p&gt;Some investigation with a KM11 on the RK11 controller showed that POLE was now incorrectly asserted 
+continuously (did they mean "poll"?). Tracked this down to a failed 7420 (E1 on the M141 at A26, sheet 
+RK11-C-12). Replaced, and reads were working again. I guess with a machine this age there is going to be a
+lot of this sort of thing where marginal parts give up after a few hours of use.  Hopefully after some 
+prolonged operation things will settle down a little bit...&lt;/p&gt;
+&lt;p&gt;In any case, &lt;em&gt;still&lt;/em&gt; unable to boot any of my RT11 packs.  I Decided to step back and run MAINDEC diagnostic
+ZRKK. This is the RK11 dynamic diagnostic that destructively modifies a pack, and I had not previously run it 
+-- I had just optimistically jumped to trying to boot existing packs after the drive restore and calibration.
+The diagnostic ran successfully for a while, through various format and read and write tests over the whole
+pack (encouraging!), then hung up consistently on test 35 (octal), which tests whether the RK11 interrupts
+the processor correctly when IDE is set.&lt;/p&gt;
+&lt;p&gt;So it could be the case that my RT11 boots hang up when they first start trying to make use of interrupts. 
+Verified that I can run MAINDEC ZKWA, which tests interrupts from the KW11-L line clock, so interrupt 
+fielding in the CPU looks good.&lt;/p&gt;
+&lt;p&gt;Re-ran MAINDEC ZRKK, and noted that the CPU is waiting in micro-state BRK.00 (154) on page FLOWS 12 of the
+engineering drawings. This state has a wait for Unibus INTR to be asserted, so it looks like a problem with
+interrupt signaling on the RK11 side.&lt;/p&gt;
+&lt;p&gt;I have a bit of travel coming up, so I probably won't get back to this for a week or two. But the next 
+sensible step I think will be to work with a logic analyzer on the backplane of the RK11, slot A6 where the
+M7820 interrupt control flipchip goes, and see what is/isn't happening with the interrupt signaling on that
+end. I suspect there will probably be a failed IC on the M7820.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Fritz Mueller</dc:creator><pubDate>Thu, 08 Jun 2017 00:00:00 -0700</pubDate><guid isPermaLink="false">tag:fritzm.github.io,2017-06-08:/rk11-6.html</guid><category>Retro-Computing</category><category>PDP-11</category></item><item><title>PDP-11/45: RK11 V - Checksum issues</title><link>http://fritzm.github.io/rk11-5.html</link><description>&lt;p&gt;Decided to use the disk utilities provided in PDP11GUI to write a fresh RT11 pack.  PDP11GUI successfully
 assembled and downloaded a driver, then took a little under 2 hours to download the pack image over the
 console serial line and write the pack without indicating any errors.&lt;/p&gt;
 &lt;p&gt;The resulting pack fared no better at boot than any of my existing legacy packs, however.  I attempted
