@@ -1,5 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0"><channel><title>fritzm.github.io - PDP-11</title><link>http://fritzm.github.io/</link><description></description><lastBuildDate>Thu, 08 Jun 2017 00:00:00 -0700</lastBuildDate><item><title>PDP-11/45: RK11 VI - "Pole" and Interrupt Issues</title><link>http://fritzm.github.io/rk11-6.html</link><description>&lt;p&gt;Replaced the failed 7401 in the RKDA to RKDB data path, and verified that the RKDB stuck bit 11 problem was
+<rss version="2.0"><channel><title>fritzm.github.io - PDP-11</title><link>http://fritzm.github.io/</link><description></description><lastBuildDate>Sun, 25 Jun 2017 00:00:00 -0700</lastBuildDate><item><title>PDP-11/45: RK11 VII</title><link>http://fritzm.github.io/rk11-7.html</link><description>&lt;p&gt;Okay, back from travel and picked up the thread on the RK11 interrupt problem this weekend. Put the KM11 in 
+the first slot on the RK11 which allows to monitor interrupt request. An interrupt can be very easily
+generated from the front panel by writing bit 6 (Interrupt on Done Enable) on in the RKCS register at 777404.
+Did this, and noticed that interrupt request logic on the RK11 went active, but never cleared.&lt;/p&gt;
+&lt;p&gt;Checked bus request and grant continuity all the way through to the CPU backplane and back and that looked
+fine (the RK11 in its default configuration uses BR5).&lt;/p&gt;
+&lt;p&gt;Chased bus request with a logic probe all the way to the CPU backplane, and it was being asserted correctly.
+Looking at BG5, however, I noticed it was always asserted, even if BR5 was inactive. Disconnected all
+peripherals and terminated the Unibus directly on the CPU backplane, and this was still the case. So there
+was problem with BG5 in the CPU itself.&lt;/p&gt;
+&lt;p&gt;Threw the CPU UBC card out on extenders, and took a look at BG5 logic with a logic probe.  The 8881 driver
+for this signal (E42 on sheet UBCD of the engineering drawings) had failed -- pins 8 and 9 were high, but pin
+10, BG5, was not being driven low. Pulled this chip, put in a socket and a replacement, and the BG was then 
+working properly.  That's three repairs total to this poor old UBC card so far!  Was able to then verify from 
+the front panel that the processor fielded interrupt 220 in response to
+setting the IDE bit in RKCS. Progress!&lt;/p&gt;
+&lt;p&gt;Back to the MAINDEC ZRKK -- interrupt test now passes, and the diagnostic continues. BUT... error output now
+on test octal 57, which is working out the "hardware pole" feature of the controller.  Thought this might
+be due to the RK11 being configured for two RK05 drives, but I have restored/connected only the first.
+Rejumpered the G740 flipchip for a single drive, but this didn't seem to help.  Hmmm, will need to read the
+diagnostic source to see what it is trying to do...&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://fritzm.github.io/images/pdp11/G740.jpg"&gt;&lt;img src='/images/pdp11/G740_thumbnail_tall.jpg'/&gt;&lt;/a&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Fritz Mueller</dc:creator><pubDate>Sun, 25 Jun 2017 00:00:00 -0700</pubDate><guid isPermaLink="false">tag:fritzm.github.io,2017-06-25:/rk11-7.html</guid><category>Retro-Computing</category><category>PDP-11</category></item><item><title>PDP-11/45: RK11 VI - "Pole" and Interrupt Issues</title><link>http://fritzm.github.io/rk11-6.html</link><description>&lt;p&gt;Replaced the failed 7401 in the RKDA to RKDB data path, and verified that the RKDB stuck bit 11 problem was
 fixed.  Ran the system for another couple hours to rewrite a fresh RT11 pack, then another problem developed:
 read operations would successfully obtain the bus, but would never complete.&lt;/p&gt;
 &lt;p&gt;Some investigation with a KM11 on the RK11 controller showed that POLE was now incorrectly asserted 
