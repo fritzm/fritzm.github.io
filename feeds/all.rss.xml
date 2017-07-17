@@ -1,5 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0"><channel><title>fritzm.github.io</title><link>http://fritzm.github.io/</link><description></description><lastBuildDate>Sun, 25 Jun 2017 00:00:00 -0700</lastBuildDate><item><title>PDP-11/45: RK11 VII</title><link>http://fritzm.github.io/rk11-7.html</link><description>&lt;p&gt;Okay, back from travel and picked up the thread on the RK11 interrupt problem this weekend. Put the KM11 in 
+<rss version="2.0"><channel><title>fritzm.github.io</title><link>http://fritzm.github.io/</link><description></description><lastBuildDate>Tue, 04 Jul 2017 00:00:00 -0700</lastBuildDate><item><title>PDP-11/45: M9301 Troubles</title><link>http://fritzm.github.io/m9301-troubles.html</link><description>&lt;p&gt;After a lot of recent progress with the RK11, suffered a setback: after trying once again to image
+a fresh RT11 pack, the machine began to behave erratically at boot.  Sometimes the boot monitor would run
+fine, sometimes it would run for a while and then take a machine exception or vector off to bad address,
+and sometimes the machine would fail to boot at all, immediately taking exceptions of various sorts. Getting
+so close, but then lost a lot of ground; I guess that's sort of the way it is going to be with a machine
+that is this old...&lt;/p&gt;
+&lt;p&gt;So, back to the top without a working boot monitor.  Microcode sequencing and seemed to be working fine --
+exam/deposit/step working reliably from the front panel.  Checked execution of the first few instructions
+of the boot ROM in detail, a branch and some single operand instructions, and they seemed to execute
+correctly.&lt;/p&gt;
+&lt;p&gt;Assuming some sort of new failure in the CPU, I prepared to instrument the Unibus with the HP
+logic analyzer; it seemed that way I could trigger on machine exceptions then look back over the captured
+address traces for a pattern.  To make sense of those, I'd need a listing of the boot ROM in hand.  Noel
+Chiappa has a dump for this and a partial disassembly on his site &lt;a href="http://ana-3.lcs.mit.edu/~jnc/tech/pdp11/ROMs/M9301-YB.mac"&gt;here&lt;/a&gt;,
+but is it the same as mine?  Better check...&lt;/p&gt;
+&lt;p&gt;Started to run through Noel's listing and compare to the ROM contents on my machine via front panel exam.
+Sure enough, there seemed to be some words different in a few places.  Maybe the CPU is fine, and the ROM
+card is failing?  Swapped out the M9301 for a simpler M792 diode matrix boot ROM, and sure enough -- was
+able to boot straight away off my RKDP pack, and from there reliably beat up the CPU with diagnostics.  So,
+great news: just a failing M9301!&lt;/p&gt;
+&lt;p&gt;Alright, so now I want to capture a dump of the M9301 so I can systematically compare with Noel's listing
+to see if there's a pattern in failed/flaky bits to help guide my repair.  For this I need a memory dump
+utility that I can toggle in from the front panel.  Came up with this:&lt;/p&gt;
+&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt; 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nt"&gt;001000&lt;/span&gt;  &lt;span class="nt"&gt;012705&lt;/span&gt;  &lt;span class="nt"&gt;START&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;  &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;177564&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R5&lt;/span&gt;      &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;CONSOLE&lt;/span&gt; &lt;span class="nt"&gt;XCSR&lt;/span&gt;
+        &lt;span class="nt"&gt;177564&lt;/span&gt;
+&lt;span class="nt"&gt;001004&lt;/span&gt;  &lt;span class="nt"&gt;012700&lt;/span&gt;  &lt;span class="nt"&gt;L0&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;177570&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R0&lt;/span&gt;      &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;SWITCH&lt;/span&gt; &lt;span class="nt"&gt;REGISTER&lt;/span&gt;
+        &lt;span class="nt"&gt;177570&lt;/span&gt;
+&lt;span class="nt"&gt;001010&lt;/span&gt;  &lt;span class="nt"&gt;000000&lt;/span&gt;          &lt;span class="nt"&gt;HALT&lt;/span&gt;
+&lt;span class="nt"&gt;001012&lt;/span&gt;  &lt;span class="nt"&gt;011004&lt;/span&gt;          &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="p"&gt;@&lt;/span&gt;&lt;span class="k"&gt;R0&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R4&lt;/span&gt;          &lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;READ&lt;/span&gt; &lt;span class="nt"&gt;ADDR&lt;/span&gt; &lt;span class="nt"&gt;FROM&lt;/span&gt; &lt;span class="nt"&gt;SWITCHES&lt;/span&gt;
+&lt;span class="nt"&gt;001014&lt;/span&gt;  &lt;span class="nt"&gt;000000&lt;/span&gt;          &lt;span class="nt"&gt;HALT&lt;/span&gt;
+&lt;span class="nt"&gt;001016&lt;/span&gt;  &lt;span class="nt"&gt;011003&lt;/span&gt;          &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="p"&gt;@&lt;/span&gt;&lt;span class="k"&gt;R0&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R3&lt;/span&gt;          &lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;READ&lt;/span&gt; &lt;span class="nt"&gt;COUNT&lt;/span&gt; &lt;span class="nt"&gt;FROM&lt;/span&gt; &lt;span class="nt"&gt;SWITCHES&lt;/span&gt;
+&lt;span class="nt"&gt;001020&lt;/span&gt;  &lt;span class="nt"&gt;012401&lt;/span&gt;  &lt;span class="nt"&gt;L1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nt"&gt;R4&lt;/span&gt;&lt;span class="o"&gt;)+,&lt;/span&gt;&lt;span class="nt"&gt;R1&lt;/span&gt;        &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;GET&lt;/span&gt; &lt;span class="nt"&gt;NEXT&lt;/span&gt; &lt;span class="nt"&gt;WORD&lt;/span&gt; &lt;span class="nt"&gt;TO&lt;/span&gt; &lt;span class="nt"&gt;DUMP&lt;/span&gt;
+&lt;span class="nt"&gt;001022&lt;/span&gt;  &lt;span class="nt"&gt;012702&lt;/span&gt;          &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;6&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R2&lt;/span&gt;           &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;SIX&lt;/span&gt; &lt;span class="nt"&gt;DIGITS&lt;/span&gt; &lt;span class="nt"&gt;TO&lt;/span&gt; &lt;span class="nt"&gt;PRINT&lt;/span&gt;
+        &lt;span class="nt"&gt;000006&lt;/span&gt;
+&lt;span class="nt"&gt;001026&lt;/span&gt;  &lt;span class="nt"&gt;005000&lt;/span&gt;          &lt;span class="nt"&gt;CLR&lt;/span&gt;     &lt;span class="nt"&gt;R0&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;R0&lt;/span&gt; &lt;span class="nt"&gt;GETS&lt;/span&gt; &lt;span class="nt"&gt;MSB&lt;/span&gt; &lt;span class="nt"&gt;R1&lt;/span&gt;
+&lt;span class="nt"&gt;001030&lt;/span&gt;  &lt;span class="nt"&gt;073027&lt;/span&gt;          &lt;span class="nt"&gt;ASHC&lt;/span&gt;    &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;1&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R0&lt;/span&gt;
+        &lt;span class="nt"&gt;000001&lt;/span&gt;
+&lt;span class="nt"&gt;001034&lt;/span&gt;  &lt;span class="nt"&gt;062700&lt;/span&gt;  &lt;span class="nt"&gt;L2&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;ADD&lt;/span&gt;     &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;60&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R0&lt;/span&gt;          &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;MAKE&lt;/span&gt; &lt;span class="nt"&gt;INTO&lt;/span&gt; &lt;span class="nt"&gt;ASCII&lt;/span&gt; &lt;span class="nt"&gt;DIGIT&lt;/span&gt;
+        &lt;span class="nt"&gt;000060&lt;/span&gt;
+&lt;span class="nt"&gt;001040&lt;/span&gt;  &lt;span class="nt"&gt;010065&lt;/span&gt;          &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="nt"&gt;R0&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;2&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nt"&gt;R5&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;        &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;OUTPUT&lt;/span&gt;
+        &lt;span class="nt"&gt;000002&lt;/span&gt;
+&lt;span class="nt"&gt;001044&lt;/span&gt;  &lt;span class="nt"&gt;105715&lt;/span&gt;          &lt;span class="nt"&gt;TSTB&lt;/span&gt;    &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nt"&gt;R5&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;span class="nt"&gt;001046&lt;/span&gt;  &lt;span class="nt"&gt;100376&lt;/span&gt;          &lt;span class="nt"&gt;BPL&lt;/span&gt;     &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nc"&gt;-2&lt;/span&gt;
+&lt;span class="nt"&gt;001050&lt;/span&gt;  &lt;span class="nt"&gt;005000&lt;/span&gt;          &lt;span class="nt"&gt;CLR&lt;/span&gt;     &lt;span class="nt"&gt;R0&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;R0&lt;/span&gt; &lt;span class="nt"&gt;GETS&lt;/span&gt; &lt;span class="nt"&gt;3&lt;/span&gt; &lt;span class="nt"&gt;MSB&lt;/span&gt; &lt;span class="nt"&gt;R1&lt;/span&gt;
+&lt;span class="nt"&gt;001052&lt;/span&gt;  &lt;span class="nt"&gt;073027&lt;/span&gt;          &lt;span class="nt"&gt;ASHC&lt;/span&gt;    &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;3&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R0&lt;/span&gt;
+        &lt;span class="nt"&gt;000003&lt;/span&gt;
+&lt;span class="nt"&gt;001056&lt;/span&gt;  &lt;span class="nt"&gt;077212&lt;/span&gt;          &lt;span class="nt"&gt;SOB&lt;/span&gt;     &lt;span class="nt"&gt;R2&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;L2&lt;/span&gt;           &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;LOOP&lt;/span&gt; &lt;span class="nt"&gt;DIGITS&lt;/span&gt;
+&lt;span class="nt"&gt;001060&lt;/span&gt;  &lt;span class="nt"&gt;012765&lt;/span&gt;          &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;15&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;2&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nt"&gt;R5&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;       &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;OUTPUT&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;\R&amp;#39;&lt;/span&gt;
+        &lt;span class="nt"&gt;000015&lt;/span&gt;
+        &lt;span class="nt"&gt;000002&lt;/span&gt;
+&lt;span class="nt"&gt;001066&lt;/span&gt;  &lt;span class="nt"&gt;105715&lt;/span&gt;          &lt;span class="nt"&gt;TSTB&lt;/span&gt;    &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nt"&gt;R5&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;span class="nt"&gt;001070&lt;/span&gt;  &lt;span class="nt"&gt;100376&lt;/span&gt;          &lt;span class="nt"&gt;BPL&lt;/span&gt;     &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nc"&gt;-2&lt;/span&gt;
+&lt;span class="nt"&gt;001072&lt;/span&gt;  &lt;span class="nt"&gt;012765&lt;/span&gt;          &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;12&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;2&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nt"&gt;R5&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;       &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;OUTPUT&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;\N&amp;#39;&lt;/span&gt;
+        &lt;span class="nt"&gt;000012&lt;/span&gt;
+        &lt;span class="nt"&gt;000002&lt;/span&gt;
+&lt;span class="nt"&gt;001100&lt;/span&gt;  &lt;span class="nt"&gt;105715&lt;/span&gt;          &lt;span class="nt"&gt;TSTB&lt;/span&gt;    &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nt"&gt;R5&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;span class="nt"&gt;001102&lt;/span&gt;  &lt;span class="nt"&gt;100376&lt;/span&gt;          &lt;span class="nt"&gt;BPL&lt;/span&gt;     &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nc"&gt;-2&lt;/span&gt;
+&lt;span class="nt"&gt;001104&lt;/span&gt;  &lt;span class="nt"&gt;077333&lt;/span&gt;          &lt;span class="nt"&gt;SOB&lt;/span&gt;     &lt;span class="nt"&gt;R3&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;L1&lt;/span&gt;           &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;LOOP&lt;/span&gt; &lt;span class="nt"&gt;WORDS&lt;/span&gt;
+&lt;span class="nt"&gt;001106&lt;/span&gt;  &lt;span class="nt"&gt;000736&lt;/span&gt;          &lt;span class="nt"&gt;BR&lt;/span&gt;      &lt;span class="nt"&gt;L0&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;START&lt;/span&gt; &lt;span class="nt"&gt;OVER&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+
+&lt;p&gt;Executed this a few times and got slightly different results, then things settled into a pattern where the
+lowest nybble of every word was consistently zeroed but everything else was fine.  Smoking gun pointing to
+a single PROM on the M9301.  Pulled and reseated that chip, and did the same for the other three while I
+was at it, and ... everything 100% after that.  Wow, really should have just tried that first...&lt;/p&gt;
+&lt;p&gt;Well, at least I'm up and running again!  The memory dump program might come in useful again at some other
+time, and as a byproduct after I fixed my M9301 I got 100% agreement with Noel's listing.  So I think that
+listing can be considered authoritative now; good enough to generate replacement PROMs should anybody
+ever need to do so.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://fritzm.github.io/images/pdp11/M9301.jpg"&gt;&lt;img src='/images/pdp11/M9301_thumbnail_tall.jpg'/&gt;&lt;/a&gt;
+&lt;a href="http://fritzm.github.io/images/pdp11/M792-YB.jpg"&gt;&lt;img src='/images/pdp11/M792-YB_thumbnail_tall.jpg'/&gt;&lt;/a&gt;
+&lt;span class="videobox"&gt;
+                &lt;iframe width="328" height="200"
+                    src='https://www.youtube.com/embed/E7MAFjZVZ2Y?rel=0'
+                    frameborder='0' webkitAllowFullScreen mozallowfullscreen
+                    allowFullScreen&gt;
+                &lt;/iframe&gt;
+            &lt;/span&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Fritz Mueller</dc:creator><pubDate>Tue, 04 Jul 2017 00:00:00 -0700</pubDate><guid isPermaLink="false">tag:fritzm.github.io,2017-07-04:/m9301-troubles.html</guid><category>Retro-Computing</category><category>PDP-11</category></item><item><title>PDP-11/45: RK11 VII</title><link>http://fritzm.github.io/rk11-7.html</link><description>&lt;p&gt;Okay, back from travel and picked up the thread on the RK11 interrupt problem this weekend. Put the KM11 in 
 the first slot on the RK11 which allows to monitor interrupt request. An interrupt can be very easily
 generated from the front panel by writing bit 6 (Interrupt on Done Enable) on in the RKCS register at 777404.
 Did this, and noticed that interrupt request logic on the RK11 went active, but never cleared.&lt;/p&gt;
