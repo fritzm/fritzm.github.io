@@ -66,7 +66,7 @@ by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fr
     </div>
 
     <div><p>Not much technical in this post, except the big ticket news: after all the recent repairs and generating a
-fresh RT11-pack <strong>RT-11 BOOTS FROM DISK!</strong></p>
+fresh RT-11 pack <strong>RT-11 BOOTS FROM DISK!</strong></p>
 <p>It's been a very long road getting here, but the machine finally has a working, full-featured, operating
 system, capable of supporting self-hosted program development.  Spent a few enjoyable hours editing,
 assembling, linking, and debugging some small MACRO-11 hacks directly on the machine, using the native RT-11
@@ -93,7 +93,7 @@ by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fr
     </div>
 
     <div><p>After a lot of recent progress with the RK11, suffered a setback: after trying once again to image
-a fresh RT11 pack, the machine began to behave erratically at boot.  Sometimes the boot monitor would run
+a fresh RT-11 pack, the machine began to behave erratically at boot.  Sometimes the boot monitor would run
 fine, sometimes it would run for a while and then take a machine exception or vector off to bad address,
 and sometimes the machine would fail to boot at all, immediately taking exceptions of various sorts. Getting
 so close, but then lost a lot of ground; I guess that's sort of the way it is going to be with a machine
@@ -261,26 +261,26 @@ by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fr
     </div>
 
     <div><p>Replaced the failed 7401 in the RKDA to RKDB data path, and verified that the RKDB stuck bit 11 problem was
-fixed.  Ran the system for another couple hours to rewrite a fresh RT11 pack, then another problem developed:
+fixed.  Ran the system for another couple hours to rewrite a fresh RT-11 pack, then another problem developed:
 read operations would successfully obtain the bus, but would never complete.</p>
-<p>Some investigation with a KM11 on the RK11 controller showed that POLE was now incorrectly asserted 
-continuously (did they mean "poll"?). Tracked this down to a failed 7420 (E1 on the M141 at A26, sheet 
+<p>Some investigation with a KM11 on the RK11 controller showed that POLE was now incorrectly asserted
+continuously (did they mean "poll"?). Tracked this down to a failed 7420 (E1 on the M141 at A26, sheet
 RK11-C-12). Replaced, and reads were working again. I guess with a machine this age there is going to be a
-lot of this sort of thing where marginal parts give up after a few hours of use.  Hopefully after some 
+lot of this sort of thing where marginal parts give up after a few hours of use.  Hopefully after some
 prolonged operation things will settle down a little bit...</p>
-<p>In any case, <em>still</em> unable to boot any of my RT11 packs.  I Decided to step back and run MAINDEC diagnostic
-ZRKK. This is the RK11 dynamic diagnostic that destructively modifies a pack, and I had not previously run it 
+<p>In any case, <em>still</em> unable to boot any of my RT-11 packs.  I Decided to step back and run MAINDEC diagnostic
+ZRKK. This is the RK11 dynamic diagnostic that destructively modifies a pack, and I had not previously run it
 -- I had just optimistically jumped to trying to boot existing packs after the drive restore and calibration.
 The diagnostic ran successfully for a while, through various format and read and write tests over the whole
 pack (encouraging!), then hung up consistently on test 35 (octal), which tests whether the RK11 interrupts
 the processor correctly when IDE is set.</p>
-<p>So it could be the case that my RT11 boots hang up when they first start trying to make use of interrupts. 
-Verified that I can run MAINDEC ZKWA, which tests interrupts from the KW11-L line clock, so interrupt 
+<p>So it could be the case that my RT-11 boots hang up when they first start trying to make use of interrupts.
+Verified that I can run MAINDEC ZKWA, which tests interrupts from the KW11-L line clock, so interrupt
 fielding in the CPU looks good.</p>
 <p>Re-ran MAINDEC ZRKK, and noted that the CPU is waiting in micro-state BRK.00 (154) on page FLOWS 12 of the
 engineering drawings. This state has a wait for Unibus INTR to be asserted, so it looks like a problem with
 interrupt signaling on the RK11 side.</p>
-<p>I have a bit of travel coming up, so I probably won't get back to this for a week or two. But the next 
+<p>I have a bit of travel coming up, so I probably won't get back to this for a week or two. But the next
 sensible step I think will be to work with a logic analyzer on the backplane of the RK11, slot A6 where the
 M7820 interrupt control flipchip goes, and see what is/isn't happening with the interrupt signaling on that
 end. I suspect there will probably be a failed IC on the M7820.</p></div>
@@ -300,18 +300,18 @@ by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fr
 
     </div>
 
-    <div><p>Decided to use the disk utilities provided in PDP11GUI to write a fresh RT11 pack.  PDP11GUI successfully
+    <div><p>Decided to use the disk utilities provided in PDP11GUI to write a fresh RT-11 pack.  PDP11GUI successfully
 assembled and downloaded a driver, then took a little under 2 hours to download the pack image over the
 console serial line and write the pack without indicating any errors.</p>
 <p>The resulting pack fared no better at boot than any of my existing legacy packs, however.  I attempted
 to verify the pack via PDP11GUI, and noticed that the controller was indicating checksum errors for every
 sector on cylinders 64-127 and 192-202 (that is, whenever bit 11 of the RKDA was set).  Tried this on several
 other packs, including the RKDP pack which had previously booted, and found that these errors were returned
-for these cylinders on <em>all</em> packs, so definitely a controller or drive issue, and not specific to any 
+for these cylinders on <em>all</em> packs, so definitely a controller or drive issue, and not specific to any
 particular pack.</p>
 <p>Verified that bit 11 of the RKDA could be read and written normally, and that when so addressed the RK05
 drive would mechanically seek to the correct cylinders.  Programmed some format-mode reads (these just return
-sector headers) manually via the front panel, and verified that the sector headers were being returned 
+sector headers) manually via the front panel, and verified that the sector headers were being returned
 correctly from disk for the affected cylinders.</p>
 <p>Tried a few flipchip swaps to see if the affected bit would move: B18 and B19 (adder; sheet RK11-C-14; no
 change), A21 and B21 (RKDB; sheet RK11-C-10; no change).</p>
@@ -351,13 +351,13 @@ is not asserting NPG at all.</p>
 Turns out to be a failed 8881 bus driver for NPG at the end of the line (E55 on KB11-A drawing UBCD). Pulled,
 socketed, replaced.</p>
 <p>After this, the CPU was asserting NPG, but the signaling still looked a little squirrelly.  Turns out that
-there are jumpers (W1-W5) on the M9301 bootstrap terminator that need to be installed to provide grant 
+there are jumpers (W1-W5) on the M9301 bootstrap terminator that need to be installed to provide grant
 pull-ups when they are not otherwise provided internally by the processor (and the 11/45 is one such
 case).  After installing the jumpers, NPG signaling looked solid.</p>
-<p>Tried mounting a booting a few packs.  Packs marked as having RT11 would run for a short while and then hang.
+<p>Tried mounting a booting a few packs.  Packs marked as having RT-11 would run for a short while and then hang.
 But an RKDP pack <em>successfully booted!</em>  Wow, that feels pretty good after about two years of working
 seriously on this restoration.  :-)</p>
-<p>Going to stop here on a high note, and pick up trying to get a good RT11 boot next time.</p>
+<p>Going to stop here on a high note, and pick up trying to get a good RT-11 boot next time.</p>
 <p><a href="http://fritzm.github.io/images/pdp11/rkdp-boot.jpg"><img src='/images/pdp11/rkdp-boot_thumbnail_tall.jpg'/></a></p></div>
     <hr />
 </div>
