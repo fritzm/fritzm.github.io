@@ -214,7 +214,7 @@ result.</p>
 <p>I next moved the extender card over to GRA, where this signal originates from a subsidiary ROM, but unfortunately at
 that point the MS11-L memory behavior got even worse, putting and end to these experiments.  So I'll have to tackle
 that first...</p>
-<p>Moved the MR11 ROM over to the expansion backplane where the MS11-L resides, and it works fine there.  So it doesn't
+<p>Moved the M792 ROM over to the expansion backplane where the MS11-L resides, and it works fine there.  So it doesn't
 seem to be a bus wiring or jumper problem onto the expansion backplane.  Checked the power input pins on the backplane
 behind the MS11-L.  5V was a little low there; trimmed this up.  Probably need to clean or replace the Molex contacts
 on the power distribution board in the cabinet, as it seems a few mV are being shed there needlessly compared to the
@@ -288,7 +288,7 @@ different boards.</p>
 to inductor L1 which looked as if it had been partially sheared away from the board at some point during installation/removal/storage.  Repaired this.  Success!  Able to load addresses from the front console now. Switches are mirrored
 in the BR when halted in console.</p>
 <p>Address bit 0 seems stuck.  Swapped PDR from spare board back to the original.  Can now examine and modify the
-light/switch register, and examine the contents of the MR11 ROM.</p>
+light/switch register, and examine the contents of the M792 ROM.</p>
 <p>Jumpered the DD11 expansion backplane back in, and slotted in the MS11-L memory.  Limited success: can modify and
 examine memory for example near address 001000, but cannot modify low memory addresses.  In some ranges, can only
 modify every other word.  Also, PC seems stuck at 022000.</p>
@@ -320,7 +320,7 @@ Console is no longer all address and data lights on, but basic console load addr
 still not working.  A random assortment of address lines seem stuck, different on each power cycle.  About the only
 thing that reliably functions from the console is loading the two highest address bits from the switches, immediately
 after a reset.  Pulled the floating point unit, un-jumpered the DD11 expansion backplane, and removed all peripherals
-except the MR11 diode ROM; same (broken) behavior...</p>
+except the M792 diode ROM; same (broken) behavior...</p>
 <p>Scoped all the DC voltages, and did not notice any glitches.  Pulled the H742s for some bench work: verified AC LO and
 DC LO signaling on both units, replaced a broken Mate-n-Lok connector on one of the units, blew out dust from all the 5V
 regulators and replaced their indicator bulbs with modern equivalent (CM7381). Sourced and put on order a modern
@@ -436,11 +436,11 @@ populated (128K x 18bit) MS11-L MOS memory board, and a couple of replacement BC
 to the CPU cards.  The MS11-L is a bit of a luxury; I am figuring it will be easier to deal with during bringup than
 the core memory systems I have on hand.  It will also be nice to run with a full address space.</p>
 <p>Below is an updated shot of the CPU chassis with the expansion backplane installed, populated with bus jumpers,
-terminators, grant continuity cards, the MS11-L memory, a DL11 serial interface, and an MR11-DB boostrap ROM.  I've gone
+terminators, grant continuity cards, the MS11-L memory, a DL11 serial interface, and an M792-YB boostrap ROM.  I've gone
 ahead and slotted in the FPU in the first four slots, since the cleaned and refurbished CPU cabinet is probably the
 safest place to store them now.  Console cables are also installed:</p>
 <p><a href="http://fritzm.github.io/images/pdp11/boards-in-chassis-2.jpg"><img src='/images/pdp11/boards-in-chassis-2_thumbnail_tall.jpg'/></a></p>
-<p>The MR11 ROM is an interesting bit, and probably worth a comment.  This is a 32-word diode-matrix ROM card.  The bits
+<p>The M792 ROM is an interesting bit, and probably worth a comment.  This is a 32-word diode-matrix ROM card.  The bits
 are physically laid out on the card (see pictures below); where there is a diode, there is a logical 1 bit and where
 there is the absence of a diode there is a logical 0 bit.  Typically the matrix would be loaded with a bootstrap program,
 to save the operator from having to toggle it in from the console on each boot.</p>
