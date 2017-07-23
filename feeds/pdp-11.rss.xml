@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rss version="2.0"><channel><title>fritzm.github.io - PDP-11</title><link>http://fritzm.github.io/</link><description></description><lastBuildDate>Sat, 15 Jul 2017 00:00:00 -0700</lastBuildDate><item><title>PDP-11/45: VT52 Keyboard Repair</title><link>http://fritzm.github.io/vt52-keyboard.html</link><description>&lt;p&gt;The VT52 had a broken ESC key, and with RT-11 up and running I was motivated to dig in and fix it (you need
 that ESC key if you are going to run the K52 editor).  Pulling the keycap and giving things a look over, the
-leaf contacts and the plastic plunger that activate the key look fine.  Need to get at the keyboard module
-itself to troubleshoot then.  On a VT52, that means opening the thing all the way up and pulling the main
-boards to get access. In we go...&lt;/p&gt;
+leaf contacts and the plastic plunger that activate the key looked fine.  Need to get at the keyboard module
+itself to troubleshoot, and on a VT52 that means opening the thing all the way up and pulling the main
+boards. In we go...&lt;/p&gt;
 &lt;p&gt;Extracted the keyboard module, powered it from my bench supply, and used a breadboard and some jumpers to
-drive the key select decoders.  Key closure on the back of the module is intermittent, but some flexure of
-the entire keyboard PCB seems to be affecting it.  Replaced/reflowed the solder on the back of the key
-switch even though it looked fine and that seems to have fixed it.&lt;/p&gt;
+drive the key select decoders.  Key closure on the back of the module was intermittent, but some flexure of
+the entire keyboard PCB seemed to be affecting it.  Replaced/reflowed the solder on the back of the key
+switch and that seems to have fixed it.&lt;/p&gt;
 &lt;p&gt;Back together, working well now.  Test drove it for a while under RT-11...&lt;/p&gt;
 &lt;p&gt;&lt;a href="http://fritzm.github.io/images/pdp11/vt52-guts.jpg"&gt;&lt;img src='/images/pdp11/vt52-guts_thumbnail_tall.jpg'/&gt;&lt;/a&gt;
 &lt;a href="http://fritzm.github.io/images/pdp11/vt52-keys.jpg"&gt;&lt;img src='/images/pdp11/vt52-keys_thumbnail_tall.jpg'/&gt;&lt;/a&gt;
 &lt;a href="http://fritzm.github.io/images/pdp11/rt11-adventure.jpg"&gt;&lt;img src='/images/pdp11/rt11-adventure_thumbnail_tall.jpg'/&gt;&lt;/a&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Fritz Mueller</dc:creator><pubDate>Sat, 15 Jul 2017 00:00:00 -0700</pubDate><guid isPermaLink="false">tag:fritzm.github.io,2017-07-15:/vt52-keyboard.html</guid><category>Retro-Computing</category><category>PDP-11</category></item><item><title>PDP-11/45: Data Recovery</title><link>http://fritzm.github.io/data-recovery.html</link><description>&lt;p&gt;Okay, the system is working well enough now to start attempting recovery and archive of the dozen or so RK05
 packs that I have on-hand.  These were all obtained (along with the RK05 drives, controller and power supply)
-in a surplus auction downstream of the Stanford Hansen Experimental Physics Lab, sometime in the early '90s.&lt;/p&gt;
+in a surplus auction downstream of Stanford's Hansen Experimental Physics Lab, sometime in the early '90s.&lt;/p&gt;
 &lt;p&gt;The packs date from the mid-70's to early-80's, and the labels indicate contents related to experiments and
 research projects taking place at the lab at that time.  One particular pack seems associated with the
 Stanford Gravity Wave Project, which built early resonant mass detectors.  Other packs labeled "FEL" would
@@ -21,13 +21,13 @@ be related to early free-electron laser research.  Many of the names on the pack
 related scientific publications from the time.&lt;/p&gt;
 &lt;p&gt;The process for dealing with these packs involves opening them up for inspection and cleaning before
 mounting them, with hopes of avoiding beating up or destroying the drive heads and/or media with head crashes.
-Much has been written about pack cleaning on the classicmp mailing lists and in the vcfed forums, but briefly
-the process involves some clean-room nitrile gloves, lint-free wipes, and anhydrous isopropyl alcohol.  The
+Much has been written about pack cleaning on the classiccmp mailing lists and in the vcfed forums, but briefly
+the process involves some clean-room gloves, lint-free wipes, and anhydrous isopropyl alcohol.  The
 outside of the pack is first cleaned of dust and grime, then the packs are opened and inspected and the disk
-surfaces given a scrub with the wipes and alcohol.  If a pack seems in good enough shape to mount, I'll spin
-it up and run it in the drive with head load disabled for about a half-hour.  This gets a good air-flow over
+surfaces given a scrub with the wipes and alcohol.  If a pack seems in good enough shape to mount, it is spun
+up and run in a drive with head load disabled for about a half-hour.  This gets a good air-flow over
 the disk to blow out remaining loose particulates and also lets the disk come up to thermal equilibrium.
-After that I let the heads load, standing by with a finger on the unload switch in case there are any bad
+After that the heads are loaded, with a finger standing by on the unload switch in case there are any bad
 noises...&lt;/p&gt;
 &lt;p&gt;I've already been dealing with two of the packs extensively during the restoration: one is an RKDP
 diagnostics pack, and the other was a backup pack of same.  I was able to capture a complete, error-free
@@ -35,7 +35,7 @@ image of the RKDP pack using PDP11GUI.  This seems to be an earlier version of t
 already available on bitsavers; I've sent the bits to Al Kossow, but as I understand it his project has
 a big backlog at the moment so it may be a while before he can consider my submission.  In the meantime,
 for those interested, the disk image is available &lt;a href="http://www.slac.stanford.edu/~fritzm/data/pdp11/rk05/MAINDEC-11-DZZAA-J-HB.dsk"&gt;here&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;The RKDP backup disk was used as a test pack during the RK11/RK05 restoration work, and was overwritten
+&lt;p&gt;The RKDP backup disk was used as a test pack during the RK11/RK05 restoration work, and thus was overwritten
 by the RK05 diagnostic read/write tests.  It now contains a bootable RT-11 image, written via PDP11GUI.
 Mixed results on the other packs so far: some have had severe head crashes (see pic below) or are otherwise
 damaged to the point that I am hesitant to mount them.  Some have been mysteriously unreadable.  It looks
@@ -60,6 +60,11 @@ the authors for permission first.&lt;/p&gt;
     &lt;td&gt;DZQUD-A RKDP-RK11 MONITOR&lt;/td&gt;
     &lt;td&gt;[1974] MAINDEC diagnostics for PDP-11/40/45 CPU/MMU/FPU, MS11, DL11, DR11, RK11, LC11/LA30, KW11-L/P. Full recovery.&lt;/td&gt;
 &lt;/tr&gt;&lt;tr&gt;
+    &lt;td&gt;B1-75814&lt;/td&gt;
+    &lt;td&gt;RKDB Backup&lt;/td&gt;
+    &lt;td&gt;unknown&lt;/td&gt;
+    &lt;td&gt;[unknown] Presumed to be backup of ZO 50511; used as test disk and overwritten.&lt;/td&gt;
+&lt;/tr&gt;&lt;tr&gt;
     &lt;td&gt;B1-28320&lt;/td&gt;
     &lt;td&gt;&lt;span style="text-decoration:underline;"&gt;Gravitational&lt;/span&gt; &lt;span style="text-decoration:underline;"&gt;Radiation&lt;/span&gt; &lt;span style="text-decoration:underline;"&gt;Experiment&lt;/span&gt;&lt;br&gt;Boughn, Hollenhorst, Paik, Sears, Taber MSA&lt;/td&gt;
     &lt;td&gt;DOS/BATCH V09-20&lt;/td&gt;
@@ -68,7 +73,7 @@ the authors for permission first.&lt;/p&gt;
     &lt;td&gt;AD-21279&lt;/td&gt;
     &lt;td&gt;BLAZQUEZ RT-11 AUG 83&lt;/td&gt;
     &lt;td&gt;RT-11FB (S) V04.00L&lt;/td&gt;
-    &lt;td&gt;[1983] Fortran and MACRO-11 codes relating to image processing and display.  Device driver code for Deanza Systems ID-2000 display and Calcomp plotter.  Names: Ken Dinwiddie (De Anza codes), Art Vetter (Calcomp codes). Full recovery.&lt;/td&gt;
+    &lt;td&gt;[1983] Fortran and MACRO-11 codes relating to image processing and display.  Device driver code for DeAnza Systems ID-2000 display and Calcomp plotter.  Names: Ken Dinwiddie (DeAnza codes), Art Vetter (Calcomp codes). Full recovery.&lt;/td&gt;
 &lt;/tr&gt;&lt;tr&gt;
     &lt;td&gt;BAK 9069 A&lt;/td&gt;
     &lt;td&gt;W. COLSON&lt;/td&gt;
@@ -80,15 +85,40 @@ the authors for permission first.&lt;/p&gt;
     &lt;td&gt;DOS/BATCH V9-20C&lt;/td&gt;
     &lt;td&gt;[1974-78] Head crash on read (ouch!) Partial recovery.  Unrecovered data looks to be mostly OS files; may be patchable.&lt;/td&gt;
 &lt;/tr&gt;&lt;tr&gt;
-    &lt;td&gt;AE 20116&lt;/td&gt;
-    &lt;td&gt;DEACON FEL&lt;/td&gt;
-    &lt;td&gt;unknown&lt;/td&gt;
-    &lt;td&gt;[unknown] Corrosion spots on media; did not mount.&lt;/td&gt;
-&lt;/tr&gt;&lt;tr&gt;
     &lt;td&gt;ZO 50399&lt;/td&gt;
     &lt;td&gt;TRANSPORT + DATA&lt;br&gt;1/18/80&lt;/td&gt;
     &lt;td&gt;DOS/BATCH V9-20C&lt;/td&gt;
-    &lt;td&gt;[1980-83] Minor corrosion spot. Partial recovery. Data files and compiled Fortran programs.&lt;/td&gt;
+    &lt;td&gt;[1980-83] Minor corrosion spot. Partial recovery. Data files and Fortran programs.&lt;/td&gt;
+&lt;/tr&gt;&lt;tr&gt;
+    &lt;td&gt;E172140&lt;/td&gt;
+    &lt;td&gt;M. O'Halloran  Ray Tracing&lt;br&gt;R. RAND BBU PROGRAMS&lt;/td&gt;
+    &lt;td&gt;TBD&lt;/td&gt;
+    &lt;td&gt;[TBD]&lt;/td&gt;
+&lt;/tr&gt;&lt;tr&gt;
+    &lt;td&gt;B1-45441&lt;/td&gt;
+    &lt;td&gt;RT 11&lt;/td&gt;
+    &lt;td&gt;TBD&lt;/td&gt;
+    &lt;td&gt;[TBD] Minor head crashes on media.&lt;/td&gt;
+&lt;/tr&gt;&lt;tr&gt;
+    &lt;td&gt;B1-24056&lt;/td&gt;
+    &lt;td&gt;RDAS&lt;/td&gt;
+    &lt;td&gt;TBD&lt;/td&gt;
+    &lt;td&gt;[TBD] Minor head crashes on media.&lt;/td&gt;
+&lt;/tr&gt;&lt;tr&gt;
+    &lt;td&gt;AE 20116&lt;/td&gt;
+    &lt;td&gt;DEACON FEL&lt;/td&gt;
+    &lt;td&gt;unknown&lt;/td&gt;
+    &lt;td&gt;[unknown] Many corrosion spots on media; did not mount.&lt;/td&gt;
+&lt;/tr&gt;&lt;tr&gt;
+    &lt;td&gt;19177&lt;/td&gt;
+    &lt;td&gt;Transport DOS/BATCH-9 V 20C&lt;/td&gt;
+    &lt;td&gt;unknown&lt;/td&gt;
+    &lt;td&gt;[unknown] Major head crash on media; did not mount.&lt;/td&gt;
+&lt;/tr&gt;&lt;tr&gt;
+    &lt;td&gt;B1-44898&lt;/td&gt;
+    &lt;td&gt;RDAS9 - V20C&lt;/td&gt;
+    &lt;td&gt;unknown&lt;/td&gt;
+    &lt;td&gt;[unknown] Medium head crashes on media; did not mount.&lt;/td&gt;
 &lt;/tr&gt;&lt;/tbody&gt;
 &lt;/table&gt;
 
