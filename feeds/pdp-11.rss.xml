@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0"><channel><title>fritzm.github.io - PDP-11</title><link>http://fritzm.github.io/</link><description></description><lastBuildDate>Sun, 09 Jul 2017 00:00:00 -0700</lastBuildDate><item><title>PDP-11/45: Data Recovery</title><link>http://fritzm.github.io/data-recovery.html</link><description>&lt;p&gt;Okay, the system is working well enough now to start attempting recovery and archive of the dozen or so RK05
+<rss version="2.0"><channel><title>fritzm.github.io - PDP-11</title><link>http://fritzm.github.io/</link><description></description><lastBuildDate>Sat, 15 Jul 2017 00:00:00 -0700</lastBuildDate><item><title>PDP-11/45: VT52 Keyboard Repair</title><link>http://fritzm.github.io/vt52-keyboard.html</link><description>&lt;p&gt;The VT52 had a broken ESC key, and with RT-11 up and running I was motivated to dig in and fix it (you need
+that ESC key if you are going to run the K52 editor).  Pulling the keycap and giving things a look over, the
+leaf contacts and the plastic plunger that activate the key look fine.  Need to get at the keyboard module
+itself to troubleshoot then.  On a VT52, that means opening the thing all the way up and pulling the main
+boards to get access. In we go...&lt;/p&gt;
+&lt;p&gt;Extracted the keyboard module, powered it from my bench supply, and used a breadboard and some jumpers to
+drive the key select decoders.  Key closure on the back of the module is intermittent, but some flexure of
+the entire keyboard PCB seems to be affecting it.  Replaced/reflowed the solder on the back of the key
+switch even though it looked fine and that seems to have fixed it.&lt;/p&gt;
+&lt;p&gt;Back together, working well now.  Test drove it for a while under RT-11...&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://fritzm.github.io/images/pdp11/vt52-guts.jpg"&gt;&lt;img src='/images/pdp11/vt52-guts_thumbnail_tall.jpg'/&gt;&lt;/a&gt;
+&lt;a href="http://fritzm.github.io/images/pdp11/vt52-keys.jpg"&gt;&lt;img src='/images/pdp11/vt52-keys_thumbnail_tall.jpg'/&gt;&lt;/a&gt;
+&lt;a href="http://fritzm.github.io/images/pdp11/rt11-adventure.jpg"&gt;&lt;img src='/images/pdp11/rt11-adventure_thumbnail_tall.jpg'/&gt;&lt;/a&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Fritz Mueller</dc:creator><pubDate>Sat, 15 Jul 2017 00:00:00 -0700</pubDate><guid isPermaLink="false">tag:fritzm.github.io,2017-07-15:/vt52-keyboard.html</guid><category>Retro-Computing</category><category>PDP-11</category></item><item><title>PDP-11/45: Data Recovery</title><link>http://fritzm.github.io/data-recovery.html</link><description>&lt;p&gt;Okay, the system is working well enough now to start attempting recovery and archive of the dozen or so RK05
 packs that I have on-hand.  These were all obtained (along with the RK05 drives, controller and power supply)
 in a surplus auction downstream of the Stanford Hansen Experimental Physics Lab, sometime in the early '90s.&lt;/p&gt;
 &lt;p&gt;The packs date from the mid-70's to early-80's, and the labels indicate contents related to experiments and
