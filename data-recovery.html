@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>fritzm.github.io</title>
+    <meta name="description" content="">
+    <meta name="author" content="Fritz Mueller">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+    <script src="http://fritzm.github.io/theme/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="http://fritzm.github.io/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="http://fritzm.github.io/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="http://fritzm.github.io/theme/local.css" rel="stylesheet">
+    <link href="http://fritzm.github.io/theme/pygments.css" rel="stylesheet">
+
+    <!-- So Firefox can bookmark->"abo this site" -->
+        <link href="feeds/all.rss.xml" rel="alternate" title="fritzm.github.io" type="application/rss+xml">
+
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="navbar-inner">
+    <div class="container">
+
+         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+         </a>
+
+        <a class="brand" href="http://fritzm.github.io">fritzm.github.io</a>
+
+        <div class="nav-collapse">
+        <ul class="nav">
+
+        </ul>
+        </div>
+
+    </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="content">
+    <div class="row">
+
+        <div class="span9">
+    <div class='article'>
+        <div class="content-title">
+            <h1>PDP-11/45: Data Recovery</h1>
+Sun 09 July 2017
+
+by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+        </div>
+	
+        <div><p>Okay, the system is working well enough now to start attempting recovery and archive of the dozen or so RK05
+packs that I have on-hand.  These were all obtained (along with the RK05 drives, controller and power supply)
+in a surplus auction downstream of the Stanford Hansen Experimental Physics Lab, sometime in the early '90s.</p>
+<p>The packs date from the mid-70's to early-80's, and the labels indicate contents related to experiments and
+research projects taking place at the lab at that time.  One particular pack seems associated with the
+Stanford Gravity Wave Project, which built early resonant mass detectors.  Other packs labeled "FEL" would
+be related to early free-electron laser research.  Many of the names on the packs are are readily found on
+related scientific publications from the time.</p>
+<p>The process for dealing with these packs involves opening them up for inspection and cleaning before
+mounting them, with hopes of avoiding beating up or destroying the drive heads and/or media with head crashes.
+Much has been written about pack cleaning on the classicmp mailing lists and in the vcfed forums, but briefly
+the process involves some clean-room nitrile gloves, lint-free wipes, and anhydrous isopropyl alcohol.  The
+outside of the pack is first cleaned of dust and grime, then the packs are opened and inspected and the disk
+surfaces given a scrub with the wipes and alcohol.  If a pack seems in good enough shape to mount, I'll spin
+it up and run it in the drive with head load disabled for about a half-hour.  This gets a good air-flow over
+the disk to blow out remaining loose particulates and also lets the disk come up to thermal equilibrium.
+After that I let the heads load, standing by with a finger on the unload switch in case there are any bad
+noises...</p>
+<p>I've already been dealing with two of the packs extensively during the restoration: one is an RKDP
+diagnostics pack, and the other was a backup pack of same.  I was able to capture a complete, error-free
+image of the RKDP pack using PDP11GUI.  This seems to be an earlier version of this disk that what is
+already available on bitsavers; I've sent the bits to Al Kossow, but as I understand it his project has
+a big backlog at the moment so it may be a while before he can consider my submission.  In the meantime,
+for those interested, the disk image is available <a href="http://www.slac.stanford.edu/~fritzm/data/pdp11/rk05/MAINDEC-11-DZZAA-J-HB.dsk">here</a>.</p>
+<p>The RKDP backup disk was used as a test pack during the RK11/RK05 restoration work, and was overwritten
+by the RK05 diagnostic read/write tests.  It now contains a bootable RT-11 image, written via PDP11GUI.
+Mixed results on the other packs so far: some have had severe head crashes (see pic below) or are otherwise
+damaged to the point that I am hesitant to mount them.  Some have been mysteriously unreadable.  It looks
+like I can expect about 50% recovery.  Results so far are tabulated here.  I hope to be able to make other
+recovered images available soon, but since they contain original research materials I am trying to contact
+the authors for permission first.</p>
+<style>
+.disklist { display: inline; border-collapse: collapse; margin-right: 1em; }
+.disklist caption { font-weight: bold; }
+.disklist tr:nth-child(even) { background-color: #f2f2f2; }
+.disklist th, .disklist td { padding: 5px; }
+.disklist td { border: 1px solid lightgray; font-family: Menlo,Consolas,monospace; }
+</style>
+
+<table class="disklist">
+<thead>
+<tr><th>Serial #</th><th>Label</th><th>OS</th><th>Notes</th></tr>
+</thead>
+<tbody><tr>
+    <td>ZO 50511</td>
+    <td>MAINDEC-11-DZZAA-J-HB 9/21/74 M<br>XXDP RKDP RK11 DIAGNOSTIC PACKAGE</td>
+    <td>DZQUD-A RKDP-RK11 MONITOR</td>
+    <td>[1974] MAINDEC diagnostics for PDP-11/40/45 CPU/MMU/FPU, MS11, DL11, DR11, RK11, LC11/LA30, KW11-L/P. Full recovery.</td>
+</tr><tr>
+    <td>B1-28320</td>
+    <td><span style="text-decoration:underline;">Gravitational</span> <span style="text-decoration:underline;">Radiation</span> <span style="text-decoration:underline;">Experiment</span><br>Boughn, Hollenhorst, Paik, Sears, Taber MSA</td>
+    <td>DOS/BATCH V09-20</td>
+    <td>[1976-77] Fortran and MACRO-11 codes, mostly calculations relating to resonant mass detector design. Full recovery.</td>
+</tr><tr>
+    <td>AD-21279</td>
+    <td>BLAZQUEZ RT-11 AUG 83</td>
+    <td>RT-11FB (S) V04.00L</td>
+    <td>[1983] Fortran and MACRO-11 codes relating to image processing and display.  Device driver code for Deanza Systems ID-2000 display and Calcomp plotter.  Names: Ken Dinwiddie (De Anza codes), Art Vetter (Calcomp codes). Full recovery.</td>
+</tr><tr>
+    <td>BAK 9069 A</td>
+    <td>W. COLSON</td>
+    <td>DOS/BATCH V9-20C</td>
+    <td>[1977-78] Full recovery.</td>
+</tr><tr>
+    <td>AE 61745</td>
+    <td>FEL L.ELIAS</td>
+    <td>DOS/BATCH V9-20C</td>
+    <td>[1974-78] Head crash on read (ouch!) Partial recovery.  Unrecovered data looks to be mostly OS files; may be patchable.</td>
+</tr><tr>
+    <td>AE 20116</td>
+    <td>DEACON FEL</td>
+    <td>unknown</td>
+    <td>[unknown] Corrosion spots on media; did not mount.</td>
+</tr><tr>
+    <td>ZO 50399</td>
+    <td>TRANSPORT + DATA<br>1/18/80</td>
+    <td>DOS/BATCH V9-20C</td>
+    <td>[1980-83] Minor corrosion spot. Partial recovery. Data files and compiled Fortran programs.</td>
+</tr></tbody>
+</table>
+
+<p><a href="http://fritzm.github.io/images/pdp11/rk05-packs.jpg"><img src='/images/pdp11/rk05-packs_thumbnail_tall.jpg'/></a>
+<a href="http://fritzm.github.io/images/pdp11/head-crashes.jpg"><img src='/images/pdp11/head-crashes_thumbnail_tall.jpg'/></a>
+<a href="http://fritzm.github.io/images/pdp11/gravity-pack.jpg"><img src='/images/pdp11/gravity-pack_thumbnail_tall.jpg'/></a></p></div>
+	
+        <hr>
+
+        <h2>Comments</h2>
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'fritzm'; 
+    var disqus_title = 'PDP-11/45: Data Recovery';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+        </div>
+
+        <div class="span3">
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header">
+                Site
+                </li>
+
+                <li><a href="http://fritzm.github.io/">Archives</a>
+                <li><a href="http://fritzm.github.io/tags.html">Tags</a>
+
+
+
+                <li><a href="http://fritzm.github.io/feeds/all.rss.xml" rel="alternate" type="application/rss+xml">RSS feed</a></li>
+
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header">
+                Categories
+                </li>
+
+                <li><a href="http://fritzm.github.io/category/math.html">Math</a></li>
+                <li><a href="http://fritzm.github.io/category/pdp-11.html">PDP-11</a></li>
+                <li><a href="http://fritzm.github.io/category/programming.html">Programming</a></li>
+            </ul>
+            </div>
+
+
+
+
+            <div class="social">
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header">
+                Social
+                </li>
+
+                <li><a href="http://facebook.com/fritzmueller">facebook</a></li>
+                <li><a href="http://twitter.com/infrafritz">twitter</a></li>
+                <li><a href="http://instagram.com/infrafritz">Instagram</a></li>
+                <li><a href="http://www.linkedin.com/pub/fritz-mueller/a/679/62/">LinkedIn</a></li>
+                <li><a href="http://jsfiddle.net/user/fritzm/fiddles/">JSFiddle</a></li>
+                <li><a href="https://github.com/fritzm">GitHub</a></li>
+            </ul>
+            </div>
+            </div>
+
+        </div>     </div>     </div> 
+<footer>
+<br />
+<p><a href="http://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2012</p>
+</footer>
+
+</div> <!-- /container -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-collapse.js"></script>
+</body>
+</html>

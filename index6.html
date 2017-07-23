@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>fritzm.github.io</title>
+    <meta name="description" content="">
+    <meta name="author" content="Fritz Mueller">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+    <script src="http://fritzm.github.io/theme/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="http://fritzm.github.io/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="http://fritzm.github.io/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="http://fritzm.github.io/theme/local.css" rel="stylesheet">
+    <link href="http://fritzm.github.io/theme/pygments.css" rel="stylesheet">
+
+    <!-- So Firefox can bookmark->"abo this site" -->
+        <link href="feeds/all.rss.xml" rel="alternate" title="fritzm.github.io" type="application/rss+xml">
+
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="navbar-inner">
+    <div class="container">
+
+         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+         </a>
+
+        <a class="brand" href="http://fritzm.github.io">fritzm.github.io</a>
+
+        <div class="nav-collapse">
+        <ul class="nav">
+
+        </ul>
+        </div>
+
+    </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="content">
+    <div class="row">
+
+        <div class="span9">
+
+
+<div class='article'>
+    <div class="content-title">
+        <a href="http://fritzm.github.io/moebius.html"><h1>Moebious transformation animated GIFs</h1></a>
+Mon 01 December 2014
+
+by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+    </div>
+
+    <div><p>Here are some animated GIFs that I created a few years ago with MATLAB.  These characterize the action of the four classes of Moebius transformations, mapping the complex plane to itself.  They were inspired by the illustrations and analysis in a section of Tristan Needham's excellent book <a href="http://books.google.com/books?vid=ISBN0198534469"><em>Visual Complex Analysis</em></a>:</p>
+<figure><img src="/images/moebius/elliptic.gif"><figcaption>elliptic</figcaption></figure>
+
+<figure><img src="/images/moebius/hyperbolic.gif"><figcaption>hyperbolic</figcaption></figure>
+
+<figure><img src="/images/moebius/loxodromic.gif"><figcaption>loxodromic</figcaption></figure>
+
+<figure><img src="/images/moebius/parabolic.gif"><figcaption>parabolic</figcaption></figure>
+
+<p>So what's it all about?  A Moebius transformation is a mapping on the complex numbers of the form </p>
+<div class="math">$$ M(z) = \frac{az + b}{cz + d}, $$</div>
+<p> where <span class="math">\(a, b, c, d\)</span> are complex constants.  Moebius tranformations have many nice features: they are one-to-one and onto on the complex plane (extended with the addition of the "point at <span class="math">\(\infty\)</span>"), they form a group under composition, they are conformal (angle preserving).  Interestingly, though conformality only implies that they map infinitesimal circles to other infinitesimal circles, Moebius transformations actually map circles of <em>any</em> size in the complex plane to other circles in the plane.  For a really nice exposition and proofs of these qualities, see Needham.</p>
+<p>Fixed points on the plane under a Moebius transform will simply be solutions of </p>
+<div class="math">$$ z = \frac{az+b}{cz+d}, $$</div>
+<p> which is just quadratic in <span class="math">\(z\)</span>.  So a (non-identity) Moebius transform will have at most two fixed points, or one when there is a repeated root.  Following Needham, for the remainder of this discussion we'll refer to the fixed points of a given Moebius transformation as <span class="math">\(\xi_+\)</span>, <span class="math">\(\xi_-\)</span> in the two root case, or just <span class="math">\(\xi\)</span> in the repeated root case.</p>
+<p>Most of the qualities above are readily observable in the animations: one or two fixed points, circles mapping to circles, one-to-one, easy to imagine extension to the whole plane.  Conformality is a little harder to see, but if you look closely you can see that the angles at each of the corners in these crazed checkerboards always remain 90°.</p>
+<p>The GIFs were generated using a transform method.  Given a Moebius transformation with two fixed points (we will revisit the single fixed point case shortly), consider the additional Moebius transformation defined by </p>
+<div class="math">$$ F(z) =  \frac{z - \xi_+}{z - \xi_-}. $$</div>
+<p> This will send <span class="math">\(\xi_+\)</span> to <span class="math">\(0\)</span>, and  <span class="math">\(\xi_-\)</span> to <span class="math">\(\infty\)</span>.  We can now construct </p>
+<div class="math">$$ \widetilde{M} = F \circ  M \circ F^{-1}, $$</div>
+<p> which is itself a Moebius transformation (since the  Moebius transformations are a group under composition) and which will  have fixed points at <span class="math">\(0\)</span> and <span class="math">\(\infty\)</span>.  We can consider <span class="math">\(M\)</span> and <span class="math">\(\widetilde{M}\)</span> to be a transform pair; for any <span class="math">\(M\)</span> there is a corresponding <span class="math">\(\widetilde{M}\)</span> with fixed points at <span class="math">\(0\)</span> and <span class="math">\(\infty\)</span>.</p>
+<p>Now it turns out that Moebius transformations with fixed points at both <span class="math">\(0\)</span> and <span class="math">\(\infty\)</span> reduce to a particularly simple form — that of a single complex multiplication, i.e. just a dilation and/or rotation about the origin of the complex plane.  See Needham for exposition of this.  The elliptic, hyperbolic, and loxodromic classes of Moebius transformations turn out to be those whose corresponding <span class="math">\(\widetilde{M}\)</span> is a pure rotation, pure dilation, or general combination of the two, respectively.</p>
+<p>To generate these GIFs, we decorate the complex plane on the <span class="math">\(\widetilde{M}\)</span> side like a circular checkerboard or dart board, and represent the action of a given class of <span class="math">\(\widetilde{M}\)</span> transformations by rotating it, dilating it, or a combination of both, e.g.:</p>
+<figure><img src="/images/moebius/pre-elliptic.gif"><figcaption>elliptic \(\widetilde{M}\)</figcaption></figure>
+
+<figure><img src="/images/moebius/pre-hyperbolic.gif"><figcaption>hyperbolic \(\widetilde{M}\)</figcaption></figure>
+
+<p>On the <span class="math">\(M\)</span> side, we can pick fixed points <span class="math">\(\xi_+\)</span>, <span class="math">\(\xi_-\)</span> wherever we like, and then derive the corresponding <span class="math">\(F\)</span> as above.  For each frame, we take each point on the <span class="math">\(M\)</span> side, map it through <span class="math">\(F\)</span> to find the corresponding point on the <span class="math">\(\widetilde{M}\)</span> side, and check that against a dynamic checkerboard model to see if the point should be black or white in this frame.</p>
+<p>Returning to the repeated root, single fixed point case: we treat this similarly, but set </p>
+<div class="math">$$ F = \frac{1}{z - \xi}, $$</div>
+<p> which sends <span class="math">\(\xi\)</span> to <span class="math">\(\infty\)</span>.  As before, it turns out that Moebius transformations of this form (repeated fixed point at <span class="math">\(\infty\)</span>) reduce to a very simple form: this time, a pure translation.  The parabolic class of Moebius transformations are those whose corresponding <span class="math">\(\widetilde{M}\)</span> transformation is a pure translation.  To illustrate these, we use a translating dynamic checkerboard on the <span class="math">\(\widetilde{M}\)</span> side that looks like this:</p>
+<figure><img src="/images/moebius/pre-parabolic.gif"><figcaption>parabolic \(\widetilde{M}\)</figcaption></figure>
+
+<p>All of this can be done quite succinctly in MATLAB, once it is understood what needs to be done.  Below is the MATLAB snippet which was used to generate these GIFs.  Commenting and uncommenting various lines chooses different <span class="math">\(F\)</span> and <span class="math">\(\widetilde{M}\)</span> side checkerboard models, resulting in the different outputs.</p>
+<p>The first few lines create a 512x512 matrix of complex numbers, ranging from -3 to 3 on both the real and imaginary axes, to represent a portion of the complex plane.  This is then pre-mapped through an appropriate <span class="math">\(F\)</span>.  The <code>for</code> loop iterates on each frame.  The dynamic checkerboard result is calculated as the <code>xor</code> of various versions of functions <code>g1</code> and <code>g2</code> operating over the premapped points.  Each frame is downsampled and written to disk as a separate file, then at the end all the frames are stitched into a movie.  I must then have used some non-matlab utility to convert the movies to animated GIFs, but I'm not sure what that was...</p>
+<div class="highlight"><pre><span></span><span class="n">Z</span> <span class="p">=</span> <span class="o">-</span><span class="mi">3</span><span class="p">:</span><span class="mi">6</span><span class="o">/</span><span class="mi">512</span><span class="p">:</span><span class="mi">3</span><span class="o">-</span><span class="p">(</span><span class="mi">6</span><span class="o">/</span><span class="mi">512</span><span class="p">);</span> <span class="n">Z</span> <span class="p">=</span> <span class="n">Z</span><span class="p">(</span><span class="nb">ones</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">length</span><span class="p">(</span><span class="n">Z</span><span class="p">)),:);</span> <span class="n">Z</span> <span class="p">=</span> <span class="nb">complex</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span><span class="n">Z</span><span class="o">&#39;</span><span class="p">);</span>
+
+<span class="c">%Z = 1 ./ Z;        % one finite fixed point</span>
+<span class="n">Z</span> <span class="p">=</span> <span class="p">(</span><span class="n">Z</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">./</span><span class="p">(</span><span class="n">Z</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>  <span class="c">% two finite fixed points</span>
+
+<span class="n">im</span> <span class="p">=</span> <span class="p">[];</span> <span class="n">g1</span> <span class="p">=</span> <span class="p">[];</span> <span class="n">g2</span> <span class="p">=</span> <span class="p">[];</span>
+
+<span class="k">for</span> <span class="n">frame</span> <span class="p">=</span> <span class="mi">1</span><span class="p">:</span><span class="mi">30</span>
+    <span class="n">g1</span> <span class="p">=</span> <span class="nb">mod</span><span class="p">(</span><span class="nb">log</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">Z</span><span class="p">))</span><span class="o">*</span><span class="mi">4</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="mi">1</span><span class="p">;</span>           <span class="c">% radial, static</span>
+<span class="c">%    g1 = mod(log(abs(Z))*4+(frame-1)/15,2)&lt;1; % radial, dynamic</span>
+<span class="c">%    g1 = mod(real(Z)+(frame-1)*.8/30,.8)&lt;.4;  % vertical, dynamic</span>
+<span class="c">%    g2 = mod(angle(Z), pi/6)&lt;(pi/12);         % circumferential, static</span>
+    <span class="n">g2</span> <span class="p">=</span> <span class="nb">mod</span><span class="p">(</span><span class="nb">angle</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span><span class="o">+</span><span class="p">(</span><span class="n">frame</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="nb">pi</span><span class="o">/</span><span class="mi">180</span><span class="p">,</span> <span class="nb">pi</span><span class="o">/</span><span class="mi">6</span><span class="p">)</span><span class="o">&lt;</span><span class="p">(</span><span class="nb">pi</span><span class="o">/</span><span class="mi">12</span><span class="p">);</span> <span class="c">% circumferential, dynamic</span>
+<span class="c">%    g2 = mod(imag(Z),.8)&lt;.4;                  % horizontal, static</span>
+    <span class="n">im</span><span class="p">(:,:,</span><span class="mi">1</span><span class="p">,</span><span class="n">frame</span><span class="p">)</span> <span class="p">=</span> <span class="n">imresize</span><span class="p">(</span><span class="n">xor</span><span class="p">(</span><span class="n">g1</span><span class="p">,</span><span class="n">g2</span><span class="p">),</span> <span class="p">.</span><span class="mi">25</span><span class="p">,</span> <span class="s">&#39;bilinear&#39;</span><span class="p">);</span>
+    <span class="n">imwrite</span><span class="p">(</span><span class="n">im</span><span class="p">(:,:,</span><span class="mi">1</span><span class="p">,</span><span class="n">frame</span><span class="p">),</span> <span class="n">sprintf</span><span class="p">(</span><span class="s">&#39;frame%.2d.bmp&#39;</span><span class="p">,</span> <span class="n">frame</span><span class="p">));</span>
+<span class="k">end</span>
+
+<span class="n">mov</span> <span class="p">=</span> <span class="n">immovie</span><span class="p">(</span><span class="mi">255</span><span class="o">*</span><span class="n">im</span><span class="p">,</span><span class="n">gray</span><span class="p">(</span><span class="mi">255</span><span class="p">));</span>
+<span class="n">movie</span><span class="p">(</span><span class="n">mov</span><span class="p">,</span><span class="mi">50</span><span class="p">);</span>
+</pre></div>
+
+
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script></div>
+    <hr />
+</div>
+
+<div class="pagination">
+<ul>
+    <li class="prev"><a href="http://fritzm.github.io/index5.html">&larr; Previous</a></li>
+
+    <li class=""><a href="http://fritzm.github.io/index.html">1</a></li>
+    <li class=""><a href="http://fritzm.github.io/index2.html">2</a></li>
+    <li class=""><a href="http://fritzm.github.io/index3.html">3</a></li>
+    <li class=""><a href="http://fritzm.github.io/index4.html">4</a></li>
+    <li class=""><a href="http://fritzm.github.io/index5.html">5</a></li>
+    <li class="active"><a href="http://fritzm.github.io/index6.html">6</a></li>
+
+    <li class="next disabled"><a href="#">&rarr; Next</a></li>
+
+</ul>
+</div>
+  
+        </div>
+
+        <div class="span3">
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header">
+                Site
+                </li>
+
+                <li><a href="http://fritzm.github.io/">Archives</a>
+                <li><a href="http://fritzm.github.io/tags.html">Tags</a>
+
+
+
+                <li><a href="http://fritzm.github.io/feeds/all.rss.xml" rel="alternate" type="application/rss+xml">RSS feed</a></li>
+
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header">
+                Categories
+                </li>
+
+                <li><a href="http://fritzm.github.io/category/math.html">Math</a></li>
+                <li><a href="http://fritzm.github.io/category/pdp-11.html">PDP-11</a></li>
+                <li><a href="http://fritzm.github.io/category/programming.html">Programming</a></li>
+            </ul>
+            </div>
+
+
+
+
+            <div class="social">
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header">
+                Social
+                </li>
+
+                <li><a href="http://facebook.com/fritzmueller">facebook</a></li>
+                <li><a href="http://twitter.com/infrafritz">twitter</a></li>
+                <li><a href="http://instagram.com/infrafritz">Instagram</a></li>
+                <li><a href="http://www.linkedin.com/pub/fritz-mueller/a/679/62/">LinkedIn</a></li>
+                <li><a href="http://jsfiddle.net/user/fritzm/fiddles/">JSFiddle</a></li>
+                <li><a href="https://github.com/fritzm">GitHub</a></li>
+            </ul>
+            </div>
+            </div>
+
+        </div>     </div>     </div> 
+<footer>
+<br />
+<p><a href="http://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2012</p>
+</footer>
+
+</div> <!-- /container -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-collapse.js"></script>
+</body>
+</html>

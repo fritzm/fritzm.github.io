@@ -56,6 +56,32 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="http://fritzm.github.io/m9301-running.html"><h1>PDP-11/45: Running the M9301 console emulator</h1></a>
+Thu 23 June 2016
+
+by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+    </div>
+
+    <div><p>Replacement DRAMs showed up.  Pulled and replaced the two faulty ones on the MS11.  Pic below -- you can see the
+replacements are socketed, and are the TI parts instead of the original ITT.  Full address space is working now!  Now
+that bank 0 is repaired, trap vectors can conceivably work.</p>
+<p>Jumpered and configured a DL11-E serial card for use as console, slotted in an M9301-YB bootstrap terminator, connected
+up the VT52, powered up, and off it goes straight to the console emulator!  That means the basic instruction set tests
+in the boot ROM are passing as well, which is great news.</p>
+<p>Next step will be to hook up PDP11GUI and load some more in-depth diagnostics, in order to shake out any
+remaining bugs with the CPU and memory system.  Will slot in the FPU at that point for testing and debug as well.</p>
+<p><a href="http://fritzm.github.io/images/pdp11/ms11-repaired.jpg"><img src='/images/pdp11/ms11-repaired_thumbnail_tall.jpg'/></a>
+<a href="http://fritzm.github.io/images/pdp11/m9301-running.jpg"><img src='/images/pdp11/m9301-running_thumbnail_tall.jpg'/></a></p></div>
+    <hr />
+</div>
+
+
+
+<div class='article'>
+    <div class="content-title">
         <a href="http://fritzm.github.io/cpu-debug-5.html"><h1>PDP-11/45: CPU debug V -- chasing lights!</h1></a>
 Sun 19 June 2016
 
@@ -418,95 +444,6 @@ the harness build on the bench:</p>
     <hr />
 </div>
 
-
-
-<div class='article'>
-    <div class="content-title">
-        <a href="http://fritzm.github.io/ebay-parts.html"><h1>PDP-11/45: Some parts from eBay</h1></a>
-Sat 09 April 2016
-
-by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
-    </div>
-
-    <div><p>I've been keeping an eye on eBay and have collected a few more goodies: a DD11-D nine-slot expansion backplane, a fully
-populated (128K x 18bit) MS11-L MOS memory board, and a couple of replacement BC08-R cables for connecting the console
-to the CPU cards.  The MS11-L is a bit of a luxury; I am figuring it will be easier to deal with during bringup than
-the core memory systems I have on hand.  It will also be nice to run with a full address space.</p>
-<p>Below is an updated shot of the CPU chassis with the expansion backplane installed, populated with bus jumpers,
-terminators, grant continuity cards, the MS11-L memory, a DL11 serial interface, and an M792-YB boostrap ROM.  I've gone
-ahead and slotted in the FPU in the first four slots, since the cleaned and refurbished CPU cabinet is probably the
-safest place to store them now.  Console cables are also installed:</p>
-<p><a href="http://fritzm.github.io/images/pdp11/boards-in-chassis-2.jpg"><img src='/images/pdp11/boards-in-chassis-2_thumbnail_tall.jpg'/></a></p>
-<p>The M792 ROM is an interesting bit, and probably worth a comment.  This is a 32-word diode-matrix ROM card.  The bits
-are physically laid out on the card (see pictures below); where there is a diode, there is a logical 1 bit and where
-there is the absence of a diode there is a logical 0 bit.  Typically the matrix would be loaded with a bootstrap program,
-to save the operator from having to toggle it in from the console on each boot.</p>
-<p>The program could be modified by physically adding or removing diodes in the matrix.  My card has had such a mod; there
-is a handwritten note attached from some engineer describing this.  The mod customizes the bootstrap to always load
-from an RK disk unit, to avoid having to toggle in the device address at boot.  I will probably revert this mod because
-I like having things in fairly stock/usual condition.</p>
-<p><a href="http://fritzm.github.io/images/pdp11/mr11-with-note.jpg"><img src='/images/pdp11/mr11-with-note_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/mr11-bare.jpg"><img src='/images/pdp11/mr11-bare_thumbnail_tall.jpg'/></a></p>
-<p>For fun, here's the source listing of the stock bootstrap.  You can match the octal digits of the machine code against
-the diodes in the ROM above (low word addresses at the top of the matrix, and least-significant-bits on the left).</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">173100</span> <span class="nt">013701</span>         <span class="nt">MOV</span>     <span class="o">@</span><span class="p">#</span><span class="nn">177570</span><span class="o">,</span><span class="nt">R1</span>     <span class="o">;</span><span class="nt">READ</span> <span class="nt">SWITCH</span> <span class="nt">REG</span> <span class="nt">FOR</span> <span class="o">....</span>
-       <span class="nt">177570</span>
-<span class="nt">173104</span> <span class="nt">000005</span> <span class="nt">BEGIN</span><span class="o">:</span>  <span class="nt">RESET</span>                   <span class="o">;</span><span class="nt">FORCE</span> <span class="nt">CLEAR</span> <span class="nt">IF</span> <span class="nt">RETRY</span>
-<span class="nt">173106</span> <span class="nt">010100</span>         <span class="nt">MOV</span>     <span class="nt">R1</span><span class="o">,</span><span class="nt">R0</span>           <span class="o">;...</span><span class="p">.</span><span class="nc">DEVICE</span> <span class="nt">WC</span> <span class="nt">ADDRESS</span>
-<span class="nt">173110</span> <span class="nt">012710</span>         <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">-256</span><span class="o">,</span><span class="p">@</span><span class="k">R0</span>       <span class="p">;</span><span class="nt">SET</span> <span class="nt">TO</span> <span class="nt">READ</span> <span class="nt">256</span> <span class="nt">WORDS</span>
-       <span class="nt">177400</span>
-<span class="nt">173114</span> <span class="nt">020027</span>         <span class="nt">CMP</span>     <span class="nt">R0</span><span class="o">,</span><span class="p">#</span><span class="nn">177344</span>      <span class="o">;</span><span class="nt">IS</span> <span class="nt">IT</span> <span class="nt">DECTAPE</span><span class="o">?</span>
-       <span class="nt">177344</span>
-<span class="nt">173120</span> <span class="nt">001007</span>         <span class="nt">BNE</span>     <span class="nt">START</span>           <span class="o">;</span><span class="nt">NO</span><span class="o">.</span> <span class="nt">GO</span> <span class="nt">TO</span> <span class="nt">START</span>
-<span class="nt">173122</span> <span class="nt">012740</span>         <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">4002</span><span class="o">,</span><span class="nt">-</span><span class="o">(</span><span class="nt">R0</span><span class="o">)</span>     <span class="o">;</span><span class="nt">YES</span><span class="o">.</span> <span class="nt">MOVE</span> <span class="nt">TAPE</span> <span class="nt">TO</span> <span class="nt">FRONT</span>
-       <span class="nt">004002</span>
-<span class="nt">173126</span> <span class="nt">005710</span>         <span class="nt">TST</span>     <span class="p">@</span><span class="k">R0</span>             <span class="p">;</span><span class="nt">WAIT</span> <span class="nt">FOR</span> <span class="nt">ERROR</span><span class="o">!</span>
-<span class="nt">173130</span> <span class="nt">100376</span>         <span class="nt">BPL</span>     <span class="p">.</span><span class="nc">-2</span>
-<span class="nt">173132</span> <span class="nt">005740</span>         <span class="nt">TST</span>     <span class="nt">-</span><span class="o">(</span><span class="nt">R0</span><span class="o">)</span>           <span class="o">;</span><span class="nt">IS</span> <span class="nt">IT</span> <span class="nt">ENDZONE</span><span class="o">?</span>
-<span class="nt">173134</span> <span class="nt">100363</span>         <span class="nt">BPL</span>     <span class="nt">BEGIN</span>           <span class="o">;</span><span class="nt">NO</span><span class="o">.</span> <span class="nt">TRY</span> <span class="nt">AGAIN</span>
-<span class="nt">173136</span> <span class="nt">022020</span>         <span class="nt">CMP</span>     <span class="o">(</span><span class="nt">R0</span><span class="o">)+,(</span><span class="nt">R0</span><span class="o">)+</span>     <span class="o">;</span><span class="nt">ADJUST</span> <span class="nt">POINTER</span>
-<span class="nt">173140</span> <span class="nt">012740</span> <span class="nt">START</span><span class="o">:</span>  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">5</span><span class="o">,</span><span class="nt">-</span><span class="o">(</span><span class="nt">R0</span><span class="o">)</span>        <span class="o">;</span><span class="nt">NOW</span> <span class="nt">START</span> <span class="nt">ACTUAL</span> <span class="nt">READ</span>
-       <span class="nt">000005</span>
-<span class="nt">173144</span> <span class="nt">105710</span>         <span class="nt">TSTB</span>    <span class="p">@</span><span class="k">R0</span>             <span class="p">;</span><span class="nt">WAIT</span> <span class="nt">FOR</span> <span class="nt">DONE</span>
-<span class="nt">173146</span> <span class="nt">100376</span>         <span class="nt">BPL</span>     <span class="p">.</span><span class="nc">-2</span>
-<span class="nt">173150</span> <span class="nt">005710</span>         <span class="nt">TST</span>     <span class="p">@</span><span class="k">R0</span>             <span class="p">;</span><span class="nt">ERROR</span> <span class="nt">ENCOUNTERED</span><span class="o">?</span>
-<span class="nt">173152</span> <span class="nt">100754</span>         <span class="nt">BMI</span>     <span class="nt">BEGIN</span>           <span class="o">;</span><span class="nt">IF</span> <span class="nt">SO</span> <span class="nt">START</span> <span class="nt">OVER</span>
-<span class="nt">173154</span> <span class="nt">105010</span>         <span class="nt">CLRB</span>    <span class="p">@</span><span class="k">R0</span>             <span class="p">;</span><span class="nt">FOR</span> <span class="nt">DECTAPE</span><span class="o">,</span><span class="nt">STOP</span> <span class="nt">TRANSPORT</span>
-<span class="nt">173156</span> <span class="nt">000137</span>         <span class="nt">JMP</span>     <span class="o">@</span><span class="p">#</span><span class="nn">0</span>             <span class="o">;</span><span class="nt">GO</span> <span class="nt">TO</span> <span class="nt">ROUTINE</span> <span class="nt">LOADED</span>
-</pre></div>
-</td></tr></table>
-
-<p>Hmmm, the Pygments syntax highlighting package used by my blog generator doesn't seem to grok MACRO-11; may have to
-do something about that...</p></div>
-    <hr />
-</div>
-
 <div class="pagination">
 <ul>
     <li class="prev"><a href="http://fritzm.github.io/author/fritz-mueller3.html">&larr; Previous</a></li>
@@ -516,6 +453,7 @@ do something about that...</p></div>
     <li class=""><a href="http://fritzm.github.io/author/fritz-mueller3.html">3</a></li>
     <li class="active"><a href="http://fritzm.github.io/author/fritz-mueller4.html">4</a></li>
     <li class=""><a href="http://fritzm.github.io/author/fritz-mueller5.html">5</a></li>
+    <li class=""><a href="http://fritzm.github.io/author/fritz-mueller6.html">6</a></li>
 
     <li class="next"><a href="http://fritzm.github.io/author/fritz-mueller5.html">Next &rarr;</a></li>
 
