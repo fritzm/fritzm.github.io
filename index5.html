@@ -90,8 +90,8 @@ Mate-n-Lok still in production.  Some of the connectors are out of production, b
 track down.</p>
 <p>Here are some pictures of the amassed wire of appropriate guages and colors, connectors, crimp pins, and the start of
 the harness build on the bench:</p>
-<p><a href="http://fritzm.github.io/images/pdp11/harness-parts.jpg"><img src='/images/pdp11/harness-parts_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/harness-bench.jpg"><img src='/images/pdp11/harness-bench_thumbnail_tall.jpg'/></a></p></div>
+<p><img src='/images/pdp11/harness-parts_thumbnail_tall.jpg' title='Wire, connectors, and crimp tool to get started on replacement power harness' onclick='pswipe("pdp11",22);'/>
+<img src='/images/pdp11/harness-bench_thumbnail_tall.jpg' title='Partially completed replacement power harness' onclick='pswipe("pdp11",23);'/></p></div>
     <hr />
 </div>
 
@@ -116,7 +116,7 @@ the core memory systems I have on hand.  It will also be nice to run with a full
 terminators, grant continuity cards, the MS11-L memory, a DL11 serial interface, and an M792-YB boostrap ROM.  I've gone
 ahead and slotted in the FPU in the first four slots, since the cleaned and refurbished CPU cabinet is probably the
 safest place to store them now.  Console cables are also installed:</p>
-<p><a href="http://fritzm.github.io/images/pdp11/boards-in-chassis-2.jpg"><img src='/images/pdp11/boards-in-chassis-2_thumbnail_tall.jpg'/></a></p>
+<p><img src='/images/pdp11/boards-in-chassis-2_thumbnail_tall.jpg' title='Backplane and expansion populated with CPU, MMU, FPU, bootstrap ROM, console serial, 256K RAM, grant continuity cards and terminators' onclick='pswipe("pdp11",19);'/></p>
 <p>The M792 ROM is an interesting bit, and probably worth a comment.  This is a 32-word diode-matrix ROM card.  The bits
 are physically laid out on the card (see pictures below); where there is a diode, there is a logical 1 bit and where
 there is the absence of a diode there is a logical 0 bit.  Typically the matrix would be loaded with a bootstrap program,
@@ -125,8 +125,8 @@ to save the operator from having to toggle it in from the console on each boot.<
 is a handwritten note attached from some engineer describing this.  The mod customizes the bootstrap to always load
 from an RK disk unit, to avoid having to toggle in the device address at boot.  I will probably revert this mod because
 I like having things in fairly stock/usual condition.</p>
-<p><a href="http://fritzm.github.io/images/pdp11/mr11-with-note.jpg"><img src='/images/pdp11/mr11-with-note_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/mr11-bare.jpg"><img src='/images/pdp11/mr11-bare_thumbnail_tall.jpg'/></a></p>
+<p><img src='/images/pdp11/mr11-with-note_thumbnail_tall.jpg' title='A modified M792-YB bootstrap ROM, with a vintage note attached' onclick='pswipe("pdp11",20);'/>
+<img src='/images/pdp11/mr11-bare_thumbnail_tall.jpg' title='M792-YB bootstrap ROM with note removed' onclick='pswipe("pdp11",21);'/></p>
 <p>For fun, here's the source listing of the stock bootstrap.  You can match the octal digits of the machine code against
 the diodes in the ROM above (low word addresses at the top of the matrix, and least-significant-bits on the left).</p>
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
@@ -202,14 +202,14 @@ oxidation and flakiness with the connectors to the chargen ROM daughter card (I 
 of VT52s even back in the day).  A little more difficult to track down were some flaky solder joints around the clock
 chip.  But, everything else seems to be in pretty good shape and its working well now!  Here it is hooked up to a linux
 VM on my macbook, compiling some LSST code to generate some output as a test drive:</p>
-<p><a href="http://fritzm.github.io/images/pdp11/vt52.jpg"><img src='/images/pdp11/vt52_thumbnail_tall.jpg'/></a></p>
+<p><img src='/images/pdp11/vt52_thumbnail_tall.jpg' title='VT52 hooked up to a Linux VM for a test drive' onclick='pswipe("pdp11",17);'/></p>
 <p>Man, seeing that funky font again, with its non-descending-descenders, is really great!  Surprisingly, it doesn't seem
 to be available in digital format anywhere, unlike the later VT100 fonts, etc.  Try as I might, I couldn't seem to find
 the chargen ROM listing in any of the DEC documentation archives, either.</p>
 <p>Well, I do have a Digilent FPGA eval card and some level conversion chips laying around, so as a holiday hack project
 I put together a quick ROM scanner in Verlog, interfaced it to the VT52 chargen on a breadboard, and scanned out the
 contents.  Here's a picture of the scanner in action, and the produced output:</p>
-<p><a href="http://fritzm.github.io/images/pdp11/rom-scanner.jpg"><img src='/images/pdp11/rom-scanner_thumbnail_tall.jpg'/></a></p>
+<p><img src='/images/pdp11/rom-scanner_thumbnail_tall.jpg' title='Homemade FPGA ROM scanner used to read out the VT52 character generator ROM' onclick='pswipe("pdp11",18);'/></p>
 <p>The yellow-ish board on the right is the VT52 chargen.  The Verilog source for the scanner, the scanned data, and some
 preliminary attempts to convert the data to a few modern font formats are available on my github over at
 <a href="https://github.com/fritzm/vt52">https://github.com/fritzm/vt52</a>.  I need to learn some more about font formats to make some better font files; if I do
@@ -234,10 +234,10 @@ by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fr
 <p>One kind of interesting thing: the logic boards were stored vertically for several decades, and on some of the cards with plastic ribbon-cable connectors the plastic seems to have flaked and shed and fallen down the boards.  The flakey substance then grew some impressive crystals between some of the solder traces.  Scrubbed these out with some anhydrous IPA.</p>
 <p>A tip copied from a fellow restorer: Alconox detergent for removing grime from various plastic components.  Parts soaked overnight come out looking nearly new (here you can see the cleaned plastic card guides).</p>
 <p>Also pictured here are the characteristic bloody knuckles that are obtained whenever wrestling with PDP backplanes, logic cards, and terminators in close confines.  That really takes you back...</p>
-<p><a href="http://fritzm.github.io/images/pdp11/boards-in-chassis.jpg"><img src='/images/pdp11/boards-in-chassis_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/board-with-crystals.jpg"><img src='/images/pdp11/board-with-crystals_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/crystals.jpg"><img src='/images/pdp11/crystals_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/knuckles.jpg"><img src='/images/pdp11/knuckles_thumbnail_tall.jpg'/></a></p></div>
+<p><img src='/images/pdp11/boards-in-chassis_thumbnail_tall.jpg' title='CPU and MMU logic installed.  Empty slots on the right are for the FPU.' onclick='pswipe("pdp11",13);'/>
+<img src='/images/pdp11/board-with-crystals_thumbnail_tall.jpg' title='Logic board with crystals after several decades of storage' onclick='pswipe("pdp11",14);'/>
+<img src='/images/pdp11/crystals_thumbnail_tall.jpg' title='Closeup of crystals on logic board' onclick='pswipe("pdp11",15);'/>
+<img src='/images/pdp11/knuckles_thumbnail_tall.jpg' title='The characteristic bloody knuckles that are obtained whenever wrestling with PDP backplanes, logic cards, and terminators in close confines' onclick='pswipe("pdp11",16);'/></p></div>
     <hr />
 </div>
 
@@ -257,8 +257,8 @@ by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fr
     <div><p>The H742 supplies are now back together, mounted in the cabinet, and wired through to the 861.  I've powered them up and run them for minutes at a time (without any DC regulator loads) and there have been no surprise detonations...</p>
 <p>The repainted cabinet side door has also been remounted.</p>
 <p>Spent some time on the front panel as well.  Removed the tubular lock and took a trip to the local locksmith to have a new key made up.  Replaced all the incandescent indicator lamps with the closest modern equivalent.  Panel is now remounted and it's starting to look like a real '11!</p>
-<p><a href="http://fritzm.github.io/images/pdp11/742s-mounted.jpg"><img src='/images/pdp11/742s-mounted_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/front-panel.jpg"><img src='/images/pdp11/front-panel_thumbnail_tall.jpg'/></a></p></div>
+<p><img src='/images/pdp11/742s-mounted_thumbnail_tall.jpg' title='H742s and CPU cabinet remounted' onclick='pswipe("pdp11",11);'/>
+<img src='/images/pdp11/front-panel_thumbnail_tall.jpg' title='Front panel remounted -- starting to look like a real PDP-11!' onclick='pswipe("pdp11",12);'/></p></div>
     <hr />
 </div>
 
@@ -277,8 +277,8 @@ by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fr
 
     <div><p>Spent a lot of time over a couple weekends cleaning and reconditioning all the muffin cooling fans for the CPU cabinet and power supplies.  As you can see in the photo below, there are a lot of these!  All reassembled now, and wired along with the back-of-cabinet power distribution board.  Also did a clean on the big box fan at the top of the rack, not seen here.</p>
 <p>I have also completely torn down the H742s to give them a thorough clean, touch up a few last corrosion spots, and replace the failing neon indicators.</p>
-<p><a href="http://fritzm.github.io/images/pdp11/chassis-with-fans.jpg"><img src='/images/pdp11/chassis-with-fans_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/742-rebuild.jpg"><img src='/images/pdp11/742-rebuild_thumbnail_tall.jpg'/></a></p></div>
+<p><img src='/images/pdp11/chassis-with-fans_thumbnail_tall.jpg' title='CPU cabinet with restored cooling fans' onclick='pswipe("pdp11",9);'/>
+<img src='/images/pdp11/742-rebuild_thumbnail_tall.jpg' title='Deeper into the H742s for cleaning, sanding, and painting' onclick='pswipe("pdp11",10);'/></p></div>
     <hr />
 </div>
 
@@ -296,7 +296,7 @@ by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fr
     </div>
 
     <div><p>Found a little time to clean up and go through the power control boards for the H742 supplies.  They are looking pretty good.  Even the big electrolytics seem fine on first look.  These things were built with very high quality components, and they really seem to last and last.</p>
-<p><a href="http://fritzm.github.io/images/pdp11/pwr-ctrls.jpg"><img src='/images/pdp11/pwr-ctrls_thumbnail_tall.jpg'/></a></p></div>
+<p><img src='/images/pdp11/pwr-ctrls_thumbnail_tall.jpg' title='H742 power controller boards' onclick='pswipe("pdp11",8);'/></p></div>
     <hr />
 </div>
 
@@ -315,9 +315,9 @@ by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fr
 
     <div><p>Had a little more time to work on the PDP-11 this weekend.  Mostly going after some corrosion on the CPU cabinet and H742 power supplies.  Tore these down, sanded down the corroded bits, then hit with a satin finish Rustoleum rattle-can which dries to a reasonable approximation of the original powder-coat.</p>
 <p>Neon indicators on the H742s are dim and flickery, so ordered some replacements for these, too.</p>
-<p><a href="http://fritzm.github.io/images/pdp11/h742-teardown.jpg"><img src='/images/pdp11/h742-teardown_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/h742-corrosion.jpg"><img src='/images/pdp11/h742-corrosion_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/cpu-cabinet.jpg"><img src='/images/pdp11/cpu-cabinet_thumbnail_tall.jpg'/></a></p></div>
+<p><img src='/images/pdp11/h742-teardown_thumbnail_tall.jpg' title='Tearing down the H742 power supplies' onclick='pswipe("pdp11",5);'/>
+<img src='/images/pdp11/h742-corrosion_thumbnail_tall.jpg' title='Corrosion on part of an H742 chassis, to be sanded and painted' onclick='pswipe("pdp11",6);'/>
+<img src='/images/pdp11/cpu-cabinet_thumbnail_tall.jpg' title='CPU cabinet getting some touch-up paint after sanding corroded spots' onclick='pswipe("pdp11",7);'/></p></div>
     <hr />
 </div>
 
@@ -335,7 +335,7 @@ by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fr
     </div>
 
     <div><p>Well, might as well start at the beginning with the AC power system, so here's the 861 power control.  In very good shape for some 40 year old kit!  The neon indicator lamps have gone, so I sourced the modern equivalent and put them on order.  Everything else is tight and clean:</p>
-<p><a href="http://fritzm.github.io/images/pdp11/861.jpg"><img src='/images/pdp11/861_thumbnail_tall.jpg'/></a></p></div>
+<p><img src='/images/pdp11/861_thumbnail_tall.jpg' title='H861 AC power controller' onclick='pswipe("pdp11",4);'/></p></div>
     <hr />
 </div>
 
@@ -358,10 +358,10 @@ by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fr
 <p>After a couple of years in CA, I happened on a decomissioned two-rack 11/40 system at Stanford, essentially free for the effort of hauling.  This had most of the missing cabinetry, power supplies, and peripherals needed to reconstruct the 11/45!  So I procurred this and added it to a growing west coast equipment stash.  And then real-life set in -- job changes, house moves, raising a kid...  Through all of that I held on to all the parts, vowing to "get to it someday".  I would pick through the stuff from time to time over the years, but never had the time to take the project very far.</p>
 <p>Well, now "someday" is here!  The kid is off to college and I've moved house once again, but this time I reserved some working space for the project and pulled all the parts so they are together and accessible.  So here we go...</p>
 <p>Here are a some pics from the first weekend: the two H960 racks that are the bones of the whole thing, some glamour shots of the processor backplane and the RK11-C disk controller, and my buddy Chris helping to remount the RK05 drives on their rails temporarily to keep them off the floor and out of harm's way:</p>
-<p><a href="http://fritzm.github.io/images/pdp11/racks.jpg"><img src='/images/pdp11/racks_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/kb11a-backplane.jpg"><img src='/images/pdp11/kb11a-backplane_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/rk11c.jpg"><img src='/images/pdp11/rk11c_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/rk05-help.png"><img src='/images/pdp11/rk05-help_thumbnail_tall.png'/></a></p></div>
+<p><img src='/images/pdp11/racks_thumbnail_tall.jpg' title='H960 racks: the backbones' onclick='pswipe("pdp11",0);'/>
+<img src='/images/pdp11/kb11a-backplane_thumbnail_tall.jpg' title='KB11-A CPU backplane' onclick='pswipe("pdp11",1);'/>
+<img src='/images/pdp11/rk11c_thumbnail_tall.jpg' title='RK11-C disk controller backplane' onclick='pswipe("pdp11",2);'/>
+<img src='/images/pdp11/rk05-help_thumbnail_tall.png' title='Help getting the RK05 drives off the floor -- thanks, Chris!' onclick='pswipe("pdp11",3);'/></p></div>
     <hr />
 </div>
 

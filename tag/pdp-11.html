@@ -91,9 +91,9 @@ drive the key select decoders.  Key closure on the back of the module was interm
 the entire keyboard PCB seemed to be affecting it.  Replaced/reflowed the solder on the back of the key
 switch and that seems to have fixed it.</p>
 <p>Back together, working well now.  Test drove it for a while under RT-11...</p>
-<p><a href="http://fritzm.github.io/images/pdp11/vt52-guts.jpg"><img src='/images/pdp11/vt52-guts_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/vt52-keys.jpg"><img src='/images/pdp11/vt52-keys_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/rt11-adventure.jpg"><img src='/images/pdp11/rt11-adventure_thumbnail_tall.jpg'/></a></p></div>
+<p><img src='/images/pdp11/vt52-guts_thumbnail_tall.jpg' title='VT52 with logic boards and keyboard removed' onclick='pswipe("pdp11",65);'/>
+<img src='/images/pdp11/vt52-keys_thumbnail_tall.jpg' title='VT52 keyboard under test, powered from bench supply' onclick='pswipe("pdp11",66);'/>
+<img src='/images/pdp11/rt11-adventure_thumbnail_tall.jpg' title='VT52 test drive with RT-11 Adventure' onclick='pswipe("pdp11",67);'/></p></div>
     <hr />
 </div>
 
@@ -221,9 +221,9 @@ the authors for permission first.</p>
 </tr></tbody>
 </table>
 
-<p><a href="http://fritzm.github.io/images/pdp11/rk05-packs.jpg"><img src='/images/pdp11/rk05-packs_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/head-crashes.jpg"><img src='/images/pdp11/head-crashes_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/gravity-pack.jpg"><img src='/images/pdp11/gravity-pack_thumbnail_tall.jpg'/></a></p></div>
+<p><img src='/images/pdp11/rk05-packs_thumbnail_tall.jpg' title='Some of the RK05 packs obtained in a surplus auction downstream of Stanford&#39;s Hansen Experimental Physics Lab' onclick='pswipe("pdp11",62);'/>
+<img src='/images/pdp11/head-crashes_thumbnail_tall.jpg' title='An RK05 disk platter with obvious head crashes' onclick='pswipe("pdp11",63);'/>
+<img src='/images/pdp11/gravity-pack_thumbnail_tall.jpg' title='RK05 pack spinning in drive with heads loaded' onclick='pswipe("pdp11",64);'/></p></div>
     <hr />
 </div>
 
@@ -250,7 +250,7 @@ Very satisfying!</p>
 <p>Next up will be to clean and inspect the dozen or so RK05 packs that I have on hand, and retrieve and
 archive whatever content I can.  That should let me clear off a few packs to create some space to
 experiment with some additional operating systems, including 6th Edition Unix.</p>
-<p><a href="http://fritzm.github.io/images/pdp11/rt11-boots.jpg"><img src='/images/pdp11/rt11-boots_thumbnail_tall.jpg'/></a></p></div>
+<p><img src='/images/pdp11/rt11-boots_thumbnail_tall.jpg' title='At long last: RT-11 boots from an RK05 pack!' onclick='pswipe("pdp11",61);'/></p></div>
     <hr />
 </div>
 
@@ -372,8 +372,8 @@ was at it, and ... everything 100% after that.  Wow, really should have just tri
 time, and as a byproduct after I fixed my M9301 I got 100% agreement with Noel's listing.  So I think that
 listing can be considered authoritative now; good enough to generate replacement PROMs should anybody
 ever need to do so.</p>
-<p><a href="http://fritzm.github.io/images/pdp11/M9301.jpg"><img src='/images/pdp11/M9301_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/M792-YB.jpg"><img src='/images/pdp11/M792-YB_thumbnail_tall.jpg'/></a>
+<p><img src='/images/pdp11/M9301_thumbnail_tall.jpg' title='M9301-YB bootstrap ROM' onclick='pswipe("pdp11",59);'/>
+<img src='/images/pdp11/M792-YB_thumbnail_tall.jpg' title='M792-YB diode-matrix bootstrap ROM' onclick='pswipe("pdp11",60);'/>
 <span class="videobox">
                 <iframe width="328" height="200"
                     src='https://www.youtube.com/embed/E7MAFjZVZ2Y?rel=0'
@@ -397,7 +397,7 @@ by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fr
 
     </div>
 
-    <div><p>Okay, back from travel and picked up the thread on the RK11 interrupt problem this weekend. Put the KM11 in 
+    <div><p>Okay, back from travel and picked up the thread on the RK11 interrupt problem this weekend. Put the KM11 in
 the first slot on the RK11 which allows to monitor interrupt request. An interrupt can be very easily
 generated from the front panel by writing bit 6 (Interrupt on Done Enable) on in the RKCS register at 777404.
 Did this, and noticed that interrupt request logic on the RK11 went active, but never cleared.</p>
@@ -409,8 +409,8 @@ peripherals and terminated the Unibus directly on the CPU backplane, and this wa
 was problem with BG5 in the CPU itself.</p>
 <p>Threw the CPU UBC card out on extenders, and took a look at BG5 logic with a logic probe.  The 8881 driver
 for this signal (E42 on sheet UBCD of the engineering drawings) had failed -- pins 8 and 9 were high, but pin
-10, BG5, was not being driven low. Pulled this chip, put in a socket and a replacement, and the BG was then 
-working properly.  That's three repairs total to this poor old UBC card so far!  Was able to then verify from 
+10, BG5, was not being driven low. Pulled this chip, put in a socket and a replacement, and the BG was then
+working properly.  That's three repairs total to this poor old UBC card so far!  Was able to then verify from
 the front panel that the processor fielded interrupt 220 in response to
 setting the IDE bit in RKCS. Progress!</p>
 <p>Back to the MAINDEC ZRKK -- interrupt test now passes, and the diagnostic continues. BUT... error output now
@@ -418,7 +418,7 @@ on test octal 57, which is working out the "hardware pole" feature of the contro
 be due to the RK11 being configured for two RK05 drives, but I have restored/connected only the first.
 Rejumpered the G740 flipchip for a single drive, but this didn't seem to help.  Hmmm, will need to read the
 diagnostic source to see what it is trying to do...</p>
-<p><a href="http://fritzm.github.io/images/pdp11/G740.jpg"><img src='/images/pdp11/G740_thumbnail_tall.jpg'/></a></p></div>
+<p><img src='/images/pdp11/G740_thumbnail_tall.jpg' title='G740 Disk Selection flipchip, jumpered for two drives' onclick='pswipe("pdp11",58);'/></p></div>
     <hr />
 </div>
 
@@ -533,7 +533,7 @@ case).  After installing the jumpers, NPG signaling looked solid.</p>
 But an RKDP pack <em>successfully booted!</em>  Wow, that feels pretty good after about two years of working
 seriously on this restoration.  :-)</p>
 <p>Going to stop here on a high note, and pick up trying to get a good RT-11 boot next time.</p>
-<p><a href="http://fritzm.github.io/images/pdp11/rkdp-boot.jpg"><img src='/images/pdp11/rkdp-boot_thumbnail_tall.jpg'/></a></p></div>
+<p><img src='/images/pdp11/rkdp-boot_thumbnail_tall.jpg' title='First boot off disk -- RKDP diagnostics pack!' onclick='pswipe("pdp11",57);'/></p></div>
     <hr />
 </div>
 
@@ -634,9 +634,9 @@ voyage through my box of spares, swapping in cables looking for one that works r
 need work on some sort of modern replacement, since original BC11-A in good shape are getting hard to find.
 It will be sad if at the end of this journey I can't boot the machine for mere lack of a good cable between
 the drives and controller!</p>
-<p><a href="http://fritzm.github.io/images/pdp11/rk05-cartridge-foam.jpg"><img src='/images/pdp11/rk05-cartridge-foam_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/rk05-running.jpg"><img src='/images/pdp11/rk05-running_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/BC11-woes.jpg"><img src='/images/pdp11/BC11-woes_thumbnail_tall.jpg'/></a></p></div>
+<p><img src='/images/pdp11/rk05-cartridge-foam_thumbnail_tall.jpg' title='Foam inside the hub of an RK05 pack -- could be bad news if this is decaying like other DEC foam...' onclick='pswipe("pdp11",54);'/>
+<img src='/images/pdp11/rk05-running_thumbnail_tall.jpg' title='RK05 running offline from controller; pack spinning and heads loaded' onclick='pswipe("pdp11",55);'/>
+<img src='/images/pdp11/BC11-woes_thumbnail_tall.jpg' title='A box of BC11-A cables to be sorted through...' onclick='pswipe("pdp11",56);'/></p></div>
     <hr />
 </div>
 

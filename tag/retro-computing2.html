@@ -82,38 +82,38 @@ by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fr
     </div>
 
     <div><p>Started going through the two RK05 drives.  Lots of work to remove and clean up all the decaying foam.
-Replaced the emergency head retract NiCd battery packs on both units.  They were both slightly leaky, but 
+Replaced the emergency head retract NiCd battery packs on both units.  They were both slightly leaky, but
 luckily neither had made a big mess.</p>
 <p>Air filter elbows are intact on both units, and still slightly flexible, though they do have a white
 powdery coating where the material is degenerating.  Cleaned up okay with some warm soapy water and a
 toothbrush.  I'm sure these will continue to decompose/decay, however, and in the long term having loose
 particulates develop inside the elbow seems a certain recipe for a head crash.  I may explore the possibility
 of 3D printing some sort of modern replacement for these.</p>
-<p>Heads on the first unit look to be in decent shape, but some oxide buildup.  In the second unit, the 
+<p>Heads on the first unit look to be in decent shape, but some oxide buildup.  In the second unit, the
 carriage was not parked, so the heads were in contact with each other.  They don't look damaged from a
 preliminary inspection, but this head pair has considerably more oxide.  Before and after cleaning shots of
 the upper and lower heads on the first unit below.</p>
-<p>Pulled the H743 power supplies and reformed the larger electrolytics.  After this, both power supplies 
-powered up fine, though the -15V regulator on the first unit was trimmed very hot (-23 or so).  Trimmed this 
-down, put the supply back in the first unit and powered up.  Under load, the -15V regulator drooped to -8, 
+<p>Pulled the H743 power supplies and reformed the larger electrolytics.  After this, both power supplies
+powered up fine, though the -15V regulator on the first unit was trimmed very hot (-23 or so).  Trimmed this
+down, put the supply back in the first unit and powered up.  Under load, the -15V regulator drooped to -8,
 and a pico fuse on the +15V supply blew immediately.</p>
 <p>Swapped in the -15V regulator from the second supply, which was not trimmed hot, and replaced the blown
 pico fuse.  Now under load the supply held without drooping, and the +15V pico did not reblow.  So looks
 like a bad -15V regulator.  Put a few 723 regulator ICs on order in advance of debugging this.</p>
 <p>After getting the power supply in the first unit up and going, blower powers on, power indicator lights, and
 after about three seconds the door safety relay clunks and load indicator lights. Write protect indicator
-toggles with panel switch presses per expectation.  If the cartridge-on switch is depressed manually and the 
+toggles with panel switch presses per expectation.  If the cartridge-on switch is depressed manually and the
 load toggle is hit, the spindle motor spins up and runs smoothly.</p>
 <p>There are some significant abrasions on the lower panel of the first unit under both the spindle and spindle
 motor axles.  It looks like a spacer button which is intended to hold off the lower panel has decayed; will
 need to improvise some sort of replacement.</p>
-<p><a href="http://fritzm.github.io/images/pdp11/rk05.jpg"><img src='/images/pdp11/rk05_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/h743.jpg"><img src='/images/pdp11/h743_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/rk05-lower-before.jpg"><img src='/images/pdp11/rk05-lower-before_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/rk05-lower-after.jpg"><img src='/images/pdp11/rk05-lower-after_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/rk05-upper-before.jpg"><img src='/images/pdp11/rk05-upper-before_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/rk05-upper-after.jpg"><img src='/images/pdp11/rk05-upper-after_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/lower-cover-abrasions.jpg"><img src='/images/pdp11/lower-cover-abrasions_thumbnail_tall.jpg'/></a></p></div>
+<p><img src='/images/pdp11/rk05_thumbnail_tall.jpg' title='RK05 drive internals' onclick='pswipe("pdp11",47);'/>
+<img src='/images/pdp11/h743_thumbnail_tall.jpg' title='H743 power supply pulled and on bench' onclick='pswipe("pdp11",48);'/>
+<img src='/images/pdp11/rk05-lower-before_thumbnail_tall.jpg' title='First RK05 lower head before cleaning' onclick='pswipe("pdp11",49);'/>
+<img src='/images/pdp11/rk05-lower-after_thumbnail_tall.jpg' title='First RK05 lower head after cleaning' onclick='pswipe("pdp11",50);'/>
+<img src='/images/pdp11/rk05-upper-before_thumbnail_tall.jpg' title='First RK05 upper head before cleaning' onclick='pswipe("pdp11",51);'/>
+<img src='/images/pdp11/rk05-upper-after_thumbnail_tall.jpg' title='First RK05 upder head after cleaning' onclick='pswipe("pdp11",52);'/>
+<img src='/images/pdp11/lower-cover-abrasions_thumbnail_tall.jpg' title='Abrasions on first RK05 lower cover, from contact with spindle motor shafts' onclick='pswipe("pdp11",53);'/></p></div>
     <hr />
 </div>
 
@@ -267,7 +267,7 @@ by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fr
     <div><p>Finished up the cleanup and rebuild of the H720E for the RK11-C controller: reformed the big electrolytics
 over a couple of days, and swapped out the tantalum filters on the regulator board (one of which had started
 to leak) for some replacements.  Tantalums of the correct form and value are crazy expensive, and since these
-caps (C11-C17, C23) are banked resevoirs on the regulated rails their exact values are not critical.  Went 
+caps (C11-C17, C23) are banked resevoirs on the regulated rails their exact values are not critical.  Went
 with some aluminum electrolytics instead that worked out to a little more aggregate capacity on each bank.</p>
 <p>My H720E is missing its top cover plate, so there was about 40 years worth of accumulated dust in there -- a
 lot to clean up!  I'm not sure if the cover was customarily left off to facilitate cooling of the regulator
@@ -275,11 +275,11 @@ board, or if it is just genuinely missing.  Will see if the forums/lists have an
 hard to fab a replacement if it is really supposed to be there.</p>
 <p>Routed the inter-cabinet power control wiring, racked the RK11, and cabled everything up.  This included
 moving the M9301 bootstrap terminator over to slot 0, then rummaging through a box of BC11 bus cables for one
-that was both long enough and in decent enough shape to connect the CPU and the RK11.  Some of these bus 
+that was both long enough and in decent enough shape to connect the CPU and the RK11.  Some of these bus
 cables had period-correct labeling (see picture below :-))  Got a good tip off the cctalk mailing list
 (thanks, Jerry!) to drape the BC11 with a service loop from the top-rear of the CPU rack, thus avoiding any
 entanglement with the rack slides while moving the CPU cabinet in and out.</p>
-<p>A 2000pF cap that was flown over the RK11 backplane (+5V to DR BUS DC LO L) had broken free of its pin 
+<p>A 2000pF cap that was flown over the RK11 backplane (+5V to DR BUS DC LO L) had broken free of its pin
 connectors; jury-rigged this with some arduino jumpers I had lying around, until I can track down some
 appropriate replacement connectors.</p>
 <p>Good news is that after this the machine still booted the M9301 bootstrap, and was still able to run and
@@ -292,7 +292,7 @@ out at the RK11.</p>
 </pre></div>
 
 
-<p>This is the RKDB register, implemented two M203 R/S flip-flop modules in slots A21 and B21 (see sheet
+<p>This is the RKDB register, implemented by two M203 R/S flip-flop modules in slots A21 and B21 (see sheet
 RK11-C-10 in the RK11-C engineering drawings).  Swapped these, and the stuck bit moved to the other half of
 of the register, so looks like failed gate.  Pulled, socketed, replaced, and diagnostic no longer reports
 any stuck bits.  Next diagnostic fail is:</p>
@@ -302,11 +302,11 @@ any stuck bits.  Next diagnostic fail is:</p>
 
 <p>This is test #21 of the diagnostic, testing controller reset.  Will need to do some reading up on the design
 of the controller and the diagnostic source to understand how to troubleshoot it further.  All for now!</p>
-<p><a href="http://fritzm.github.io/images/pdp11/720e-caps.jpg"><img src='/images/pdp11/720e-caps_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/rk11-racked.jpg"><img src='/images/pdp11/rk11-racked_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/bc11-good.jpg"><img src='/images/pdp11/bc11-good_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/rk11-back.jpg"><img src='/images/pdp11/rk11-back_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/m203.jpg"><img src='/images/pdp11/m203_thumbnail_tall.jpg'/></a></p></div>
+<p><img src='/images/pdp11/720e-caps_thumbnail_tall.jpg' title='H720e regulator card with refreshed caps' onclick='pswipe("pdp11",42);'/>
+<img src='/images/pdp11/rk11-racked_thumbnail_tall.jpg' title='RK11-C controller installed in rack, with temporary jumper hack for flown cap' onclick='pswipe("pdp11",43);'/>
+<img src='/images/pdp11/bc11-good_thumbnail_tall.jpg' title='A BC11-A bus cable, with vintage label' onclick='pswipe("pdp11",44);'/>
+<img src='/images/pdp11/rk11-back_thumbnail_tall.jpg' title='RK11-C controller from the back, flipchips and cabling visible' onclick='pswipe("pdp11",45);'/>
+<img src='/images/pdp11/m203_thumbnail_tall.jpg' title='A failing M203, the cause of a stuck bit in RK11 register RKDB' onclick='pswipe("pdp11",46);'/></p></div>
     <hr />
 </div>
 
@@ -323,7 +323,7 @@ by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fr
 
     </div>
 
-    <div><p>Okay, after socketing in the replacement 74H10 and reseating a few boards, the output from the floating 
+    <div><p>Okay, after socketing in the replacement 74H10 and reseating a few boards, the output from the floating
 point diagnostic now looks correct:</p>
 <p><span style="font-size: x-small; font-family: monospace; white-space: pre; display: block; line-height: normal; font-weight: bold;">................ ................ ................ ................ .........11..... .........11..... .........11..... .........11.....
 ................ ................ ................ ................ ..........11.... ..........11.... ..........11.... ..........11....
@@ -383,7 +383,7 @@ point diagnostic now looks correct:</p>
 .......111...... ........11...... ........11...... ........11...... ................ ................ ................ ................
 .......1111..... .........11..... .........11..... .........11..... ................ ................ ................ ................
 .........11..... .........11..... .........11..... .........11..... ................ ................ ................ ................</span></p>
-<p>With this fix, <strong>the machine is now reliably passing the complete suite of CPU, MMU, and FPU diagnostics</strong> 
+<p>With this fix, <strong>the machine is now reliably passing the complete suite of CPU, MMU, and FPU diagnostics</strong>
 -- a real milestone!  I also loaded paper tape BASIC via PDP11GUI, swapped the console over to my VT100, and
 played around for a little bit.  Working well, and gratifying to see the machine actually running some
 software other than diagnostics.</p>
@@ -398,8 +398,8 @@ cabinet as well.</p>
 leakage through filter caps in the various power supplies that the GFCI has started to trip from time to time.
 Took a pause to rewire the box -- left two of the outlets GFCI protected for the washer/dryer, and rewired two
 as non-protected for use with the PDP-11.</p>
-<p><a href="http://fritzm.github.io/images/pdp11/cabinets.jpg"><img src='/images/pdp11/cabinets_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/basic.jpg"><img src='/images/pdp11/basic_thumbnail_tall.jpg'/></a></p></div>
+<p><img src='/images/pdp11/cabinets_thumbnail_tall.jpg' title='Cabinet side panels and decorative top panels cleaned and installed' onclick='pswipe("pdp11",40);'/>
+<img src='/images/pdp11/basic_thumbnail_tall.jpg' title='Running papertape BASIC, loaded via PDP11GUI' onclick='pswipe("pdp11",41);'/></p></div>
     <hr />
 </div>
 
@@ -1006,8 +1006,8 @@ unit lost its top cover plate somewhere over the years (I'll have to build some 
 <p>There are a couple of 22,000 mFD 50v electrolytic caps here that I'll try reforming before hitting them at full power,
 since they've been sitting idle for upwards of 30yrs!  Also, one obviously leaking 330 mfd axial on regulator board, so
 I'll replace this and all its identical twins.  Parts on order...</p>
-<p><a href="http://fritzm.github.io/images/pdp11/h720e-breakdown.jpg"><img src='/images/pdp11/h720e-breakdown_thumbnail_tall.jpg'/></a>
-<a href="http://fritzm.github.io/images/pdp11/h720e-leaking-cap.jpg"><img src='/images/pdp11/h720e-leaking-cap_thumbnail_tall.jpg'/></a></p></div>
+<p><img src='/images/pdp11/h720e-breakdown_thumbnail_tall.jpg' title='Tearing down the H720E power supply for the RK11 storage controller' onclick='pswipe("pdp11",38);'/>
+<img src='/images/pdp11/h720e-leaking-cap_thumbnail_tall.jpg' title='Leaking tantalum cap on H720e regulator board' onclick='pswipe("pdp11",39);'/></p></div>
     <hr />
 </div>
 
