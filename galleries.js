@@ -68,5 +68,11 @@ var galleries = {
                             {src:"/images/pdp11/vt52-guts.jpg", w:4032, h:3024, title:"VT52 with logic boards and keyboard removed"},
                             {src:"/images/pdp11/vt52-keys.jpg", w:4032, h:3024, title:"VT52 keyboard under test, powered from bench supply"},
                             {src:"/images/pdp11/rt11-adventure.jpg", w:3024, h:3024, title:"VT52 test drive with RT-11 Adventure"},
+                            {src:"/images/pdp11/la30-cap.jpg", w:3024, h:3024, title:"PCB-containing cap from ferro-resonant supply; to be replaced"},
+                            {src:"/images/pdp11/la30-supply.jpg", w:4032, h:3024, title:"LA30 H735 supply, pulled to bench for clean/refurb"},
+                            {src:"/images/pdp11/la30-cards.jpg", w:3024, h:3024, title:"LA30 internal controller card cage"},
+                            {src:"/images/pdp11/la30-head.jpg", w:3024, h:3024, title:"LA30 print head"},
+                            {src:"/images/pdp11/la30-carriage.jpg", w:4032, h:3024, title:"LA30 carriage, disassembled for clean, repairs, and lube.  A mangled paper drag spring is visible on the print bar assembly."},
+                            {src:"/images/pdp11/la30-cleaned.jpg", w:4032, h:3024, title:"LA30 cleaned and reassembled"},
                     ],
     };
