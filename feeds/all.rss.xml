@@ -1,5 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0"><channel><title>fritzm.github.io</title><link>http://fritzm.github.io/</link><description></description><lastBuildDate>Sat, 25 Nov 2017 00:00:00 -0800</lastBuildDate><item><title>PDP-11/45: LA30 repair</title><link>http://fritzm.github.io/la30-repair.html</link><description>&lt;p&gt;Once again its been a little while since I've had to work on PDP-11 stuff or put any updates here; the &lt;a href="https://www.lsst.org"&gt;day
+<rss version="2.0"><channel><title>fritzm.github.io</title><link>http://fritzm.github.io/</link><description></description><lastBuildDate>Sun, 26 Nov 2017 00:00:00 -0800</lastBuildDate><item><title>PDP-11/45: LA30 repair II</title><link>http://fritzm.github.io/la30-2.html</link><description>&lt;p&gt;Okay, first thing to debug today is the ready light.  This is lit by RDY LITE L, pin A16D2 (lower right of
+sheet M7721-0-1 in the LA30 engineering drawings).  Logic probe showed this was correctly asserted low. Pulled
+the lamp and checked it with bench supply, and it checked fine.  Verified +10 and ground at the lamp socket as
+well, so why isn't it lit?  Turns out it is polarized, and the socket is soldered in backwards (?!). Corrected
+the socket, and ready light is working.&lt;/p&gt;
+&lt;p&gt;Noticed that ribbon is stalling occasionally.  Ribbon tension seems to be overcoming the clutch on the take-up
+side.  It seems tensioning drag on the inactive side is too high.  Not sure what to do about this one yet;
+there is not much adjustable within the clutches, and the service manual only recommends replacement if they
+are out of spec (yeah, good luck finding one!)&lt;/p&gt;
+&lt;p&gt;Repeated the experiment with loopback jumper (A15R2 to A15C2).  Turns out I had miscounted backplane pins the
+first time. With jumper placed correctly, I am now get a printing response to the keyboard.  Not quite right,
+but definite progress:&lt;/p&gt;
+&lt;p&gt;&lt;img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/la30-first-print.jpg"
+title="LA30 first print attempt"/&gt;&lt;/p&gt;
+&lt;p&gt;Here I had typed &lt;code&gt;:;L&lt;/code&gt;, and then some other letters.  You can see evidence of correct pins firing for the
+first three characters, though either head movement or pin timing is off.  Letter spacing appears more or less
+correct for 80 characters per line.&lt;/p&gt;
+&lt;p&gt;Okay, hooked up the logic analyzer, and started to take a look at the character generator clocking to see if
+all the the columns are being clocked out correctly.  The logic analyzer shows a malfunction consistent with
+the print behavior: character column clocking resets after two columns rather than proceeding through all
+five:&lt;/p&gt;
+&lt;p&gt;&lt;img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/la30-chargen-clock-
+trace.jpg" title="LA30 character generator clocking trace.  Resets incorrectly after only two of five
+character columns"/&gt;&lt;/p&gt;
+&lt;p&gt;This signaling is mediated by a ripple counter on the M7724 character generator card:&lt;/p&gt;
+&lt;p&gt;&lt;img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/la30-chargen-schem.jpg"
+title="LA30 character generator clocking partial schematic."/&gt;&lt;/p&gt;
+&lt;p&gt;So it looks like one or more of these 7474 quad flops has failed.  I note on my chargen board that these are
+early 70's Nat Semi parts; Mattis had a very similar issue (search "7474" on &lt;a href="http://www.datormuseum.se/computers/digital-equipment-corporation/pdp-11-04"&gt;this
+page&lt;/a&gt;) on his LA30 chargen with
+the same parts.&lt;/p&gt;
+&lt;p&gt;All I have time for this weekend; next time I'll get the chip clip on these for a closer look, then pull and
+replace the baddies.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Fritz Mueller</dc:creator><pubDate>Sun, 26 Nov 2017 00:00:00 -0800</pubDate><guid isPermaLink="false">tag:fritzm.github.io,2017-11-26:/la30-2.html</guid><category>Retro-Computing</category><category>PDP-11</category></item><item><title>PDP-11/45: LA30 repair</title><link>http://fritzm.github.io/la30-repair.html</link><description>&lt;p&gt;Once again its been a little while since I've had to work on PDP-11 stuff or put any updates here; the &lt;a href="https://www.lsst.org"&gt;day
 gig&lt;/a&gt; has been pretty intense lately.&lt;/p&gt;
 &lt;p&gt;Recent efforts have been focused on restoration of an LA30 printing terminal.  This was really filthy
 (including a mouse nest, yuck) so in addition to the usual electronics work it had to be completely

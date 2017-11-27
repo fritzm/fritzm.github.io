@@ -68,66 +68,67 @@
     <div class="row">
 
         <div class="span9">
-
-
-<div class='article'>
-    <div class="content-title">
-        <a href="http://fritzm.github.io/861.html"><h1>PDP-11/45: 861 AC power control</h1></a>
-Sun 29 March 2015
+    <div class='article'>
+        <div class="content-title">
+            <h1>PDP-11/45: LA30 repair II</h1>
+Sun 26 November 2017
 
 by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
  
 
 
+        </div>
+	
+        <div><p>Okay, first thing to debug today is the ready light.  This is lit by RDY LITE L, pin A16D2 (lower right of
+sheet M7721-0-1 in the LA30 engineering drawings).  Logic probe showed this was correctly asserted low. Pulled
+the lamp and checked it with bench supply, and it checked fine.  Verified +10 and ground at the lamp socket as
+well, so why isn't it lit?  Turns out it is polarized, and the socket is soldered in backwards (?!). Corrected
+the socket, and ready light is working.</p>
+<p>Noticed that ribbon is stalling occasionally.  Ribbon tension seems to be overcoming the clutch on the take-up
+side.  It seems tensioning drag on the inactive side is too high.  Not sure what to do about this one yet;
+there is not much adjustable within the clutches, and the service manual only recommends replacement if they
+are out of spec (yeah, good luck finding one!)</p>
+<p>Repeated the experiment with loopback jumper (A15R2 to A15C2).  Turns out I had miscounted backplane pins the
+first time. With jumper placed correctly, I am now get a printing response to the keyboard.  Not quite right,
+but definite progress:</p>
+<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/la30-first-print.jpg"
+title="LA30 first print attempt"/></p>
+<p>Here I had typed <code>:;L</code>, and then some other letters.  You can see evidence of correct pins firing for the
+first three characters, though either head movement or pin timing is off.  Letter spacing appears more or less
+correct for 80 characters per line.</p>
+<p>Okay, hooked up the logic analyzer, and started to take a look at the character generator clocking to see if
+all the the columns are being clocked out correctly.  The logic analyzer shows a malfunction consistent with
+the print behavior: character column clocking resets after two columns rather than proceeding through all
+five:</p>
+<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/la30-chargen-clock-
+trace.jpg" title="LA30 character generator clocking trace.  Resets incorrectly after only two of five
+character columns"/></p>
+<p>This signaling is mediated by a ripple counter on the M7724 character generator card:</p>
+<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/la30-chargen-schem.jpg"
+title="LA30 character generator clocking partial schematic."/></p>
+<p>So it looks like one or more of these 7474 quad flops has failed.  I note on my chargen board that these are
+early 70's Nat Semi parts; Mattis had a very similar issue (search "7474" on <a href="http://www.datormuseum.se/computers/digital-equipment-corporation/pdp-11-04">this
+page</a>) on his LA30 chargen with
+the same parts.</p>
+<p>All I have time for this weekend; next time I'll get the chip clip on these for a closer look, then pull and
+replace the baddies.</p></div>
+	
+        <hr>
+
+        <h2>Comments</h2>
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'fritzm'; 
+    var disqus_title = 'PDP-11/45: LA30 repair II';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
     </div>
-
-    <div><p>Well, might as well start at the beginning with the AC power system, so here's the 861 power control.  In very good shape for some 40 year old kit!  The neon indicator lamps have gone, so I sourced the modern equivalent and put them on order.  Everything else is tight and clean:</p>
-<p><img src='/images/pdp11/861_thumbnail_tall.jpg' title='H861 AC power controller' onclick='pswipe("pdp11",4);'/></p></div>
-    <hr />
-</div>
-
-
-
-<div class='article'>
-    <div class="content-title">
-        <a href="http://fritzm.github.io/begin-again.html"><h1>PDP-11/45: Begin Again</h1></a>
-Sun 15 March 2015
-
-by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
-    </div>
-
-    <div><p>Back in the mid/late '80s, when I was hanging around CMU, a computer club member introduced me to the club's nearly forgotten hardware lab.  It was still stuffed with remnants of the earlier time-sharing age, including two or three full-cabinet PDP-11 systems with names like "Banshee" and "Centaur".  I thought these were the coolest -- CPUs you could see inside, and hack with a soldering iron and a wire wrap gun.  Real front panels with lights and toggles, and machine language programming as a physical activity.  For a kid fascinated with computers, it was great.  You couldn't get closer to the metal; you could quite literally get your head inside these machines.</p>
-<p>I began spending off hours in the lab, puttering with the 11s and getting to know them.  Eventually, the club decided it was time to clean house and remove all of the older equipment.  Most stuff was scheduled to be hauled away to the dump, but I was welcome to anything I wanted to haul away myself in advance.  So I bothered some friends with a car, disassembled one of the 11/45s there ("Banshee" I believe) which seemed like the nicest thing, and hauled it off to my off-campus house.  There it resided in the basement with many other oddments for some years.</p>
-<p>Eventually, I ended up moving out to CA, and after some time the 11/45 CPU was disassembled and packed into moving boxes for the west coast as practically as possible, leaving all the bulkier parts behind.</p>
-<p>After a couple of years in CA, I happened on a decomissioned two-rack 11/40 system at Stanford, essentially free for the effort of hauling.  This had most of the missing cabinetry, power supplies, and peripherals needed to reconstruct the 11/45!  So I procurred this and added it to a growing west coast equipment stash.  And then real-life set in -- job changes, house moves, raising a kid...  Through all of that I held on to all the parts, vowing to "get to it someday".  I would pick through the stuff from time to time over the years, but never had the time to take the project very far.</p>
-<p>Well, now "someday" is here!  The kid is off to college and I've moved house once again, but this time I reserved some working space for the project and pulled all the parts so they are together and accessible.  So here we go...</p>
-<p>Here are a some pics from the first weekend: the two H960 racks that are the bones of the whole thing, some glamour shots of the processor backplane and the RK11-C disk controller, and my buddy Chris helping to remount the RK05 drives on their rails temporarily to keep them off the floor and out of harm's way:</p>
-<p><img src='/images/pdp11/racks_thumbnail_tall.jpg' title='H960 racks: the backbones' onclick='pswipe("pdp11",0);'/>
-<img src='/images/pdp11/kb11a-backplane_thumbnail_tall.jpg' title='KB11-A CPU backplane' onclick='pswipe("pdp11",1);'/>
-<img src='/images/pdp11/rk11c_thumbnail_tall.jpg' title='RK11-C disk controller backplane' onclick='pswipe("pdp11",2);'/>
-<img src='/images/pdp11/rk05-help_thumbnail_tall.png' title='Help getting the RK05 drives off the floor -- thanks, Chris!' onclick='pswipe("pdp11",3);'/></p></div>
-    <hr />
-</div>
-
-<div class="pagination">
-<ul>
-    <li class="prev"><a href="http://fritzm.github.io/tag/retro-computing5.html">&larr; Previous</a></li>
-
-    <li class=""><a href="http://fritzm.github.io/tag/retro-computing.html">1</a></li>
-    <li class=""><a href="http://fritzm.github.io/tag/retro-computing2.html">2</a></li>
-    <li class=""><a href="http://fritzm.github.io/tag/retro-computing3.html">3</a></li>
-    <li class=""><a href="http://fritzm.github.io/tag/retro-computing4.html">4</a></li>
-    <li class=""><a href="http://fritzm.github.io/tag/retro-computing5.html">5</a></li>
-    <li class="active"><a href="http://fritzm.github.io/tag/retro-computing6.html">6</a></li>
-
-    <li class="next disabled"><a href="#">&rarr; Next</a></li>
-
-</ul>
-</div>
-  
         </div>
 
         <div class="span3">
