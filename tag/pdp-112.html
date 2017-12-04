@@ -72,6 +72,42 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="http://fritzm.github.io/cpu-debug-6.html"><h1>PDP-11/45: CPU debug VI - RK11 NPRs and first disk boot!</h1></a>
+Sun 14 May 2017
+
+by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+    </div>
+
+    <div><p>Took a little of time to sort through BC11 cables to find a good one for drive interfacing, but in the end I
+found one that worked okay and got the seek tester code from the previous post working reliably.  At this
+point I mounted one of the recently cleaned RK05 packs, but found that the M9301 bootstrap would hang the bus
+on the first read operation.</p>
+<p>A little scoping around on the RK11-C showed that it was asserting NPR to the processor, but never receiving
+NPG.  A quick check of NPG continuity on the backplane showed a missing jumper on one slot of my DD11-D.
+Wrapped this on, verified NPG continuity all the way out to the RK11, but still no joy.  Turns out the CPU
+is not asserting NPG at all.</p>
+<p>Threw the CPU UBC card out on extenders and had a go at chasing though the NPG logic with a logic probe.
+Turns out to be a failed 8881 bus driver for NPG at the end of the line (E55 on KB11-A drawing UBCD). Pulled,
+socketed, replaced.</p>
+<p>After this, the CPU was asserting NPG, but the signaling still looked a little squirrelly.  Turns out that
+there are jumpers (W1-W5) on the M9301 bootstrap terminator that need to be installed to provide grant
+pull-ups when they are not otherwise provided internally by the processor (and the 11/45 is one such
+case).  After installing the jumpers, NPG signaling looked solid.</p>
+<p>Tried mounting a booting a few packs.  Packs marked as having RT-11 would run for a short while and then hang.
+But an RKDP pack <em>successfully booted!</em>  Wow, that feels pretty good after about two years of working
+seriously on this restoration.  :-)</p>
+<p>Going to stop here on a high note, and pick up trying to get a good RT-11 boot next time.</p>
+<p><img src='/images/pdp11/rkdp-boot_thumbnail_tall.jpg' title='First boot off disk -- RKDP diagnostics pack!' onclick='pswipe("pdp11",57);'/></p></div>
+    <hr />
+</div>
+
+
+
+<div class='article'>
+    <div class="content-title">
         <a href="http://fritzm.github.io/rk05-2.html"><h1>PDP-11/45: RK05 II - Head Load and Servo Calibration</h1></a>
 Sun 09 April 2017
 
@@ -946,80 +982,6 @@ in D3 is incorrect (037777 177777 177777 177777).  Verified the correct microflo
 <p>Stopped in microstate MOD.22, and examined ALUs on FRL where the fractional result is masked.  ALU function
 selects (for A &amp; ~B) and B inputs (all zeros for mask) look correct throughout.  A inputs, however,
 are all ones except the least significant bit, which seems incorrect.  All for now -- will dig a little deeper on the microcode flows and follow up on this lead next time...</p></div>
-    <hr />
-</div>
-
-
-
-<div class='article'>
-    <div class="content-title">
-        <a href="http://fritzm.github.io/diagnostics-11.html"><h1>PDP-11/45: Diagnostics XI - FP11 FPU, cont.</h1></a>
-Sun 23 October 2016
-
-by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
-    </div>
-
-    <div><p>Wrote some small test programs to investigate FP add/subtract.  Turns out that single-precision add/subtract
-works fine, but double-precision results come back with some erroneous bits set in the fraction.
-Here's the test code I ended up using for troublshooting -- when executed on my machine, bits 24 and 25
-end up incorrectly set in the result at D3:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17</pre></div></td><td class="code"><div class="highlight"><pre><span></span>        <span class="nt">000000</span>                          <span class="nt">AC0</span><span class="o">=%</span><span class="nt">0</span>
-        <span class="nt">000001</span>                          <span class="nt">AC1</span><span class="o">=%</span><span class="nt">1</span>
-<span class="nt">000000</span>                                  <span class="p">.</span><span class="nc">ASECT</span>
-        <span class="nt">001000</span>                          <span class="o">.=</span><span class="nt">1000</span>
-<span class="nt">001000</span>  <span class="nt">170011</span>                  <span class="nt">START</span><span class="o">:</span>  <span class="nt">SETD</span>                <span class="o">;</span><span class="nt">SET</span> <span class="nt">DOUBLE</span> <span class="nt">PRECISION</span> <span class="nt">MODE</span>
-<span class="nt">001002</span>  <span class="nt">172467</span>  <span class="nt">000014</span>                  <span class="nt">LDD</span>     <span class="nt">D1</span><span class="o">,</span><span class="nt">AC0</span>      <span class="o">;</span><span class="nt">FETCH</span> <span class="nt">FIRST</span> <span class="nt">ADDEND</span> <span class="nt">FROM</span> <span class="nt">D1</span>
-<span class="nt">001006</span>  <span class="nt">172567</span>  <span class="nt">000020</span>                  <span class="nt">LDD</span>     <span class="nt">D2</span><span class="o">,</span><span class="nt">AC1</span>      <span class="o">;</span><span class="nt">FETCH</span> <span class="nt">SECOND</span> <span class="nt">ADDEND</span> <span class="nt">FROM</span> <span class="nt">D2</span>
-<span class="nt">001012</span>  <span class="nt">172100</span>                          <span class="nt">ADDD</span>    <span class="nt">AC0</span><span class="o">,</span><span class="nt">AC1</span>     <span class="o">;</span><span class="nt">ADD</span> <span class="nt">THEM</span> <span class="o">(</span><span class="nt">RESULT</span> <span class="nt">IN</span> <span class="nt">AC1</span><span class="o">)</span>
-<span class="nt">001014</span>  <span class="nt">174167</span>  <span class="nt">000022</span>                  <span class="nt">STD</span>     <span class="nt">AC1</span><span class="o">,</span><span class="nt">D3</span>      <span class="o">;</span><span class="nt">STORE</span> <span class="nt">RESULT</span> <span class="nt">TO</span> <span class="nt">D3</span>
-<span class="nt">001020</span>  <span class="nt">000000</span>                          <span class="nt">HALT</span>
-<span class="nt">001022</span>  <span class="nt">040200</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D1</span><span class="o">:</span>     <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">040000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span> <span class="o">;</span><span class="nt">0</span><span class="p">.</span><span class="nc">5</span>
-<span class="nt">001030</span>  <span class="nt">000000</span>
-<span class="nt">001032</span>  <span class="nt">040200</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D2</span><span class="o">:</span>     <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">040000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span> <span class="o">;</span><span class="nt">0</span><span class="p">.</span><span class="nc">5</span>
-<span class="nt">001040</span>  <span class="nt">000000</span>
-<span class="nt">001042</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D3</span><span class="o">:</span>     <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span>
-<span class="nt">001050</span>  <span class="nt">000000</span>
-        <span class="nt">001000</span>                          <span class="p">.</span><span class="nc">END</span>    <span class="nt">START</span>
-</pre></div>
-</td></tr></table>
-
-<p>So, the usual procedure: KM11 in the floating point slot, and FRL (where these bits are handled) out on
-extenders.  First step is to verify the microcode sequencing with the KM11 and front panel, and it looks good.
-In particular, the FPU is sequencing through states ADD.04 and ADD.06 per expectation for double-precision,
-branching correctly for non-zero operands, and taking the equal exponents branch through ADD.24 (refer to
-page FLOWS 8 of the FP11 engineering drawings).</p>
-<p>Next, stopped in state ADD.38, where the fraction addition occurs, and scanned the inputs and outputs of
-all the 74181 bitslice ALUs with a logic probe. Bit 28 of the A input to the FALU (E16 pin 2, refer to page
-FRLJ of the FP11 engineering drawings) is incorrectly set.  This is arriving via the AR register.</p>
-<p>The value in the AR register is originally fetched from the register scratchpad, then flows through QR, BR,
-and the FALU during microstates ADD.04, ADD.06, and ADD.02.  Some more stepping and logic probe work showed
-that the fraction values are correct along these paths through these states.  So it looks like AR itself
-may be at fault.</p>
-<p>Set up the logic analyzer on E15, which is a 74194 shift-register that holds bits 28-31 of AR.  It looks
-like it is indeed faulty:</p>
-<p><img src='/images/pdp11/bad-ar.jpg'/></p>
-<p>Here we can see what should be a broadside load: positive CLK edge, S0 and S1 both asserted, and inputs of
-all zeros.  But the output sticks brokenly at 8.  Pulled this shift register, soldered in a socket, and put
-a replacement and a couple of spares on order.  All for now, until the parts arrive.</p></div>
     <hr />
 </div>
 

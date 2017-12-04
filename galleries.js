@@ -74,5 +74,7 @@ var galleries = {
                             {src:"/images/pdp11/la30-head.jpg", w:3024, h:3024, title:"LA30 print head"},
                             {src:"/images/pdp11/la30-carriage.jpg", w:4032, h:3024, title:"LA30 carriage, disassembled for clean, repairs, and lube.  A mangled paper drag spring is visible on the print bar assembly."},
                             {src:"/images/pdp11/la30-cleaned.jpg", w:4032, h:3024, title:"LA30 cleaned and reassembled"},
+                            {src:"/images/pdp11/kr2736.jpg", w:4032, h:3024, title:"The SMC KR2736-17 keyboard scanner/encoder in the LA30"},
+                            {src:"/images/pdp11/G380.jpg", w:4032, h:3024, title:"G380 solenoid driver card from the LA30, with failed parts pulled"},
                     ],
     };
