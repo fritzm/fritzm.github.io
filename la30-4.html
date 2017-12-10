@@ -68,10 +68,52 @@
     <div class="row">
 
         <div class="span9">
-    <h1>Authors on fritzm.github.io</h1>
+    <div class='article'>
+        <div class="content-title">
+            <h1>PDP-11/45: LA30 repair IV</h1>
+Sat 09 December 2017
 
-    <ul>        <li><a href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a> (56)</li>
-    </ul>
+by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+        </div>
+	
+        <div><p>Received replacement components for the blown G380 solenoid driver channel.  After this repair, all pins are
+firing and printing correctly.  Calibrated left margin.  Checked pin drive signal, which was within
+specifications and required no adjustment.</p>
+<p>Went to check carriage return pulse timing calibrations, but as it turns out the G396 clock accelerator card
+in this LA30 has not had ECO 2 applied and therefore has no timing calibration pots.  Carriage return seems to
+be functioning correctly and reliably after the left margin adjustment in any case.</p>
+<p>Inspected and cleaned the M7910 interface card; it appears to be in good shape.  Rejumpered the base address
+and interrupt vector for console operation. Slotted it into the PDP-11 in place of the DL11 I had been using
+up until now, and cabled up to the LA30.  Booted to the M9301 monitor and then on into RT-11, and everything
+seems to be working fine!  Here's a short video of the RT-11 boot, followed by the start of a session of
+Adventure:</p>
+<p><span class="videobox">
+                <iframe width="640" height="390"
+                    src='https://www.youtube.com/embed/gMIL2bvUYIs?rel=0'
+                    frameborder='0' webkitAllowFullScreen mozallowfullscreen
+                    allowFullScreen>
+                </iframe>
+            </span></p></div>
+	
+        <hr>
+
+        <h2>Comments</h2>
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'fritzm'; 
+    var disqus_title = 'PDP-11/45: LA30 repair IV';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
         </div>
 
         <div class="span3">
