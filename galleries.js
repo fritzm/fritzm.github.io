@@ -76,5 +76,9 @@ var galleries = {
                             {src:"/images/pdp11/la30-cleaned.jpg", w:4032, h:3024, title:"LA30 cleaned and reassembled"},
                             {src:"/images/pdp11/kr2736.jpg", w:4032, h:3024, title:"The SMC KR2736-17 keyboard scanner/encoder in the LA30"},
                             {src:"/images/pdp11/G380.jpg", w:4032, h:3024, title:"G380 solenoid driver card from the LA30, with failed parts pulled"},
+                            {src:"/images/pdp11/VCFW3.jpg", w:720, h:960, title:"Reassembly on the VCF West show floor"},
+                            {src:"/images/pdp11/VCFW1.jpg", w:2416, h:2272, title:"Running diagnostics and consulting the RK11-C prints..."},
+                            {src:"/images/pdp11/VCFW2.jpg", w:4032, h:3024, title:"Pavl stops by with an RX02 and controller to help out with debug.  Replacement KM11 debug board visible in the upper diagnostic port of the RK11-C."},
+                            {src:"/images/pdp11/VCFW4.jpg", w:1536, h:2048, title:"With Pete Richert, an old friend from Digidesign days!"},
                     ],
     };

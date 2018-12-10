@@ -72,6 +72,47 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="http://fritzm.github.io/diagnostics-4.html"><h1>PDP-11/45: Diagnostics IV - CKBME0</h1></a>
+Sun 17 July 2016
+
+by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+    </div>
+
+    <div><p>Some progress with the CKBME0 diagnostic mentioned previously.  It seems the concern with how the test behaves wrt.
+preconditions of the serial interface was well founded.</p>
+<p>In order to debug more easily, I extracted the failing test and built a small loop around it, with a pass counter
+and display register update, etc.  In the original test suite, a RESET instruction is executed immediately prior to
+the failing test, and it takes some time to come around the failing test on each pass, so I included a RESET and
+a delay loop in my test code as well.  I then got failure modes and rates consistent with the original test suite.</p>
+<p>The experiments previously described had indicated timing sensitivity (e.g. running on the RC maintenance clock at 50%
+clock speed changed the pass failure rate from ~50% to 100%) so I began to think more seriously about timing
+between the processor and the serial card, and how the time taken to circulate the entire suite of tests could affect
+the precondition of the serial interface when entering the test in subsequent passes.  A re-read of the DL11
+documentation showed that the transmit data is also double-buffered; if the transmit shift register is empty, a
+character written to the output buffer will be latched to the transmit shift register causing the output buffer to
+go ready again almost immediately.</p>
+<p>I inserted the following code before the BIS/WAIT sequence in the original diagnostic (listed previously), which
+establishes consistent preconditions (shift register full, buffer empty) before the BIS.  Success rate went to 100%:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span></span>        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">40</span><span class="o">,@</span><span class="p">#</span><span class="nn">177566</span>    <span class="o">;</span><span class="nt">ENSURE</span> <span class="nt">XMIT</span> <span class="nt">SHIFT</span> <span class="nt">REGISTER</span> <span class="nt">HAS</span> <span class="nt">SOMETHING</span> <span class="nt">TO</span> <span class="nt">CHEW</span> <span class="nt">ON</span>
+<span class="nt">L0</span><span class="o">:</span>     <span class="nt">TSTB</span>    <span class="o">@</span><span class="p">#</span><span class="nn">TTCSR</span>         <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">XMIT</span> <span class="nt">BUFFER</span>
+        <span class="nt">BPL</span>     <span class="nt">L0</span>              <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">UNTIL</span> <span class="nt">READY</span><span class="o">,</span> <span class="nt">ENSURES</span> <span class="nt">INT</span> <span class="nt">IMMEDIATELY</span> <span class="nt">AFTER</span> <span class="nt">BIS</span>
+</pre></div>
+</td></tr></table>
+
+<p>I then further verified that the unmodified original diagnostic suite passes 100% if I turn the M7800 down to 4800
+Baud.  Worth noting when trying to run these older diagnostics!</p></div>
+    <hr />
+</div>
+
+
+
+<div class='article'>
+    <div class="content-title">
         <a href="http://fritzm.github.io/vt52-repair.html"><h1>PDP-11/45: VT52 repair</h1></a>
 Sat 16 July 2016
 
@@ -538,45 +579,6 @@ output of the same regulator on the main backplane, but things seem within state
 the battery backup supply inputs and the corresponding main supply inputs, per documentation.  Now have -15 to the
 MS11-L, but still no joy.</p>
 <p>Will need to go deeper into the MS11-L next time...</p></div>
-    <hr />
-</div>
-
-
-
-<div class='article'>
-    <div class="content-title">
-        <a href="http://fritzm.github.io/cpu-debug-3.html"><h1>PDP-11/45: KM11 replica and CPU debug III</h1></a>
-Sat 11 June 2016
-
-by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
-    </div>
-
-    <div><p>Received the boards and components for the KM11 replica; stuffed and soldered, and it appears to work!  There are
-some photos below.  I can easily single-step microcode, clock states, and bus cycles now, which should really help
-with the CPU debug.</p>
-<p>Swapped DAP for a spare, and this has fixed the stuck PC issue.  Memory issues remain, but by choosing a working
-memory range, I can start to toggle in and attempt to execute very simple programs.</p>
-<p>The simplest possible program, unconditional branch to self, seems to execute correctly:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span></span>001000 000777         BR      .-0
-</pre></div>
-</td></tr></table>
-
-<p>A register to register data move test does not however:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2</pre></div></td><td class="code"><div class="highlight"><pre><span></span>001000 010203         MOV     R2,R3
-001002 000776         BR      .-2
-</pre></div>
-</td></tr></table>
-
-<p>Control flow is as expected, but the value that ends up in R3 seems to be negated.  Still, pretty good progress!
-Now that I can step machine states, the next step will be to put the DAP out on an extender card and start tracking
-down signals with a logic probe.</p>
-<p>The HP1662A logic analyzer from eBay has also arrived; should come in handy in investigating the memory issue.</p>
-<p><img src='/images/pdp11/km11_thumbnail_tall.jpg' title='Tom Uban KM11 replica, stuffed with parts and ready to go' onclick='pswipe("pdp11",29);'/>
-<img src='/images/pdp11/km11-action_thumbnail_tall.jpg' title='Tom Uban KM11 replica in action' onclick='pswipe("pdp11",30);'/></p></div>
     <hr />
 </div>
 
