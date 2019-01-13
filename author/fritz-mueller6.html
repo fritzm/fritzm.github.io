@@ -72,6 +72,27 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="http://fritzm.github.io/panel-and-742s.html"><h1>PDP-11/45: H742s and front panel</h1></a>
+Sun 21 June 2015
+
+by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+    </div>
+
+    <div><p>The H742 supplies are now back together, mounted in the cabinet, and wired through to the 861.  I've powered them up and run them for minutes at a time (without any DC regulator loads) and there have been no surprise detonations...</p>
+<p>The repainted cabinet side door has also been remounted.</p>
+<p>Spent some time on the front panel as well.  Removed the tubular lock and took a trip to the local locksmith to have a new key made up.  Replaced all the incandescent indicator lamps with the closest modern equivalent.  Panel is now remounted and it's starting to look like a real '11!</p>
+<p><img src='/images/pdp11/742s-mounted_thumbnail_tall.jpg' title='H742s and CPU cabinet remounted' onclick='pswipe("pdp11",11);'/>
+<img src='/images/pdp11/front-panel_thumbnail_tall.jpg' title='Front panel remounted -- starting to look like a real PDP-11!' onclick='pswipe("pdp11",12);'/></p></div>
+    <hr />
+</div>
+
+
+
+<div class='article'>
+    <div class="content-title">
         <a href="http://fritzm.github.io/fans-and-h742s.html"><h1>PDP-11/45: AC power and cooling</h1></a>
 Sun 07 June 2015
 
@@ -247,12 +268,12 @@ by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fr
 <span class="n">im</span> <span class="p">=</span> <span class="p">[];</span> <span class="n">g1</span> <span class="p">=</span> <span class="p">[];</span> <span class="n">g2</span> <span class="p">=</span> <span class="p">[];</span>
 
 <span class="k">for</span> <span class="n">frame</span> <span class="p">=</span> <span class="mi">1</span><span class="p">:</span><span class="mi">30</span>
-    <span class="n">g1</span> <span class="p">=</span> <span class="nb">mod</span><span class="p">(</span><span class="nb">log</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">Z</span><span class="p">))</span><span class="o">*</span><span class="mi">4</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="mi">1</span><span class="p">;</span>           <span class="c">% radial, static</span>
-<span class="c">%    g1 = mod(log(abs(Z))*4+(frame-1)/15,2)&lt;1; % radial, dynamic</span>
-<span class="c">%    g1 = mod(real(Z)+(frame-1)*.8/30,.8)&lt;.4;  % vertical, dynamic</span>
-<span class="c">%    g2 = mod(angle(Z), pi/6)&lt;(pi/12);         % circumferential, static</span>
-    <span class="n">g2</span> <span class="p">=</span> <span class="nb">mod</span><span class="p">(</span><span class="nb">angle</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span><span class="o">+</span><span class="p">(</span><span class="n">frame</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="nb">pi</span><span class="o">/</span><span class="mi">180</span><span class="p">,</span> <span class="nb">pi</span><span class="o">/</span><span class="mi">6</span><span class="p">)</span><span class="o">&lt;</span><span class="p">(</span><span class="nb">pi</span><span class="o">/</span><span class="mi">12</span><span class="p">);</span> <span class="c">% circumferential, dynamic</span>
-<span class="c">%    g2 = mod(imag(Z),.8)&lt;.4;                  % horizontal, static</span>
+    <span class="n">g1</span> <span class="p">=</span> <span class="nb">mod</span><span class="p">(</span><span class="nb">log</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">Z</span><span class="p">))</span><span class="o">*</span><span class="mi">4</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span><span class="n">lt</span><span class="p">;</span><span class="mi">1</span><span class="p">;</span>           <span class="c">% radial, static</span>
+<span class="c">%    g1 = mod(log(abs(Z))*4+(frame-1)/15,2)&amp;lt;1; % radial, dynamic</span>
+<span class="c">%    g1 = mod(real(Z)+(frame-1)*.8/30,.8)&amp;lt;.4;  % vertical, dynamic</span>
+<span class="c">%    g2 = mod(angle(Z), pi/6)&amp;lt;(pi/12);         % circumferential, static</span>
+    <span class="n">g2</span> <span class="p">=</span> <span class="nb">mod</span><span class="p">(</span><span class="nb">angle</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span><span class="o">+</span><span class="p">(</span><span class="n">frame</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="nb">pi</span><span class="o">/</span><span class="mi">180</span><span class="p">,</span> <span class="nb">pi</span><span class="o">/</span><span class="mi">6</span><span class="p">)</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;(</span><span class="nb">pi</span><span class="o">/</span><span class="mi">12</span><span class="p">);</span> <span class="c">% circumferential, dynamic</span>
+<span class="c">%    g2 = mod(imag(Z),.8)&amp;lt;.4;                  % horizontal, static</span>
     <span class="n">im</span><span class="p">(:,:,</span><span class="mi">1</span><span class="p">,</span><span class="n">frame</span><span class="p">)</span> <span class="p">=</span> <span class="n">imresize</span><span class="p">(</span><span class="n">xor</span><span class="p">(</span><span class="n">g1</span><span class="p">,</span><span class="n">g2</span><span class="p">),</span> <span class="p">.</span><span class="mi">25</span><span class="p">,</span> <span class="s">&#39;bilinear&#39;</span><span class="p">);</span>
     <span class="n">imwrite</span><span class="p">(</span><span class="n">im</span><span class="p">(:,:,</span><span class="mi">1</span><span class="p">,</span><span class="n">frame</span><span class="p">),</span> <span class="n">sprintf</span><span class="p">(</span><span class="s">&#39;frame%.2d.bmp&#39;</span><span class="p">,</span> <span class="n">frame</span><span class="p">));</span>
 <span class="k">end</span>

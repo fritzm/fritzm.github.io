@@ -1,5 +1,241 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0"><channel><title>fritzm.github.io</title><link>http://fritzm.github.io/</link><description></description><lastBuildDate>Sun, 09 Dec 2018 00:00:00 -0800</lastBuildDate><item><title>PDP-11/45 Behaving Badly</title><link>http://fritzm.github.io/behaving-badly.html</link><description>&lt;p&gt;Wow, a year to the day since the previous post here!  Not a lot of PDP-11 work this past year, with lots of
+<rss version="2.0"><channel><title>fritzm.github.io</title><link>http://fritzm.github.io/</link><description></description><lastBuildDate>Mon, 07 Jan 2019 00:00:00 -0800</lastBuildDate><item><title>PDP-11/45: RSTS/E V06C attempts</title><link>http://fritzm.github.io/rsts.html</link><description>&lt;p&gt;Okay, back in action after replacing the failed nand at B26 in the RK11-C.  MAINDEC ZRKK now passes reliably.
+Wish I'd been able to get to the bottom of this at the show, but it was really hard to effectively debug on
+the floor there while the show was in progress -- you naturally want to stop and chat with everybody who drops
+by to take a look, so its hard to get into a good technical flow.&lt;/p&gt;
+&lt;p&gt;Since one of the RK11-C diagnostics I needed to use writes a pack destructively, I had to sacrifice my working
+RT-11 pack along the way.  Rather than go back to the same old RT-11 image, I figured maybe time to try
+something different?  RSTS/E would probably be more fun with multiple terminals and the DZ11 that I have
+anyway, and I've never actually played around with RSTS.  So decided to give that a go...&lt;/p&gt;
+&lt;p&gt;Did some poking around looking at various available versions, and V06C seemed like a pretty good starting
+point: it's new enough to explicitly support all of my hardware (including the DZ11 and excepting the VT100),
+but old enough to still have relatively modest storage requirements so I can hope to run it with the single
+RK05 that I currently have working.  There is also complete distribution tape available at rsts.org, and a
+fairly complete set of documentation at bitsavers.&lt;/p&gt;
+&lt;p&gt;Spent a bit of time reading the sysgen manual, and managed to sysgen under simh and generate a bootable
+RK05 image for my hardware.  I then transferred this image to my single working pack using PDP11GUI; this is
+frustratingly slow (~3 hours to write a 2.5mb pack)!!  I had forgotten how bad this is.  I'm not quite sure
+why it is as slow as it is; it shouldn't take much more than 45 minutes to push that much data through a DL11
+at 9600 baud, even without compression, and the PDP-11 disk subsystem can easily keep up with that.  I'm not
+sure if PDP11GUI is spending a lot of time turning around the serial line, or has a bunch of per-character
+overhead, or...?  In any case, I'm motivated to do something about it; more on this some other time soon.&lt;/p&gt;
+&lt;p&gt;So, unfortunately, the RSTS image which works under simh fails to completely boot on the real hardware. It
+runs through the initial "Option:" menu without trouble, and upon start the RSTS light chaser runs in the
+data lights on the front panel.  Characters are echoed on the console terminal, but it never reaches code to
+print the banner or prompt for the initial control file.  The system appears to be in a loop reading the same
+section of disk repetitively, and the display register shows a continuously increasing count.&lt;/p&gt;
+&lt;p&gt;Got a lot of help from folks over on the cctalk mailing list on this one, since I'm a newbie to RSTS.  Paul K.
+provided some useful tips:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;RSTS displays an error count in the display register, so that's why I see an increasing count there.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;The "fancy" idle pattern that includes both the address and data lights apparently shows up in a later
+release of RSTS and requires a particular sysgen option, so its not surprising that I only see the pattern
+in the data lights on my machine.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;The ODT debugger may be loaded with RSTS for startup debugging by configuring it using an undocumented
+option in the change memory layout section of the "DEFAULT" command at the boot prompt.  Enter "ODT" there,
+and provide a space for it in the memory map.  After that, at ^P at the console will take you to the ODT
+prompt. &lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;   Memory allocation table:
+
+     0K: 00000000 - 00123777 (  21K) : EXEC
+    21K: 00124000 - 00213777 (  14K) : RTS (BASIC)
+    35K: 00214000 - 00227777 (   3K) : ODT
+    38K: 00230000 - 00757777 (  86K) : USER
+   124K: 00760000 - End              : NXM
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;ul&gt;
+&lt;li&gt;A handy way to query the RSTS symbol table is to use the "PATCH" command at the boot prompt (one can also
+look through the .MAP files generated during sysgen):&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;   Option: PA
+   File to patch? 
+   Module name? 
+   Base address? ERL
+   Offset address? 
+    Base   Offset  Old     New?
+   041314  000000  005267  ? ^Z
+   Offset address? ^Z
+   Base address? 
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;ul&gt;
+&lt;li&gt;Paul also provided this procedure for triggering a crash dump from an ODT breakpoint under RSTS:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;1. Make sure crash dump is enabled (in the &amp;quot;default&amp;quot; option).  Start the system.  Let it run for at least one minute.  (I&amp;#39;m not entirely sure about older versions, but I think that a crash within one minute of startup is handled differently and doesn&amp;#39;t do all the usual dump and restart machinery.)
+
+2. Set the data switches all UP.  (In SIMH, enter &amp;quot;D SR 177777&amp;quot;.)
+
+3. Set a breakpoint.
+
+4. When you hit the breakpoint, change the PC to 52, like this:
+
+    0B:055244 
+    _$7/055244 52 
+    _P 
+
+  (you enter only &amp;quot;$7/&amp;quot; and &amp;quot;52&amp;lt;return&amp;gt;&amp;quot; and &amp;quot;P&amp;quot;, the rest is output from ODT.)
+
+  The system will write the crashdump and then automatically restart.
+
+5. You should now have the crash dump in [0,1]CRASH.SYS
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Further experiments coordinated by Paul then led to the conclusion that an error like this could reasonably be
+expected to be triggered by a corrupted INIT.BAC or BASIC.RTS file.  This led me to wish to verify that the
+disk pack contents really matched the image file I was running successfully under simh.  Some standalone code
+to dump a CRC of every sector on the pack seemed like it would be useful in this regard, so I coded up the
+following:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;        &lt;span class="nt"&gt;RKDS&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nt"&gt;177400&lt;/span&gt;
+        &lt;span class="nt"&gt;RKER&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nt"&gt;177402&lt;/span&gt;
+        &lt;span class="nt"&gt;RKCS&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nt"&gt;177404&lt;/span&gt;
+        &lt;span class="nt"&gt;RKWC&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nt"&gt;177406&lt;/span&gt;
+        &lt;span class="nt"&gt;RKBA&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nt"&gt;177410&lt;/span&gt;
+        &lt;span class="nt"&gt;RKDA&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nt"&gt;177412&lt;/span&gt;
+
+        &lt;span class="nt"&gt;XCSR&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nt"&gt;177564&lt;/span&gt;
+        &lt;span class="nt"&gt;XBUF&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nt"&gt;177566&lt;/span&gt;
+
+        &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nc"&gt;ASECT&lt;/span&gt;
+        &lt;span class="o"&gt;.=&lt;/span&gt;&lt;span class="nt"&gt;1000&lt;/span&gt;
+&lt;span class="nt"&gt;START&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;  
+        &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;700&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;SP&lt;/span&gt;         &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;INIT&lt;/span&gt; &lt;span class="nt"&gt;STACK&lt;/span&gt; &lt;span class="nt"&gt;POINTER&lt;/span&gt;
+
+        &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;-----&lt;/span&gt; &lt;span class="nt"&gt;INIT&lt;/span&gt; &lt;span class="nt"&gt;CRC&lt;/span&gt; &lt;span class="nt"&gt;LOOKUP&lt;/span&gt; &lt;span class="nt"&gt;TABLE&lt;/span&gt;
+
+        &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;10041&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R0&lt;/span&gt;       &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;CRC&lt;/span&gt; &lt;span class="nt"&gt;POLYNOMIAL&lt;/span&gt; 
+        &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;CRCTBL&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R1&lt;/span&gt;      &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;LOOKUP&lt;/span&gt; &lt;span class="nt"&gt;TABLE&lt;/span&gt; &lt;span class="nt"&gt;TO&lt;/span&gt; &lt;span class="nt"&gt;FILL&lt;/span&gt;
+        &lt;span class="nt"&gt;ADD&lt;/span&gt;     &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;1000&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R1&lt;/span&gt;        &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;START&lt;/span&gt; &lt;span class="nt"&gt;FILLING&lt;/span&gt; &lt;span class="nt"&gt;FROM&lt;/span&gt; &lt;span class="nt"&gt;END&lt;/span&gt; &lt;span class="o"&gt;(+&lt;/span&gt;&lt;span class="nt"&gt;512&lt;/span&gt; &lt;span class="nt"&gt;WORDS&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+        &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;377&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R2&lt;/span&gt;         &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;COUNT&lt;/span&gt; &lt;span class="nt"&gt;DOWN&lt;/span&gt; &lt;span class="nt"&gt;FROM&lt;/span&gt; &lt;span class="nt"&gt;INDEX&lt;/span&gt; &lt;span class="nt"&gt;511&lt;/span&gt;      
+&lt;span class="nt"&gt;L0&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="nt"&gt;R2&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R4&lt;/span&gt;           &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;GET&lt;/span&gt; &lt;span class="nt"&gt;COPY&lt;/span&gt; &lt;span class="nt"&gt;OF&lt;/span&gt; &lt;span class="nt"&gt;INDEX&lt;/span&gt;
+        &lt;span class="nt"&gt;SWAB&lt;/span&gt;    &lt;span class="nt"&gt;R4&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;MOVE&lt;/span&gt; &lt;span class="nt"&gt;TO&lt;/span&gt; &lt;span class="nt"&gt;UPPER&lt;/span&gt; &lt;span class="nt"&gt;BYTE&lt;/span&gt;
+        &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;10&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R3&lt;/span&gt;          &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;LOOP&lt;/span&gt; &lt;span class="nt"&gt;OVER&lt;/span&gt; &lt;span class="nt"&gt;EIGHT&lt;/span&gt; &lt;span class="nt"&gt;BITS&lt;/span&gt; &lt;span class="nt"&gt;OF&lt;/span&gt; &lt;span class="nt"&gt;INDEX&lt;/span&gt;  
+&lt;span class="nt"&gt;L1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;ASL&lt;/span&gt;     &lt;span class="nt"&gt;R4&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;SHIFT&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;MSB&lt;/span&gt; &lt;span class="nt"&gt;TO&lt;/span&gt; &lt;span class="nt"&gt;CARRY&lt;/span&gt; &lt;span class="nt"&gt;FLAG&lt;/span&gt;
+        &lt;span class="nt"&gt;BCC&lt;/span&gt;     &lt;span class="nt"&gt;L2&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;IF&lt;/span&gt; &lt;span class="nt"&gt;MSB&lt;/span&gt; &lt;span class="nt"&gt;NOT&lt;/span&gt; &lt;span class="nt"&gt;SET&lt;/span&gt; &lt;span class="nt"&gt;SKIP&lt;/span&gt; &lt;span class="nt"&gt;AHEAD&lt;/span&gt;
+        &lt;span class="nt"&gt;XOR&lt;/span&gt;     &lt;span class="nt"&gt;R0&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R4&lt;/span&gt;           &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;ELSE&lt;/span&gt; &lt;span class="nt"&gt;XOR&lt;/span&gt; &lt;span class="nt"&gt;IN&lt;/span&gt; &lt;span class="nt"&gt;POLYNOMIAL&lt;/span&gt;
+&lt;span class="nt"&gt;L2&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;SOB&lt;/span&gt;     &lt;span class="nt"&gt;R3&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;L1&lt;/span&gt;           &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;LOOP&lt;/span&gt; &lt;span class="nt"&gt;OVER&lt;/span&gt; &lt;span class="nt"&gt;BITS&lt;/span&gt;
+        &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="nt"&gt;R4&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;-&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nt"&gt;R1&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;        &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;SAVE&lt;/span&gt; &lt;span class="nt"&gt;RESULT&lt;/span&gt; &lt;span class="nt"&gt;IN&lt;/span&gt; &lt;span class="nt"&gt;LOOKUP&lt;/span&gt; &lt;span class="nt"&gt;TABLE&lt;/span&gt;
+        &lt;span class="nt"&gt;DEC&lt;/span&gt;     &lt;span class="nt"&gt;R2&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;COUNT&lt;/span&gt; &lt;span class="nt"&gt;DOWN&lt;/span&gt;
+        &lt;span class="nt"&gt;BPL&lt;/span&gt;     &lt;span class="nt"&gt;L0&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;LOOP&lt;/span&gt; &lt;span class="nt"&gt;OVER&lt;/span&gt; &lt;span class="nt"&gt;TABLE&lt;/span&gt; &lt;span class="nt"&gt;ENTRIES&lt;/span&gt;
+
+        &lt;span class="nt"&gt;CLR&lt;/span&gt;     &lt;span class="nt"&gt;R5&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;INIT&lt;/span&gt; &lt;span class="nt"&gt;SECTOR&lt;/span&gt; &lt;span class="nt"&gt;COUNTER&lt;/span&gt;
+
+        &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;-----&lt;/span&gt; &lt;span class="nt"&gt;PRINT&lt;/span&gt; &lt;span class="nt"&gt;START&lt;/span&gt; &lt;span class="nt"&gt;OF&lt;/span&gt; &lt;span class="nt"&gt;LINE&lt;/span&gt;
+
+&lt;span class="nt"&gt;L3&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="nt"&gt;R5&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R0&lt;/span&gt;           &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;GET&lt;/span&gt; &lt;span class="nt"&gt;SECTOR&lt;/span&gt; &lt;span class="nt"&gt;COUNTER&lt;/span&gt;
+        &lt;span class="nt"&gt;JSR&lt;/span&gt;     &lt;span class="nt"&gt;PC&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;PRNW&lt;/span&gt;         &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;PRINT&lt;/span&gt; &lt;span class="nt"&gt;IT&lt;/span&gt;
+        &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;DELIM1&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R0&lt;/span&gt;      &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;GET&lt;/span&gt; &lt;span class="nt"&gt;POST-SECTOR&lt;/span&gt; &lt;span class="nt"&gt;DELIMETER&lt;/span&gt;
+        &lt;span class="nt"&gt;JSR&lt;/span&gt;     &lt;span class="nt"&gt;PC&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;PRNSTR&lt;/span&gt;       &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;PRINT&lt;/span&gt; &lt;span class="nt"&gt;IT&lt;/span&gt;
+
+        &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;-----&lt;/span&gt; &lt;span class="nt"&gt;READ&lt;/span&gt; &lt;span class="nt"&gt;8&lt;/span&gt; &lt;span class="nt"&gt;SECTORS&lt;/span&gt; &lt;span class="nt"&gt;FROM&lt;/span&gt; &lt;span class="nt"&gt;DISK&lt;/span&gt;
+
+&lt;span class="nt"&gt;L4&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="nt"&gt;R5&lt;/span&gt;&lt;span class="o"&gt;,@&lt;/span&gt;&lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;RKDA&lt;/span&gt;       &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;SET&lt;/span&gt; &lt;span class="nt"&gt;START&lt;/span&gt; &lt;span class="nt"&gt;SECTOR&lt;/span&gt;
+        &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;DBUF&lt;/span&gt;&lt;span class="o"&gt;,@&lt;/span&gt;&lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;RKBA&lt;/span&gt;    &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;SET&lt;/span&gt; &lt;span class="nt"&gt;TARGET&lt;/span&gt; &lt;span class="nt"&gt;ADDRESS&lt;/span&gt;
+        &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;-4000&lt;/span&gt;&lt;span class="o"&gt;,@&lt;/span&gt;&lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;RKWC&lt;/span&gt;   &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;READ&lt;/span&gt; &lt;span class="nt"&gt;8&lt;/span&gt; &lt;span class="nt"&gt;SECTORS&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nt"&gt;2K&lt;/span&gt; &lt;span class="nt"&gt;WORDS&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+        &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;5&lt;/span&gt;&lt;span class="o"&gt;,@&lt;/span&gt;&lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;RKCS&lt;/span&gt;       &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;READ&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="nt"&gt;GO&lt;/span&gt;
+        &lt;span class="nt"&gt;TSTB&lt;/span&gt;    &lt;span class="o"&gt;@&lt;/span&gt;&lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;RKCS&lt;/span&gt;          &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;CHECK&lt;/span&gt; &lt;span class="nt"&gt;RKCS&lt;/span&gt; &lt;span class="nt"&gt;RDY&lt;/span&gt; &lt;span class="nt"&gt;BIT&lt;/span&gt;
+        &lt;span class="nt"&gt;BPL&lt;/span&gt;     &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nc"&gt;-4&lt;/span&gt;             &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;LOOP&lt;/span&gt; &lt;span class="nt"&gt;IF&lt;/span&gt; &lt;span class="nt"&gt;BUSY&lt;/span&gt;
+
+        &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;-----&lt;/span&gt; &lt;span class="nt"&gt;HANDLE&lt;/span&gt; &lt;span class="nt"&gt;ERROR&lt;/span&gt; &lt;span class="nt"&gt;IF&lt;/span&gt; &lt;span class="nt"&gt;ANY&lt;/span&gt;
+
+        &lt;span class="nt"&gt;BIT&lt;/span&gt;     &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;100000&lt;/span&gt;&lt;span class="o"&gt;,@&lt;/span&gt;&lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;RKCS&lt;/span&gt;  &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;CHECK&lt;/span&gt; &lt;span class="nt"&gt;FOR&lt;/span&gt; &lt;span class="nt"&gt;ERROR&lt;/span&gt;
+        &lt;span class="nt"&gt;BEQ&lt;/span&gt;     &lt;span class="nt"&gt;L5&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;SKIP&lt;/span&gt; &lt;span class="nt"&gt;AHEAD&lt;/span&gt; &lt;span class="nt"&gt;IF&lt;/span&gt; &lt;span class="nt"&gt;NOT&lt;/span&gt;
+        &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;ERRSTR&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R0&lt;/span&gt;      &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;POINT&lt;/span&gt; &lt;span class="nt"&gt;TO&lt;/span&gt; &lt;span class="nt"&gt;ERROR&lt;/span&gt; &lt;span class="nt"&gt;INDICATOR&lt;/span&gt;
+        &lt;span class="nt"&gt;JSR&lt;/span&gt;     &lt;span class="nt"&gt;PC&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;PRNSTR&lt;/span&gt;       &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;PRINT&lt;/span&gt; &lt;span class="nt"&gt;IT&lt;/span&gt;
+        &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="o"&gt;@&lt;/span&gt;&lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;RKER&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R0&lt;/span&gt;       &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;GET&lt;/span&gt; &lt;span class="nt"&gt;ERROR&lt;/span&gt; &lt;span class="nt"&gt;REG&lt;/span&gt;
+        &lt;span class="nt"&gt;JSR&lt;/span&gt;     &lt;span class="nt"&gt;PC&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;PRNW&lt;/span&gt;         &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;PRINT&lt;/span&gt; &lt;span class="nt"&gt;IT&lt;/span&gt;
+        &lt;span class="nt"&gt;BR&lt;/span&gt;      &lt;span class="nt"&gt;L8&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;MOVE&lt;/span&gt; &lt;span class="nt"&gt;ON&lt;/span&gt; &lt;span class="nt"&gt;TO&lt;/span&gt; &lt;span class="nt"&gt;NEXT&lt;/span&gt; &lt;span class="nt"&gt;8&lt;/span&gt; &lt;span class="nt"&gt;SECTORS&lt;/span&gt;
+
+&lt;span class="nt"&gt;L5&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;DBUF&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R4&lt;/span&gt;        &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;POINT&lt;/span&gt; &lt;span class="nt"&gt;TO&lt;/span&gt; &lt;span class="nt"&gt;START&lt;/span&gt; &lt;span class="nt"&gt;OF&lt;/span&gt; &lt;span class="nt"&gt;DATA&lt;/span&gt; &lt;span class="nt"&gt;JUST&lt;/span&gt; &lt;span class="nt"&gt;READ&lt;/span&gt;
+
+        &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;-----&lt;/span&gt; &lt;span class="nt"&gt;RUN&lt;/span&gt; &lt;span class="nt"&gt;CRC&lt;/span&gt; &lt;span class="nt"&gt;FOR&lt;/span&gt; &lt;span class="nt"&gt;ONE&lt;/span&gt; &lt;span class="nt"&gt;SECTOR&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;  &lt;span class="nt"&gt;FOR&lt;/span&gt; &lt;span class="nt"&gt;EACH&lt;/span&gt; &lt;span class="nt"&gt;INPUT&lt;/span&gt; &lt;span class="nt"&gt;BYTE&lt;/span&gt; &lt;span class="nt"&gt;CH&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;
+        &lt;span class="o"&gt;;&lt;/span&gt;       &lt;span class="nt"&gt;CRC&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nt"&gt;CRCTBL&lt;/span&gt;&lt;span class="cp"&gt;[&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="nx"&gt;CRC&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;8&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;^&lt;/span&gt; &lt;span class="nx"&gt;CH&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt; &lt;span class="mi"&gt;255&lt;/span&gt;&lt;span class="cp"&gt;]&lt;/span&gt; &lt;span class="o"&gt;^&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nt"&gt;CRC&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class="nt"&gt;8&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+
+&lt;span class="nt"&gt;L6&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;CLR&lt;/span&gt;     &lt;span class="nt"&gt;R0&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;RESET&lt;/span&gt; &lt;span class="nt"&gt;CRC&lt;/span&gt;
+        &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;1000&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R1&lt;/span&gt;        &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;LOOP&lt;/span&gt; &lt;span class="nt"&gt;OVER&lt;/span&gt; &lt;span class="nt"&gt;ONE&lt;/span&gt; &lt;span class="nt"&gt;SECTOR&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nt"&gt;256&lt;/span&gt; &lt;span class="nt"&gt;WORDS&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;span class="nt"&gt;L7&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="nt"&gt;R0&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R2&lt;/span&gt;           &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;GET&lt;/span&gt; &lt;span class="nt"&gt;COPY&lt;/span&gt; &lt;span class="nt"&gt;OF&lt;/span&gt; &lt;span class="nt"&gt;CRC&lt;/span&gt;
+        &lt;span class="nt"&gt;SWAB&lt;/span&gt;    &lt;span class="nt"&gt;R2&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;MOVE&lt;/span&gt; &lt;span class="nt"&gt;HIGH&lt;/span&gt; &lt;span class="nt"&gt;BYTE&lt;/span&gt; &lt;span class="nt"&gt;DOWN&lt;/span&gt;
+        &lt;span class="nt"&gt;MOVB&lt;/span&gt;    &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nt"&gt;R4&lt;/span&gt;&lt;span class="o"&gt;)+,&lt;/span&gt;&lt;span class="nt"&gt;R3&lt;/span&gt;        &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;GET&lt;/span&gt; &lt;span class="nt"&gt;NEXT&lt;/span&gt; &lt;span class="nt"&gt;INPUT&lt;/span&gt; &lt;span class="nt"&gt;BYTE&lt;/span&gt; &lt;span class="nt"&gt;TO&lt;/span&gt; &lt;span class="nt"&gt;PROCESS&lt;/span&gt;
+        &lt;span class="nt"&gt;XOR&lt;/span&gt;     &lt;span class="nt"&gt;R3&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R2&lt;/span&gt;           &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;XOR&lt;/span&gt; &lt;span class="nt"&gt;ONTO&lt;/span&gt; &lt;span class="nt"&gt;MUNGED&lt;/span&gt; &lt;span class="nt"&gt;CRC&lt;/span&gt;
+        &lt;span class="nt"&gt;BIC&lt;/span&gt;     &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;177400&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R2&lt;/span&gt;      &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;MASK&lt;/span&gt; &lt;span class="nt"&gt;OFF&lt;/span&gt; &lt;span class="nt"&gt;HIGH&lt;/span&gt; &lt;span class="nt"&gt;BYTE&lt;/span&gt;
+        &lt;span class="nt"&gt;ASL&lt;/span&gt;     &lt;span class="nt"&gt;R2&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;TIMES&lt;/span&gt; &lt;span class="nt"&gt;TWO&lt;/span&gt; &lt;span class="nt"&gt;INDEX&lt;/span&gt; &lt;span class="nt"&gt;INTO&lt;/span&gt; &lt;span class="nt"&gt;LOOKUP&lt;/span&gt; &lt;span class="nt"&gt;TABLE&lt;/span&gt;
+        &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="nt"&gt;CRCTBL&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nt"&gt;R2&lt;/span&gt;&lt;span class="o"&gt;),&lt;/span&gt;&lt;span class="nt"&gt;R3&lt;/span&gt;   &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;LOOKUP&lt;/span&gt; &lt;span class="nt"&gt;VALUE&lt;/span&gt;
+        &lt;span class="nt"&gt;SWAB&lt;/span&gt;    &lt;span class="nt"&gt;R0&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;MOVE&lt;/span&gt; &lt;span class="nt"&gt;LOW&lt;/span&gt; &lt;span class="nt"&gt;BYTE&lt;/span&gt; &lt;span class="nt"&gt;OF&lt;/span&gt; &lt;span class="nt"&gt;CRC&lt;/span&gt; &lt;span class="nt"&gt;UP&lt;/span&gt;
+        &lt;span class="nt"&gt;CLRB&lt;/span&gt;    &lt;span class="nt"&gt;R0&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;MASK&lt;/span&gt; &lt;span class="nt"&gt;OFF&lt;/span&gt; &lt;span class="nt"&gt;THE&lt;/span&gt; &lt;span class="nt"&gt;BOTTOM&lt;/span&gt;
+        &lt;span class="nt"&gt;XOR&lt;/span&gt;     &lt;span class="nt"&gt;R3&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R0&lt;/span&gt;           &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;XOR&lt;/span&gt; &lt;span class="nt"&gt;IN&lt;/span&gt; &lt;span class="nt"&gt;THE&lt;/span&gt; &lt;span class="nt"&gt;LOOKED&lt;/span&gt; &lt;span class="nt"&gt;UP&lt;/span&gt; &lt;span class="nt"&gt;VALUE&lt;/span&gt;
+        &lt;span class="nt"&gt;SOB&lt;/span&gt;     &lt;span class="nt"&gt;R1&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;L7&lt;/span&gt;           &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;LOOP&lt;/span&gt; &lt;span class="nt"&gt;OVER&lt;/span&gt; &lt;span class="nt"&gt;BYTES&lt;/span&gt;
+
+        &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;-----&lt;/span&gt; &lt;span class="nt"&gt;PRINT&lt;/span&gt; &lt;span class="nt"&gt;CRC&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;DELIMIT&lt;/span&gt; &lt;span class="nt"&gt;AND&lt;/span&gt; &lt;span class="nt"&gt;LOOP&lt;/span&gt;
+
+        &lt;span class="nt"&gt;JSR&lt;/span&gt;     &lt;span class="nt"&gt;PC&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;PRNW&lt;/span&gt;         &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;PRINT&lt;/span&gt; &lt;span class="nt"&gt;CRC&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;ALREADY&lt;/span&gt; &lt;span class="nt"&gt;IN&lt;/span&gt; &lt;span class="nt"&gt;R0&lt;/span&gt;
+        &lt;span class="nt"&gt;CMP&lt;/span&gt;     &lt;span class="nt"&gt;R4&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;DBUF&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="nt"&gt;10000&lt;/span&gt;  &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;END&lt;/span&gt; &lt;span class="nt"&gt;OF&lt;/span&gt; &lt;span class="nt"&gt;DISK&lt;/span&gt; &lt;span class="nt"&gt;BUFFER&lt;/span&gt;&lt;span class="o"&gt;?&lt;/span&gt;
+        &lt;span class="nt"&gt;BEQ&lt;/span&gt;     &lt;span class="nt"&gt;L8&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;IF&lt;/span&gt; &lt;span class="nt"&gt;SO&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;EXIT&lt;/span&gt; &lt;span class="nt"&gt;LOOP&lt;/span&gt;
+        &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;DELIM2&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R0&lt;/span&gt;      &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;ELSE&lt;/span&gt; &lt;span class="nt"&gt;POINT&lt;/span&gt; &lt;span class="nt"&gt;TO&lt;/span&gt; &lt;span class="nt"&gt;POST-CRC&lt;/span&gt; &lt;span class="nt"&gt;DELIMETER&lt;/span&gt;
+        &lt;span class="nt"&gt;JSR&lt;/span&gt;     &lt;span class="nt"&gt;PC&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;PRNSTR&lt;/span&gt;       &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;PRINT&lt;/span&gt; &lt;span class="nt"&gt;IT&lt;/span&gt;
+        &lt;span class="nt"&gt;BR&lt;/span&gt;      &lt;span class="nt"&gt;L6&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;GO&lt;/span&gt; &lt;span class="nt"&gt;DO&lt;/span&gt; &lt;span class="nt"&gt;ANOTHER&lt;/span&gt; &lt;span class="nt"&gt;SECTOR&lt;/span&gt;
+
+        &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;-----&lt;/span&gt; &lt;span class="nt"&gt;DELIMIT&lt;/span&gt; &lt;span class="nt"&gt;END&lt;/span&gt; &lt;span class="nt"&gt;OF&lt;/span&gt; &lt;span class="nt"&gt;LINE&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;LOOP&lt;/span&gt; 
+
+&lt;span class="nt"&gt;L8&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;CRLF&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R0&lt;/span&gt;        &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;POINT&lt;/span&gt; &lt;span class="nt"&gt;TO&lt;/span&gt; &lt;span class="nt"&gt;LINE&lt;/span&gt; &lt;span class="nt"&gt;DELIMETER&lt;/span&gt;
+        &lt;span class="nt"&gt;JSR&lt;/span&gt;     &lt;span class="nt"&gt;PC&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;PRNSTR&lt;/span&gt;       &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;PRINT&lt;/span&gt; &lt;span class="nt"&gt;IT&lt;/span&gt;
+        &lt;span class="nt"&gt;ADD&lt;/span&gt;     &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;10&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R5&lt;/span&gt;          &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;MOVE&lt;/span&gt; &lt;span class="nt"&gt;AHEAD&lt;/span&gt; &lt;span class="nt"&gt;8&lt;/span&gt; &lt;span class="nt"&gt;SECTORS&lt;/span&gt;
+        &lt;span class="nt"&gt;CMP&lt;/span&gt;     &lt;span class="nt"&gt;R5&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;11410&lt;/span&gt;       &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;AT&lt;/span&gt; &lt;span class="nt"&gt;END&lt;/span&gt; &lt;span class="nt"&gt;OF&lt;/span&gt; &lt;span class="nt"&gt;PACK&lt;/span&gt;&lt;span class="o"&gt;?&lt;/span&gt;
+        &lt;span class="nt"&gt;BLT&lt;/span&gt;     &lt;span class="nt"&gt;L3&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;IF&lt;/span&gt; &lt;span class="nt"&gt;NOT&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;GO&lt;/span&gt; &lt;span class="nt"&gt;DO&lt;/span&gt; &lt;span class="nt"&gt;THE&lt;/span&gt; &lt;span class="nt"&gt;NEXT&lt;/span&gt; &lt;span class="nt"&gt;8&lt;/span&gt;
+
+        &lt;span class="nt"&gt;HALT&lt;/span&gt;                    &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;ALL&lt;/span&gt; &lt;span class="nt"&gt;DONE&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;
+
+        &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;-----&lt;/span&gt; &lt;span class="nt"&gt;PRINT&lt;/span&gt; &lt;span class="nt"&gt;A&lt;/span&gt; &lt;span class="nt"&gt;WORD&lt;/span&gt; &lt;span class="nt"&gt;IN&lt;/span&gt; &lt;span class="nt"&gt;OCTAL&lt;/span&gt;
+
+&lt;span class="nt"&gt;PRNW&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;   &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;6&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R2&lt;/span&gt;           &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;SIX&lt;/span&gt; &lt;span class="nt"&gt;DIGITS&lt;/span&gt; &lt;span class="nt"&gt;TO&lt;/span&gt; &lt;span class="nt"&gt;PRINT&lt;/span&gt;
+        &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="nt"&gt;R0&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R1&lt;/span&gt;           &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;MOVE&lt;/span&gt; &lt;span class="nt"&gt;OUTPUT&lt;/span&gt; &lt;span class="nt"&gt;WORD&lt;/span&gt; &lt;span class="nt"&gt;OVER&lt;/span&gt; &lt;span class="nt"&gt;TO&lt;/span&gt; &lt;span class="nt"&gt;R1&lt;/span&gt;
+        &lt;span class="nt"&gt;CLR&lt;/span&gt;     &lt;span class="nt"&gt;R0&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;RESET&lt;/span&gt; &lt;span class="nt"&gt;OUTPUT&lt;/span&gt; &lt;span class="nt"&gt;CHAR&lt;/span&gt;
+        &lt;span class="nt"&gt;ASHC&lt;/span&gt;    &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;1&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R0&lt;/span&gt;           &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;AND&lt;/span&gt; &lt;span class="nt"&gt;SHIFT&lt;/span&gt; &lt;span class="nt"&gt;IN&lt;/span&gt; &lt;span class="nt"&gt;MSB&lt;/span&gt; &lt;span class="nt"&gt;TO&lt;/span&gt; &lt;span class="nt"&gt;START&lt;/span&gt;
+&lt;span class="nt"&gt;L9&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;ADD&lt;/span&gt;     &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;60&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R0&lt;/span&gt;          &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;MAKE&lt;/span&gt; &lt;span class="nt"&gt;INTO&lt;/span&gt; &lt;span class="nt"&gt;ASCII&lt;/span&gt; &lt;span class="nt"&gt;DIGIT&lt;/span&gt;
+        &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="nt"&gt;R0&lt;/span&gt;&lt;span class="o"&gt;,@&lt;/span&gt;&lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;XBUF&lt;/span&gt;       &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;PRINT&lt;/span&gt; &lt;span class="nt"&gt;IT&lt;/span&gt;
+        &lt;span class="nt"&gt;TSTB&lt;/span&gt;    &lt;span class="o"&gt;@&lt;/span&gt;&lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;XCSR&lt;/span&gt;          &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;CHECK&lt;/span&gt; &lt;span class="nt"&gt;IF&lt;/span&gt; &lt;span class="nt"&gt;XMIT&lt;/span&gt; &lt;span class="nt"&gt;DONE&lt;/span&gt;
+        &lt;span class="nt"&gt;BPL&lt;/span&gt;     &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nc"&gt;-4&lt;/span&gt;             &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;LOOP&lt;/span&gt; &lt;span class="nt"&gt;UNTIL&lt;/span&gt; &lt;span class="nt"&gt;SO&lt;/span&gt;
+        &lt;span class="nt"&gt;CLR&lt;/span&gt;     &lt;span class="nt"&gt;R0&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;RESET&lt;/span&gt; &lt;span class="nt"&gt;OUTPUT&lt;/span&gt; &lt;span class="nt"&gt;CHAR&lt;/span&gt;
+        &lt;span class="nt"&gt;ASHC&lt;/span&gt;    &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;3&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;R0&lt;/span&gt;           &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;SHIFT&lt;/span&gt; &lt;span class="nt"&gt;IN&lt;/span&gt; &lt;span class="nt"&gt;NEXT&lt;/span&gt; &lt;span class="nt"&gt;THREE&lt;/span&gt; &lt;span class="nt"&gt;BITS&lt;/span&gt;
+        &lt;span class="nt"&gt;SOB&lt;/span&gt;     &lt;span class="nt"&gt;R2&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="nt"&gt;L9&lt;/span&gt;           &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;LOOP&lt;/span&gt; &lt;span class="nt"&gt;DIGITS&lt;/span&gt;
+        &lt;span class="nt"&gt;RTS&lt;/span&gt;     &lt;span class="nt"&gt;PC&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;RETURN&lt;/span&gt; &lt;span class="nt"&gt;TO&lt;/span&gt; &lt;span class="nt"&gt;CALLER&lt;/span&gt;
+
+        &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;-----&lt;/span&gt; &lt;span class="nt"&gt;PRINT&lt;/span&gt; &lt;span class="nt"&gt;A&lt;/span&gt; &lt;span class="nt"&gt;NULL-TERMINATED&lt;/span&gt; &lt;span class="nt"&gt;STRING&lt;/span&gt;
+
+&lt;span class="nt"&gt;PRNSTR&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nt"&gt;MOVB&lt;/span&gt;    &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nt"&gt;R0&lt;/span&gt;&lt;span class="o"&gt;)+,@&lt;/span&gt;&lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;XBUF&lt;/span&gt;    &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;PRINT&lt;/span&gt; &lt;span class="nt"&gt;ONE&lt;/span&gt; &lt;span class="nt"&gt;CHAR&lt;/span&gt; &lt;span class="nt"&gt;AND&lt;/span&gt; &lt;span class="nt"&gt;ADVANCE&lt;/span&gt;
+        &lt;span class="nt"&gt;TSTB&lt;/span&gt;    &lt;span class="o"&gt;@&lt;/span&gt;&lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;XCSR&lt;/span&gt;          &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;CHECK&lt;/span&gt; &lt;span class="nt"&gt;IF&lt;/span&gt; &lt;span class="nt"&gt;XMIT&lt;/span&gt; &lt;span class="nt"&gt;DONE&lt;/span&gt;
+        &lt;span class="nt"&gt;BPL&lt;/span&gt;     &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nc"&gt;-4&lt;/span&gt;             &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;LOOP&lt;/span&gt; &lt;span class="nt"&gt;UNTIL&lt;/span&gt; &lt;span class="nt"&gt;SO&lt;/span&gt;
+        &lt;span class="nt"&gt;TSTB&lt;/span&gt;    &lt;span class="p"&gt;@&lt;/span&gt;&lt;span class="k"&gt;R0&lt;/span&gt;             &lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;CHECK&lt;/span&gt; &lt;span class="nt"&gt;IF&lt;/span&gt; &lt;span class="nt"&gt;END&lt;/span&gt; &lt;span class="nt"&gt;OF&lt;/span&gt; &lt;span class="nt"&gt;STRING&lt;/span&gt;
+        &lt;span class="nt"&gt;BNE&lt;/span&gt;     &lt;span class="nt"&gt;PRNSTR&lt;/span&gt;          &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;LOOP&lt;/span&gt; &lt;span class="nt"&gt;IF&lt;/span&gt; &lt;span class="nt"&gt;NOT&lt;/span&gt;
+        &lt;span class="nt"&gt;RTS&lt;/span&gt;     &lt;span class="nt"&gt;PC&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;ELSE&lt;/span&gt; &lt;span class="nt"&gt;RETURN&lt;/span&gt; &lt;span class="nt"&gt;TO&lt;/span&gt; &lt;span class="nt"&gt;CALLER&lt;/span&gt;
+
+&lt;span class="nt"&gt;DELIM1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nc"&gt;ASCIZ&lt;/span&gt;  &lt;span class="o"&gt;/:&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt;            &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;POST-SECTOR&lt;/span&gt; &lt;span class="nt"&gt;DELIMETER&lt;/span&gt;
+&lt;span class="nt"&gt;DELIM2&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nc"&gt;ASCIZ&lt;/span&gt;  &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt;             &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;POST-CRC&lt;/span&gt; &lt;span class="nt"&gt;DELIMETER&lt;/span&gt;
+&lt;span class="nt"&gt;CRLF&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;   &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nc"&gt;ASCIZ&lt;/span&gt;  &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;15&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;12&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;        &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;LINE&lt;/span&gt; &lt;span class="nt"&gt;DELIMETER&lt;/span&gt;
+&lt;span class="nt"&gt;ERRSTR&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nc"&gt;ASCIZ&lt;/span&gt;  &lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="nt"&gt;ERROR&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt;       &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;ERROR&lt;/span&gt; &lt;span class="nt"&gt;INDICATOR&lt;/span&gt;
+
+&lt;span class="nt"&gt;CRCTBL&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nc"&gt;BLKW&lt;/span&gt;   &lt;span class="nt"&gt;400&lt;/span&gt;             &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;CRC&lt;/span&gt; &lt;span class="nt"&gt;LOOKUP&lt;/span&gt; &lt;span class="nt"&gt;TABLE&lt;/span&gt;
+&lt;span class="nt"&gt;DBUF&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;   &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nc"&gt;BLKW&lt;/span&gt;   &lt;span class="nt"&gt;4000&lt;/span&gt;            &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;DISK&lt;/span&gt; &lt;span class="nt"&gt;DATA&lt;/span&gt; &lt;span class="nt"&gt;BUFFER&lt;/span&gt;
+
+        &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nc"&gt;END&lt;/span&gt;    &lt;span class="nt"&gt;START&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Running this indicated the RSTS pack was in good shape, and not corrupt.  So, maybe I have had a lurking
+hardware bug in my memory system (a 256KB MS11-L), which never tripped up RT-11 and so has to date
+gone undiagnosed?&lt;/p&gt;
+&lt;p&gt;At this point, Noel suggested on cctalk that I give Release 6 Unix a try as well, and see if it suffers
+similarly.  Worth a shot!  Out of time for now, and back to the day gig tomorrow after holiday break.
+Happy new year, all!&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Fritz Mueller</dc:creator><pubDate>Mon, 07 Jan 2019 00:00:00 -0800</pubDate><guid isPermaLink="false">tag:fritzm.github.io,2019-01-07:/rsts.html</guid><category>Retro-Computing</category><category>PDP-11</category></item><item><title>PDP-11/45 Behaving Badly</title><link>http://fritzm.github.io/behaving-badly.html</link><description>&lt;p&gt;Wow, a year to the day since the previous post here!  Not a lot of PDP-11 work this past year, with lots of
 other stuff like home improvements going on, but a few things worth catching up on here.&lt;/p&gt;
 &lt;p&gt;Mainly, I got brave this past year and decided to actually rent a van and take the 11/45 out of the basement
 to the VCF West show at the Computer History Museum in Mountain View.  This was a &lt;em&gt;lot&lt;/em&gt; more physical work
@@ -7,7 +243,7 @@ than I had anticipated.  Working on this thing a piece at a time, sitting in one
 get kind of used to it and forget how much iron it actually is...  But breaking it down, loading it into a
 van, unloading into the show, reassembling, then reversing the whole process at the end of the show is a stark
 reminder, both of the size of the machine and of my advancing age, ha!  A &lt;em&gt;huge&lt;/em&gt; thank-you to my workmate
-Brian Van Klaveren, who selflessly gave up a weekend, a vacation day, and some mileage on his back to give me
+Brian, who selflessly gave up a weekend, a vacation day, and some mileage on his back to give me
 a hand.  He has already informed me that "the answer for next year is 'no'." :-)&lt;/p&gt;
 &lt;p&gt;&lt;img src='/images/pdp11/VCFW3_thumbnail_tall.jpg' title='Reassembly on the VCF West show floor' onclick='pswipe("pdp11",76);'/&gt;
 &lt;img src='/images/pdp11/VCFW1_thumbnail_tall.jpg' title='Running diagnostics and consulting the RK11-C prints...' onclick='pswipe("pdp11",77);'/&gt;
@@ -56,54 +292,7 @@ TIMOUT,PC=004536
 
 
 &lt;p&gt;And the relevant bit of the diagnostic listing:&lt;/p&gt;
-&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt; 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;014362  2$:     MOV     RKVEC,R1
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;014362  2$:     MOV     RKVEC,R1
 014366          MOV     #3$,(R1)+               ;SET UP VECTOR ADRES FOR RK11 INTERUPT
 014372          MOV     #340,(R1)               ;SET UP PSW ON INTERRUPT
 014376          BIS     #40,@RKDA               ;ADRES CYLINDER #1
@@ -152,7 +341,7 @@ TIMOUT,PC=004536
 014526          ERROR   53                      ;SCP DID NOT SET AFTER RK11 INTERRUPTED
                                                 ;INDICATING SEEK WAS
 &lt;/pre&gt;&lt;/div&gt;
-&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+
 
 &lt;p&gt;So, based on the fact that we don't hit error 75 from 14426 (and the fact that the previous test, #36, in
 this diagnostic is passing) unlike some previous issues the RK11 here &lt;em&gt;is&lt;/em&gt; able to generate interrupts and the
@@ -1763,7 +1952,7 @@ binary.  This makes it a little easier to follow along while debugging the newer
 &lt;span class="nt"&gt;013620&lt;/span&gt; &lt;span class="nt"&gt;012737&lt;/span&gt;  &lt;span class="nt"&gt;013644&lt;/span&gt;  &lt;span class="nt"&gt;000014&lt;/span&gt;          &lt;span class="nt"&gt;MOV&lt;/span&gt;     &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;TTY7B&lt;/span&gt;&lt;span class="o"&gt;,@&lt;/span&gt;&lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;BPTVEC&lt;/span&gt; &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;LOAD&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;T&amp;#39;&lt;/span&gt; &lt;span class="nt"&gt;BIT&lt;/span&gt; &lt;span class="nt"&gt;TRAP&lt;/span&gt; &lt;span class="nt"&gt;VECTOR&lt;/span&gt;
 &lt;span class="nt"&gt;013626&lt;/span&gt; &lt;span class="nt"&gt;005002&lt;/span&gt;                          &lt;span class="nt"&gt;CLR&lt;/span&gt;     &lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="nt"&gt;2&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;CLEAR&lt;/span&gt; &lt;span class="nt"&gt;INDICATOR&lt;/span&gt;
 &lt;span class="nt"&gt;013630&lt;/span&gt; &lt;span class="nt"&gt;052737&lt;/span&gt;  &lt;span class="nt"&gt;000100&lt;/span&gt;  &lt;span class="nt"&gt;177564&lt;/span&gt;          &lt;span class="nt"&gt;BIS&lt;/span&gt;     &lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;100&lt;/span&gt;&lt;span class="o"&gt;,@&lt;/span&gt;&lt;span class="p"&gt;#&lt;/span&gt;&lt;span class="nn"&gt;TTCSR&lt;/span&gt;    &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;ALLOW&lt;/span&gt; &lt;span class="nt"&gt;INTERRUPT&lt;/span&gt; &lt;span class="nt"&gt;INTERRUPT&lt;/span&gt; &lt;span class="nt"&gt;OCCURS&lt;/span&gt; &lt;span class="nt"&gt;AFTER&lt;/span&gt;
-                                                               &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;THIS&lt;/span&gt; &lt;span class="nt"&gt;INSTRUCTION&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt; &lt;span class="nt"&gt;BEFORE&lt;/span&gt; &lt;span class="nt"&gt;NEXT&lt;/span&gt;
+                                                               &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;THIS&lt;/span&gt; &lt;span class="nt"&gt;INSTRUCTION&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="nt"&gt;amp&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt; &lt;span class="nt"&gt;BEFORE&lt;/span&gt; &lt;span class="nt"&gt;NEXT&lt;/span&gt;
 &lt;span class="nt"&gt;013636&lt;/span&gt; &lt;span class="nt"&gt;000001&lt;/span&gt;                  &lt;span class="nt"&gt;WAIT1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;  &lt;span class="nt"&gt;WAIT&lt;/span&gt;                    &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;WAIT&lt;/span&gt; &lt;span class="nt"&gt;FOR&lt;/span&gt; &lt;span class="nt"&gt;AN&lt;/span&gt; &lt;span class="nt"&gt;INTERRUPT&lt;/span&gt;
 &lt;span class="nt"&gt;013640&lt;/span&gt; &lt;span class="nt"&gt;005202&lt;/span&gt;                          &lt;span class="nt"&gt;INC&lt;/span&gt;     &lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="nt"&gt;2&lt;/span&gt;              &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;INCREMENT&lt;/span&gt; &lt;span class="nt"&gt;INDICATOR&lt;/span&gt;
 &lt;span class="nt"&gt;013642&lt;/span&gt; &lt;span class="nt"&gt;000000&lt;/span&gt;                          &lt;span class="nt"&gt;HLT&lt;/span&gt;                     &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;ERROR&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt; &lt;span class="nt"&gt;NO&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;T&amp;#39;&lt;/span&gt; &lt;span class="nt"&gt;TRAP&lt;/span&gt; &lt;span class="nt"&gt;AFTER&lt;/span&gt; &lt;span class="nt"&gt;INTERRUPT&lt;/span&gt;
@@ -2292,12 +2481,12 @@ I will update that repo.  Any help from fontophiles gladly accepted!&lt;/p&gt;</
 &lt;span class="n"&gt;im&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[];&lt;/span&gt; &lt;span class="n"&gt;g1&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[];&lt;/span&gt; &lt;span class="n"&gt;g2&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[];&lt;/span&gt;
 
 &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;frame&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;30&lt;/span&gt;
-    &lt;span class="n"&gt;g1&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;mod&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;log&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;abs&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Z&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;lt&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;           &lt;span class="c"&gt;% radial, static&lt;/span&gt;
-&lt;span class="c"&gt;%    g1 = mod(log(abs(Z))*4+(frame-1)/15,2)&amp;lt;1; % radial, dynamic&lt;/span&gt;
-&lt;span class="c"&gt;%    g1 = mod(real(Z)+(frame-1)*.8/30,.8)&amp;lt;.4;  % vertical, dynamic&lt;/span&gt;
-&lt;span class="c"&gt;%    g2 = mod(angle(Z), pi/6)&amp;lt;(pi/12);         % circumferential, static&lt;/span&gt;
-    &lt;span class="n"&gt;g2&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;mod&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;angle&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Z&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;frame&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nb"&gt;pi&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;180&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;pi&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;6&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;pi&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;12&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt; &lt;span class="c"&gt;% circumferential, dynamic&lt;/span&gt;
-&lt;span class="c"&gt;%    g2 = mod(imag(Z),.8)&amp;lt;.4;                  % horizontal, static&lt;/span&gt;
+    &lt;span class="n"&gt;g1&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;mod&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;log&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;abs&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Z&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;amp&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="n"&gt;lt&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;           &lt;span class="c"&gt;% radial, static&lt;/span&gt;
+&lt;span class="c"&gt;%    g1 = mod(log(abs(Z))*4+(frame-1)/15,2)&amp;amp;lt;1; % radial, dynamic&lt;/span&gt;
+&lt;span class="c"&gt;%    g1 = mod(real(Z)+(frame-1)*.8/30,.8)&amp;amp;lt;.4;  % vertical, dynamic&lt;/span&gt;
+&lt;span class="c"&gt;%    g2 = mod(angle(Z), pi/6)&amp;amp;lt;(pi/12);         % circumferential, static&lt;/span&gt;
+    &lt;span class="n"&gt;g2&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;mod&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;angle&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Z&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;frame&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nb"&gt;pi&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;180&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;pi&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;6&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;lt&lt;/span&gt;&lt;span class="p"&gt;;(&lt;/span&gt;&lt;span class="nb"&gt;pi&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;12&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt; &lt;span class="c"&gt;% circumferential, dynamic&lt;/span&gt;
+&lt;span class="c"&gt;%    g2 = mod(imag(Z),.8)&amp;amp;lt;.4;                  % horizontal, static&lt;/span&gt;
     &lt;span class="n"&gt;im&lt;/span&gt;&lt;span class="p"&gt;(:,:,&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;frame&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="n"&gt;imresize&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;xor&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;g1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;g2&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="mi"&gt;25&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;bilinear&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
     &lt;span class="n"&gt;imwrite&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;im&lt;/span&gt;&lt;span class="p"&gt;(:,:,&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;frame&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;sprintf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;frame%.2d.bmp&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;frame&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
 &lt;span class="k"&gt;end&lt;/span&gt;

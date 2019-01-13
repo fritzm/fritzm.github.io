@@ -87,7 +87,7 @@ than I had anticipated.  Working on this thing a piece at a time, sitting in one
 get kind of used to it and forget how much iron it actually is...  But breaking it down, loading it into a
 van, unloading into the show, reassembling, then reversing the whole process at the end of the show is a stark
 reminder, both of the size of the machine and of my advancing age, ha!  A <em>huge</em> thank-you to my workmate
-Brian Van Klaveren, who selflessly gave up a weekend, a vacation day, and some mileage on his back to give me
+Brian, who selflessly gave up a weekend, a vacation day, and some mileage on his back to give me
 a hand.  He has already informed me that "the answer for next year is 'no'." :-)</p>
 <p><img src='/images/pdp11/VCFW3_thumbnail_tall.jpg' title='Reassembly on the VCF West show floor' onclick='pswipe("pdp11",76);'/>
 <img src='/images/pdp11/VCFW1_thumbnail_tall.jpg' title='Running diagnostics and consulting the RK11-C prints...' onclick='pswipe("pdp11",77);'/>
@@ -136,54 +136,7 @@ TIMOUT,PC=004536
 
 
 <p>And the relevant bit of the diagnostic listing:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48</pre></div></td><td class="code"><div class="highlight"><pre><span></span>014362  2$:     MOV     RKVEC,R1
+<div class="highlight"><pre><span></span>014362  2$:     MOV     RKVEC,R1
 014366          MOV     #3$,(R1)+               ;SET UP VECTOR ADRES FOR RK11 INTERUPT
 014372          MOV     #340,(R1)               ;SET UP PSW ON INTERRUPT
 014376          BIS     #40,@RKDA               ;ADRES CYLINDER #1
@@ -232,7 +185,7 @@ TIMOUT,PC=004536
 014526          ERROR   53                      ;SCP DID NOT SET AFTER RK11 INTERRUPTED
                                                 ;INDICATING SEEK WAS
 </pre></div>
-</td></tr></table>
+
 
 <p>So, based on the fact that we don't hit error 75 from 14426 (and the fact that the previous test, #36, in
 this diagnostic is passing) unlike some previous issues the RK11 here <em>is</em> able to generate interrupts and the

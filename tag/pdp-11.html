@@ -72,6 +72,259 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="http://fritzm.github.io/rsts.html"><h1>PDP-11/45: RSTS/E V06C attempts</h1></a>
+Mon 07 January 2019
+
+by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+    </div>
+
+    <div><p>Okay, back in action after replacing the failed nand at B26 in the RK11-C.  MAINDEC ZRKK now passes reliably.
+Wish I'd been able to get to the bottom of this at the show, but it was really hard to effectively debug on
+the floor there while the show was in progress -- you naturally want to stop and chat with everybody who drops
+by to take a look, so its hard to get into a good technical flow.</p>
+<p>Since one of the RK11-C diagnostics I needed to use writes a pack destructively, I had to sacrifice my working
+RT-11 pack along the way.  Rather than go back to the same old RT-11 image, I figured maybe time to try
+something different?  RSTS/E would probably be more fun with multiple terminals and the DZ11 that I have
+anyway, and I've never actually played around with RSTS.  So decided to give that a go...</p>
+<p>Did some poking around looking at various available versions, and V06C seemed like a pretty good starting
+point: it's new enough to explicitly support all of my hardware (including the DZ11 and excepting the VT100),
+but old enough to still have relatively modest storage requirements so I can hope to run it with the single
+RK05 that I currently have working.  There is also complete distribution tape available at rsts.org, and a
+fairly complete set of documentation at bitsavers.</p>
+<p>Spent a bit of time reading the sysgen manual, and managed to sysgen under simh and generate a bootable
+RK05 image for my hardware.  I then transferred this image to my single working pack using PDP11GUI; this is
+frustratingly slow (~3 hours to write a 2.5mb pack)!!  I had forgotten how bad this is.  I'm not quite sure
+why it is as slow as it is; it shouldn't take much more than 45 minutes to push that much data through a DL11
+at 9600 baud, even without compression, and the PDP-11 disk subsystem can easily keep up with that.  I'm not
+sure if PDP11GUI is spending a lot of time turning around the serial line, or has a bunch of per-character
+overhead, or...?  In any case, I'm motivated to do something about it; more on this some other time soon.</p>
+<p>So, unfortunately, the RSTS image which works under simh fails to completely boot on the real hardware. It
+runs through the initial "Option:" menu without trouble, and upon start the RSTS light chaser runs in the
+data lights on the front panel.  Characters are echoed on the console terminal, but it never reaches code to
+print the banner or prompt for the initial control file.  The system appears to be in a loop reading the same
+section of disk repetitively, and the display register shows a continuously increasing count.</p>
+<p>Got a lot of help from folks over on the cctalk mailing list on this one, since I'm a newbie to RSTS.  Paul K.
+provided some useful tips:</p>
+<ul>
+<li>
+<p>RSTS displays an error count in the display register, so that's why I see an increasing count there.</p>
+</li>
+<li>
+<p>The "fancy" idle pattern that includes both the address and data lights apparently shows up in a later
+release of RSTS and requires a particular sysgen option, so its not surprising that I only see the pattern
+in the data lights on my machine.</p>
+</li>
+<li>
+<p>The ODT debugger may be loaded with RSTS for startup debugging by configuring it using an undocumented
+option in the change memory layout section of the "DEFAULT" command at the boot prompt.  Enter "ODT" there,
+and provide a space for it in the memory map.  After that, at ^P at the console will take you to the ODT
+prompt. </p>
+</li>
+</ul>
+<div class="highlight"><pre><span></span>   Memory allocation table:
+
+     0K: 00000000 - 00123777 (  21K) : EXEC
+    21K: 00124000 - 00213777 (  14K) : RTS (BASIC)
+    35K: 00214000 - 00227777 (   3K) : ODT
+    38K: 00230000 - 00757777 (  86K) : USER
+   124K: 00760000 - End              : NXM
+</pre></div>
+
+
+<ul>
+<li>A handy way to query the RSTS symbol table is to use the "PATCH" command at the boot prompt (one can also
+look through the .MAP files generated during sysgen):</li>
+</ul>
+<div class="highlight"><pre><span></span>   Option: PA
+   File to patch? 
+   Module name? 
+   Base address? ERL
+   Offset address? 
+    Base   Offset  Old     New?
+   041314  000000  005267  ? ^Z
+   Offset address? ^Z
+   Base address? 
+</pre></div>
+
+
+<ul>
+<li>Paul also provided this procedure for triggering a crash dump from an ODT breakpoint under RSTS:</li>
+</ul>
+<div class="highlight"><pre><span></span>1. Make sure crash dump is enabled (in the &quot;default&quot; option).  Start the system.  Let it run for at least one minute.  (I&#39;m not entirely sure about older versions, but I think that a crash within one minute of startup is handled differently and doesn&#39;t do all the usual dump and restart machinery.)
+
+2. Set the data switches all UP.  (In SIMH, enter &quot;D SR 177777&quot;.)
+
+3. Set a breakpoint.
+
+4. When you hit the breakpoint, change the PC to 52, like this:
+
+    0B:055244 
+    _$7/055244 52 
+    _P 
+
+  (you enter only &quot;$7/&quot; and &quot;52&lt;return&gt;&quot; and &quot;P&quot;, the rest is output from ODT.)
+
+  The system will write the crashdump and then automatically restart.
+
+5. You should now have the crash dump in [0,1]CRASH.SYS
+</pre></div>
+
+
+<p>Further experiments coordinated by Paul then led to the conclusion that an error like this could reasonably be
+expected to be triggered by a corrupted INIT.BAC or BASIC.RTS file.  This led me to wish to verify that the
+disk pack contents really matched the image file I was running successfully under simh.  Some standalone code
+to dump a CRC of every sector on the pack seemed like it would be useful in this regard, so I coded up the
+following:</p>
+<div class="highlight"><pre><span></span>        <span class="nt">RKDS</span><span class="o">=</span><span class="nt">177400</span>
+        <span class="nt">RKER</span><span class="o">=</span><span class="nt">177402</span>
+        <span class="nt">RKCS</span><span class="o">=</span><span class="nt">177404</span>
+        <span class="nt">RKWC</span><span class="o">=</span><span class="nt">177406</span>
+        <span class="nt">RKBA</span><span class="o">=</span><span class="nt">177410</span>
+        <span class="nt">RKDA</span><span class="o">=</span><span class="nt">177412</span>
+
+        <span class="nt">XCSR</span><span class="o">=</span><span class="nt">177564</span>
+        <span class="nt">XBUF</span><span class="o">=</span><span class="nt">177566</span>
+
+        <span class="p">.</span><span class="nc">ASECT</span>
+        <span class="o">.=</span><span class="nt">1000</span>
+<span class="nt">START</span><span class="o">:</span>  
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">700</span><span class="o">,</span><span class="nt">SP</span>         <span class="o">;</span><span class="nt">INIT</span> <span class="nt">STACK</span> <span class="nt">POINTER</span>
+
+        <span class="o">;</span><span class="nt">-----</span> <span class="nt">INIT</span> <span class="nt">CRC</span> <span class="nt">LOOKUP</span> <span class="nt">TABLE</span>
+
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">10041</span><span class="o">,</span><span class="nt">R0</span>       <span class="o">;</span><span class="nt">CRC</span> <span class="nt">POLYNOMIAL</span> 
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">CRCTBL</span><span class="o">,</span><span class="nt">R1</span>      <span class="o">;</span><span class="nt">LOOKUP</span> <span class="nt">TABLE</span> <span class="nt">TO</span> <span class="nt">FILL</span>
+        <span class="nt">ADD</span>     <span class="p">#</span><span class="nn">1000</span><span class="o">,</span><span class="nt">R1</span>        <span class="o">;</span><span class="nt">START</span> <span class="nt">FILLING</span> <span class="nt">FROM</span> <span class="nt">END</span> <span class="o">(+</span><span class="nt">512</span> <span class="nt">WORDS</span><span class="o">)</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">377</span><span class="o">,</span><span class="nt">R2</span>         <span class="o">;</span><span class="nt">COUNT</span> <span class="nt">DOWN</span> <span class="nt">FROM</span> <span class="nt">INDEX</span> <span class="nt">511</span>      
+<span class="nt">L0</span><span class="o">:</span>     <span class="nt">MOV</span>     <span class="nt">R2</span><span class="o">,</span><span class="nt">R4</span>           <span class="o">;</span><span class="nt">GET</span> <span class="nt">COPY</span> <span class="nt">OF</span> <span class="nt">INDEX</span>
+        <span class="nt">SWAB</span>    <span class="nt">R4</span>              <span class="o">;</span><span class="nt">MOVE</span> <span class="nt">TO</span> <span class="nt">UPPER</span> <span class="nt">BYTE</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">10</span><span class="o">,</span><span class="nt">R3</span>          <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">OVER</span> <span class="nt">EIGHT</span> <span class="nt">BITS</span> <span class="nt">OF</span> <span class="nt">INDEX</span>  
+<span class="nt">L1</span><span class="o">:</span>     <span class="nt">ASL</span>     <span class="nt">R4</span>              <span class="o">;</span><span class="nt">SHIFT</span><span class="o">,</span> <span class="nt">MSB</span> <span class="nt">TO</span> <span class="nt">CARRY</span> <span class="nt">FLAG</span>
+        <span class="nt">BCC</span>     <span class="nt">L2</span>              <span class="o">;</span><span class="nt">IF</span> <span class="nt">MSB</span> <span class="nt">NOT</span> <span class="nt">SET</span> <span class="nt">SKIP</span> <span class="nt">AHEAD</span>
+        <span class="nt">XOR</span>     <span class="nt">R0</span><span class="o">,</span><span class="nt">R4</span>           <span class="o">;</span><span class="nt">ELSE</span> <span class="nt">XOR</span> <span class="nt">IN</span> <span class="nt">POLYNOMIAL</span>
+<span class="nt">L2</span><span class="o">:</span>     <span class="nt">SOB</span>     <span class="nt">R3</span><span class="o">,</span><span class="nt">L1</span>           <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">OVER</span> <span class="nt">BITS</span>
+        <span class="nt">MOV</span>     <span class="nt">R4</span><span class="o">,</span><span class="nt">-</span><span class="o">(</span><span class="nt">R1</span><span class="o">)</span>        <span class="o">;</span><span class="nt">SAVE</span> <span class="nt">RESULT</span> <span class="nt">IN</span> <span class="nt">LOOKUP</span> <span class="nt">TABLE</span>
+        <span class="nt">DEC</span>     <span class="nt">R2</span>              <span class="o">;</span><span class="nt">COUNT</span> <span class="nt">DOWN</span>
+        <span class="nt">BPL</span>     <span class="nt">L0</span>              <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">OVER</span> <span class="nt">TABLE</span> <span class="nt">ENTRIES</span>
+
+        <span class="nt">CLR</span>     <span class="nt">R5</span>              <span class="o">;</span><span class="nt">INIT</span> <span class="nt">SECTOR</span> <span class="nt">COUNTER</span>
+
+        <span class="o">;</span><span class="nt">-----</span> <span class="nt">PRINT</span> <span class="nt">START</span> <span class="nt">OF</span> <span class="nt">LINE</span>
+
+<span class="nt">L3</span><span class="o">:</span>     <span class="nt">MOV</span>     <span class="nt">R5</span><span class="o">,</span><span class="nt">R0</span>           <span class="o">;</span><span class="nt">GET</span> <span class="nt">SECTOR</span> <span class="nt">COUNTER</span>
+        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRNW</span>         <span class="o">;</span><span class="nt">PRINT</span> <span class="nt">IT</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">DELIM1</span><span class="o">,</span><span class="nt">R0</span>      <span class="o">;</span><span class="nt">GET</span> <span class="nt">POST-SECTOR</span> <span class="nt">DELIMETER</span>
+        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRNSTR</span>       <span class="o">;</span><span class="nt">PRINT</span> <span class="nt">IT</span>
+
+        <span class="o">;</span><span class="nt">-----</span> <span class="nt">READ</span> <span class="nt">8</span> <span class="nt">SECTORS</span> <span class="nt">FROM</span> <span class="nt">DISK</span>
+
+<span class="nt">L4</span><span class="o">:</span>     <span class="nt">MOV</span>     <span class="nt">R5</span><span class="o">,@</span><span class="p">#</span><span class="nn">RKDA</span>       <span class="o">;</span><span class="nt">SET</span> <span class="nt">START</span> <span class="nt">SECTOR</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">DBUF</span><span class="o">,@</span><span class="p">#</span><span class="nn">RKBA</span>    <span class="o">;</span><span class="nt">SET</span> <span class="nt">TARGET</span> <span class="nt">ADDRESS</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">-4000</span><span class="o">,@</span><span class="p">#</span><span class="nn">RKWC</span>   <span class="o">;</span><span class="nt">READ</span> <span class="nt">8</span> <span class="nt">SECTORS</span> <span class="o">(</span><span class="nt">2K</span> <span class="nt">WORDS</span><span class="o">)</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">5</span><span class="o">,@</span><span class="p">#</span><span class="nn">RKCS</span>       <span class="o">;</span><span class="nt">READ</span> <span class="o">+</span> <span class="nt">GO</span>
+        <span class="nt">TSTB</span>    <span class="o">@</span><span class="p">#</span><span class="nn">RKCS</span>          <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">RKCS</span> <span class="nt">RDY</span> <span class="nt">BIT</span>
+        <span class="nt">BPL</span>     <span class="p">.</span><span class="nc">-4</span>             <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">IF</span> <span class="nt">BUSY</span>
+
+        <span class="o">;</span><span class="nt">-----</span> <span class="nt">HANDLE</span> <span class="nt">ERROR</span> <span class="nt">IF</span> <span class="nt">ANY</span>
+
+        <span class="nt">BIT</span>     <span class="p">#</span><span class="nn">100000</span><span class="o">,@</span><span class="p">#</span><span class="nn">RKCS</span>  <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">FOR</span> <span class="nt">ERROR</span>
+        <span class="nt">BEQ</span>     <span class="nt">L5</span>              <span class="o">;</span><span class="nt">SKIP</span> <span class="nt">AHEAD</span> <span class="nt">IF</span> <span class="nt">NOT</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">ERRSTR</span><span class="o">,</span><span class="nt">R0</span>      <span class="o">;</span><span class="nt">POINT</span> <span class="nt">TO</span> <span class="nt">ERROR</span> <span class="nt">INDICATOR</span>
+        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRNSTR</span>       <span class="o">;</span><span class="nt">PRINT</span> <span class="nt">IT</span>
+        <span class="nt">MOV</span>     <span class="o">@</span><span class="p">#</span><span class="nn">RKER</span><span class="o">,</span><span class="nt">R0</span>       <span class="o">;</span><span class="nt">GET</span> <span class="nt">ERROR</span> <span class="nt">REG</span>
+        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRNW</span>         <span class="o">;</span><span class="nt">PRINT</span> <span class="nt">IT</span>
+        <span class="nt">BR</span>      <span class="nt">L8</span>              <span class="o">;</span><span class="nt">MOVE</span> <span class="nt">ON</span> <span class="nt">TO</span> <span class="nt">NEXT</span> <span class="nt">8</span> <span class="nt">SECTORS</span>
+
+<span class="nt">L5</span><span class="o">:</span>     <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">DBUF</span><span class="o">,</span><span class="nt">R4</span>        <span class="o">;</span><span class="nt">POINT</span> <span class="nt">TO</span> <span class="nt">START</span> <span class="nt">OF</span> <span class="nt">DATA</span> <span class="nt">JUST</span> <span class="nt">READ</span>
+
+        <span class="o">;</span><span class="nt">-----</span> <span class="nt">RUN</span> <span class="nt">CRC</span> <span class="nt">FOR</span> <span class="nt">ONE</span> <span class="nt">SECTOR</span><span class="o">.</span>  <span class="nt">FOR</span> <span class="nt">EACH</span> <span class="nt">INPUT</span> <span class="nt">BYTE</span> <span class="nt">CH</span><span class="o">:</span>
+        <span class="o">;</span>       <span class="nt">CRC</span> <span class="o">=</span> <span class="nt">CRCTBL</span><span class="cp">[</span><span class="p">((</span><span class="nx">CRC</span> <span class="o">&gt;&gt;</span> <span class="mi">8</span><span class="p">)</span> <span class="p">^</span> <span class="nx">CH</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">255</span><span class="cp">]</span> <span class="o">^</span> <span class="o">(</span><span class="nt">CRC</span> <span class="o">&lt;&lt;</span> <span class="nt">8</span><span class="o">)</span>
+
+<span class="nt">L6</span><span class="o">:</span>     <span class="nt">CLR</span>     <span class="nt">R0</span>              <span class="o">;</span><span class="nt">RESET</span> <span class="nt">CRC</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">1000</span><span class="o">,</span><span class="nt">R1</span>        <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">OVER</span> <span class="nt">ONE</span> <span class="nt">SECTOR</span> <span class="o">(</span><span class="nt">256</span> <span class="nt">WORDS</span><span class="o">)</span>
+<span class="nt">L7</span><span class="o">:</span>     <span class="nt">MOV</span>     <span class="nt">R0</span><span class="o">,</span><span class="nt">R2</span>           <span class="o">;</span><span class="nt">GET</span> <span class="nt">COPY</span> <span class="nt">OF</span> <span class="nt">CRC</span>
+        <span class="nt">SWAB</span>    <span class="nt">R2</span>              <span class="o">;</span><span class="nt">MOVE</span> <span class="nt">HIGH</span> <span class="nt">BYTE</span> <span class="nt">DOWN</span>
+        <span class="nt">MOVB</span>    <span class="o">(</span><span class="nt">R4</span><span class="o">)+,</span><span class="nt">R3</span>        <span class="o">;</span><span class="nt">GET</span> <span class="nt">NEXT</span> <span class="nt">INPUT</span> <span class="nt">BYTE</span> <span class="nt">TO</span> <span class="nt">PROCESS</span>
+        <span class="nt">XOR</span>     <span class="nt">R3</span><span class="o">,</span><span class="nt">R2</span>           <span class="o">;</span><span class="nt">XOR</span> <span class="nt">ONTO</span> <span class="nt">MUNGED</span> <span class="nt">CRC</span>
+        <span class="nt">BIC</span>     <span class="p">#</span><span class="nn">177400</span><span class="o">,</span><span class="nt">R2</span>      <span class="o">;</span><span class="nt">MASK</span> <span class="nt">OFF</span> <span class="nt">HIGH</span> <span class="nt">BYTE</span>
+        <span class="nt">ASL</span>     <span class="nt">R2</span>              <span class="o">;</span><span class="nt">TIMES</span> <span class="nt">TWO</span> <span class="nt">INDEX</span> <span class="nt">INTO</span> <span class="nt">LOOKUP</span> <span class="nt">TABLE</span>
+        <span class="nt">MOV</span>     <span class="nt">CRCTBL</span><span class="o">(</span><span class="nt">R2</span><span class="o">),</span><span class="nt">R3</span>   <span class="o">;</span><span class="nt">LOOKUP</span> <span class="nt">VALUE</span>
+        <span class="nt">SWAB</span>    <span class="nt">R0</span>              <span class="o">;</span><span class="nt">MOVE</span> <span class="nt">LOW</span> <span class="nt">BYTE</span> <span class="nt">OF</span> <span class="nt">CRC</span> <span class="nt">UP</span>
+        <span class="nt">CLRB</span>    <span class="nt">R0</span>              <span class="o">;</span><span class="nt">MASK</span> <span class="nt">OFF</span> <span class="nt">THE</span> <span class="nt">BOTTOM</span>
+        <span class="nt">XOR</span>     <span class="nt">R3</span><span class="o">,</span><span class="nt">R0</span>           <span class="o">;</span><span class="nt">XOR</span> <span class="nt">IN</span> <span class="nt">THE</span> <span class="nt">LOOKED</span> <span class="nt">UP</span> <span class="nt">VALUE</span>
+        <span class="nt">SOB</span>     <span class="nt">R1</span><span class="o">,</span><span class="nt">L7</span>           <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">OVER</span> <span class="nt">BYTES</span>
+
+        <span class="o">;</span><span class="nt">-----</span> <span class="nt">PRINT</span> <span class="nt">CRC</span><span class="o">,</span> <span class="nt">DELIMIT</span> <span class="nt">AND</span> <span class="nt">LOOP</span>
+
+        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRNW</span>         <span class="o">;</span><span class="nt">PRINT</span> <span class="nt">CRC</span><span class="o">,</span> <span class="nt">ALREADY</span> <span class="nt">IN</span> <span class="nt">R0</span>
+        <span class="nt">CMP</span>     <span class="nt">R4</span><span class="o">,</span><span class="p">#</span><span class="nn">DBUF</span><span class="o">+</span><span class="nt">10000</span>  <span class="o">;</span><span class="nt">END</span> <span class="nt">OF</span> <span class="nt">DISK</span> <span class="nt">BUFFER</span><span class="o">?</span>
+        <span class="nt">BEQ</span>     <span class="nt">L8</span>              <span class="o">;</span><span class="nt">IF</span> <span class="nt">SO</span><span class="o">,</span> <span class="nt">EXIT</span> <span class="nt">LOOP</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">DELIM2</span><span class="o">,</span><span class="nt">R0</span>      <span class="o">;</span><span class="nt">ELSE</span> <span class="nt">POINT</span> <span class="nt">TO</span> <span class="nt">POST-CRC</span> <span class="nt">DELIMETER</span>
+        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRNSTR</span>       <span class="o">;</span><span class="nt">PRINT</span> <span class="nt">IT</span>
+        <span class="nt">BR</span>      <span class="nt">L6</span>              <span class="o">;</span><span class="nt">GO</span> <span class="nt">DO</span> <span class="nt">ANOTHER</span> <span class="nt">SECTOR</span>
+
+        <span class="o">;</span><span class="nt">-----</span> <span class="nt">DELIMIT</span> <span class="nt">END</span> <span class="nt">OF</span> <span class="nt">LINE</span><span class="o">,</span> <span class="nt">LOOP</span> 
+
+<span class="nt">L8</span><span class="o">:</span>     <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">CRLF</span><span class="o">,</span><span class="nt">R0</span>        <span class="o">;</span><span class="nt">POINT</span> <span class="nt">TO</span> <span class="nt">LINE</span> <span class="nt">DELIMETER</span>
+        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRNSTR</span>       <span class="o">;</span><span class="nt">PRINT</span> <span class="nt">IT</span>
+        <span class="nt">ADD</span>     <span class="p">#</span><span class="nn">10</span><span class="o">,</span><span class="nt">R5</span>          <span class="o">;</span><span class="nt">MOVE</span> <span class="nt">AHEAD</span> <span class="nt">8</span> <span class="nt">SECTORS</span>
+        <span class="nt">CMP</span>     <span class="nt">R5</span><span class="o">,</span><span class="p">#</span><span class="nn">11410</span>       <span class="o">;</span><span class="nt">AT</span> <span class="nt">END</span> <span class="nt">OF</span> <span class="nt">PACK</span><span class="o">?</span>
+        <span class="nt">BLT</span>     <span class="nt">L3</span>              <span class="o">;</span><span class="nt">IF</span> <span class="nt">NOT</span><span class="o">,</span> <span class="nt">GO</span> <span class="nt">DO</span> <span class="nt">THE</span> <span class="nt">NEXT</span> <span class="nt">8</span>
+
+        <span class="nt">HALT</span>                    <span class="o">;</span><span class="nt">ALL</span> <span class="nt">DONE</span><span class="o">!</span>
+
+        <span class="o">;</span><span class="nt">-----</span> <span class="nt">PRINT</span> <span class="nt">A</span> <span class="nt">WORD</span> <span class="nt">IN</span> <span class="nt">OCTAL</span>
+
+<span class="nt">PRNW</span><span class="o">:</span>   <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">6</span><span class="o">,</span><span class="nt">R2</span>           <span class="o">;</span><span class="nt">SIX</span> <span class="nt">DIGITS</span> <span class="nt">TO</span> <span class="nt">PRINT</span>
+        <span class="nt">MOV</span>     <span class="nt">R0</span><span class="o">,</span><span class="nt">R1</span>           <span class="o">;</span><span class="nt">MOVE</span> <span class="nt">OUTPUT</span> <span class="nt">WORD</span> <span class="nt">OVER</span> <span class="nt">TO</span> <span class="nt">R1</span>
+        <span class="nt">CLR</span>     <span class="nt">R0</span>              <span class="o">;</span><span class="nt">RESET</span> <span class="nt">OUTPUT</span> <span class="nt">CHAR</span>
+        <span class="nt">ASHC</span>    <span class="p">#</span><span class="nn">1</span><span class="o">,</span><span class="nt">R0</span>           <span class="o">;</span><span class="nt">AND</span> <span class="nt">SHIFT</span> <span class="nt">IN</span> <span class="nt">MSB</span> <span class="nt">TO</span> <span class="nt">START</span>
+<span class="nt">L9</span><span class="o">:</span>     <span class="nt">ADD</span>     <span class="p">#</span><span class="nn">60</span><span class="o">,</span><span class="nt">R0</span>          <span class="o">;</span><span class="nt">MAKE</span> <span class="nt">INTO</span> <span class="nt">ASCII</span> <span class="nt">DIGIT</span>
+        <span class="nt">MOV</span>     <span class="nt">R0</span><span class="o">,@</span><span class="p">#</span><span class="nn">XBUF</span>       <span class="o">;</span><span class="nt">PRINT</span> <span class="nt">IT</span>
+        <span class="nt">TSTB</span>    <span class="o">@</span><span class="p">#</span><span class="nn">XCSR</span>          <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">IF</span> <span class="nt">XMIT</span> <span class="nt">DONE</span>
+        <span class="nt">BPL</span>     <span class="p">.</span><span class="nc">-4</span>             <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">UNTIL</span> <span class="nt">SO</span>
+        <span class="nt">CLR</span>     <span class="nt">R0</span>              <span class="o">;</span><span class="nt">RESET</span> <span class="nt">OUTPUT</span> <span class="nt">CHAR</span>
+        <span class="nt">ASHC</span>    <span class="p">#</span><span class="nn">3</span><span class="o">,</span><span class="nt">R0</span>           <span class="o">;</span><span class="nt">SHIFT</span> <span class="nt">IN</span> <span class="nt">NEXT</span> <span class="nt">THREE</span> <span class="nt">BITS</span>
+        <span class="nt">SOB</span>     <span class="nt">R2</span><span class="o">,</span><span class="nt">L9</span>           <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">DIGITS</span>
+        <span class="nt">RTS</span>     <span class="nt">PC</span>              <span class="o">;</span><span class="nt">RETURN</span> <span class="nt">TO</span> <span class="nt">CALLER</span>
+
+        <span class="o">;</span><span class="nt">-----</span> <span class="nt">PRINT</span> <span class="nt">A</span> <span class="nt">NULL-TERMINATED</span> <span class="nt">STRING</span>
+
+<span class="nt">PRNSTR</span><span class="o">:</span> <span class="nt">MOVB</span>    <span class="o">(</span><span class="nt">R0</span><span class="o">)+,@</span><span class="p">#</span><span class="nn">XBUF</span>    <span class="o">;</span><span class="nt">PRINT</span> <span class="nt">ONE</span> <span class="nt">CHAR</span> <span class="nt">AND</span> <span class="nt">ADVANCE</span>
+        <span class="nt">TSTB</span>    <span class="o">@</span><span class="p">#</span><span class="nn">XCSR</span>          <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">IF</span> <span class="nt">XMIT</span> <span class="nt">DONE</span>
+        <span class="nt">BPL</span>     <span class="p">.</span><span class="nc">-4</span>             <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">UNTIL</span> <span class="nt">SO</span>
+        <span class="nt">TSTB</span>    <span class="p">@</span><span class="k">R0</span>             <span class="p">;</span><span class="nt">CHECK</span> <span class="nt">IF</span> <span class="nt">END</span> <span class="nt">OF</span> <span class="nt">STRING</span>
+        <span class="nt">BNE</span>     <span class="nt">PRNSTR</span>          <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">IF</span> <span class="nt">NOT</span>
+        <span class="nt">RTS</span>     <span class="nt">PC</span>              <span class="o">;</span><span class="nt">ELSE</span> <span class="nt">RETURN</span> <span class="nt">TO</span> <span class="nt">CALLER</span>
+
+<span class="nt">DELIM1</span><span class="o">:</span> <span class="p">.</span><span class="nc">ASCIZ</span>  <span class="o">/:</span> <span class="o">/</span>            <span class="o">;</span><span class="nt">POST-SECTOR</span> <span class="nt">DELIMETER</span>
+<span class="nt">DELIM2</span><span class="o">:</span> <span class="p">.</span><span class="nc">ASCIZ</span>  <span class="o">/</span> <span class="o">/</span>             <span class="o">;</span><span class="nt">POST-CRC</span> <span class="nt">DELIMETER</span>
+<span class="nt">CRLF</span><span class="o">:</span>   <span class="p">.</span><span class="nc">ASCIZ</span>  <span class="o">&lt;</span><span class="nt">15</span><span class="o">&gt;&lt;</span><span class="nt">12</span><span class="o">&gt;</span>        <span class="o">;</span><span class="nt">LINE</span> <span class="nt">DELIMETER</span>
+<span class="nt">ERRSTR</span><span class="o">:</span> <span class="p">.</span><span class="nc">ASCIZ</span>  <span class="o">/</span><span class="nt">ERROR</span><span class="o">:</span> <span class="o">/</span>       <span class="o">;</span><span class="nt">ERROR</span> <span class="nt">INDICATOR</span>
+
+<span class="nt">CRCTBL</span><span class="o">:</span> <span class="p">.</span><span class="nc">BLKW</span>   <span class="nt">400</span>             <span class="o">;</span><span class="nt">CRC</span> <span class="nt">LOOKUP</span> <span class="nt">TABLE</span>
+<span class="nt">DBUF</span><span class="o">:</span>   <span class="p">.</span><span class="nc">BLKW</span>   <span class="nt">4000</span>            <span class="o">;</span><span class="nt">DISK</span> <span class="nt">DATA</span> <span class="nt">BUFFER</span>
+
+        <span class="p">.</span><span class="nc">END</span>    <span class="nt">START</span>
+</pre></div>
+
+
+<p>Running this indicated the RSTS pack was in good shape, and not corrupt.  So, maybe I have had a lurking
+hardware bug in my memory system (a 256KB MS11-L), which never tripped up RT-11 and so has to date
+gone undiagnosed?</p>
+<p>At this point, Noel suggested on cctalk that I give Release 6 Unix a try as well, and see if it suffers
+similarly.  Worth a shot!  Out of time for now, and back to the day gig tomorrow after holiday break.
+Happy new year, all!</p></div>
+    <hr />
+</div>
+
+
+
+<div class='article'>
+    <div class="content-title">
         <a href="http://fritzm.github.io/behaving-badly.html"><h1>PDP-11/45 Behaving Badly</h1></a>
 Sun 09 December 2018
 
@@ -89,7 +342,7 @@ than I had anticipated.  Working on this thing a piece at a time, sitting in one
 get kind of used to it and forget how much iron it actually is...  But breaking it down, loading it into a
 van, unloading into the show, reassembling, then reversing the whole process at the end of the show is a stark
 reminder, both of the size of the machine and of my advancing age, ha!  A <em>huge</em> thank-you to my workmate
-Brian Van Klaveren, who selflessly gave up a weekend, a vacation day, and some mileage on his back to give me
+Brian, who selflessly gave up a weekend, a vacation day, and some mileage on his back to give me
 a hand.  He has already informed me that "the answer for next year is 'no'." :-)</p>
 <p><img src='/images/pdp11/VCFW3_thumbnail_tall.jpg' title='Reassembly on the VCF West show floor' onclick='pswipe("pdp11",76);'/>
 <img src='/images/pdp11/VCFW1_thumbnail_tall.jpg' title='Running diagnostics and consulting the RK11-C prints...' onclick='pswipe("pdp11",77);'/>
@@ -138,54 +391,7 @@ TIMOUT,PC=004536
 
 
 <p>And the relevant bit of the diagnostic listing:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48</pre></div></td><td class="code"><div class="highlight"><pre><span></span>014362  2$:     MOV     RKVEC,R1
+<div class="highlight"><pre><span></span>014362  2$:     MOV     RKVEC,R1
 014366          MOV     #3$,(R1)+               ;SET UP VECTOR ADRES FOR RK11 INTERUPT
 014372          MOV     #340,(R1)               ;SET UP PSW ON INTERRUPT
 014376          BIS     #40,@RKDA               ;ADRES CYLINDER #1
@@ -234,7 +440,7 @@ TIMOUT,PC=004536
 014526          ERROR   53                      ;SCP DID NOT SET AFTER RK11 INTERRUPTED
                                                 ;INDICATING SEEK WAS
 </pre></div>
-</td></tr></table>
+
 
 <p>So, based on the fact that we don't hit error 75 from 14426 (and the fact that the previous test, #36, in
 this diagnostic is passing) unlike some previous issues the RK11 here <em>is</em> able to generate interrupts and the
@@ -767,44 +973,6 @@ ever need to do so.</p>
                     allowFullScreen>
                 </iframe>
             </span></p></div>
-    <hr />
-</div>
-
-
-
-<div class='article'>
-    <div class="content-title">
-        <a href="http://fritzm.github.io/rk11-7.html"><h1>PDP-11/45: RK11 VII</h1></a>
-Sun 25 June 2017
-
-by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
-    </div>
-
-    <div><p>Okay, back from travel and picked up the thread on the RK11 interrupt problem this weekend. Put the KM11 in
-the first slot on the RK11 which allows to monitor interrupt request. An interrupt can be very easily
-generated from the front panel by writing bit 6 (Interrupt on Done Enable) on in the RKCS register at 777404.
-Did this, and noticed that interrupt request logic on the RK11 went active, but never cleared.</p>
-<p>Checked bus request and grant continuity all the way through to the CPU backplane and back and that looked
-fine (the RK11 in its default configuration uses BR5).</p>
-<p>Chased bus request with a logic probe all the way to the CPU backplane, and it was being asserted correctly.
-Looking at BG5, however, I noticed it was always asserted, even if BR5 was inactive. Disconnected all
-peripherals and terminated the Unibus directly on the CPU backplane, and this was still the case. So there
-was problem with BG5 in the CPU itself.</p>
-<p>Threw the CPU UBC card out on extenders, and took a look at BG5 logic with a logic probe.  The 8881 driver
-for this signal (E42 on sheet UBCD of the engineering drawings) had failed -- pins 8 and 9 were high, but pin
-10, BG5, was not being driven low. Pulled this chip, put in a socket and a replacement, and the BG was then
-working properly.  That's three repairs total to this poor old UBC card so far!  Was able to then verify from
-the front panel that the processor fielded interrupt 220 in response to
-setting the IDE bit in RKCS. Progress!</p>
-<p>Back to the MAINDEC ZRKK -- interrupt test now passes, and the diagnostic continues. BUT... error output now
-on test octal 57, which is working out the "hardware pole" feature of the controller.  Thought this might
-be due to the RK11 being configured for two RK05 drives, but I have restored/connected only the first.
-Rejumpered the G740 flipchip for a single drive, but this didn't seem to help.  Hmmm, will need to read the
-diagnostic source to see what it is trying to do...</p>
-<p><img src='/images/pdp11/G740_thumbnail_tall.jpg' title='G740 Disk Selection flipchip, jumpered for two drives' onclick='pswipe("pdp11",58);'/></p></div>
     <hr />
 </div>
 
