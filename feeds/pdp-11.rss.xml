@@ -326,11 +326,11 @@ cases!  Womp, womp...&lt;/p&gt;
 &lt;p&gt;Well, might as well continue to look into the parity error handling, since some things still seem fishy there.
 The DEC documentation is a bit murky here; various versions of the KB11-A maintenance manual and 11/45
 processor handbook say different and somewhat contradictory things; some info in earlier editions is also
-removed form later ones.  The available engineering drawings for the KB11-A CPU look to have some significant
-differences from the actual boards I have on hand, and there are more than a few ECO's for these boards listed
-as relating specifically to parity handling, but for which no other information is available.  And Noel has
-uncovered evidence that even the Unibus signaling related to parity may have been changed by DEC around the
-early times of the early 11/45. Could be interesting...&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Fritz Mueller</dc:creator><pubDate>Mon, 21 Jan 2019 00:00:00 -0800</pubDate><guid isPermaLink="false">tag:fritzm.github.io,2019-01-21:/unix-and-ms11.html</guid><category>Retro-Computing</category><category>PDP-11</category></item><item><title>PDP-11/45: RSTS/E V06C attempts</title><link>http://fritzm.github.io/rsts.html</link><description>&lt;p&gt;Okay, back in action after replacing the failed nand at B26 in the RK11-C.  MAINDEC ZRKK now passes reliably.
+removed form later ones.  The available engineering drawings for the relevant parts of the KB11-A CPU look to
+have some significant differences from the actual boards I have on hand, and there are more than a few ECO's
+for these boards listed as relating specifically to parity handling, but for which no other information is
+available.  And Noel has uncovered evidence that even the Unibus signaling related to parity may have been
+changed by DEC around the times of the early 11/45. Could be interesting...&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Fritz Mueller</dc:creator><pubDate>Mon, 21 Jan 2019 00:00:00 -0800</pubDate><guid isPermaLink="false">tag:fritzm.github.io,2019-01-21:/unix-and-ms11.html</guid><category>Retro-Computing</category><category>PDP-11</category></item><item><title>PDP-11/45: RSTS/E V06C attempts</title><link>http://fritzm.github.io/rsts.html</link><description>&lt;p&gt;Okay, back in action after replacing the failed nand at B26 in the RK11-C.  MAINDEC ZRKK now passes reliably.
 Wish I'd been able to get to the bottom of this at the show, but it was really hard to effectively debug on
 the floor there while the show was in progress -- you naturally want to stop and chat with everybody who drops
 by to take a look, so its hard to get into a good technical flow.&lt;/p&gt;
