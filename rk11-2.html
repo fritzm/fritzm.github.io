@@ -2,28 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>fritzm.github.io</title>
+    <title>fritzm.github.io - PDP-11/45: RK11 II</title>
     <meta name="description" content="">
     <meta name="author" content="Fritz Mueller">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
     <!--[if lt IE 9]>
-    <script src="http://fritzm.github.io/theme/html5.js"></script>
+    <script src="https://fritzm.github.io/theme/html5.js"></script>
     <![endif]-->
 
     <!-- Le styles -->
-    <link href="http://fritzm.github.io/theme/bootstrap.min.css" rel="stylesheet">
-    <link href="http://fritzm.github.io/theme/bootstrap.min.responsive.css" rel="stylesheet">
-    <link href="http://fritzm.github.io/theme/local.css" rel="stylesheet">
-    <link href="http://fritzm.github.io/theme/pygments.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/local.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/pygments.css" rel="stylesheet">
 
     <!-- Photoswipe -->
-    <link rel="stylesheet" href="http://fritzm.github.io/theme/photoswipe.css">
-    <link rel="stylesheet" href="http://fritzm.github.io/theme/default-skin/default-skin.css">
-    <script src="http://fritzm.github.io/theme/photoswipe.min.js"></script>
-    <script src="http://fritzm.github.io/theme/photoswipe-ui-default.min.js"></script>
-    <script src="http://fritzm.github.io/galleries.js"></script>
+    <link rel="stylesheet" href="https://fritzm.github.io/theme/photoswipe.css">
+    <link rel="stylesheet" href="https://fritzm.github.io/theme/default-skin/default-skin.css">
+    <script src="https://fritzm.github.io/theme/photoswipe.min.js"></script>
+    <script src="https://fritzm.github.io/theme/photoswipe-ui-default.min.js"></script>
+    <script src="https://fritzm.github.io/galleries.js"></script>
     <script type="text/javascript">
         var pswipe = function(gname, index) {
             var pswpElement = document.querySelectorAll('.pswp')[0];
@@ -35,7 +35,7 @@
     </script>
 
     <!-- So Firefox can bookmark->"abo this site" -->
-        <link href="feeds/all.rss.xml" rel="alternate" title="fritzm.github.io" type="application/rss+xml">
+        <link href="https://fritzm.github.io/feeds/all.rss.xml" rel="alternate" title="fritzm.github.io" type="application/rss+xml">
 
 </head>
 
@@ -51,14 +51,14 @@
              <span class="icon-bar"></span>
          </a>
 
-        <a class="brand" href="http://fritzm.github.io">fritzm.github.io</a>
+        <a class="brand" href="https://fritzm.github.io">fritzm.github.io</a>
 
         <div class="nav-collapse">
         <ul class="nav">
-
+            
         </ul>
         </div>
-
+        
     </div>
     </div>
 </div>
@@ -73,7 +73,7 @@
             <h1>PDP-11/45: RK11 II</h1>
 Mon 20 February 2017
 
-by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
  
 
 
@@ -104,31 +104,31 @@ ZRKJE0 diagnotic that is trapping out:</p>
 21
 22
 23
-24</pre></div></td><td class="code"><div class="highlight"><pre><span></span>        <span class="nt">177404</span>                          <span class="nt">RKCS</span><span class="o">=</span><span class="nt">177404</span>
-<span class="nt">000000</span>                                  <span class="p">.</span><span class="nc">ASECT</span>
-        <span class="nt">001000</span>                          <span class="o">.=</span><span class="nt">1000</span>
-<span class="nt">001000</span>  <span class="nt">012706</span>  <span class="nt">000770</span>          <span class="nt">START</span><span class="o">:</span>  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">770</span><span class="o">,</span><span class="nt">SP</span>         <span class="o">;</span><span class="nt">INIT</span> <span class="nt">STACK</span> <span class="nt">POINTER</span>
-<span class="nt">001004</span>  <span class="nt">005000</span>                          <span class="nt">CLR</span>     <span class="nt">R0</span>              <span class="o">;</span><span class="nt">INIT</span> <span class="nt">TRAP</span> <span class="nt">BASE</span>
-<span class="nt">001006</span>  <span class="nt">012701</span>  <span class="nt">000002</span>                  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">2</span><span class="o">,</span><span class="nt">R1</span>           <span class="o">;</span><span class="nt">INIT</span> <span class="nt">TRAP</span> <span class="nt">DEST</span>
-<span class="nt">001012</span>  <span class="nt">010120</span>                  <span class="nt">L1</span><span class="o">:</span>     <span class="nt">MOV</span>     <span class="nt">R1</span><span class="o">,(</span><span class="nt">R0</span><span class="o">)+</span>        <span class="o">;</span><span class="nt">STORE</span> <span class="nt">TRAP</span> <span class="nt">DEST</span>
-<span class="nt">001014</span>  <span class="nt">005020</span>                          <span class="nt">CLR</span>     <span class="o">(</span><span class="nt">R0</span><span class="o">)+</span>           <span class="o">;</span><span class="nt">AND</span> <span class="nt">STORE</span> <span class="nt">HALT</span> <span class="nt">AT</span> <span class="nt">TRAP</span> <span class="nt">DEST</span>
-<span class="nt">001016</span>  <span class="nt">062701</span>  <span class="nt">000004</span>                  <span class="nt">ADD</span>     <span class="p">#</span><span class="nn">4</span><span class="o">,</span><span class="nt">R1</span>           <span class="o">;</span><span class="nt">UPDATE</span> <span class="nt">TRAP</span> <span class="nt">DEST</span>
-<span class="nt">001022</span>  <span class="nt">020600</span>                          <span class="nt">CMP</span>     <span class="nt">SP</span><span class="o">,</span><span class="nt">R0</span>           <span class="o">;</span><span class="nt">ALL</span> <span class="nt">TRAPS</span> <span class="nt">INITD</span><span class="o">?</span>
-<span class="nt">001024</span>  <span class="nt">001372</span>                          <span class="nt">BNE</span>     <span class="nt">L1</span>              <span class="o">;</span><span class="nt">IF</span> <span class="nt">NOT</span><span class="o">,</span> <span class="nt">KEEP</span> <span class="nt">GOING</span>
-<span class="nt">001026</span>  <span class="nt">005002</span>                          <span class="nt">CLR</span>     <span class="nt">R2</span>              <span class="o">;</span><span class="nt">INIT</span> <span class="nt">MAIN</span> <span class="nt">ITERATION</span> <span class="nt">COUNT</span>
-<span class="nt">001030</span>  <span class="nt">005202</span>                  <span class="nt">L2</span><span class="o">:</span>     <span class="nt">INC</span>     <span class="nt">R2</span>              <span class="o">;</span><span class="nt">INC</span> <span class="nt">MAIN</span> <span class="nt">ITERATION</span> <span class="nt">COUNT</span>
-<span class="nt">001032</span>  <span class="nt">010237</span>  <span class="nt">177570</span>                  <span class="nt">MOV</span>     <span class="nt">R2</span><span class="o">,@</span><span class="p">#</span><span class="nn">177570</span>     <span class="o">;</span><span class="nt">UPDATE</span> <span class="nt">DISPLAY</span> <span class="nt">REG</span>
-<span class="nt">001036</span>  <span class="nt">012700</span>  <span class="nt">177404</span>                  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">RKCS</span><span class="o">,</span><span class="nt">R0</span>        <span class="o">;</span><span class="nt">GET</span> <span class="nt">RKCS</span> <span class="nt">ADDRESS</span>
-<span class="nt">001042</span>  <span class="nt">012710</span>  <span class="nt">007560</span>                  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">7560</span><span class="o">,</span><span class="p">@</span><span class="k">R0</span>       <span class="p">;</span><span class="nt">SET</span> <span class="nt">RESET</span> <span class="nt">CTRLR</span> <span class="nt">CMD</span>
-<span class="nt">001046</span>  <span class="nt">005210</span>                          <span class="nt">INC</span>     <span class="p">@</span><span class="k">R0</span>             <span class="p">;</span><span class="nt">SET</span> <span class="nt">GO</span> <span class="nt">BIT</span>
-<span class="nt">001050</span>  <span class="nt">005005</span>                          <span class="nt">CLR</span>     <span class="nt">R5</span>              <span class="o">;</span><span class="nt">INIT</span> <span class="nt">CHECK</span> <span class="nt">COUNT</span>
-<span class="nt">001052</span>  <span class="nt">105710</span>                  <span class="nt">L3</span><span class="o">:</span>     <span class="nt">TSTB</span>    <span class="p">@</span><span class="k">R0</span>             <span class="p">;</span><span class="nt">CHECK</span> <span class="nt">DONE</span> <span class="nt">BIT</span>
-<span class="nt">001054</span>  <span class="nt">100765</span>                          <span class="nt">BMI</span>     <span class="nt">L2</span>              <span class="o">;</span><span class="nt">IF</span> <span class="nt">SET</span><span class="o">,</span> <span class="nt">NEXT</span> <span class="nt">MAIN</span> <span class="nt">LOOP</span>
-<span class="nt">001056</span>  <span class="nt">005205</span>                          <span class="nt">INC</span>     <span class="nt">R5</span>              <span class="o">;</span><span class="nt">OTHERWISE</span> <span class="nt">INC</span> <span class="nt">CHECK</span> <span class="nt">COUNT</span>
-<span class="nt">001060</span>  <span class="nt">001374</span>                          <span class="nt">BNE</span>     <span class="nt">L3</span>              <span class="o">;</span><span class="nt">IF</span> <span class="nt">NOT</span> <span class="nt">EXPIRED</span> <span class="nt">GO</span> <span class="nt">CHECK</span> <span class="nt">AGAIN</span>
-<span class="nt">001062</span>  <span class="nt">000000</span>                          <span class="nt">HALT</span>                    <span class="o">;</span><span class="nt">OTHERWISE</span><span class="o">,</span> <span class="nt">HALT</span> <span class="nt">HERE</span>
-        <span class="nt">001000</span>                          <span class="p">.</span><span class="nc">END</span>    <span class="nt">START</span>
-</pre></div>
+24</pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="w">        </span><span class="mi">177404</span><span class="w">                          </span><span class="n">RKCS</span><span class="o">=</span><span class="mi">177404</span><span class="w"></span>
+<span class="mi">000000</span><span class="w">                                  </span><span class="p">.</span><span class="n">ASECT</span><span class="w"></span>
+<span class="w">        </span><span class="mi">001000</span><span class="w">                          </span><span class="p">.</span><span class="o">=</span><span class="mi">1000</span><span class="w"></span>
+<span class="mi">001000</span><span class="w">  </span><span class="mi">012706</span><span class="w">  </span><span class="mi">000770</span><span class="w">          </span><span class="k">START</span><span class="err">:</span><span class="w">  </span><span class="n">MOV</span><span class="w">     </span><span class="n">#770</span><span class="p">,</span><span class="n">SP</span><span class="w">         </span><span class="p">;</span><span class="n">INIT</span><span class="w"> </span><span class="n">STACK</span><span class="w"> </span><span class="n">POINTER</span><span class="w"></span>
+<span class="mi">001004</span><span class="w">  </span><span class="mi">005000</span><span class="w">                          </span><span class="n">CLR</span><span class="w">     </span><span class="n">R0</span><span class="w">              </span><span class="p">;</span><span class="n">INIT</span><span class="w"> </span><span class="n">TRAP</span><span class="w"> </span><span class="n">BASE</span><span class="w"></span>
+<span class="mi">001006</span><span class="w">  </span><span class="mi">012701</span><span class="w">  </span><span class="mi">000002</span><span class="w">                  </span><span class="n">MOV</span><span class="w">     </span><span class="n">#2</span><span class="p">,</span><span class="n">R1</span><span class="w">           </span><span class="p">;</span><span class="n">INIT</span><span class="w"> </span><span class="n">TRAP</span><span class="w"> </span><span class="n">DEST</span><span class="w"></span>
+<span class="mi">001012</span><span class="w">  </span><span class="mi">010120</span><span class="w">                  </span><span class="nl">L1</span><span class="p">:</span><span class="w">     </span><span class="n">MOV</span><span class="w">     </span><span class="n">R1</span><span class="p">,(</span><span class="n">R0</span><span class="p">)</span><span class="o">+</span><span class="w">        </span><span class="p">;</span><span class="n">STORE</span><span class="w"> </span><span class="n">TRAP</span><span class="w"> </span><span class="n">DEST</span><span class="w"></span>
+<span class="mi">001014</span><span class="w">  </span><span class="mi">005020</span><span class="w">                          </span><span class="n">CLR</span><span class="w">     </span><span class="p">(</span><span class="n">R0</span><span class="p">)</span><span class="o">+</span><span class="w">           </span><span class="p">;</span><span class="ow">AND</span><span class="w"> </span><span class="n">STORE</span><span class="w"> </span><span class="n">HALT</span><span class="w"> </span><span class="k">AT</span><span class="w"> </span><span class="n">TRAP</span><span class="w"> </span><span class="n">DEST</span><span class="w"></span>
+<span class="mi">001016</span><span class="w">  </span><span class="mi">062701</span><span class="w">  </span><span class="mi">000004</span><span class="w">                  </span><span class="k">ADD</span><span class="w">     </span><span class="n">#4</span><span class="p">,</span><span class="n">R1</span><span class="w">           </span><span class="p">;</span><span class="k">UPDATE</span><span class="w"> </span><span class="n">TRAP</span><span class="w"> </span><span class="n">DEST</span><span class="w"></span>
+<span class="mi">001022</span><span class="w">  </span><span class="mi">020600</span><span class="w">                          </span><span class="n">CMP</span><span class="w">     </span><span class="n">SP</span><span class="p">,</span><span class="n">R0</span><span class="w">           </span><span class="p">;</span><span class="ow">ALL</span><span class="w"> </span><span class="n">TRAPS</span><span class="w"> </span><span class="n">INITD</span><span class="vm">?</span><span class="w"></span>
+<span class="mi">001024</span><span class="w">  </span><span class="mi">001372</span><span class="w">                          </span><span class="n">BNE</span><span class="w">     </span><span class="n">L1</span><span class="w">              </span><span class="p">;</span><span class="k">IF</span><span class="w"> </span><span class="ow">NOT</span><span class="p">,</span><span class="w"> </span><span class="n">KEEP</span><span class="w"> </span><span class="n">GOING</span><span class="w"></span>
+<span class="mi">001026</span><span class="w">  </span><span class="mi">005002</span><span class="w">                          </span><span class="n">CLR</span><span class="w">     </span><span class="n">R2</span><span class="w">              </span><span class="p">;</span><span class="n">INIT</span><span class="w"> </span><span class="n">MAIN</span><span class="w"> </span><span class="n">ITERATION</span><span class="w"> </span><span class="nf">COUNT</span><span class="w"></span>
+<span class="mi">001030</span><span class="w">  </span><span class="mi">005202</span><span class="w">                  </span><span class="nl">L2</span><span class="p">:</span><span class="w">     </span><span class="n">INC</span><span class="w">     </span><span class="n">R2</span><span class="w">              </span><span class="p">;</span><span class="n">INC</span><span class="w"> </span><span class="n">MAIN</span><span class="w"> </span><span class="n">ITERATION</span><span class="w"> </span><span class="nf">COUNT</span><span class="w"></span>
+<span class="mi">001032</span><span class="w">  </span><span class="mi">010237</span><span class="w">  </span><span class="mi">177570</span><span class="w">                  </span><span class="n">MOV</span><span class="w">     </span><span class="n">R2</span><span class="p">,</span><span class="err">@</span><span class="n">#177570</span><span class="w">     </span><span class="p">;</span><span class="k">UPDATE</span><span class="w"> </span><span class="n">DISPLAY</span><span class="w"> </span><span class="n">REG</span><span class="w"></span>
+<span class="mi">001036</span><span class="w">  </span><span class="mi">012700</span><span class="w">  </span><span class="mi">177404</span><span class="w">                  </span><span class="n">MOV</span><span class="w">     </span><span class="n">#RKCS</span><span class="p">,</span><span class="n">R0</span><span class="w">        </span><span class="p">;</span><span class="k">GET</span><span class="w"> </span><span class="n">RKCS</span><span class="w"> </span><span class="n">ADDRESS</span><span class="w"></span>
+<span class="mi">001042</span><span class="w">  </span><span class="mi">012710</span><span class="w">  </span><span class="mi">007560</span><span class="w">                  </span><span class="n">MOV</span><span class="w">     </span><span class="n">#7560</span><span class="p">,</span><span class="nv">@R0</span><span class="w">       </span><span class="p">;</span><span class="k">SET</span><span class="w"> </span><span class="n">RESET</span><span class="w"> </span><span class="n">CTRLR</span><span class="w"> </span><span class="n">CMD</span><span class="w"></span>
+<span class="mi">001046</span><span class="w">  </span><span class="mi">005210</span><span class="w">                          </span><span class="n">INC</span><span class="w">     </span><span class="nv">@R0</span><span class="w">             </span><span class="p">;</span><span class="k">SET</span><span class="w"> </span><span class="k">GO</span><span class="w"> </span><span class="nc">BIT</span><span class="w"></span>
+<span class="mi">001050</span><span class="w">  </span><span class="mi">005005</span><span class="w">                          </span><span class="n">CLR</span><span class="w">     </span><span class="n">R5</span><span class="w">              </span><span class="p">;</span><span class="n">INIT</span><span class="w"> </span><span class="k">CHECK</span><span class="w"> </span><span class="nf">COUNT</span><span class="w"></span>
+<span class="mi">001052</span><span class="w">  </span><span class="mi">105710</span><span class="w">                  </span><span class="nl">L3</span><span class="p">:</span><span class="w">     </span><span class="n">TSTB</span><span class="w">    </span><span class="nv">@R0</span><span class="w">             </span><span class="p">;</span><span class="k">CHECK</span><span class="w"> </span><span class="n">DONE</span><span class="w"> </span><span class="nc">BIT</span><span class="w"></span>
+<span class="mi">001054</span><span class="w">  </span><span class="mi">100765</span><span class="w">                          </span><span class="n">BMI</span><span class="w">     </span><span class="n">L2</span><span class="w">              </span><span class="p">;</span><span class="k">IF</span><span class="w"> </span><span class="k">SET</span><span class="p">,</span><span class="w"> </span><span class="k">NEXT</span><span class="w"> </span><span class="n">MAIN</span><span class="w"> </span><span class="n">LOOP</span><span class="w"></span>
+<span class="mi">001056</span><span class="w">  </span><span class="mi">005205</span><span class="w">                          </span><span class="n">INC</span><span class="w">     </span><span class="n">R5</span><span class="w">              </span><span class="p">;</span><span class="n">OTHERWISE</span><span class="w"> </span><span class="n">INC</span><span class="w"> </span><span class="k">CHECK</span><span class="w"> </span><span class="nf">COUNT</span><span class="w"></span>
+<span class="mi">001060</span><span class="w">  </span><span class="mi">001374</span><span class="w">                          </span><span class="n">BNE</span><span class="w">     </span><span class="n">L3</span><span class="w">              </span><span class="p">;</span><span class="k">IF</span><span class="w"> </span><span class="ow">NOT</span><span class="w"> </span><span class="n">EXPIRED</span><span class="w"> </span><span class="k">GO</span><span class="w"> </span><span class="k">CHECK</span><span class="w"> </span><span class="n">AGAIN</span><span class="w"></span>
+<span class="mi">001062</span><span class="w">  </span><span class="mi">000000</span><span class="w">                          </span><span class="n">HALT</span><span class="w">                    </span><span class="p">;</span><span class="n">OTHERWISE</span><span class="p">,</span><span class="w"> </span><span class="n">HALT</span><span class="w"> </span><span class="n">HERE</span><span class="w"></span>
+<span class="w">        </span><span class="mi">001000</span><span class="w">                          </span><span class="p">.</span><span class="k">END</span><span class="w">    </span><span class="k">START</span><span class="w"></span>
+</code></pre></div>
 </td></tr></table>
 
 <p>Running this code, the error is easily reproduced -- the machine traps on a bus timeout and halts after 
@@ -159,36 +159,23 @@ this that are not apparent on a logic analyzer.</p></div>
 	
         <hr>
 
-        <h2>Comments</h2>
-<div id="disqus_thread"></div>
-<script type="text/javascript">
-    var disqus_shortname = 'fritzm'; 
-    var disqus_title = 'PDP-11/45: RK11 II';
-
-    (function() {
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-</script>
-<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
     </div>
         </div>
-
+        
         <div class="span3">
 
             <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
             <ul class="nav nav-list">
-                <li class="nav-header">
+                <li class="nav-header"> 
                 Site
                 </li>
+            
+                <li><a href="https://fritzm.github.io/archives.html">Archives</a>
+                <li><a href="https://fritzm.github.io/tags.html">Tags</a>
 
-                <li><a href="http://fritzm.github.io/">Archives</a>
-                <li><a href="http://fritzm.github.io/tags.html">Tags</a>
 
 
-
-                <li><a href="http://fritzm.github.io/feeds/all.rss.xml" rel="alternate" type="application/rss+xml">RSS feed</a></li>
+                <li><a href="https://fritzm.github.io/feeds/all.rss.xml" rel="alternate">RSS feed</a></li>
 
             </ul>
             </div>
@@ -196,13 +183,14 @@ this that are not apparent on a logic analyzer.</p></div>
 
             <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
             <ul class="nav nav-list">
-                <li class="nav-header">
+                <li class="nav-header"> 
                 Categories
                 </li>
-
-                <li><a href="http://fritzm.github.io/category/math.html">Math</a></li>
-                <li><a href="http://fritzm.github.io/category/pdp-11.html">PDP-11</a></li>
-                <li><a href="http://fritzm.github.io/category/programming.html">Programming</a></li>
+                
+                <li><a href="https://fritzm.github.io/category/math.html">Math</a></li>
+                <li><a href="https://fritzm.github.io/category/pdp-11.html">PDP-11</a></li>
+                <li><a href="https://fritzm.github.io/category/programming.html">Programming</a></li>
+                   
             </ul>
             </div>
 
@@ -212,10 +200,10 @@ this that are not apparent on a logic analyzer.</p></div>
             <div class="social">
             <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
             <ul class="nav nav-list">
-                <li class="nav-header">
+                <li class="nav-header"> 
                 Social
                 </li>
-
+           
                 <li><a href="http://facebook.com/fritzmueller">facebook</a></li>
                 <li><a href="http://twitter.com/infrafritz">twitter</a></li>
                 <li><a href="http://instagram.com/infrafritz">Instagram</a></li>
@@ -226,10 +214,11 @@ this that are not apparent on a logic analyzer.</p></div>
             </div>
             </div>
 
-        </div>     </div>     </div> 
+        </div>  
+    </div>     </div> 
 <footer>
 <br />
-<p><a href="http://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2012</p>
+<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2019</p>
 </footer>
 
 </div> <!-- /container -->
@@ -273,6 +262,7 @@ this that are not apparent on a logic analyzer.</p></div>
 </div>
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-collapse.js"></script>
+<script src="https://fritzm.github.io/theme/bootstrap-collapse.js"></script>
+ 
 </body>
 </html>

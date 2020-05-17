@@ -2,28 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>fritzm.github.io</title>
+    <title>fritzm.github.io - PDP-11/45: VT52</title>
     <meta name="description" content="">
     <meta name="author" content="Fritz Mueller">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
     <!--[if lt IE 9]>
-    <script src="http://fritzm.github.io/theme/html5.js"></script>
+    <script src="https://fritzm.github.io/theme/html5.js"></script>
     <![endif]-->
 
     <!-- Le styles -->
-    <link href="http://fritzm.github.io/theme/bootstrap.min.css" rel="stylesheet">
-    <link href="http://fritzm.github.io/theme/bootstrap.min.responsive.css" rel="stylesheet">
-    <link href="http://fritzm.github.io/theme/local.css" rel="stylesheet">
-    <link href="http://fritzm.github.io/theme/pygments.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/local.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/pygments.css" rel="stylesheet">
 
     <!-- Photoswipe -->
-    <link rel="stylesheet" href="http://fritzm.github.io/theme/photoswipe.css">
-    <link rel="stylesheet" href="http://fritzm.github.io/theme/default-skin/default-skin.css">
-    <script src="http://fritzm.github.io/theme/photoswipe.min.js"></script>
-    <script src="http://fritzm.github.io/theme/photoswipe-ui-default.min.js"></script>
-    <script src="http://fritzm.github.io/galleries.js"></script>
+    <link rel="stylesheet" href="https://fritzm.github.io/theme/photoswipe.css">
+    <link rel="stylesheet" href="https://fritzm.github.io/theme/default-skin/default-skin.css">
+    <script src="https://fritzm.github.io/theme/photoswipe.min.js"></script>
+    <script src="https://fritzm.github.io/theme/photoswipe-ui-default.min.js"></script>
+    <script src="https://fritzm.github.io/galleries.js"></script>
     <script type="text/javascript">
         var pswipe = function(gname, index) {
             var pswpElement = document.querySelectorAll('.pswp')[0];
@@ -35,7 +35,7 @@
     </script>
 
     <!-- So Firefox can bookmark->"abo this site" -->
-        <link href="feeds/all.rss.xml" rel="alternate" title="fritzm.github.io" type="application/rss+xml">
+        <link href="https://fritzm.github.io/feeds/all.rss.xml" rel="alternate" title="fritzm.github.io" type="application/rss+xml">
 
 </head>
 
@@ -51,14 +51,14 @@
              <span class="icon-bar"></span>
          </a>
 
-        <a class="brand" href="http://fritzm.github.io">fritzm.github.io</a>
+        <a class="brand" href="https://fritzm.github.io">fritzm.github.io</a>
 
         <div class="nav-collapse">
         <ul class="nav">
-
+            
         </ul>
         </div>
-
+        
     </div>
     </div>
 </div>
@@ -73,62 +73,50 @@
             <h1>PDP-11/45: VT52</h1>
 Sun 03 January 2016
 
-by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
  
 
 
         </div>
 	
-        <div><p>Spend some time reviving a VT52 that I intend to use with the PDP-11.  This was a pretty nice eBay find.  There was some
-oxidation and flakiness with the connectors to the chargen ROM daughter card (I remember this being typical
-of VT52s even back in the day).  A little more difficult to track down were some flaky solder joints around the clock
-chip.  But, everything else seems to be in pretty good shape and its working well now!  Here it is hooked up to a linux
-VM on my macbook, compiling some LSST code to generate some output as a test drive:</p>
+        <div><p>Spent some time reviving a VT52 that I intend to use with the PDP-11.  This was a pretty nice eBay find. 
+There was some oxidation and flakiness with the connectors to the chargen ROM daughter card (I remember this
+being typical of VT52s even back in the day).  A little more difficult to track down were some flaky solder
+joints around the clock chip.  But, everything else seems to be in pretty good shape and its working well now!
+Here it is hooked up to a Linux VM on my macbook, compiling some LSST code to generate some output as a test
+drive:</p>
 <p><img src='/images/pdp11/vt52_thumbnail_tall.jpg' title='VT52 hooked up to a Linux VM for a test drive' onclick='pswipe("pdp11",17);'/></p>
-<p>Man, seeing that funky font again, with its non-descending-descenders, is really great!  Surprisingly, it doesn't seem
-to be available in digital format anywhere, unlike the later VT100 fonts, etc.  Try as I might, I couldn't seem to find
-the chargen ROM listing in any of the DEC documentation archives, either.</p>
-<p>Well, I do have a Digilent FPGA eval card and some level conversion chips laying around, so as a holiday hack project
-I put together a quick ROM scanner in Verlog, interfaced it to the VT52 chargen on a breadboard, and scanned out the
-contents.  Here's a picture of the scanner in action, and the produced output:</p>
+<p>Man, seeing that funky font again, with its non-descending-descenders, is really great!  Surprisingly, it
+doesn't seem to be available in digital format anywhere, unlike the later VT100 fonts, etc.  Try as I might, I
+couldn't seem to find the chargen ROM listing in any of the DEC documentation archives, either.</p>
+<p>Well, I do have a Digilent FPGA eval card and some level conversion chips laying around, so as a holiday hack
+project I put together a quick ROM scanner in Verilog, interfaced it to the VT52 chargen on a breadboard, and
+scanned out the contents.  Here's a picture of the scanner in action, and the produced output:</p>
 <p><img src='/images/pdp11/rom-scanner_thumbnail_tall.jpg' title='Homemade FPGA ROM scanner used to read out the VT52 character generator ROM' onclick='pswipe("pdp11",18);'/></p>
-<p>The yellow-ish board on the right is the VT52 chargen.  The Verilog source for the scanner, the scanned data, and some
-preliminary attempts to convert the data to a few modern font formats are available on my github over at
-<a href="https://github.com/fritzm/vt52">https://github.com/fritzm/vt52</a>.  I need to learn some more about font formats to make some better font files; if I do
-I will update that repo.  Any help from fontophiles gladly accepted!</p></div>
+<p>The yellowish board on the right is the VT52 chargen.  The Verilog source for the scanner, the scanned data,
+and some preliminary attempts to convert the data to a few modern font formats are available on my github over
+at <a href="https://github.com/fritzm/vt52">https://github.com/fritzm/vt52</a>.  I need to learn some more about font formats to make some better font
+files; if I do I will update that repo.  Any help from fontophiles gladly accepted!</p></div>
 	
         <hr>
 
-        <h2>Comments</h2>
-<div id="disqus_thread"></div>
-<script type="text/javascript">
-    var disqus_shortname = 'fritzm'; 
-    var disqus_title = 'PDP-11/45: VT52';
-
-    (function() {
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-</script>
-<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
     </div>
         </div>
-
+        
         <div class="span3">
 
             <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
             <ul class="nav nav-list">
-                <li class="nav-header">
+                <li class="nav-header"> 
                 Site
                 </li>
+            
+                <li><a href="https://fritzm.github.io/archives.html">Archives</a>
+                <li><a href="https://fritzm.github.io/tags.html">Tags</a>
 
-                <li><a href="http://fritzm.github.io/">Archives</a>
-                <li><a href="http://fritzm.github.io/tags.html">Tags</a>
 
 
-
-                <li><a href="http://fritzm.github.io/feeds/all.rss.xml" rel="alternate" type="application/rss+xml">RSS feed</a></li>
+                <li><a href="https://fritzm.github.io/feeds/all.rss.xml" rel="alternate">RSS feed</a></li>
 
             </ul>
             </div>
@@ -136,13 +124,14 @@ I will update that repo.  Any help from fontophiles gladly accepted!</p></div>
 
             <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
             <ul class="nav nav-list">
-                <li class="nav-header">
+                <li class="nav-header"> 
                 Categories
                 </li>
-
-                <li><a href="http://fritzm.github.io/category/math.html">Math</a></li>
-                <li><a href="http://fritzm.github.io/category/pdp-11.html">PDP-11</a></li>
-                <li><a href="http://fritzm.github.io/category/programming.html">Programming</a></li>
+                
+                <li><a href="https://fritzm.github.io/category/math.html">Math</a></li>
+                <li><a href="https://fritzm.github.io/category/pdp-11.html">PDP-11</a></li>
+                <li><a href="https://fritzm.github.io/category/programming.html">Programming</a></li>
+                   
             </ul>
             </div>
 
@@ -152,10 +141,10 @@ I will update that repo.  Any help from fontophiles gladly accepted!</p></div>
             <div class="social">
             <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
             <ul class="nav nav-list">
-                <li class="nav-header">
+                <li class="nav-header"> 
                 Social
                 </li>
-
+           
                 <li><a href="http://facebook.com/fritzmueller">facebook</a></li>
                 <li><a href="http://twitter.com/infrafritz">twitter</a></li>
                 <li><a href="http://instagram.com/infrafritz">Instagram</a></li>
@@ -166,10 +155,11 @@ I will update that repo.  Any help from fontophiles gladly accepted!</p></div>
             </div>
             </div>
 
-        </div>     </div>     </div> 
+        </div>  
+    </div>     </div> 
 <footer>
 <br />
-<p><a href="http://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2012</p>
+<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2019</p>
 </footer>
 
 </div> <!-- /container -->
@@ -213,6 +203,7 @@ I will update that repo.  Any help from fontophiles gladly accepted!</p></div>
 </div>
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-collapse.js"></script>
+<script src="https://fritzm.github.io/theme/bootstrap-collapse.js"></script>
+ 
 </body>
 </html>

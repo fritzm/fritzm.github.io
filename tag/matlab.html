@@ -2,28 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>fritzm.github.io</title>
+    <title>fritzm.github.io - MATLAB</title>
     <meta name="description" content="">
     <meta name="author" content="Fritz Mueller">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
     <!--[if lt IE 9]>
-    <script src="http://fritzm.github.io/theme/html5.js"></script>
+    <script src="https://fritzm.github.io/theme/html5.js"></script>
     <![endif]-->
 
     <!-- Le styles -->
-    <link href="http://fritzm.github.io/theme/bootstrap.min.css" rel="stylesheet">
-    <link href="http://fritzm.github.io/theme/bootstrap.min.responsive.css" rel="stylesheet">
-    <link href="http://fritzm.github.io/theme/local.css" rel="stylesheet">
-    <link href="http://fritzm.github.io/theme/pygments.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/local.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/pygments.css" rel="stylesheet">
 
     <!-- Photoswipe -->
-    <link rel="stylesheet" href="http://fritzm.github.io/theme/photoswipe.css">
-    <link rel="stylesheet" href="http://fritzm.github.io/theme/default-skin/default-skin.css">
-    <script src="http://fritzm.github.io/theme/photoswipe.min.js"></script>
-    <script src="http://fritzm.github.io/theme/photoswipe-ui-default.min.js"></script>
-    <script src="http://fritzm.github.io/galleries.js"></script>
+    <link rel="stylesheet" href="https://fritzm.github.io/theme/photoswipe.css">
+    <link rel="stylesheet" href="https://fritzm.github.io/theme/default-skin/default-skin.css">
+    <script src="https://fritzm.github.io/theme/photoswipe.min.js"></script>
+    <script src="https://fritzm.github.io/theme/photoswipe-ui-default.min.js"></script>
+    <script src="https://fritzm.github.io/galleries.js"></script>
     <script type="text/javascript">
         var pswipe = function(gname, index) {
             var pswpElement = document.querySelectorAll('.pswp')[0];
@@ -35,7 +35,7 @@
     </script>
 
     <!-- So Firefox can bookmark->"abo this site" -->
-        <link href="feeds/all.rss.xml" rel="alternate" title="fritzm.github.io" type="application/rss+xml">
+        <link href="https://fritzm.github.io/feeds/all.rss.xml" rel="alternate" title="fritzm.github.io" type="application/rss+xml">
 
 </head>
 
@@ -51,14 +51,14 @@
              <span class="icon-bar"></span>
          </a>
 
-        <a class="brand" href="http://fritzm.github.io">fritzm.github.io</a>
+        <a class="brand" href="https://fritzm.github.io">fritzm.github.io</a>
 
         <div class="nav-collapse">
         <ul class="nav">
-
+            
         </ul>
         </div>
-
+        
     </div>
     </div>
 </div>
@@ -68,19 +68,22 @@
     <div class="row">
 
         <div class="span9">
+        
 
+        
 
 <div class='article'>
     <div class="content-title">
-        <a href="http://fritzm.github.io/moebius.html"><h1>Moebious transformation animated GIFs</h1></a>
+        <a href="https://fritzm.github.io/moebius.html"><h1>Moebious transformation animated GIFs</h1></a>
 Mon 01 December 2014
 
-by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
  
 
 
+ 
     </div>
-
+    
     <div><p>Here are some animated GIFs that I created a few years ago with MATLAB.  These characterize the action of the four classes of Moebius transformations, mapping the complex plane to itself.  They were inspired by the illustrations and analysis in a section of Tristan Needham's excellent book <a href="http://books.google.com/books?vid=ISBN0198534469"><em>Visual Complex Analysis</em></a>:</p>
 <figure><img src="/images/moebius/elliptic.gif"><figcaption>elliptic</figcaption></figure>
 
@@ -116,27 +119,27 @@ by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fr
 
 <p>All of this can be done quite succinctly in MATLAB, once it is understood what needs to be done.  Below is the MATLAB snippet which was used to generate these GIFs.  Commenting and uncommenting various lines chooses different <span class="math">\(F\)</span> and <span class="math">\(\widetilde{M}\)</span> side checkerboard models, resulting in the different outputs.</p>
 <p>The first few lines create a 512x512 matrix of complex numbers, ranging from -3 to 3 on both the real and imaginary axes, to represent a portion of the complex plane.  This is then pre-mapped through an appropriate <span class="math">\(F\)</span>.  The <code>for</code> loop iterates on each frame.  The dynamic checkerboard result is calculated as the <code>xor</code> of various versions of functions <code>g1</code> and <code>g2</code> operating over the premapped points.  Each frame is downsampled and written to disk as a separate file, then at the end all the frames are stitched into a movie.  I must then have used some non-matlab utility to convert the movies to animated GIFs, but I'm not sure what that was...</p>
-<div class="highlight"><pre><span></span><span class="n">Z</span> <span class="p">=</span> <span class="o">-</span><span class="mi">3</span><span class="p">:</span><span class="mi">6</span><span class="o">/</span><span class="mi">512</span><span class="p">:</span><span class="mi">3</span><span class="o">-</span><span class="p">(</span><span class="mi">6</span><span class="o">/</span><span class="mi">512</span><span class="p">);</span> <span class="n">Z</span> <span class="p">=</span> <span class="n">Z</span><span class="p">(</span><span class="nb">ones</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">length</span><span class="p">(</span><span class="n">Z</span><span class="p">)),:);</span> <span class="n">Z</span> <span class="p">=</span> <span class="nb">complex</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span><span class="n">Z</span><span class="o">&#39;</span><span class="p">);</span>
+<div class="highlight"><pre><span></span><code><span class="n">Z</span> <span class="p">=</span> <span class="o">-</span><span class="mi">3</span><span class="p">:</span><span class="mi">6</span><span class="o">/</span><span class="mi">512</span><span class="p">:</span><span class="mi">3</span><span class="o">-</span><span class="p">(</span><span class="mi">6</span><span class="o">/</span><span class="mi">512</span><span class="p">);</span> <span class="n">Z</span> <span class="p">=</span> <span class="n">Z</span><span class="p">(</span><span class="nb">ones</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">length</span><span class="p">(</span><span class="n">Z</span><span class="p">)),:);</span> <span class="n">Z</span> <span class="p">=</span> <span class="nb">complex</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span><span class="n">Z</span><span class="o">&#39;</span><span class="p">);</span>
 
 <span class="c">%Z = 1 ./ Z;        % one finite fixed point</span>
 <span class="n">Z</span> <span class="p">=</span> <span class="p">(</span><span class="n">Z</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">./</span><span class="p">(</span><span class="n">Z</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>  <span class="c">% two finite fixed points</span>
 
 <span class="n">im</span> <span class="p">=</span> <span class="p">[];</span> <span class="n">g1</span> <span class="p">=</span> <span class="p">[];</span> <span class="n">g2</span> <span class="p">=</span> <span class="p">[];</span>
 
-<span class="k">for</span> <span class="n">frame</span> <span class="p">=</span> <span class="mi">1</span><span class="p">:</span><span class="mi">30</span>
-    <span class="n">g1</span> <span class="p">=</span> <span class="nb">mod</span><span class="p">(</span><span class="nb">log</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">Z</span><span class="p">))</span><span class="o">*</span><span class="mi">4</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span><span class="n">lt</span><span class="p">;</span><span class="mi">1</span><span class="p">;</span>           <span class="c">% radial, static</span>
-<span class="c">%    g1 = mod(log(abs(Z))*4+(frame-1)/15,2)&amp;lt;1; % radial, dynamic</span>
-<span class="c">%    g1 = mod(real(Z)+(frame-1)*.8/30,.8)&amp;lt;.4;  % vertical, dynamic</span>
-<span class="c">%    g2 = mod(angle(Z), pi/6)&amp;lt;(pi/12);         % circumferential, static</span>
-    <span class="n">g2</span> <span class="p">=</span> <span class="nb">mod</span><span class="p">(</span><span class="nb">angle</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span><span class="o">+</span><span class="p">(</span><span class="n">frame</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="nb">pi</span><span class="o">/</span><span class="mi">180</span><span class="p">,</span> <span class="nb">pi</span><span class="o">/</span><span class="mi">6</span><span class="p">)</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;(</span><span class="nb">pi</span><span class="o">/</span><span class="mi">12</span><span class="p">);</span> <span class="c">% circumferential, dynamic</span>
-<span class="c">%    g2 = mod(imag(Z),.8)&amp;lt;.4;                  % horizontal, static</span>
-    <span class="n">im</span><span class="p">(:,:,</span><span class="mi">1</span><span class="p">,</span><span class="n">frame</span><span class="p">)</span> <span class="p">=</span> <span class="n">imresize</span><span class="p">(</span><span class="n">xor</span><span class="p">(</span><span class="n">g1</span><span class="p">,</span><span class="n">g2</span><span class="p">),</span> <span class="p">.</span><span class="mi">25</span><span class="p">,</span> <span class="s">&#39;bilinear&#39;</span><span class="p">);</span>
+<span class="n">for</span> <span class="s">frame</span> <span class="s">=</span> <span class="s">1:30</span>
+    <span class="n">g1</span> <span class="p">=</span> <span class="nb">mod</span><span class="p">(</span><span class="nb">log</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">Z</span><span class="p">))</span><span class="o">*</span><span class="mi">4</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="o">&lt;</span><span class="mi">1</span><span class="p">;</span>           <span class="c">% radial, static</span>
+<span class="c">%    g1 = mod(log(abs(Z))*4+(frame-1)/15,2)&lt;1; % radial, dynamic</span>
+<span class="c">%    g1 = mod(real(Z)+(frame-1)*.8/30,.8)&lt;.4;  % vertical, dynamic</span>
+<span class="c">%    g2 = mod(angle(Z), pi/6)&lt;(pi/12);         % circumferential, static</span>
+    <span class="n">g2</span> <span class="p">=</span> <span class="nb">mod</span><span class="p">(</span><span class="nb">angle</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span><span class="o">+</span><span class="p">(</span><span class="n">frame</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="nb">pi</span><span class="o">/</span><span class="mi">180</span><span class="p">,</span> <span class="nb">pi</span><span class="o">/</span><span class="mi">6</span><span class="p">)</span><span class="o">&lt;</span><span class="p">(</span><span class="nb">pi</span><span class="o">/</span><span class="mi">12</span><span class="p">);</span> <span class="c">% circumferential, dynamic</span>
+<span class="c">%    g2 = mod(imag(Z),.8)&lt;.4;                  % horizontal, static</span>
+    <span class="n">im</span><span class="p">(:,:,</span><span class="mi">1</span><span class="p">,</span><span class="n">frame</span><span class="p">)</span> <span class="p">=</span> <span class="n">imresize</span><span class="p">(</span><span class="n">xor</span><span class="p">(</span><span class="n">g1</span><span class="p">,</span><span class="n">g2</span><span class="p">),</span> <span class="mf">.25</span><span class="p">,</span> <span class="s">&#39;bilinear&#39;</span><span class="p">);</span>
     <span class="n">imwrite</span><span class="p">(</span><span class="n">im</span><span class="p">(:,:,</span><span class="mi">1</span><span class="p">,</span><span class="n">frame</span><span class="p">),</span> <span class="n">sprintf</span><span class="p">(</span><span class="s">&#39;frame%.2d.bmp&#39;</span><span class="p">,</span> <span class="n">frame</span><span class="p">));</span>
-<span class="k">end</span>
+<span class="n">end</span>
 
-<span class="n">mov</span> <span class="p">=</span> <span class="n">immovie</span><span class="p">(</span><span class="mi">255</span><span class="o">*</span><span class="n">im</span><span class="p">,</span><span class="n">gray</span><span class="p">(</span><span class="mi">255</span><span class="p">));</span>
+<span class="s">mov</span> <span class="s">=</span> <span class="s">immovie(255*im,gray(255))</span><span class="p">;</span>
 <span class="n">movie</span><span class="p">(</span><span class="n">mov</span><span class="p">,</span><span class="mi">50</span><span class="p">);</span>
-</pre></div>
+</code></pre></div>
 
 
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
@@ -154,10 +157,13 @@ by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fr
     mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
     mathjaxscript.type = 'text/javascript';
     mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
-    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
         "MathJax.Hub.Config({" +
         "    config: ['MMLorHTML.js']," +
-        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
         "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
         "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
         "    displayAlign: '"+ align +"'," +
@@ -171,6 +177,8 @@ by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fr
         "        preview: 'TeX'," +
         "    }, " +
         "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
         "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
         "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
         "    }, " +
@@ -191,30 +199,32 @@ by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fr
                 "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
             "});" +
         "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
 </script></div>
     <hr />
 </div>
-
+    
 
   
         </div>
-
+        
         <div class="span3">
 
             <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
             <ul class="nav nav-list">
-                <li class="nav-header">
+                <li class="nav-header"> 
                 Site
                 </li>
+            
+                <li><a href="https://fritzm.github.io/archives.html">Archives</a>
+                <li><a href="https://fritzm.github.io/tags.html">Tags</a>
 
-                <li><a href="http://fritzm.github.io/">Archives</a>
-                <li><a href="http://fritzm.github.io/tags.html">Tags</a>
 
 
-
-                <li><a href="http://fritzm.github.io/feeds/all.rss.xml" rel="alternate" type="application/rss+xml">RSS feed</a></li>
+                <li><a href="https://fritzm.github.io/feeds/all.rss.xml" rel="alternate">RSS feed</a></li>
 
             </ul>
             </div>
@@ -222,13 +232,14 @@ by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fr
 
             <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
             <ul class="nav nav-list">
-                <li class="nav-header">
+                <li class="nav-header"> 
                 Categories
                 </li>
-
-                <li><a href="http://fritzm.github.io/category/math.html">Math</a></li>
-                <li><a href="http://fritzm.github.io/category/pdp-11.html">PDP-11</a></li>
-                <li><a href="http://fritzm.github.io/category/programming.html">Programming</a></li>
+                
+                <li><a href="https://fritzm.github.io/category/math.html">Math</a></li>
+                <li><a href="https://fritzm.github.io/category/pdp-11.html">PDP-11</a></li>
+                <li><a href="https://fritzm.github.io/category/programming.html">Programming</a></li>
+                   
             </ul>
             </div>
 
@@ -238,10 +249,10 @@ by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fr
             <div class="social">
             <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
             <ul class="nav nav-list">
-                <li class="nav-header">
+                <li class="nav-header"> 
                 Social
                 </li>
-
+           
                 <li><a href="http://facebook.com/fritzmueller">facebook</a></li>
                 <li><a href="http://twitter.com/infrafritz">twitter</a></li>
                 <li><a href="http://instagram.com/infrafritz">Instagram</a></li>
@@ -252,10 +263,11 @@ by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fr
             </div>
             </div>
 
-        </div>     </div>     </div> 
+        </div>  
+    </div>     </div> 
 <footer>
 <br />
-<p><a href="http://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2012</p>
+<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2014</p>
 </footer>
 
 </div> <!-- /container -->
@@ -299,6 +311,7 @@ by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fr
 </div>
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-collapse.js"></script>
+<script src="https://fritzm.github.io/theme/bootstrap-collapse.js"></script>
+ 
 </body>
 </html>

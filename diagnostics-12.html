@@ -2,28 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>fritzm.github.io</title>
+    <title>fritzm.github.io - PDP-11/45: Diagnostics XII - FP11 FPU, cont.</title>
     <meta name="description" content="">
     <meta name="author" content="Fritz Mueller">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
     <!--[if lt IE 9]>
-    <script src="http://fritzm.github.io/theme/html5.js"></script>
+    <script src="https://fritzm.github.io/theme/html5.js"></script>
     <![endif]-->
 
     <!-- Le styles -->
-    <link href="http://fritzm.github.io/theme/bootstrap.min.css" rel="stylesheet">
-    <link href="http://fritzm.github.io/theme/bootstrap.min.responsive.css" rel="stylesheet">
-    <link href="http://fritzm.github.io/theme/local.css" rel="stylesheet">
-    <link href="http://fritzm.github.io/theme/pygments.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/local.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/pygments.css" rel="stylesheet">
 
     <!-- Photoswipe -->
-    <link rel="stylesheet" href="http://fritzm.github.io/theme/photoswipe.css">
-    <link rel="stylesheet" href="http://fritzm.github.io/theme/default-skin/default-skin.css">
-    <script src="http://fritzm.github.io/theme/photoswipe.min.js"></script>
-    <script src="http://fritzm.github.io/theme/photoswipe-ui-default.min.js"></script>
-    <script src="http://fritzm.github.io/galleries.js"></script>
+    <link rel="stylesheet" href="https://fritzm.github.io/theme/photoswipe.css">
+    <link rel="stylesheet" href="https://fritzm.github.io/theme/default-skin/default-skin.css">
+    <script src="https://fritzm.github.io/theme/photoswipe.min.js"></script>
+    <script src="https://fritzm.github.io/theme/photoswipe-ui-default.min.js"></script>
+    <script src="https://fritzm.github.io/galleries.js"></script>
     <script type="text/javascript">
         var pswipe = function(gname, index) {
             var pswpElement = document.querySelectorAll('.pswp')[0];
@@ -35,7 +35,7 @@
     </script>
 
     <!-- So Firefox can bookmark->"abo this site" -->
-        <link href="feeds/all.rss.xml" rel="alternate" title="fritzm.github.io" type="application/rss+xml">
+        <link href="https://fritzm.github.io/feeds/all.rss.xml" rel="alternate" title="fritzm.github.io" type="application/rss+xml">
 
 </head>
 
@@ -51,14 +51,14 @@
              <span class="icon-bar"></span>
          </a>
 
-        <a class="brand" href="http://fritzm.github.io">fritzm.github.io</a>
+        <a class="brand" href="https://fritzm.github.io">fritzm.github.io</a>
 
         <div class="nav-collapse">
         <ul class="nav">
-
+            
         </ul>
         </div>
-
+        
     </div>
     </div>
 </div>
@@ -73,7 +73,7 @@
             <h1>PDP-11/45: Diagnostics XII - FP11 FPU, cont.</h1>
 Sun 30 October 2016
 
-by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
  
 
 
@@ -130,27 +130,27 @@ a similar test program for this instruction:</p>
 17
 18
 19
-20</pre></div></td><td class="code"><div class="highlight"><pre><span></span>        <span class="nt">000000</span>                          <span class="nt">AC0</span><span class="o">=%</span><span class="nt">0</span>
-        <span class="nt">000001</span>                          <span class="nt">AC1</span><span class="o">=%</span><span class="nt">1</span>
-<span class="nt">000000</span>                                  <span class="p">.</span><span class="nc">ASECT</span>
-        <span class="nt">001000</span>                          <span class="o">.=</span><span class="nt">1000</span>
-<span class="nt">001000</span>  <span class="nt">170011</span>                  <span class="nt">START</span><span class="o">:</span>  <span class="nt">SETD</span>                <span class="o">;</span><span class="nt">SET</span> <span class="nt">DOUBLE</span> <span class="nt">PRECISION</span> <span class="nt">MODE</span>
-<span class="nt">001002</span>  <span class="nt">172467</span>  <span class="nt">000020</span>                  <span class="nt">LDD</span>     <span class="nt">D1</span><span class="o">,</span><span class="nt">AC0</span>      <span class="o">;</span><span class="nt">FETCH</span> <span class="nt">FIRST</span> <span class="nt">OPERAND</span> <span class="nt">FROM</span> <span class="nt">D1</span>
-<span class="nt">001006</span>  <span class="nt">172567</span>  <span class="nt">000024</span>                  <span class="nt">LDD</span>     <span class="nt">D2</span><span class="o">,</span><span class="nt">AC1</span>      <span class="o">;</span><span class="nt">FETCH</span> <span class="nt">SECOND</span> <span class="nt">OPERAND</span> <span class="nt">FROM</span> <span class="nt">D2</span>
-<span class="nt">001012</span>  <span class="nt">171401</span>                          <span class="nt">MODD</span>    <span class="nt">AC1</span><span class="o">,</span><span class="nt">AC0</span>     <span class="o">;</span><span class="nt">MOD</span> <span class="o">(</span><span class="nt">FRAC</span> <span class="nt">IN</span> <span class="nt">AC0</span><span class="o">,</span> <span class="nt">INT</span> <span class="nt">IN</span> <span class="nt">AC1</span><span class="o">)</span>
-<span class="nt">001014</span>  <span class="nt">174067</span>  <span class="nt">000026</span>                  <span class="nt">STD</span>     <span class="nt">AC0</span><span class="o">,</span><span class="nt">D3</span>      <span class="o">;</span><span class="nt">STORE</span> <span class="nt">FRAC</span> <span class="nt">TO</span> <span class="nt">D3</span>
-<span class="nt">001020</span>  <span class="nt">174167</span>  <span class="nt">000032</span>                  <span class="nt">STD</span>     <span class="nt">AC1</span><span class="o">,</span><span class="nt">D4</span>      <span class="o">;</span><span class="nt">STORE</span> <span class="nt">INT</span> <span class="nt">TO</span> <span class="nt">D4</span>
-<span class="nt">001024</span>  <span class="nt">000000</span>                          <span class="nt">HALT</span>
-<span class="nt">001026</span>  <span class="nt">040200</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D1</span><span class="o">:</span>     <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">040200</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span> <span class="o">;</span><span class="nt">1</span><span class="p">.</span><span class="nc">0</span>
-<span class="nt">001034</span>  <span class="nt">000000</span>
-<span class="nt">001036</span>  <span class="nt">040300</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D2</span><span class="o">:</span>     <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">040300</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span> <span class="o">;</span><span class="nt">1</span><span class="p">.</span><span class="nc">5</span>
-<span class="nt">001044</span>  <span class="nt">000000</span>
-<span class="nt">001046</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D3</span><span class="o">:</span>     <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span>
-<span class="nt">001054</span>  <span class="nt">000000</span>
-<span class="nt">001056</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D4</span><span class="o">:</span>     <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span>
-<span class="nt">001064</span>  <span class="nt">000000</span>
-        <span class="nt">001000</span>                          <span class="p">.</span><span class="nc">END</span>    <span class="nt">START</span>
-</pre></div>
+20</pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="err">        000000                          AC0=%0</span>
+<span class="err">        000001                          AC1=%1</span>
+<span class="err">000000                                  .ASECT</span>
+<span class="err">        001000                          .=1000</span>
+<span class="err">001000  170011                  START:  SETD                ;SET DOUBLE PRECISION MODE</span>
+<span class="err">001002  172467  000020                  LDD     D1,AC0      ;FETCH FIRST OPERAND FROM D1</span>
+<span class="err">001006  172567  000024                  LDD     D2,AC1      ;FETCH SECOND OPERAND FROM D2</span>
+<span class="err">001012  171401                          MODD    AC1,AC0     ;MOD (FRAC IN AC0, INT IN AC1)</span>
+<span class="err">001014  174067  000026                  STD     AC0,D3      ;STORE FRAC TO D3</span>
+<span class="err">001020  174167  000032                  STD     AC1,D4      ;STORE INT TO D4</span>
+<span class="err">001024  000000                          HALT</span>
+<span class="err">001026  040200  000000  000000  D1:     .WORD   040200,000000,000000,000000 ;1.0</span>
+<span class="err">001034  000000</span>
+<span class="err">001036  040300  000000  000000  D2:     .WORD   040300,000000,000000,000000 ;1.5</span>
+<span class="err">001044  000000</span>
+<span class="err">001046  000000  000000  000000  D3:     .WORD   000000,000000,000000,000000</span>
+<span class="err">001054  000000</span>
+<span class="err">001056  000000  000000  000000  D4:     .WORD   000000,000000,000000,000000</span>
+<span class="err">001064  000000</span>
+<span class="err">        001000                          .END    START</span>
+</code></pre></div>
 </td></tr></table>
 
 <p>This does show a problem: after exection, the integer result at D4 seems correct, but the fractional result
@@ -161,36 +161,23 @@ are all ones except the least significant bit, which seems incorrect.  All for n
 	
         <hr>
 
-        <h2>Comments</h2>
-<div id="disqus_thread"></div>
-<script type="text/javascript">
-    var disqus_shortname = 'fritzm'; 
-    var disqus_title = 'PDP-11/45: Diagnostics XII - FP11 FPU, cont.';
-
-    (function() {
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-</script>
-<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
     </div>
         </div>
-
+        
         <div class="span3">
 
             <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
             <ul class="nav nav-list">
-                <li class="nav-header">
+                <li class="nav-header"> 
                 Site
                 </li>
+            
+                <li><a href="https://fritzm.github.io/archives.html">Archives</a>
+                <li><a href="https://fritzm.github.io/tags.html">Tags</a>
 
-                <li><a href="http://fritzm.github.io/">Archives</a>
-                <li><a href="http://fritzm.github.io/tags.html">Tags</a>
 
 
-
-                <li><a href="http://fritzm.github.io/feeds/all.rss.xml" rel="alternate" type="application/rss+xml">RSS feed</a></li>
+                <li><a href="https://fritzm.github.io/feeds/all.rss.xml" rel="alternate">RSS feed</a></li>
 
             </ul>
             </div>
@@ -198,13 +185,14 @@ are all ones except the least significant bit, which seems incorrect.  All for n
 
             <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
             <ul class="nav nav-list">
-                <li class="nav-header">
+                <li class="nav-header"> 
                 Categories
                 </li>
-
-                <li><a href="http://fritzm.github.io/category/math.html">Math</a></li>
-                <li><a href="http://fritzm.github.io/category/pdp-11.html">PDP-11</a></li>
-                <li><a href="http://fritzm.github.io/category/programming.html">Programming</a></li>
+                
+                <li><a href="https://fritzm.github.io/category/math.html">Math</a></li>
+                <li><a href="https://fritzm.github.io/category/pdp-11.html">PDP-11</a></li>
+                <li><a href="https://fritzm.github.io/category/programming.html">Programming</a></li>
+                   
             </ul>
             </div>
 
@@ -214,10 +202,10 @@ are all ones except the least significant bit, which seems incorrect.  All for n
             <div class="social">
             <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
             <ul class="nav nav-list">
-                <li class="nav-header">
+                <li class="nav-header"> 
                 Social
                 </li>
-
+           
                 <li><a href="http://facebook.com/fritzmueller">facebook</a></li>
                 <li><a href="http://twitter.com/infrafritz">twitter</a></li>
                 <li><a href="http://instagram.com/infrafritz">Instagram</a></li>
@@ -228,10 +216,11 @@ are all ones except the least significant bit, which seems incorrect.  All for n
             </div>
             </div>
 
-        </div>     </div>     </div> 
+        </div>  
+    </div>     </div> 
 <footer>
 <br />
-<p><a href="http://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2012</p>
+<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2019</p>
 </footer>
 
 </div> <!-- /container -->
@@ -275,6 +264,7 @@ are all ones except the least significant bit, which seems incorrect.  All for n
 </div>
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-collapse.js"></script>
+<script src="https://fritzm.github.io/theme/bootstrap-collapse.js"></script>
+ 
 </body>
 </html>

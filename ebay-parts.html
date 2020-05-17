@@ -2,28 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>fritzm.github.io</title>
+    <title>fritzm.github.io - PDP-11/45: Some parts from eBay</title>
     <meta name="description" content="">
     <meta name="author" content="Fritz Mueller">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
     <!--[if lt IE 9]>
-    <script src="http://fritzm.github.io/theme/html5.js"></script>
+    <script src="https://fritzm.github.io/theme/html5.js"></script>
     <![endif]-->
 
     <!-- Le styles -->
-    <link href="http://fritzm.github.io/theme/bootstrap.min.css" rel="stylesheet">
-    <link href="http://fritzm.github.io/theme/bootstrap.min.responsive.css" rel="stylesheet">
-    <link href="http://fritzm.github.io/theme/local.css" rel="stylesheet">
-    <link href="http://fritzm.github.io/theme/pygments.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/local.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/pygments.css" rel="stylesheet">
 
     <!-- Photoswipe -->
-    <link rel="stylesheet" href="http://fritzm.github.io/theme/photoswipe.css">
-    <link rel="stylesheet" href="http://fritzm.github.io/theme/default-skin/default-skin.css">
-    <script src="http://fritzm.github.io/theme/photoswipe.min.js"></script>
-    <script src="http://fritzm.github.io/theme/photoswipe-ui-default.min.js"></script>
-    <script src="http://fritzm.github.io/galleries.js"></script>
+    <link rel="stylesheet" href="https://fritzm.github.io/theme/photoswipe.css">
+    <link rel="stylesheet" href="https://fritzm.github.io/theme/default-skin/default-skin.css">
+    <script src="https://fritzm.github.io/theme/photoswipe.min.js"></script>
+    <script src="https://fritzm.github.io/theme/photoswipe-ui-default.min.js"></script>
+    <script src="https://fritzm.github.io/galleries.js"></script>
     <script type="text/javascript">
         var pswipe = function(gname, index) {
             var pswpElement = document.querySelectorAll('.pswp')[0];
@@ -35,7 +35,7 @@
     </script>
 
     <!-- So Firefox can bookmark->"abo this site" -->
-        <link href="feeds/all.rss.xml" rel="alternate" title="fritzm.github.io" type="application/rss+xml">
+        <link href="https://fritzm.github.io/feeds/all.rss.xml" rel="alternate" title="fritzm.github.io" type="application/rss+xml">
 
 </head>
 
@@ -51,14 +51,14 @@
              <span class="icon-bar"></span>
          </a>
 
-        <a class="brand" href="http://fritzm.github.io">fritzm.github.io</a>
+        <a class="brand" href="https://fritzm.github.io">fritzm.github.io</a>
 
         <div class="nav-collapse">
         <ul class="nav">
-
+            
         </ul>
         </div>
-
+        
     </div>
     </div>
 </div>
@@ -73,33 +73,36 @@
             <h1>PDP-11/45: Some parts from eBay</h1>
 Sat 09 April 2016
 
-by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
  
 
 
         </div>
 	
-        <div><p>I've been keeping an eye on eBay and have collected a few more goodies: a DD11-D nine-slot expansion backplane, a fully
-populated (128K x 18bit) MS11-L MOS memory board, and a couple of replacement BC08-R cables for connecting the console
-to the CPU cards.  The MS11-L is a bit of a luxury; I am figuring it will be easier to deal with during bringup than
-the core memory systems I have on hand.  It will also be nice to run with a full address space.</p>
-<p>Below is an updated shot of the CPU chassis with the expansion backplane installed, populated with bus jumpers,
-terminators, grant continuity cards, the MS11-L memory, a DL11 serial interface, and an M792-YB boostrap ROM.  I've gone
-ahead and slotted in the FPU in the first four slots, since the cleaned and refurbished CPU cabinet is probably the
-safest place to store them now.  Console cables are also installed:</p>
+        <div><p>I've been keeping an eye on eBay and have collected a few more goodies: a DD11-D nine-slot expansion
+backplane, a fully populated (128K x 18-bit) MS11-L MOS memory board, and a couple of replacement BC08-R
+cables for connecting the console to the CPU cards.  The MS11-L is a bit of a luxury; I am figuring it will be
+easier to deal with during bring-up than the core memory systems I have on hand.  It will also be nice to run
+with a full address space.</p>
+<p>Below is an updated shot of the CPU chassis with the expansion backplane installed, populated with bus
+jumpers, terminators, grant continuity cards, the MS11-L memory, a DL11 serial interface, and an M792-YB
+bootstrap ROM.  I've gone ahead and slotted in the FPU in the first four slots, since the cleaned and
+refurbished CPU cabinet is probably the safest place to store them now.  Console cables are also installed:</p>
 <p><img src='/images/pdp11/boards-in-chassis-2_thumbnail_tall.jpg' title='Backplane and expansion populated with CPU, MMU, FPU, bootstrap ROM, console serial, 256K RAM, grant continuity cards and terminators' onclick='pswipe("pdp11",19);'/></p>
-<p>The M792 ROM is an interesting bit, and probably worth a comment.  This is a 32-word diode-matrix ROM card.  The bits
-are physically laid out on the card (see pictures below); where there is a diode, there is a logical 1 bit and where
-there is the absence of a diode there is a logical 0 bit.  Typically the matrix would be loaded with a bootstrap program,
-to save the operator from having to toggle it in from the console on each boot.</p>
-<p>The program could be modified by physically adding or removing diodes in the matrix.  My card has had such a mod; there
-is a handwritten note attached from some engineer describing this.  The mod customizes the bootstrap to always load
-from an RK disk unit, to avoid having to toggle in the device address at boot.  I will probably revert this mod because
-I like having things in fairly stock/usual condition.</p>
+<p>The M792 ROM is an interesting bit, and probably worth a comment.  This is a 32-word diode-matrix ROM card. 
+The bits are physically laid out on the card (see pictures below); where there is a diode, there is a logical
+1 bit and where there is the absence of a diode there is a logical 0 bit.  Typically the matrix would be
+loaded with a bootstrap program, to save the operator from having to toggle it in from the console on each
+boot.</p>
+<p>The program could be modified by physically adding or removing diodes in the matrix.  My card has had such a
+mod; there is a handwritten note attached from some engineer describing this.  The mod customizes the
+bootstrap to always load from an RK disk unit, to avoid having to toggle in the device address at boot.  I
+will probably revert this mod because I like having things in fairly stock/usual condition.</p>
 <p><img src='/images/pdp11/mr11-with-note_thumbnail_tall.jpg' title='A modified M792-YB bootstrap ROM, with a vintage note attached' onclick='pswipe("pdp11",20);'/>
 <img src='/images/pdp11/mr11-bare_thumbnail_tall.jpg' title='M792-YB bootstrap ROM with note removed' onclick='pswipe("pdp11",21);'/></p>
-<p>For fun, here's the source listing of the stock bootstrap.  You can match the octal digits of the machine code against
-the diodes in the ROM above (low word addresses at the top of the matrix, and least-significant-bits on the left).</p>
+<p>For fun, here's the source listing of the stock bootstrap.  You can match the octal digits of the machine code
+against the diodes in the ROM above (low word addresses at the top of the matrix, and least-significant-bits
+on the left).</p>
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
@@ -123,68 +126,55 @@ the diodes in the ROM above (low word addresses at the top of the matrix, and le
 21
 22
 23
-24</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">173100</span> <span class="nt">013701</span>         <span class="nt">MOV</span>     <span class="o">@</span><span class="p">#</span><span class="nn">177570</span><span class="o">,</span><span class="nt">R1</span>     <span class="o">;</span><span class="nt">READ</span> <span class="nt">SWITCH</span> <span class="nt">REG</span> <span class="nt">FOR</span> <span class="o">....</span>
-       <span class="nt">177570</span>
-<span class="nt">173104</span> <span class="nt">000005</span> <span class="nt">BEGIN</span><span class="o">:</span>  <span class="nt">RESET</span>                   <span class="o">;</span><span class="nt">FORCE</span> <span class="nt">CLEAR</span> <span class="nt">IF</span> <span class="nt">RETRY</span>
-<span class="nt">173106</span> <span class="nt">010100</span>         <span class="nt">MOV</span>     <span class="nt">R1</span><span class="o">,</span><span class="nt">R0</span>           <span class="o">;...</span><span class="p">.</span><span class="nc">DEVICE</span> <span class="nt">WC</span> <span class="nt">ADDRESS</span>
-<span class="nt">173110</span> <span class="nt">012710</span>         <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">-256</span><span class="o">,</span><span class="p">@</span><span class="k">R0</span>       <span class="p">;</span><span class="nt">SET</span> <span class="nt">TO</span> <span class="nt">READ</span> <span class="nt">256</span> <span class="nt">WORDS</span>
-       <span class="nt">177400</span>
-<span class="nt">173114</span> <span class="nt">020027</span>         <span class="nt">CMP</span>     <span class="nt">R0</span><span class="o">,</span><span class="p">#</span><span class="nn">177344</span>      <span class="o">;</span><span class="nt">IS</span> <span class="nt">IT</span> <span class="nt">DECTAPE</span><span class="o">?</span>
-       <span class="nt">177344</span>
-<span class="nt">173120</span> <span class="nt">001007</span>         <span class="nt">BNE</span>     <span class="nt">START</span>           <span class="o">;</span><span class="nt">NO</span><span class="o">.</span> <span class="nt">GO</span> <span class="nt">TO</span> <span class="nt">START</span>
-<span class="nt">173122</span> <span class="nt">012740</span>         <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">4002</span><span class="o">,</span><span class="nt">-</span><span class="o">(</span><span class="nt">R0</span><span class="o">)</span>     <span class="o">;</span><span class="nt">YES</span><span class="o">.</span> <span class="nt">MOVE</span> <span class="nt">TAPE</span> <span class="nt">TO</span> <span class="nt">FRONT</span>
-       <span class="nt">004002</span>
-<span class="nt">173126</span> <span class="nt">005710</span>         <span class="nt">TST</span>     <span class="p">@</span><span class="k">R0</span>             <span class="p">;</span><span class="nt">WAIT</span> <span class="nt">FOR</span> <span class="nt">ERROR</span><span class="o">!</span>
-<span class="nt">173130</span> <span class="nt">100376</span>         <span class="nt">BPL</span>     <span class="p">.</span><span class="nc">-2</span>
-<span class="nt">173132</span> <span class="nt">005740</span>         <span class="nt">TST</span>     <span class="nt">-</span><span class="o">(</span><span class="nt">R0</span><span class="o">)</span>           <span class="o">;</span><span class="nt">IS</span> <span class="nt">IT</span> <span class="nt">ENDZONE</span><span class="o">?</span>
-<span class="nt">173134</span> <span class="nt">100363</span>         <span class="nt">BPL</span>     <span class="nt">BEGIN</span>           <span class="o">;</span><span class="nt">NO</span><span class="o">.</span> <span class="nt">TRY</span> <span class="nt">AGAIN</span>
-<span class="nt">173136</span> <span class="nt">022020</span>         <span class="nt">CMP</span>     <span class="o">(</span><span class="nt">R0</span><span class="o">)+,(</span><span class="nt">R0</span><span class="o">)+</span>     <span class="o">;</span><span class="nt">ADJUST</span> <span class="nt">POINTER</span>
-<span class="nt">173140</span> <span class="nt">012740</span> <span class="nt">START</span><span class="o">:</span>  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">5</span><span class="o">,</span><span class="nt">-</span><span class="o">(</span><span class="nt">R0</span><span class="o">)</span>        <span class="o">;</span><span class="nt">NOW</span> <span class="nt">START</span> <span class="nt">ACTUAL</span> <span class="nt">READ</span>
-       <span class="nt">000005</span>
-<span class="nt">173144</span> <span class="nt">105710</span>         <span class="nt">TSTB</span>    <span class="p">@</span><span class="k">R0</span>             <span class="p">;</span><span class="nt">WAIT</span> <span class="nt">FOR</span> <span class="nt">DONE</span>
-<span class="nt">173146</span> <span class="nt">100376</span>         <span class="nt">BPL</span>     <span class="p">.</span><span class="nc">-2</span>
-<span class="nt">173150</span> <span class="nt">005710</span>         <span class="nt">TST</span>     <span class="p">@</span><span class="k">R0</span>             <span class="p">;</span><span class="nt">ERROR</span> <span class="nt">ENCOUNTERED</span><span class="o">?</span>
-<span class="nt">173152</span> <span class="nt">100754</span>         <span class="nt">BMI</span>     <span class="nt">BEGIN</span>           <span class="o">;</span><span class="nt">IF</span> <span class="nt">SO</span> <span class="nt">START</span> <span class="nt">OVER</span>
-<span class="nt">173154</span> <span class="nt">105010</span>         <span class="nt">CLRB</span>    <span class="p">@</span><span class="k">R0</span>             <span class="p">;</span><span class="nt">FOR</span> <span class="nt">DECTAPE</span><span class="o">,</span><span class="nt">STOP</span> <span class="nt">TRANSPORT</span>
-<span class="nt">173156</span> <span class="nt">000137</span>         <span class="nt">JMP</span>     <span class="o">@</span><span class="p">#</span><span class="nn">0</span>             <span class="o">;</span><span class="nt">GO</span> <span class="nt">TO</span> <span class="nt">ROUTINE</span> <span class="nt">LOADED</span>
-</pre></div>
+24</pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="mi">173100</span><span class="w"> </span><span class="mi">013701</span><span class="w">         </span><span class="n">MOV</span><span class="w">     </span><span class="err">@</span><span class="n">#177570</span><span class="p">,</span><span class="n">R1</span><span class="w">     </span><span class="p">;</span><span class="k">READ</span><span class="w"> </span><span class="n">SWITCH</span><span class="w"> </span><span class="n">REG</span><span class="w"> </span><span class="k">FOR</span><span class="w"> </span><span class="p">....</span><span class="w"></span>
+<span class="w">       </span><span class="mi">177570</span><span class="w"></span>
+<span class="mi">173104</span><span class="w"> </span><span class="mi">000005</span><span class="w"> </span><span class="k">BEGIN</span><span class="err">:</span><span class="w">  </span><span class="n">RESET</span><span class="w">                   </span><span class="p">;</span><span class="n">FORCE</span><span class="w"> </span><span class="n">CLEAR</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="n">RETRY</span><span class="w"></span>
+<span class="mi">173106</span><span class="w"> </span><span class="mi">010100</span><span class="w">         </span><span class="n">MOV</span><span class="w">     </span><span class="n">R1</span><span class="p">,</span><span class="n">R0</span><span class="w">           </span><span class="p">;....</span><span class="n">DEVICE</span><span class="w"> </span><span class="n">WC</span><span class="w"> </span><span class="n">ADDRESS</span><span class="w"></span>
+<span class="mi">173110</span><span class="w"> </span><span class="mi">012710</span><span class="w">         </span><span class="n">MOV</span><span class="w">     </span><span class="err">#</span><span class="o">-</span><span class="mi">256</span><span class="p">,</span><span class="nv">@R0</span><span class="w">       </span><span class="p">;</span><span class="k">SET</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="k">READ</span><span class="w"> </span><span class="mi">256</span><span class="w"> </span><span class="n">WORDS</span><span class="w"></span>
+<span class="w">       </span><span class="mi">177400</span><span class="w"></span>
+<span class="mi">173114</span><span class="w"> </span><span class="mi">020027</span><span class="w">         </span><span class="n">CMP</span><span class="w">     </span><span class="n">R0</span><span class="p">,</span><span class="n">#177344</span><span class="w">      </span><span class="p">;</span><span class="k">IS</span><span class="w"> </span><span class="n">IT</span><span class="w"> </span><span class="n">DECTAPE</span><span class="vm">?</span><span class="w"></span>
+<span class="w">       </span><span class="mi">177344</span><span class="w"></span>
+<span class="mi">173120</span><span class="w"> </span><span class="mi">001007</span><span class="w">         </span><span class="n">BNE</span><span class="w">     </span><span class="k">START</span><span class="w">           </span><span class="p">;</span><span class="k">NO</span><span class="p">.</span><span class="w"> </span><span class="k">GO</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="k">START</span><span class="w"></span>
+<span class="mi">173122</span><span class="w"> </span><span class="mi">012740</span><span class="w">         </span><span class="n">MOV</span><span class="w">     </span><span class="n">#4002</span><span class="p">,</span><span class="o">-</span><span class="p">(</span><span class="n">R0</span><span class="p">)</span><span class="w">     </span><span class="p">;</span><span class="n">YES</span><span class="p">.</span><span class="w"> </span><span class="n">MOVE</span><span class="w"> </span><span class="n">TAPE</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="n">FRONT</span><span class="w"></span>
+<span class="w">       </span><span class="mi">004002</span><span class="w"></span>
+<span class="mi">173126</span><span class="w"> </span><span class="mi">005710</span><span class="w">         </span><span class="n">TST</span><span class="w">     </span><span class="nv">@R0</span><span class="w">             </span><span class="p">;</span><span class="n">WAIT</span><span class="w"> </span><span class="k">FOR</span><span class="w"> </span><span class="n">ERROR</span><span class="err">!</span><span class="w"></span>
+<span class="mi">173130</span><span class="w"> </span><span class="mi">100376</span><span class="w">         </span><span class="n">BPL</span><span class="w">     </span><span class="p">.</span><span class="o">-</span><span class="mi">2</span><span class="w"></span>
+<span class="mi">173132</span><span class="w"> </span><span class="mi">005740</span><span class="w">         </span><span class="n">TST</span><span class="w">     </span><span class="o">-</span><span class="p">(</span><span class="n">R0</span><span class="p">)</span><span class="w">           </span><span class="p">;</span><span class="k">IS</span><span class="w"> </span><span class="n">IT</span><span class="w"> </span><span class="n">ENDZONE</span><span class="vm">?</span><span class="w"></span>
+<span class="mi">173134</span><span class="w"> </span><span class="mi">100363</span><span class="w">         </span><span class="n">BPL</span><span class="w">     </span><span class="k">BEGIN</span><span class="w">           </span><span class="p">;</span><span class="k">NO</span><span class="p">.</span><span class="w"> </span><span class="k">TRY</span><span class="w"> </span><span class="n">AGAIN</span><span class="w"></span>
+<span class="mi">173136</span><span class="w"> </span><span class="mi">022020</span><span class="w">         </span><span class="n">CMP</span><span class="w">     </span><span class="p">(</span><span class="n">R0</span><span class="p">)</span><span class="o">+</span><span class="p">,(</span><span class="n">R0</span><span class="p">)</span><span class="o">+</span><span class="w">     </span><span class="p">;</span><span class="n">ADJUST</span><span class="w"> </span><span class="n">POINTER</span><span class="w"></span>
+<span class="mi">173140</span><span class="w"> </span><span class="mi">012740</span><span class="w"> </span><span class="k">START</span><span class="err">:</span><span class="w">  </span><span class="n">MOV</span><span class="w">     </span><span class="n">#5</span><span class="p">,</span><span class="o">-</span><span class="p">(</span><span class="n">R0</span><span class="p">)</span><span class="w">        </span><span class="p">;</span><span class="n">NOW</span><span class="w"> </span><span class="k">START</span><span class="w"> </span><span class="n">ACTUAL</span><span class="w"> </span><span class="k">READ</span><span class="w"></span>
+<span class="w">       </span><span class="mi">000005</span><span class="w"></span>
+<span class="mi">173144</span><span class="w"> </span><span class="mi">105710</span><span class="w">         </span><span class="n">TSTB</span><span class="w">    </span><span class="nv">@R0</span><span class="w">             </span><span class="p">;</span><span class="n">WAIT</span><span class="w"> </span><span class="k">FOR</span><span class="w"> </span><span class="n">DONE</span><span class="w"></span>
+<span class="mi">173146</span><span class="w"> </span><span class="mi">100376</span><span class="w">         </span><span class="n">BPL</span><span class="w">     </span><span class="p">.</span><span class="o">-</span><span class="mi">2</span><span class="w"></span>
+<span class="mi">173150</span><span class="w"> </span><span class="mi">005710</span><span class="w">         </span><span class="n">TST</span><span class="w">     </span><span class="nv">@R0</span><span class="w">             </span><span class="p">;</span><span class="n">ERROR</span><span class="w"> </span><span class="n">ENCOUNTERED</span><span class="vm">?</span><span class="w"></span>
+<span class="mi">173152</span><span class="w"> </span><span class="mi">100754</span><span class="w">         </span><span class="n">BMI</span><span class="w">     </span><span class="k">BEGIN</span><span class="w">           </span><span class="p">;</span><span class="k">IF</span><span class="w"> </span><span class="n">SO</span><span class="w"> </span><span class="k">START</span><span class="w"> </span><span class="k">OVER</span><span class="w"></span>
+<span class="mi">173154</span><span class="w"> </span><span class="mi">105010</span><span class="w">         </span><span class="n">CLRB</span><span class="w">    </span><span class="nv">@R0</span><span class="w">             </span><span class="p">;</span><span class="k">FOR</span><span class="w"> </span><span class="n">DECTAPE</span><span class="p">,</span><span class="n">STOP</span><span class="w"> </span><span class="n">TRANSPORT</span><span class="w"></span>
+<span class="mi">173156</span><span class="w"> </span><span class="mi">000137</span><span class="w">         </span><span class="n">JMP</span><span class="w">     </span><span class="err">@</span><span class="n">#0</span><span class="w">             </span><span class="p">;</span><span class="k">GO</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="k">ROUTINE</span><span class="w"> </span><span class="n">LOADED</span><span class="w"></span>
+</code></pre></div>
 </td></tr></table>
 
-<p>Hmmm, the Pygments syntax highlighting package used by my blog generator doesn't seem to grok MACRO-11; may have to
-do something about that...</p></div>
+<p>Hmmm, the Pygments syntax highlighting package used by my blog generator doesn't seem to grok MACRO-11; may
+have to do something about that...</p></div>
 	
         <hr>
 
-        <h2>Comments</h2>
-<div id="disqus_thread"></div>
-<script type="text/javascript">
-    var disqus_shortname = 'fritzm'; 
-    var disqus_title = 'PDP-11/45: Some parts from eBay';
-
-    (function() {
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-</script>
-<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
     </div>
         </div>
-
+        
         <div class="span3">
 
             <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
             <ul class="nav nav-list">
-                <li class="nav-header">
+                <li class="nav-header"> 
                 Site
                 </li>
+            
+                <li><a href="https://fritzm.github.io/archives.html">Archives</a>
+                <li><a href="https://fritzm.github.io/tags.html">Tags</a>
 
-                <li><a href="http://fritzm.github.io/">Archives</a>
-                <li><a href="http://fritzm.github.io/tags.html">Tags</a>
 
 
-
-                <li><a href="http://fritzm.github.io/feeds/all.rss.xml" rel="alternate" type="application/rss+xml">RSS feed</a></li>
+                <li><a href="https://fritzm.github.io/feeds/all.rss.xml" rel="alternate">RSS feed</a></li>
 
             </ul>
             </div>
@@ -192,13 +182,14 @@ do something about that...</p></div>
 
             <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
             <ul class="nav nav-list">
-                <li class="nav-header">
+                <li class="nav-header"> 
                 Categories
                 </li>
-
-                <li><a href="http://fritzm.github.io/category/math.html">Math</a></li>
-                <li><a href="http://fritzm.github.io/category/pdp-11.html">PDP-11</a></li>
-                <li><a href="http://fritzm.github.io/category/programming.html">Programming</a></li>
+                
+                <li><a href="https://fritzm.github.io/category/math.html">Math</a></li>
+                <li><a href="https://fritzm.github.io/category/pdp-11.html">PDP-11</a></li>
+                <li><a href="https://fritzm.github.io/category/programming.html">Programming</a></li>
+                   
             </ul>
             </div>
 
@@ -208,10 +199,10 @@ do something about that...</p></div>
             <div class="social">
             <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
             <ul class="nav nav-list">
-                <li class="nav-header">
+                <li class="nav-header"> 
                 Social
                 </li>
-
+           
                 <li><a href="http://facebook.com/fritzmueller">facebook</a></li>
                 <li><a href="http://twitter.com/infrafritz">twitter</a></li>
                 <li><a href="http://instagram.com/infrafritz">Instagram</a></li>
@@ -222,10 +213,11 @@ do something about that...</p></div>
             </div>
             </div>
 
-        </div>     </div>     </div> 
+        </div>  
+    </div>     </div> 
 <footer>
 <br />
-<p><a href="http://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2012</p>
+<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2019</p>
 </footer>
 
 </div> <!-- /container -->
@@ -269,6 +261,7 @@ do something about that...</p></div>
 </div>
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-collapse.js"></script>
+<script src="https://fritzm.github.io/theme/bootstrap-collapse.js"></script>
+ 
 </body>
 </html>

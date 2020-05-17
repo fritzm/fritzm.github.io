@@ -2,28 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>fritzm.github.io</title>
+    <title>fritzm.github.io - PDP-11/45: Diagnostics V - D0AA0-D0MA0, CKBOA0</title>
     <meta name="description" content="">
     <meta name="author" content="Fritz Mueller">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
     <!--[if lt IE 9]>
-    <script src="http://fritzm.github.io/theme/html5.js"></script>
+    <script src="https://fritzm.github.io/theme/html5.js"></script>
     <![endif]-->
 
     <!-- Le styles -->
-    <link href="http://fritzm.github.io/theme/bootstrap.min.css" rel="stylesheet">
-    <link href="http://fritzm.github.io/theme/bootstrap.min.responsive.css" rel="stylesheet">
-    <link href="http://fritzm.github.io/theme/local.css" rel="stylesheet">
-    <link href="http://fritzm.github.io/theme/pygments.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/local.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/pygments.css" rel="stylesheet">
 
     <!-- Photoswipe -->
-    <link rel="stylesheet" href="http://fritzm.github.io/theme/photoswipe.css">
-    <link rel="stylesheet" href="http://fritzm.github.io/theme/default-skin/default-skin.css">
-    <script src="http://fritzm.github.io/theme/photoswipe.min.js"></script>
-    <script src="http://fritzm.github.io/theme/photoswipe-ui-default.min.js"></script>
-    <script src="http://fritzm.github.io/galleries.js"></script>
+    <link rel="stylesheet" href="https://fritzm.github.io/theme/photoswipe.css">
+    <link rel="stylesheet" href="https://fritzm.github.io/theme/default-skin/default-skin.css">
+    <script src="https://fritzm.github.io/theme/photoswipe.min.js"></script>
+    <script src="https://fritzm.github.io/theme/photoswipe-ui-default.min.js"></script>
+    <script src="https://fritzm.github.io/galleries.js"></script>
     <script type="text/javascript">
         var pswipe = function(gname, index) {
             var pswpElement = document.querySelectorAll('.pswp')[0];
@@ -35,7 +35,7 @@
     </script>
 
     <!-- So Firefox can bookmark->"abo this site" -->
-        <link href="feeds/all.rss.xml" rel="alternate" title="fritzm.github.io" type="application/rss+xml">
+        <link href="https://fritzm.github.io/feeds/all.rss.xml" rel="alternate" title="fritzm.github.io" type="application/rss+xml">
 
 </head>
 
@@ -51,14 +51,14 @@
              <span class="icon-bar"></span>
          </a>
 
-        <a class="brand" href="http://fritzm.github.io">fritzm.github.io</a>
+        <a class="brand" href="https://fritzm.github.io">fritzm.github.io</a>
 
         <div class="nav-collapse">
         <ul class="nav">
-
+            
         </ul>
         </div>
-
+        
     </div>
     </div>
 </div>
@@ -73,7 +73,7 @@
             <h1>PDP-11/45: Diagnostics V - D0AA0-D0MA0, CKBOA0</h1>
 Sun 31 July 2016
 
-by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
  
 
 
@@ -130,23 +130,23 @@ this a little further, the first failing sub-test is T65:</p>
 13
 14
 15
-16</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">010540</span> <span class="nt">010701</span>                  <span class="nt">T65</span><span class="o">:</span>    <span class="nt">SCOPE</span>                    <span class="o">;</span>
-<span class="nt">010542</span> <span class="nt">012737</span>  <span class="nt">030000</span>  <span class="nt">177776</span>          <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">PUM</span><span class="o">,@</span><span class="p">#</span><span class="nn">PSW</span>       <span class="o">;</span><span class="nt">KERNEL</span> <span class="nt">MODE</span><span class="o">,</span> <span class="nt">PREV</span> <span class="nt">USER</span> <span class="nt">MODE</span>
-<span class="nt">010550</span> <span class="nt">012706</span>  <span class="nt">000500</span>                  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">KPTR</span><span class="o">,</span><span class="nt">KSP</span>        <span class="o">;</span><span class="nt">SET</span> <span class="nt">KERNEL</span> <span class="nt">STACK</span> <span class="nt">POINTER</span>
-<span class="nt">010554</span> <span class="nt">012716</span>  <span class="nt">000700</span>                  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">UPTR</span><span class="o">,(</span><span class="nt">KSP</span><span class="o">)</span>
-<span class="nt">010560</span> <span class="nt">106606</span>                          <span class="nt">MTPD</span>    <span class="nt">USP</span>              <span class="o">;</span><span class="nt">SET</span> <span class="nt">USER</span> <span class="nt">STATCK</span> <span class="nt">POINTER</span>
-<span class="nt">010562</span> <span class="nt">005067</span>  <span class="nt">170110</span>                  <span class="nt">CLR</span>     <span class="nt">UPTR-2</span>
-<span class="nt">010566</span> <span class="nt">052737</span>  <span class="nt">140000</span>  <span class="nt">177776</span>          <span class="nt">BIS</span>     <span class="p">#</span><span class="nn">UM</span><span class="o">,@</span><span class="p">#</span><span class="nn">PSW</span>        <span class="o">;</span><span class="nt">USER</span> <span class="nt">MODE</span><span class="o">,</span> <span class="nt">PREV</span> <span class="nt">USER</span> <span class="nt">MODE</span>
-<span class="nt">010574</span> <span class="nt">106506</span>                          <span class="nt">MFPD</span>    <span class="nt">USP</span>              <span class="o">;</span><span class="nt">PUSH</span> <span class="nt">USER</span> <span class="nt">STACK</span> <span class="nt">POINTER</span> <span class="nt">ONTO</span> <span class="nt">USER</span> <span class="nt">STACK</span>
-<span class="nt">010576</span> <span class="nt">042737</span>  <span class="nt">140000</span>  <span class="nt">177776</span>          <span class="nt">BIC</span>     <span class="p">#</span><span class="nn">UM</span><span class="o">,@</span><span class="p">#</span><span class="nn">PSW</span>        <span class="o">;</span><span class="nt">KERNEL</span> <span class="nt">MODE</span><span class="o">,</span> <span class="nt">PREV</span> <span class="nt">USER</span> <span class="nt">MODE</span>
-<span class="nt">010604</span> <span class="nt">106506</span>                          <span class="nt">MFPD</span>    <span class="nt">USP</span>              <span class="o">;</span><span class="nt">PUSH</span> <span class="nt">USER</span> <span class="nt">STACK</span> <span class="nt">POINTER</span> <span class="nt">ONTO</span> <span class="nt">KERNEL</span> <span class="nt">STACK</span>
-<span class="nt">010606</span> <span class="nt">022716</span>  <span class="nt">000676</span>                  <span class="nt">CMP</span>     <span class="p">#</span><span class="nn">UPTR-2</span><span class="o">,(</span><span class="nt">KSP</span><span class="o">)</span>    <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">THAT</span> <span class="nt">USER</span> <span class="nt">STACK</span> <span class="nt">POINTER</span> <span class="nt">WAS</span>
-<span class="nt">010612</span> <span class="nt">001401</span>                          <span class="nt">BEQ</span>     <span class="o">.+</span><span class="nt">4</span>              <span class="o">;</span><span class="nt">PUSHED</span> <span class="nt">PROPERLY</span> <span class="o">(</span><span class="nt">ONCE</span><span class="o">)</span>
-<span class="nt">010614</span> <span class="nt">000000</span>                          <span class="nt">HLT</span>                      <span class="o">;</span><span class="nt">ERROR</span><span class="o">!</span>
-<span class="nt">010616</span> <span class="nt">022767</span>  <span class="nt">000700</span>  <span class="nt">170052</span>          <span class="nt">CMP</span>     <span class="p">#</span><span class="nn">UPTR</span><span class="o">,</span><span class="nt">UPTR-2</span>     <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">THAT</span> <span class="nt">USER</span> <span class="nt">STACK</span> <span class="nt">POINTER</span> <span class="nt">IS</span> <span class="nt">ON</span> <span class="nt">THE</span>
-<span class="nt">010624</span> <span class="nt">001401</span>                          <span class="nt">BEQ</span>     <span class="o">.+</span><span class="nt">4</span>              <span class="o">;</span><span class="nt">USERS</span> <span class="nt">STACK</span>
-<span class="nt">010626</span> <span class="nt">000000</span>                          <span class="nt">HLT</span>                      <span class="o">;</span><span class="nt">ERROR</span><span class="o">!</span>
-</pre></div>
+16</pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="err">010540 010701                  T65:    SCOPE                    ;</span>
+<span class="err">010542 012737  030000  177776          MOV     #PUM,@#PSW       ;KERNEL MODE, PREV USER MODE</span>
+<span class="err">010550 012706  000500                  MOV     #KPTR,KSP        ;SET KERNEL STACK POINTER</span>
+<span class="err">010554 012716  000700                  MOV     #UPTR,(KSP)</span>
+<span class="err">010560 106606                          MTPD    USP              ;SET USER STATCK POINTER</span>
+<span class="err">010562 005067  170110                  CLR     UPTR-2</span>
+<span class="err">010566 052737  140000  177776          BIS     #UM,@#PSW        ;USER MODE, PREV USER MODE</span>
+<span class="err">010574 106506                          MFPD    USP              ;PUSH USER STACK POINTER ONTO USER STACK</span>
+<span class="err">010576 042737  140000  177776          BIC     #UM,@#PSW        ;KERNEL MODE, PREV USER MODE</span>
+<span class="err">010604 106506                          MFPD    USP              ;PUSH USER STACK POINTER ONTO KERNEL STACK</span>
+<span class="err">010606 022716  000676                  CMP     #UPTR-2,(KSP)    ;CHECK THAT USER STACK POINTER WAS</span>
+<span class="err">010612 001401                          BEQ     .+4              ;PUSHED PROPERLY (ONCE)</span>
+<span class="err">010614 000000                          HLT                      ;ERROR!</span>
+<span class="err">010616 022767  000700  170052          CMP     #UPTR,UPTR-2     ;CHECK THAT USER STACK POINTER IS ON THE</span>
+<span class="err">010624 001401                          BEQ     .+4              ;USERS STACK</span>
+<span class="err">010626 000000                          HLT                      ;ERROR!</span>
+</code></pre></div>
 </td></tr></table>
 
 <p>This runs amok on the MFPD instruction at 010574, which should push the user stack pointer onto the user stack.
@@ -193,36 +193,23 @@ solder on the affected mechanism as a next step.</p>
 	
         <hr>
 
-        <h2>Comments</h2>
-<div id="disqus_thread"></div>
-<script type="text/javascript">
-    var disqus_shortname = 'fritzm'; 
-    var disqus_title = 'PDP-11/45: Diagnostics V - D0AA0-D0MA0, CKBOA0';
-
-    (function() {
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-</script>
-<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
     </div>
         </div>
-
+        
         <div class="span3">
 
             <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
             <ul class="nav nav-list">
-                <li class="nav-header">
+                <li class="nav-header"> 
                 Site
                 </li>
+            
+                <li><a href="https://fritzm.github.io/archives.html">Archives</a>
+                <li><a href="https://fritzm.github.io/tags.html">Tags</a>
 
-                <li><a href="http://fritzm.github.io/">Archives</a>
-                <li><a href="http://fritzm.github.io/tags.html">Tags</a>
 
 
-
-                <li><a href="http://fritzm.github.io/feeds/all.rss.xml" rel="alternate" type="application/rss+xml">RSS feed</a></li>
+                <li><a href="https://fritzm.github.io/feeds/all.rss.xml" rel="alternate">RSS feed</a></li>
 
             </ul>
             </div>
@@ -230,13 +217,14 @@ solder on the affected mechanism as a next step.</p>
 
             <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
             <ul class="nav nav-list">
-                <li class="nav-header">
+                <li class="nav-header"> 
                 Categories
                 </li>
-
-                <li><a href="http://fritzm.github.io/category/math.html">Math</a></li>
-                <li><a href="http://fritzm.github.io/category/pdp-11.html">PDP-11</a></li>
-                <li><a href="http://fritzm.github.io/category/programming.html">Programming</a></li>
+                
+                <li><a href="https://fritzm.github.io/category/math.html">Math</a></li>
+                <li><a href="https://fritzm.github.io/category/pdp-11.html">PDP-11</a></li>
+                <li><a href="https://fritzm.github.io/category/programming.html">Programming</a></li>
+                   
             </ul>
             </div>
 
@@ -246,10 +234,10 @@ solder on the affected mechanism as a next step.</p>
             <div class="social">
             <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
             <ul class="nav nav-list">
-                <li class="nav-header">
+                <li class="nav-header"> 
                 Social
                 </li>
-
+           
                 <li><a href="http://facebook.com/fritzmueller">facebook</a></li>
                 <li><a href="http://twitter.com/infrafritz">twitter</a></li>
                 <li><a href="http://instagram.com/infrafritz">Instagram</a></li>
@@ -260,10 +248,11 @@ solder on the affected mechanism as a next step.</p>
             </div>
             </div>
 
-        </div>     </div>     </div> 
+        </div>  
+    </div>     </div> 
 <footer>
 <br />
-<p><a href="http://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2012</p>
+<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2019</p>
 </footer>
 
 </div> <!-- /container -->
@@ -307,6 +296,7 @@ solder on the affected mechanism as a next step.</p>
 </div>
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-collapse.js"></script>
+<script src="https://fritzm.github.io/theme/bootstrap-collapse.js"></script>
+ 
 </body>
 </html>

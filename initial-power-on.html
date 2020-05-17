@@ -2,28 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>fritzm.github.io</title>
+    <title>fritzm.github.io - PDP-11/45: Initial Power On!</title>
     <meta name="description" content="">
     <meta name="author" content="Fritz Mueller">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
     <!--[if lt IE 9]>
-    <script src="http://fritzm.github.io/theme/html5.js"></script>
+    <script src="https://fritzm.github.io/theme/html5.js"></script>
     <![endif]-->
 
     <!-- Le styles -->
-    <link href="http://fritzm.github.io/theme/bootstrap.min.css" rel="stylesheet">
-    <link href="http://fritzm.github.io/theme/bootstrap.min.responsive.css" rel="stylesheet">
-    <link href="http://fritzm.github.io/theme/local.css" rel="stylesheet">
-    <link href="http://fritzm.github.io/theme/pygments.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/local.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/pygments.css" rel="stylesheet">
 
     <!-- Photoswipe -->
-    <link rel="stylesheet" href="http://fritzm.github.io/theme/photoswipe.css">
-    <link rel="stylesheet" href="http://fritzm.github.io/theme/default-skin/default-skin.css">
-    <script src="http://fritzm.github.io/theme/photoswipe.min.js"></script>
-    <script src="http://fritzm.github.io/theme/photoswipe-ui-default.min.js"></script>
-    <script src="http://fritzm.github.io/galleries.js"></script>
+    <link rel="stylesheet" href="https://fritzm.github.io/theme/photoswipe.css">
+    <link rel="stylesheet" href="https://fritzm.github.io/theme/default-skin/default-skin.css">
+    <script src="https://fritzm.github.io/theme/photoswipe.min.js"></script>
+    <script src="https://fritzm.github.io/theme/photoswipe-ui-default.min.js"></script>
+    <script src="https://fritzm.github.io/galleries.js"></script>
     <script type="text/javascript">
         var pswipe = function(gname, index) {
             var pswpElement = document.querySelectorAll('.pswp')[0];
@@ -35,7 +35,7 @@
     </script>
 
     <!-- So Firefox can bookmark->"abo this site" -->
-        <link href="feeds/all.rss.xml" rel="alternate" title="fritzm.github.io" type="application/rss+xml">
+        <link href="https://fritzm.github.io/feeds/all.rss.xml" rel="alternate" title="fritzm.github.io" type="application/rss+xml">
 
 </head>
 
@@ -51,14 +51,14 @@
              <span class="icon-bar"></span>
          </a>
 
-        <a class="brand" href="http://fritzm.github.io">fritzm.github.io</a>
+        <a class="brand" href="https://fritzm.github.io">fritzm.github.io</a>
 
         <div class="nav-collapse">
         <ul class="nav">
-
+            
         </ul>
         </div>
-
+        
     </div>
     </div>
 </div>
@@ -73,60 +73,48 @@
             <h1>PDP-11/45: Initial Power On!</h1>
 Sun 08 May 2016
 
-by <a class="url fn" href="http://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
  
 
 
         </div>
 	
-        <div><p>Beeped out the new harness to check for shorts or incorrect pins, then plugged in just the H742s and fired it up.  All
-the DC regulator modules seem to be working, and I was able to trim them up to nominal voltages at the CPU end of the
-harness.  The indicator lamps on all but one of the DC regulators seem to be burned out, though, so I put some new lamps
-on order (at last for the +5V regulators; a modern equivalent for the -15V regulators is tougher to find).</p>
-<p>Given that success, I plugged in the CPU side of the harness, took a deep breath, and powered on!  Hmmm.  No detonations
-or smoke, but all data/address/mode lights lit (see below), which is not right...  Front panel lamp test and data
-address mode switches and indicators are working though at least.</p>
-<p>Some investigation on the backplane turned up no +5V to slots 10 though 15, which could be part of the problem.  Ah,
-that's what the mysterious clipped red wire soldered to the backplane might have been about (visible in the top right
-<a href="http://fritzm.github.io/images/pdp11/kb11a-backplane.jpg">here</a>...)  Sure enough, some inspection shows the corresponding trace on
-the backplane looks burnt!  I could hack this red wire into my new harness I guess, but I'd rather remove it and try to
-repair the board trace with a shunt.  So the backplane will have to come out.  I guess that's what I get for not
-investigating the weird red wire and for not beeping out the power distribution on the backplane before mounting
-and populating it...</p>
+        <div><p>Beeped out the new harness to check for shorts or incorrect pins, then plugged in just the H742s and fired it
+up.  All the DC regulator modules seem to be working, and I was able to trim them up to nominal voltages at
+the CPU end of the harness.  The indicator lamps on all but one of the DC regulators seem to be burned out,
+though, so I put some new lamps on order (at last for the +5V regulators; a modern equivalent for the -15V
+regulators is tougher to find).</p>
+<p>Given that success, I plugged in the CPU side of the harness, took a deep breath, and powered on!  Hmmm.  No
+detonations or smoke, but all data/address/mode lights lit (see below), which is not right...  Front panel
+lamp test and data address mode switches and indicators are working though at least.</p>
+<p>Some investigation on the backplane turned up no +5V to slots 10 though 15, which could be part of the
+problem.  Ah, that's what the mysterious clipped red wire soldered to the backplane might have been about
+(visible in the top right <a href="https://fritzm.github.io/images/pdp11/kb11a-backplane.jpg">here</a>...)  Sure enough, some inspection
+shows the corresponding trace on the backplane looks burnt!  I could hack this red wire into my new harness I
+guess, but I'd rather remove it and try to repair the board trace with a shunt.  So the backplane will have to
+come out.  I guess that's what I get for not investigating the weird red wire and for not beeping out the
+power distribution on the backplane before mounting and populating it...</p>
 <p><img src='/images/pdp11/initial-power-on_thumbnail_tall.jpg' title='Initial power on!  No smoke, but all lights on (not right).  Well, it&#39;s a start!' onclick='pswipe("pdp11",27);'/></p></div>
 	
         <hr>
 
-        <h2>Comments</h2>
-<div id="disqus_thread"></div>
-<script type="text/javascript">
-    var disqus_shortname = 'fritzm'; 
-    var disqus_title = 'PDP-11/45: Initial Power On!';
-
-    (function() {
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-</script>
-<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
     </div>
         </div>
-
+        
         <div class="span3">
 
             <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
             <ul class="nav nav-list">
-                <li class="nav-header">
+                <li class="nav-header"> 
                 Site
                 </li>
+            
+                <li><a href="https://fritzm.github.io/archives.html">Archives</a>
+                <li><a href="https://fritzm.github.io/tags.html">Tags</a>
 
-                <li><a href="http://fritzm.github.io/">Archives</a>
-                <li><a href="http://fritzm.github.io/tags.html">Tags</a>
 
 
-
-                <li><a href="http://fritzm.github.io/feeds/all.rss.xml" rel="alternate" type="application/rss+xml">RSS feed</a></li>
+                <li><a href="https://fritzm.github.io/feeds/all.rss.xml" rel="alternate">RSS feed</a></li>
 
             </ul>
             </div>
@@ -134,13 +122,14 @@ and populating it...</p>
 
             <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
             <ul class="nav nav-list">
-                <li class="nav-header">
+                <li class="nav-header"> 
                 Categories
                 </li>
-
-                <li><a href="http://fritzm.github.io/category/math.html">Math</a></li>
-                <li><a href="http://fritzm.github.io/category/pdp-11.html">PDP-11</a></li>
-                <li><a href="http://fritzm.github.io/category/programming.html">Programming</a></li>
+                
+                <li><a href="https://fritzm.github.io/category/math.html">Math</a></li>
+                <li><a href="https://fritzm.github.io/category/pdp-11.html">PDP-11</a></li>
+                <li><a href="https://fritzm.github.io/category/programming.html">Programming</a></li>
+                   
             </ul>
             </div>
 
@@ -150,10 +139,10 @@ and populating it...</p>
             <div class="social">
             <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
             <ul class="nav nav-list">
-                <li class="nav-header">
+                <li class="nav-header"> 
                 Social
                 </li>
-
+           
                 <li><a href="http://facebook.com/fritzmueller">facebook</a></li>
                 <li><a href="http://twitter.com/infrafritz">twitter</a></li>
                 <li><a href="http://instagram.com/infrafritz">Instagram</a></li>
@@ -164,10 +153,11 @@ and populating it...</p>
             </div>
             </div>
 
-        </div>     </div>     </div> 
+        </div>  
+    </div>     </div> 
 <footer>
 <br />
-<p><a href="http://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2012</p>
+<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2019</p>
 </footer>
 
 </div> <!-- /container -->
@@ -211,6 +201,7 @@ and populating it...</p>
 </div>
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-collapse.js"></script>
+<script src="https://fritzm.github.io/theme/bootstrap-collapse.js"></script>
+ 
 </body>
 </html>
