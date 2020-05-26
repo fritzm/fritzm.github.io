@@ -122,13 +122,13 @@ and provide a space for it in the memory map.  After that, at ^P at the console 
 prompt. </p>
 </li>
 </ul>
-<div class="highlight"><pre><span></span><code>   <span class="n">Memory</span> <span class="n">allocation</span> <span class="k">table</span><span class="p">:</span>
+<div class="highlight"><pre><span></span><code>   Memory allocation table:
 
-     <span class="mi">0</span><span class="n">K</span><span class="p">:</span> <span class="mi">00000000</span> <span class="o">-</span> <span class="mi">00123777</span> <span class="p">(</span>  <span class="mi">21</span><span class="n">K</span><span class="p">)</span> <span class="p">:</span> <span class="k">EXEC</span>
-    <span class="mi">21</span><span class="n">K</span><span class="p">:</span> <span class="mi">00124000</span> <span class="o">-</span> <span class="mi">00213777</span> <span class="p">(</span>  <span class="mi">14</span><span class="n">K</span><span class="p">)</span> <span class="p">:</span> <span class="n">RTS</span> <span class="p">(</span><span class="n">BASIC</span><span class="p">)</span>
-    <span class="mi">35</span><span class="n">K</span><span class="p">:</span> <span class="mi">00214000</span> <span class="o">-</span> <span class="mi">00227777</span> <span class="p">(</span>   <span class="mi">3</span><span class="n">K</span><span class="p">)</span> <span class="p">:</span> <span class="n">ODT</span>
-    <span class="mi">38</span><span class="n">K</span><span class="p">:</span> <span class="mi">00230000</span> <span class="o">-</span> <span class="mi">00757777</span> <span class="p">(</span>  <span class="mi">86</span><span class="n">K</span><span class="p">)</span> <span class="p">:</span> <span class="k">USER</span>
-   <span class="mi">124</span><span class="n">K</span><span class="p">:</span> <span class="mi">00760000</span> <span class="o">-</span> <span class="k">End</span>              <span class="p">:</span> <span class="n">NXM</span>
+     0K: 00000000 - 00123777 (  21K) : EXEC
+    21K: 00124000 - 00213777 (  14K) : RTS (BASIC)
+    35K: 00214000 - 00227777 (   3K) : ODT
+    38K: 00230000 - 00757777 (  86K) : USER
+   124K: 00760000 - End              : NXM
 </code></pre></div>
 
 
@@ -176,137 +176,137 @@ expected to be triggered by a corrupted INIT.BAC or BASIC.RTS file.  This led me
 disk pack contents really matched the image file I was running successfully under simh.  Some standalone code
 to dump a CRC of every sector on the pack seemed like it would be useful in this regard, so I coded up the
 following:</p>
-<div class="highlight"><pre><span></span><code><span class="w">        </span><span class="n">RKDS</span><span class="o">=</span><span class="mi">177400</span><span class="w"></span>
-<span class="w">        </span><span class="n">RKER</span><span class="o">=</span><span class="mi">177402</span><span class="w"></span>
-<span class="w">        </span><span class="n">RKCS</span><span class="o">=</span><span class="mi">177404</span><span class="w"></span>
-<span class="w">        </span><span class="n">RKWC</span><span class="o">=</span><span class="mi">177406</span><span class="w"></span>
-<span class="w">        </span><span class="n">RKBA</span><span class="o">=</span><span class="mi">177410</span><span class="w"></span>
-<span class="w">        </span><span class="n">RKDA</span><span class="o">=</span><span class="mi">177412</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code>        RKDS=177400
+        RKER=177402
+        RKCS=177404
+        RKWC=177406
+        RKBA=177410
+        RKDA=177412
 
-<span class="w">        </span><span class="n">XCSR</span><span class="o">=</span><span class="mi">177564</span><span class="w"></span>
-<span class="w">        </span><span class="n">XBUF</span><span class="o">=</span><span class="mi">177566</span><span class="w"></span>
+        XCSR=177564
+        XBUF=177566
 
-<span class="w">        </span><span class="p">.</span><span class="n">ASECT</span><span class="w"></span>
-<span class="w">        </span><span class="p">.</span><span class="o">=</span><span class="mi">1000</span><span class="w"></span>
-<span class="k">START</span><span class="err">:</span><span class="w">  </span>
-<span class="w">        </span><span class="n">MOV</span><span class="w">     </span><span class="n">#700</span><span class="p">,</span><span class="n">SP</span><span class="w">         </span><span class="p">;</span><span class="n">INIT</span><span class="w"> </span><span class="n">STACK</span><span class="w"> </span><span class="n">POINTER</span><span class="w"></span>
+        .ASECT
+        .=1000
+START:  
+        MOV     #700,SP         ;INIT STACK POINTER
 
-<span class="w">        </span><span class="p">;</span><span class="c1">----- INIT CRC LOOKUP TABLE</span>
+        ;----- INIT CRC LOOKUP TABLE
 
-<span class="w">        </span><span class="n">MOV</span><span class="w">     </span><span class="n">#10041</span><span class="p">,</span><span class="n">R0</span><span class="w">       </span><span class="p">;</span><span class="n">CRC</span><span class="w"> </span><span class="n">POLYNOMIAL</span><span class="w"> </span>
-<span class="w">        </span><span class="n">MOV</span><span class="w">     </span><span class="n">#CRCTBL</span><span class="p">,</span><span class="n">R1</span><span class="w">      </span><span class="p">;</span><span class="n">LOOKUP</span><span class="w"> </span><span class="nc">TABLE</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="n">FILL</span><span class="w"></span>
-<span class="w">        </span><span class="k">ADD</span><span class="w">     </span><span class="n">#1000</span><span class="p">,</span><span class="n">R1</span><span class="w">        </span><span class="p">;</span><span class="k">START</span><span class="w"> </span><span class="n">FILLING</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="k">END</span><span class="w"> </span><span class="p">(</span><span class="o">+</span><span class="mi">256</span><span class="w"> </span><span class="n">WORDS</span><span class="p">)</span><span class="w"></span>
-<span class="w">        </span><span class="n">MOV</span><span class="w">     </span><span class="n">#377</span><span class="p">,</span><span class="n">R2</span><span class="w">         </span><span class="p">;</span><span class="nf">COUNT</span><span class="w"> </span><span class="n">DOWN</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="mi">255</span><span class="w"></span>
-<span class="nl">L0</span><span class="p">:</span><span class="w">     </span><span class="n">MOV</span><span class="w">     </span><span class="n">R2</span><span class="p">,</span><span class="n">R4</span><span class="w">           </span><span class="p">;</span><span class="k">GET</span><span class="w"> </span><span class="n">COPY</span><span class="w"> </span><span class="k">OF</span><span class="w"> </span><span class="k">INDEX</span><span class="w"></span>
-<span class="w">        </span><span class="n">SWAB</span><span class="w">    </span><span class="n">R4</span><span class="w">              </span><span class="p">;</span><span class="n">MOVE</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="nf">UPPER</span><span class="w"> </span><span class="n">BYTE</span><span class="w"></span>
-<span class="w">        </span><span class="n">MOV</span><span class="w">     </span><span class="n">#10</span><span class="p">,</span><span class="n">R3</span><span class="w">          </span><span class="p">;</span><span class="n">LOOP</span><span class="w"> </span><span class="k">OVER</span><span class="w"> </span><span class="n">EIGHT</span><span class="w"> </span><span class="n">BITS</span><span class="w"> </span><span class="k">OF</span><span class="w"> </span><span class="k">INDEX</span><span class="w">  </span>
-<span class="nl">L1</span><span class="p">:</span><span class="w">     </span><span class="n">ASL</span><span class="w">     </span><span class="n">R4</span><span class="w">              </span><span class="p">;</span><span class="n">SHIFT</span><span class="p">,</span><span class="w"> </span><span class="n">MSB</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="n">CARRY</span><span class="w"> </span><span class="n">FLAG</span><span class="w"></span>
-<span class="w">        </span><span class="n">BCC</span><span class="w">     </span><span class="n">L2</span><span class="w">              </span><span class="p">;</span><span class="k">IF</span><span class="w"> </span><span class="n">MSB</span><span class="w"> </span><span class="ow">NOT</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">SKIP</span><span class="w"> </span><span class="n">AHEAD</span><span class="w"></span>
-<span class="w">        </span><span class="n">XOR</span><span class="w">     </span><span class="n">R0</span><span class="p">,</span><span class="n">R4</span><span class="w">           </span><span class="p">;</span><span class="k">ELSE</span><span class="w"> </span><span class="n">XOR</span><span class="w"> </span><span class="ow">IN</span><span class="w"> </span><span class="n">POLYNOMIAL</span><span class="w"></span>
-<span class="nl">L2</span><span class="p">:</span><span class="w">     </span><span class="n">SOB</span><span class="w">     </span><span class="n">R3</span><span class="p">,</span><span class="n">L1</span><span class="w">           </span><span class="p">;</span><span class="n">LOOP</span><span class="w"> </span><span class="k">OVER</span><span class="w"> </span><span class="n">BITS</span><span class="w"></span>
-<span class="w">        </span><span class="n">MOV</span><span class="w">     </span><span class="n">R4</span><span class="p">,</span><span class="o">-</span><span class="p">(</span><span class="n">R1</span><span class="p">)</span><span class="w">        </span><span class="p">;</span><span class="k">SAVE</span><span class="w"> </span><span class="k">RESULT</span><span class="w"> </span><span class="ow">IN</span><span class="w"> </span><span class="n">LOOKUP</span><span class="w"> </span><span class="nc">TABLE</span><span class="w"></span>
-<span class="w">        </span><span class="k">DEC</span><span class="w">     </span><span class="n">R2</span><span class="w">              </span><span class="p">;</span><span class="nf">COUNT</span><span class="w"> </span><span class="n">DOWN</span><span class="w"></span>
-<span class="w">        </span><span class="n">BPL</span><span class="w">     </span><span class="n">L0</span><span class="w">              </span><span class="p">;</span><span class="n">LOOP</span><span class="w"> </span><span class="k">OVER</span><span class="w"> </span><span class="nc">TABLE</span><span class="w"> </span><span class="n">ENTRIES</span><span class="w"></span>
+        MOV     #10041,R0       ;CRC POLYNOMIAL 
+        MOV     #CRCTBL,R1      ;LOOKUP TABLE TO FILL
+        ADD     #1000,R1        ;START FILLING FROM END (+256 WORDS)
+        MOV     #377,R2         ;COUNT DOWN FROM INDEX 255
+L0:     MOV     R2,R4           ;GET COPY OF INDEX
+        SWAB    R4              ;MOVE TO UPPER BYTE
+        MOV     #10,R3          ;LOOP OVER EIGHT BITS OF INDEX  
+L1:     ASL     R4              ;SHIFT, MSB TO CARRY FLAG
+        BCC     L2              ;IF MSB NOT SET SKIP AHEAD
+        XOR     R0,R4           ;ELSE XOR IN POLYNOMIAL
+L2:     SOB     R3,L1           ;LOOP OVER BITS
+        MOV     R4,-(R1)        ;SAVE RESULT IN LOOKUP TABLE
+        DEC     R2              ;COUNT DOWN
+        BPL     L0              ;LOOP OVER TABLE ENTRIES
 
-<span class="w">        </span><span class="n">CLR</span><span class="w">     </span><span class="n">R5</span><span class="w">              </span><span class="p">;</span><span class="n">INIT</span><span class="w"> </span><span class="n">SECTOR</span><span class="w"> </span><span class="n">COUNTER</span><span class="w"></span>
+        CLR     R5              ;INIT SECTOR COUNTER
 
-<span class="w">        </span><span class="p">;</span><span class="c1">----- PRINT START OF LINE</span>
+        ;----- PRINT START OF LINE
 
-<span class="nl">L3</span><span class="p">:</span><span class="w">     </span><span class="n">MOV</span><span class="w">     </span><span class="n">R5</span><span class="p">,</span><span class="n">R0</span><span class="w">           </span><span class="p">;</span><span class="k">GET</span><span class="w"> </span><span class="n">SECTOR</span><span class="w"> </span><span class="n">COUNTER</span><span class="w"></span>
-<span class="w">        </span><span class="n">JSR</span><span class="w">     </span><span class="n">PC</span><span class="p">,</span><span class="n">PRNW</span><span class="w">         </span><span class="p">;</span><span class="k">PRINT</span><span class="w"> </span><span class="n">IT</span><span class="w"></span>
-<span class="w">        </span><span class="n">MOV</span><span class="w">     </span><span class="n">#DELIM1</span><span class="p">,</span><span class="n">R0</span><span class="w">      </span><span class="p">;</span><span class="k">GET</span><span class="w"> </span><span class="n">POST</span><span class="o">-</span><span class="n">SECTOR</span><span class="w"> </span><span class="n">DELIMETER</span><span class="w"></span>
-<span class="w">        </span><span class="n">JSR</span><span class="w">     </span><span class="n">PC</span><span class="p">,</span><span class="n">PRNSTR</span><span class="w">       </span><span class="p">;</span><span class="k">PRINT</span><span class="w"> </span><span class="n">IT</span><span class="w"></span>
+L3:     MOV     R5,R0           ;GET SECTOR COUNTER
+        JSR     PC,PRNW         ;PRINT IT
+        MOV     #DELIM1,R0      ;GET POST-SECTOR DELIMETER
+        JSR     PC,PRNSTR       ;PRINT IT
 
-<span class="w">        </span><span class="p">;</span><span class="c1">----- READ 8 SECTORS FROM DISK</span>
+        ;----- READ 8 SECTORS FROM DISK
 
-<span class="nl">L4</span><span class="p">:</span><span class="w">     </span><span class="n">MOV</span><span class="w">     </span><span class="n">R5</span><span class="p">,</span><span class="err">@</span><span class="n">#RKDA</span><span class="w">       </span><span class="p">;</span><span class="k">SET</span><span class="w"> </span><span class="k">START</span><span class="w"> </span><span class="n">SECTOR</span><span class="w"></span>
-<span class="w">        </span><span class="n">MOV</span><span class="w">     </span><span class="n">#DBUF</span><span class="p">,</span><span class="err">@</span><span class="n">#RKBA</span><span class="w">    </span><span class="p">;</span><span class="k">SET</span><span class="w"> </span><span class="n">TARGET</span><span class="w"> </span><span class="n">ADDRESS</span><span class="w"></span>
-<span class="w">        </span><span class="n">MOV</span><span class="w">     </span><span class="err">#</span><span class="o">-</span><span class="mi">4000</span><span class="p">,</span><span class="err">@</span><span class="n">#RKWC</span><span class="w">   </span><span class="p">;</span><span class="k">READ</span><span class="w"> </span><span class="mi">8</span><span class="w"> </span><span class="n">SECTORS</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="n">K</span><span class="w"> </span><span class="n">WORDS</span><span class="p">)</span><span class="w"></span>
-<span class="w">        </span><span class="n">MOV</span><span class="w">     </span><span class="n">#5</span><span class="p">,</span><span class="err">@</span><span class="n">#RKCS</span><span class="w">       </span><span class="p">;</span><span class="k">READ</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="k">GO</span><span class="w"></span>
-<span class="w">        </span><span class="n">TSTB</span><span class="w">    </span><span class="err">@</span><span class="n">#RKCS</span><span class="w">          </span><span class="p">;</span><span class="k">CHECK</span><span class="w"> </span><span class="n">RKCS</span><span class="w"> </span><span class="n">RDY</span><span class="w"> </span><span class="nc">BIT</span><span class="w"></span>
-<span class="w">        </span><span class="n">BPL</span><span class="w">     </span><span class="p">.</span><span class="o">-</span><span class="mi">4</span><span class="w">             </span><span class="p">;</span><span class="n">LOOP</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="n">BUSY</span><span class="w"></span>
+L4:     MOV     R5,@#RKDA       ;SET START SECTOR
+        MOV     #DBUF,@#RKBA    ;SET TARGET ADDRESS
+        MOV     #-4000,@#RKWC   ;READ 8 SECTORS (2K WORDS)
+        MOV     #5,@#RKCS       ;READ + GO
+        TSTB    @#RKCS          ;CHECK RKCS RDY BIT
+        BPL     .-4             ;LOOP IF BUSY
 
-<span class="w">        </span><span class="p">;</span><span class="c1">----- HANDLE ERROR IF ANY</span>
+        ;----- HANDLE ERROR IF ANY
 
-<span class="w">        </span><span class="nc">BIT</span><span class="w">     </span><span class="n">#100000</span><span class="p">,</span><span class="err">@</span><span class="n">#RKCS</span><span class="w">  </span><span class="p">;</span><span class="k">CHECK</span><span class="w"> </span><span class="k">FOR</span><span class="w"> </span><span class="n">ERROR</span><span class="w"></span>
-<span class="w">        </span><span class="n">BEQ</span><span class="w">     </span><span class="n">L5</span><span class="w">              </span><span class="p">;</span><span class="n">SKIP</span><span class="w"> </span><span class="n">AHEAD</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="ow">NOT</span><span class="w"></span>
-<span class="w">        </span><span class="n">MOV</span><span class="w">     </span><span class="n">#ERRSTR</span><span class="p">,</span><span class="n">R0</span><span class="w">      </span><span class="p">;</span><span class="n">POINT</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="n">ERROR</span><span class="w"> </span><span class="k">INDICATOR</span><span class="w"></span>
-<span class="w">        </span><span class="n">JSR</span><span class="w">     </span><span class="n">PC</span><span class="p">,</span><span class="n">PRNSTR</span><span class="w">       </span><span class="p">;</span><span class="k">PRINT</span><span class="w"> </span><span class="n">IT</span><span class="w"></span>
-<span class="w">        </span><span class="n">MOV</span><span class="w">     </span><span class="err">@</span><span class="n">#RKER</span><span class="p">,</span><span class="n">R0</span><span class="w">       </span><span class="p">;</span><span class="k">GET</span><span class="w"> </span><span class="n">ERROR</span><span class="w"> </span><span class="n">REG</span><span class="w"></span>
-<span class="w">        </span><span class="n">JSR</span><span class="w">     </span><span class="n">PC</span><span class="p">,</span><span class="n">PRNW</span><span class="w">         </span><span class="p">;</span><span class="k">PRINT</span><span class="w"> </span><span class="n">IT</span><span class="w"></span>
-<span class="w">        </span><span class="n">BR</span><span class="w">      </span><span class="n">L8</span><span class="w">              </span><span class="p">;</span><span class="n">MOVE</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="k">NEXT</span><span class="w"> </span><span class="mi">8</span><span class="w"> </span><span class="n">SECTORS</span><span class="w"></span>
+        BIT     #100000,@#RKCS  ;CHECK FOR ERROR
+        BEQ     L5              ;SKIP AHEAD IF NOT
+        MOV     #ERRSTR,R0      ;POINT TO ERROR INDICATOR
+        JSR     PC,PRNSTR       ;PRINT IT
+        MOV     @#RKER,R0       ;GET ERROR REG
+        JSR     PC,PRNW         ;PRINT IT
+        BR      L8              ;MOVE ON TO NEXT 8 SECTORS
 
-<span class="nl">L5</span><span class="p">:</span><span class="w">     </span><span class="n">MOV</span><span class="w">     </span><span class="n">#DBUF</span><span class="p">,</span><span class="n">R4</span><span class="w">        </span><span class="p">;</span><span class="n">POINT</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="k">START</span><span class="w"> </span><span class="k">OF</span><span class="w"> </span><span class="k">DATA</span><span class="w"> </span><span class="n">JUST</span><span class="w"> </span><span class="k">READ</span><span class="w"></span>
+L5:     MOV     #DBUF,R4        ;POINT TO START OF DATA JUST READ
 
-<span class="w">        </span><span class="p">;</span><span class="c1">----- RUN CRC FOR ONE SECTOR.  FOR EACH INPUT BYTE CH:</span>
-<span class="w">        </span><span class="p">;</span><span class="w">       </span><span class="n">CRC</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CRCTBL</span><span class="o">[</span><span class="n">((CRC &gt;&gt; 8) ^ CH) &amp; 255</span><span class="o">]</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="p">(</span><span class="n">CRC</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">8</span><span class="p">)</span><span class="w"></span>
+        ;----- RUN CRC FOR ONE SECTOR.  FOR EACH INPUT BYTE CH:
+        ;       CRC = CRCTBL[((CRC &gt;&gt; 8) ^ CH) &amp; 255] ^ (CRC &lt;&lt; 8)
 
-<span class="nl">L6</span><span class="p">:</span><span class="w">     </span><span class="n">CLR</span><span class="w">     </span><span class="n">R0</span><span class="w">              </span><span class="p">;</span><span class="n">RESET</span><span class="w"> </span><span class="n">CRC</span><span class="w"></span>
-<span class="w">        </span><span class="n">MOV</span><span class="w">     </span><span class="n">#1000</span><span class="p">,</span><span class="n">R1</span><span class="w">        </span><span class="p">;</span><span class="n">LOOP</span><span class="w"> </span><span class="k">OVER</span><span class="w"> </span><span class="n">ONE</span><span class="w"> </span><span class="n">SECTOR</span><span class="w"> </span><span class="p">(</span><span class="mi">256</span><span class="w"> </span><span class="n">WORDS</span><span class="p">)</span><span class="w"></span>
-<span class="nl">L7</span><span class="p">:</span><span class="w">     </span><span class="n">MOV</span><span class="w">     </span><span class="n">R0</span><span class="p">,</span><span class="n">R2</span><span class="w">           </span><span class="p">;</span><span class="k">GET</span><span class="w"> </span><span class="n">COPY</span><span class="w"> </span><span class="k">OF</span><span class="w"> </span><span class="n">CRC</span><span class="w"></span>
-<span class="w">        </span><span class="n">SWAB</span><span class="w">    </span><span class="n">R2</span><span class="w">              </span><span class="p">;</span><span class="n">MOVE</span><span class="w"> </span><span class="n">HIGH</span><span class="w"> </span><span class="n">BYTE</span><span class="w"> </span><span class="n">DOWN</span><span class="w"></span>
-<span class="w">        </span><span class="n">MOVB</span><span class="w">    </span><span class="p">(</span><span class="n">R4</span><span class="p">)</span><span class="o">+</span><span class="p">,</span><span class="n">R3</span><span class="w">        </span><span class="p">;</span><span class="k">GET</span><span class="w"> </span><span class="k">NEXT</span><span class="w"> </span><span class="k">INPUT</span><span class="w"> </span><span class="n">BYTE</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="n">PROCESS</span><span class="w"></span>
-<span class="w">        </span><span class="n">XOR</span><span class="w">     </span><span class="n">R3</span><span class="p">,</span><span class="n">R2</span><span class="w">           </span><span class="p">;</span><span class="n">XOR</span><span class="w"> </span><span class="n">ONTO</span><span class="w"> </span><span class="n">MUNGED</span><span class="w"> </span><span class="n">CRC</span><span class="w"></span>
-<span class="w">        </span><span class="n">BIC</span><span class="w">     </span><span class="n">#177400</span><span class="p">,</span><span class="n">R2</span><span class="w">      </span><span class="p">;</span><span class="n">MASK</span><span class="w"> </span><span class="k">OFF</span><span class="w"> </span><span class="n">HIGH</span><span class="w"> </span><span class="n">BYTE</span><span class="w"></span>
-<span class="w">        </span><span class="n">ASL</span><span class="w">     </span><span class="n">R2</span><span class="w">              </span><span class="p">;</span><span class="n">TIMES</span><span class="w"> </span><span class="n">TWO</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">LOOKUP</span><span class="w"> </span><span class="nc">TABLE</span><span class="w"></span>
-<span class="w">        </span><span class="n">MOV</span><span class="w">     </span><span class="n">CRCTBL</span><span class="p">(</span><span class="n">R2</span><span class="p">),</span><span class="n">R3</span><span class="w">   </span><span class="p">;</span><span class="n">LOOKUP</span><span class="w"> </span><span class="k">VALUE</span><span class="w"></span>
-<span class="w">        </span><span class="n">SWAB</span><span class="w">    </span><span class="n">R0</span><span class="w">              </span><span class="p">;</span><span class="n">MOVE</span><span class="w"> </span><span class="n">LOW</span><span class="w"> </span><span class="n">BYTE</span><span class="w"> </span><span class="k">OF</span><span class="w"> </span><span class="n">CRC</span><span class="w"> </span><span class="n">UP</span><span class="w"></span>
-<span class="w">        </span><span class="n">CLRB</span><span class="w">    </span><span class="n">R0</span><span class="w">              </span><span class="p">;</span><span class="n">MASK</span><span class="w"> </span><span class="k">OFF</span><span class="w"> </span><span class="n">THE</span><span class="w"> </span><span class="n">BOTTOM</span><span class="w"></span>
-<span class="w">        </span><span class="n">XOR</span><span class="w">     </span><span class="n">R3</span><span class="p">,</span><span class="n">R0</span><span class="w">           </span><span class="p">;</span><span class="n">XOR</span><span class="w"> </span><span class="ow">IN</span><span class="w"> </span><span class="n">THE</span><span class="w"> </span><span class="n">LOOKED</span><span class="w"> </span><span class="n">UP</span><span class="w"> </span><span class="k">VALUE</span><span class="w"></span>
-<span class="w">        </span><span class="n">SOB</span><span class="w">     </span><span class="n">R1</span><span class="p">,</span><span class="n">L7</span><span class="w">           </span><span class="p">;</span><span class="n">LOOP</span><span class="w"> </span><span class="k">OVER</span><span class="w"> </span><span class="n">BYTES</span><span class="w"></span>
+L6:     CLR     R0              ;RESET CRC
+        MOV     #1000,R1        ;LOOP OVER ONE SECTOR (256 WORDS)
+L7:     MOV     R0,R2           ;GET COPY OF CRC
+        SWAB    R2              ;MOVE HIGH BYTE DOWN
+        MOVB    (R4)+,R3        ;GET NEXT INPUT BYTE TO PROCESS
+        XOR     R3,R2           ;XOR ONTO MUNGED CRC
+        BIC     #177400,R2      ;MASK OFF HIGH BYTE
+        ASL     R2              ;TIMES TWO INDEX INTO LOOKUP TABLE
+        MOV     CRCTBL(R2),R3   ;LOOKUP VALUE
+        SWAB    R0              ;MOVE LOW BYTE OF CRC UP
+        CLRB    R0              ;MASK OFF THE BOTTOM
+        XOR     R3,R0           ;XOR IN THE LOOKED UP VALUE
+        SOB     R1,L7           ;LOOP OVER BYTES
 
-<span class="w">        </span><span class="p">;</span><span class="c1">----- PRINT CRC, DELIMIT AND LOOP</span>
+        ;----- PRINT CRC, DELIMIT AND LOOP
 
-<span class="w">        </span><span class="n">JSR</span><span class="w">     </span><span class="n">PC</span><span class="p">,</span><span class="n">PRNW</span><span class="w">         </span><span class="p">;</span><span class="k">PRINT</span><span class="w"> </span><span class="n">CRC</span><span class="p">,</span><span class="w"> </span><span class="n">ALREADY</span><span class="w"> </span><span class="ow">IN</span><span class="w"> </span><span class="n">R0</span><span class="w"></span>
-<span class="w">        </span><span class="n">CMP</span><span class="w">     </span><span class="n">R4</span><span class="p">,</span><span class="n">#DBUF</span><span class="o">+</span><span class="mi">10000</span><span class="w">  </span><span class="p">;</span><span class="k">END</span><span class="w"> </span><span class="k">OF</span><span class="w"> </span><span class="k">DISK</span><span class="w"> </span><span class="n">BUFFER</span><span class="vm">?</span><span class="w"></span>
-<span class="w">        </span><span class="n">BEQ</span><span class="w">     </span><span class="n">L8</span><span class="w">              </span><span class="p">;</span><span class="k">IF</span><span class="w"> </span><span class="n">SO</span><span class="p">,</span><span class="w"> </span><span class="k">EXIT</span><span class="w"> </span><span class="n">LOOP</span><span class="w"></span>
-<span class="w">        </span><span class="n">MOV</span><span class="w">     </span><span class="n">#DELIM2</span><span class="p">,</span><span class="n">R0</span><span class="w">      </span><span class="p">;</span><span class="k">ELSE</span><span class="w"> </span><span class="n">POINT</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="n">POST</span><span class="o">-</span><span class="n">CRC</span><span class="w"> </span><span class="n">DELIMETER</span><span class="w"></span>
-<span class="w">        </span><span class="n">JSR</span><span class="w">     </span><span class="n">PC</span><span class="p">,</span><span class="n">PRNSTR</span><span class="w">       </span><span class="p">;</span><span class="k">PRINT</span><span class="w"> </span><span class="n">IT</span><span class="w"></span>
-<span class="w">        </span><span class="n">BR</span><span class="w">      </span><span class="n">L6</span><span class="w">              </span><span class="p">;</span><span class="k">GO</span><span class="w"> </span><span class="n">DO</span><span class="w"> </span><span class="n">ANOTHER</span><span class="w"> </span><span class="n">SECTOR</span><span class="w"></span>
+        JSR     PC,PRNW         ;PRINT CRC, ALREADY IN R0
+        CMP     R4,#DBUF+10000  ;END OF DISK BUFFER?
+        BEQ     L8              ;IF SO, EXIT LOOP
+        MOV     #DELIM2,R0      ;ELSE POINT TO POST-CRC DELIMETER
+        JSR     PC,PRNSTR       ;PRINT IT
+        BR      L6              ;GO DO ANOTHER SECTOR
 
-<span class="w">        </span><span class="p">;</span><span class="c1">----- DELIMIT END OF LINE, LOOP </span>
+        ;----- DELIMIT END OF LINE, LOOP 
 
-<span class="nl">L8</span><span class="p">:</span><span class="w">     </span><span class="n">MOV</span><span class="w">     </span><span class="n">#CRLF</span><span class="p">,</span><span class="n">R0</span><span class="w">        </span><span class="p">;</span><span class="n">POINT</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="n">LINE</span><span class="w"> </span><span class="n">DELIMETER</span><span class="w"></span>
-<span class="w">        </span><span class="n">JSR</span><span class="w">     </span><span class="n">PC</span><span class="p">,</span><span class="n">PRNSTR</span><span class="w">       </span><span class="p">;</span><span class="k">PRINT</span><span class="w"> </span><span class="n">IT</span><span class="w"></span>
-<span class="w">        </span><span class="k">ADD</span><span class="w">     </span><span class="n">#10</span><span class="p">,</span><span class="n">R5</span><span class="w">          </span><span class="p">;</span><span class="n">MOVE</span><span class="w"> </span><span class="n">AHEAD</span><span class="w"> </span><span class="mi">8</span><span class="w"> </span><span class="n">SECTORS</span><span class="w"></span>
-<span class="w">        </span><span class="n">CMP</span><span class="w">     </span><span class="n">R5</span><span class="p">,</span><span class="n">#11410</span><span class="w">       </span><span class="p">;</span><span class="k">AT</span><span class="w"> </span><span class="k">END</span><span class="w"> </span><span class="k">OF</span><span class="w"> </span><span class="n">PACK</span><span class="vm">?</span><span class="w"></span>
-<span class="w">        </span><span class="n">BLT</span><span class="w">     </span><span class="n">L3</span><span class="w">              </span><span class="p">;</span><span class="k">IF</span><span class="w"> </span><span class="ow">NOT</span><span class="p">,</span><span class="w"> </span><span class="k">GO</span><span class="w"> </span><span class="n">DO</span><span class="w"> </span><span class="n">THE</span><span class="w"> </span><span class="k">NEXT</span><span class="w"> </span><span class="mi">8</span><span class="w"></span>
+L8:     MOV     #CRLF,R0        ;POINT TO LINE DELIMETER
+        JSR     PC,PRNSTR       ;PRINT IT
+        ADD     #10,R5          ;MOVE AHEAD 8 SECTORS
+        CMP     R5,#11410       ;AT END OF PACK?
+        BLT     L3              ;IF NOT, GO DO THE NEXT 8
 
-<span class="w">        </span><span class="n">HALT</span><span class="w">                    </span><span class="p">;</span><span class="ow">ALL</span><span class="w"> </span><span class="n">DONE</span><span class="err">!</span><span class="w"></span>
+        HALT                    ;ALL DONE!
 
-<span class="w">        </span><span class="p">;</span><span class="c1">----- PRINT A WORD IN OCTAL</span>
+        ;----- PRINT A WORD IN OCTAL
 
-<span class="nl">PRNW</span><span class="p">:</span><span class="w">   </span><span class="n">MOV</span><span class="w">     </span><span class="n">#6</span><span class="p">,</span><span class="n">R2</span><span class="w">           </span><span class="p">;</span><span class="n">SIX</span><span class="w"> </span><span class="n">DIGITS</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="k">PRINT</span><span class="w"></span>
-<span class="w">        </span><span class="n">MOV</span><span class="w">     </span><span class="n">R0</span><span class="p">,</span><span class="n">R1</span><span class="w">           </span><span class="p">;</span><span class="n">MOVE</span><span class="w"> </span><span class="k">OUTPUT</span><span class="w"> </span><span class="n">WORD</span><span class="w"> </span><span class="k">OVER</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="n">R1</span><span class="w"></span>
-<span class="w">        </span><span class="n">CLR</span><span class="w">     </span><span class="n">R0</span><span class="w">              </span><span class="p">;</span><span class="n">RESET</span><span class="w"> </span><span class="k">OUTPUT</span><span class="w"> </span><span class="nc">CHAR</span><span class="w"></span>
-<span class="w">        </span><span class="n">ASHC</span><span class="w">    </span><span class="n">#1</span><span class="p">,</span><span class="n">R0</span><span class="w">           </span><span class="p">;</span><span class="ow">AND</span><span class="w"> </span><span class="n">SHIFT</span><span class="w"> </span><span class="ow">IN</span><span class="w"> </span><span class="n">MSB</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="k">START</span><span class="w"></span>
-<span class="nl">L9</span><span class="p">:</span><span class="w">     </span><span class="k">ADD</span><span class="w">     </span><span class="n">#60</span><span class="p">,</span><span class="n">R0</span><span class="w">          </span><span class="p">;</span><span class="n">MAKE</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="nf">ASCII</span><span class="w"> </span><span class="n">DIGIT</span><span class="w"></span>
-<span class="w">        </span><span class="n">MOV</span><span class="w">     </span><span class="n">R0</span><span class="p">,</span><span class="err">@</span><span class="n">#XBUF</span><span class="w">       </span><span class="p">;</span><span class="k">PRINT</span><span class="w"> </span><span class="n">IT</span><span class="w"></span>
-<span class="w">        </span><span class="n">TSTB</span><span class="w">    </span><span class="err">@</span><span class="n">#XCSR</span><span class="w">          </span><span class="p">;</span><span class="k">CHECK</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="n">XMIT</span><span class="w"> </span><span class="n">DONE</span><span class="w"></span>
-<span class="w">        </span><span class="n">BPL</span><span class="w">     </span><span class="p">.</span><span class="o">-</span><span class="mi">4</span><span class="w">             </span><span class="p">;</span><span class="n">LOOP</span><span class="w"> </span><span class="n">UNTIL</span><span class="w"> </span><span class="n">SO</span><span class="w"></span>
-<span class="w">        </span><span class="n">CLR</span><span class="w">     </span><span class="n">R0</span><span class="w">              </span><span class="p">;</span><span class="n">RESET</span><span class="w"> </span><span class="k">OUTPUT</span><span class="w"> </span><span class="nc">CHAR</span><span class="w"></span>
-<span class="w">        </span><span class="n">ASHC</span><span class="w">    </span><span class="n">#3</span><span class="p">,</span><span class="n">R0</span><span class="w">           </span><span class="p">;</span><span class="n">SHIFT</span><span class="w"> </span><span class="ow">IN</span><span class="w"> </span><span class="k">NEXT</span><span class="w"> </span><span class="n">THREE</span><span class="w"> </span><span class="n">BITS</span><span class="w"></span>
-<span class="w">        </span><span class="n">SOB</span><span class="w">     </span><span class="n">R2</span><span class="p">,</span><span class="n">L9</span><span class="w">           </span><span class="p">;</span><span class="n">LOOP</span><span class="w"> </span><span class="n">DIGITS</span><span class="w"></span>
-<span class="w">        </span><span class="n">RTS</span><span class="w">     </span><span class="n">PC</span><span class="w">              </span><span class="p">;</span><span class="k">RETURN</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="n">CALLER</span><span class="w"></span>
+PRNW:   MOV     #6,R2           ;SIX DIGITS TO PRINT
+        MOV     R0,R1           ;MOVE OUTPUT WORD OVER TO R1
+        CLR     R0              ;RESET OUTPUT CHAR
+        ASHC    #1,R0           ;AND SHIFT IN MSB TO START
+L9:     ADD     #60,R0          ;MAKE INTO ASCII DIGIT
+        MOV     R0,@#XBUF       ;PRINT IT
+        TSTB    @#XCSR          ;CHECK IF XMIT DONE
+        BPL     .-4             ;LOOP UNTIL SO
+        CLR     R0              ;RESET OUTPUT CHAR
+        ASHC    #3,R0           ;SHIFT IN NEXT THREE BITS
+        SOB     R2,L9           ;LOOP DIGITS
+        RTS     PC              ;RETURN TO CALLER
 
-<span class="w">        </span><span class="p">;</span><span class="c1">----- PRINT A NULL-TERMINATED STRING</span>
+        ;----- PRINT A NULL-TERMINATED STRING
 
-<span class="nl">PRNSTR</span><span class="p">:</span><span class="w"> </span><span class="n">MOVB</span><span class="w">    </span><span class="p">(</span><span class="n">R0</span><span class="p">)</span><span class="o">+</span><span class="p">,</span><span class="err">@</span><span class="n">#XBUF</span><span class="w">    </span><span class="p">;</span><span class="k">PRINT</span><span class="w"> </span><span class="n">ONE</span><span class="w"> </span><span class="nc">CHAR</span><span class="w"> </span><span class="ow">AND</span><span class="w"> </span><span class="n">ADVANCE</span><span class="w"></span>
-<span class="w">        </span><span class="n">TSTB</span><span class="w">    </span><span class="err">@</span><span class="n">#XCSR</span><span class="w">          </span><span class="p">;</span><span class="k">CHECK</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="n">XMIT</span><span class="w"> </span><span class="n">DONE</span><span class="w"></span>
-<span class="w">        </span><span class="n">BPL</span><span class="w">     </span><span class="p">.</span><span class="o">-</span><span class="mi">4</span><span class="w">             </span><span class="p">;</span><span class="n">LOOP</span><span class="w"> </span><span class="n">UNTIL</span><span class="w"> </span><span class="n">SO</span><span class="w"></span>
-<span class="w">        </span><span class="n">TSTB</span><span class="w">    </span><span class="nv">@R0</span><span class="w">             </span><span class="p">;</span><span class="k">CHECK</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">END</span><span class="w"> </span><span class="k">OF</span><span class="w"> </span><span class="n">STRING</span><span class="w"></span>
-<span class="w">        </span><span class="n">BNE</span><span class="w">     </span><span class="n">PRNSTR</span><span class="w">          </span><span class="p">;</span><span class="n">LOOP</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="ow">NOT</span><span class="w"></span>
-<span class="w">        </span><span class="n">RTS</span><span class="w">     </span><span class="n">PC</span><span class="w">              </span><span class="p">;</span><span class="k">ELSE</span><span class="w"> </span><span class="k">RETURN</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="n">CALLER</span><span class="w"></span>
+PRNSTR: MOVB    (R0)+,@#XBUF    ;PRINT ONE CHAR AND ADVANCE
+        TSTB    @#XCSR          ;CHECK IF XMIT DONE
+        BPL     .-4             ;LOOP UNTIL SO
+        TSTB    @R0             ;CHECK IF END OF STRING
+        BNE     PRNSTR          ;LOOP IF NOT
+        RTS     PC              ;ELSE RETURN TO CALLER
 
-<span class="nl">DELIM1</span><span class="p">:</span><span class="w"> </span><span class="p">.</span><span class="n">ASCIZ</span><span class="w">  </span><span class="o">/</span><span class="err">:</span><span class="w"> </span><span class="o">/</span><span class="w">            </span><span class="p">;</span><span class="n">POST</span><span class="o">-</span><span class="n">SECTOR</span><span class="w"> </span><span class="n">DELIMETER</span><span class="w"></span>
-<span class="nl">DELIM2</span><span class="p">:</span><span class="w"> </span><span class="p">.</span><span class="n">ASCIZ</span><span class="w">  </span><span class="o">/</span><span class="w"> </span><span class="o">/</span><span class="w">             </span><span class="p">;</span><span class="n">POST</span><span class="o">-</span><span class="n">CRC</span><span class="w"> </span><span class="n">DELIMETER</span><span class="w"></span>
-<span class="nl">CRLF</span><span class="p">:</span><span class="w">   </span><span class="p">.</span><span class="n">ASCIZ</span><span class="w">  </span><span class="o">&lt;</span><span class="mi">15</span><span class="o">&gt;&lt;</span><span class="mi">12</span><span class="o">&gt;</span><span class="w">        </span><span class="p">;</span><span class="n">LINE</span><span class="w"> </span><span class="n">DELIMETER</span><span class="w"></span>
-<span class="nl">ERRSTR</span><span class="p">:</span><span class="w"> </span><span class="p">.</span><span class="n">ASCIZ</span><span class="w">  </span><span class="o">/</span><span class="nl">ERROR</span><span class="p">:</span><span class="w"> </span><span class="o">/</span><span class="w">       </span><span class="p">;</span><span class="n">ERROR</span><span class="w"> </span><span class="k">INDICATOR</span><span class="w"></span>
+DELIM1: .ASCIZ  /: /            ;POST-SECTOR DELIMETER
+DELIM2: .ASCIZ  / /             ;POST-CRC DELIMETER
+CRLF:   .ASCIZ  &lt;15&gt;&lt;12&gt;        ;LINE DELIMETER
+ERRSTR: .ASCIZ  /ERROR: /       ;ERROR INDICATOR
 
-<span class="nl">CRCTBL</span><span class="p">:</span><span class="w"> </span><span class="p">.</span><span class="n">BLKW</span><span class="w">   </span><span class="mi">400</span><span class="w">             </span><span class="p">;</span><span class="n">CRC</span><span class="w"> </span><span class="n">LOOKUP</span><span class="w"> </span><span class="nc">TABLE</span><span class="w"></span>
-<span class="nl">DBUF</span><span class="p">:</span><span class="w">   </span><span class="p">.</span><span class="n">BLKW</span><span class="w">   </span><span class="mi">4000</span><span class="w">            </span><span class="p">;</span><span class="k">DISK</span><span class="w"> </span><span class="k">DATA</span><span class="w"> </span><span class="n">BUFFER</span><span class="w"></span>
+CRCTBL: .BLKW   400             ;CRC LOOKUP TABLE
+DBUF:   .BLKW   4000            ;DISK DATA BUFFER
 
-<span class="w">        </span><span class="p">.</span><span class="k">END</span><span class="w">    </span><span class="k">START</span><span class="w"></span>
+        .END    START
 </code></pre></div>
 
 
@@ -378,7 +378,7 @@ Happy new year, all!</p></div>
     </div>     </div> 
 <footer>
 <br />
-<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2019</p>
+<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2020</p>
 </footer>
 
 </div> <!-- /container -->

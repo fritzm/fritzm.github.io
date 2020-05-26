@@ -80,5 +80,9 @@ var galleries = {
                             {src:"/images/pdp11/VCFW1.jpg", w:2416, h:2272, title:"Running diagnostics and consulting the RK11-C prints..."},
                             {src:"/images/pdp11/VCFW2.jpg", w:4032, h:3024, title:"Pavl stops by with an RX02 and controller to help out with debug.  Replacement KM11 debug board visible in the upper diagnostic port of the RK11-C."},
                             {src:"/images/pdp11/VCFW4.jpg", w:1536, h:2048, title:"With Pete Richert, an old friend from Digidesign days!"},
+                            {src:"/images/pdp11/dap-layout.png", w:842, h:604, title:"Corner of DAP layout from 1974 drawings"},
+                            {src:"/images/pdp11/dap-corner.png", w:4032, h:3024, title:"Corner of one of my DAP boards.  Note missing R17."},
+                            {src:"/images/pdp11/ubc-layout.png", w:1562, h:1116, title:"Corner of UBC layout from 1974 drawings"},
+                            {src:"/images/pdp11/ubc-corner.jpeg", w:3905, h:2928, title:"Corner of one of my UBC boards.  Note missing W1, R161, and unpopulated E57."},
                     ],
     };

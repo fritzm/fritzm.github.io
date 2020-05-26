@@ -74,6 +74,101 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="https://fritzm.github.io/rk11-2.html"><h1>PDP-11/45: RK11 II</h1></a>
+Mon 20 February 2017
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p>Okay, moving on with the RK11-C debug, the following bit of test code is modeled after that part of the
+ZRKJE0 diagnotic that is trapping out:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24</pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="w">        </span><span class="mi">177404</span><span class="w">                          </span><span class="n">RKCS</span><span class="o">=</span><span class="mi">177404</span><span class="w"></span>
+<span class="mi">000000</span><span class="w">                                  </span><span class="p">.</span><span class="n">ASECT</span><span class="w"></span>
+<span class="w">        </span><span class="mi">001000</span><span class="w">                          </span><span class="p">.</span><span class="o">=</span><span class="mi">1000</span><span class="w"></span>
+<span class="mi">001000</span><span class="w">  </span><span class="mi">012706</span><span class="w">  </span><span class="mi">000770</span><span class="w">          </span><span class="k">START</span><span class="err">:</span><span class="w">  </span><span class="n">MOV</span><span class="w">     </span><span class="n">#770</span><span class="p">,</span><span class="n">SP</span><span class="w">         </span><span class="p">;</span><span class="n">INIT</span><span class="w"> </span><span class="n">STACK</span><span class="w"> </span><span class="n">POINTER</span><span class="w"></span>
+<span class="mi">001004</span><span class="w">  </span><span class="mi">005000</span><span class="w">                          </span><span class="n">CLR</span><span class="w">     </span><span class="n">R0</span><span class="w">              </span><span class="p">;</span><span class="n">INIT</span><span class="w"> </span><span class="n">TRAP</span><span class="w"> </span><span class="n">BASE</span><span class="w"></span>
+<span class="mi">001006</span><span class="w">  </span><span class="mi">012701</span><span class="w">  </span><span class="mi">000002</span><span class="w">                  </span><span class="n">MOV</span><span class="w">     </span><span class="n">#2</span><span class="p">,</span><span class="n">R1</span><span class="w">           </span><span class="p">;</span><span class="n">INIT</span><span class="w"> </span><span class="n">TRAP</span><span class="w"> </span><span class="n">DEST</span><span class="w"></span>
+<span class="mi">001012</span><span class="w">  </span><span class="mi">010120</span><span class="w">                  </span><span class="nl">L1</span><span class="p">:</span><span class="w">     </span><span class="n">MOV</span><span class="w">     </span><span class="n">R1</span><span class="p">,(</span><span class="n">R0</span><span class="p">)</span><span class="o">+</span><span class="w">        </span><span class="p">;</span><span class="n">STORE</span><span class="w"> </span><span class="n">TRAP</span><span class="w"> </span><span class="n">DEST</span><span class="w"></span>
+<span class="mi">001014</span><span class="w">  </span><span class="mi">005020</span><span class="w">                          </span><span class="n">CLR</span><span class="w">     </span><span class="p">(</span><span class="n">R0</span><span class="p">)</span><span class="o">+</span><span class="w">           </span><span class="p">;</span><span class="ow">AND</span><span class="w"> </span><span class="n">STORE</span><span class="w"> </span><span class="n">HALT</span><span class="w"> </span><span class="k">AT</span><span class="w"> </span><span class="n">TRAP</span><span class="w"> </span><span class="n">DEST</span><span class="w"></span>
+<span class="mi">001016</span><span class="w">  </span><span class="mi">062701</span><span class="w">  </span><span class="mi">000004</span><span class="w">                  </span><span class="k">ADD</span><span class="w">     </span><span class="n">#4</span><span class="p">,</span><span class="n">R1</span><span class="w">           </span><span class="p">;</span><span class="k">UPDATE</span><span class="w"> </span><span class="n">TRAP</span><span class="w"> </span><span class="n">DEST</span><span class="w"></span>
+<span class="mi">001022</span><span class="w">  </span><span class="mi">020600</span><span class="w">                          </span><span class="n">CMP</span><span class="w">     </span><span class="n">SP</span><span class="p">,</span><span class="n">R0</span><span class="w">           </span><span class="p">;</span><span class="ow">ALL</span><span class="w"> </span><span class="n">TRAPS</span><span class="w"> </span><span class="n">INITD</span><span class="vm">?</span><span class="w"></span>
+<span class="mi">001024</span><span class="w">  </span><span class="mi">001372</span><span class="w">                          </span><span class="n">BNE</span><span class="w">     </span><span class="n">L1</span><span class="w">              </span><span class="p">;</span><span class="k">IF</span><span class="w"> </span><span class="ow">NOT</span><span class="p">,</span><span class="w"> </span><span class="n">KEEP</span><span class="w"> </span><span class="n">GOING</span><span class="w"></span>
+<span class="mi">001026</span><span class="w">  </span><span class="mi">005002</span><span class="w">                          </span><span class="n">CLR</span><span class="w">     </span><span class="n">R2</span><span class="w">              </span><span class="p">;</span><span class="n">INIT</span><span class="w"> </span><span class="n">MAIN</span><span class="w"> </span><span class="n">ITERATION</span><span class="w"> </span><span class="nf">COUNT</span><span class="w"></span>
+<span class="mi">001030</span><span class="w">  </span><span class="mi">005202</span><span class="w">                  </span><span class="nl">L2</span><span class="p">:</span><span class="w">     </span><span class="n">INC</span><span class="w">     </span><span class="n">R2</span><span class="w">              </span><span class="p">;</span><span class="n">INC</span><span class="w"> </span><span class="n">MAIN</span><span class="w"> </span><span class="n">ITERATION</span><span class="w"> </span><span class="nf">COUNT</span><span class="w"></span>
+<span class="mi">001032</span><span class="w">  </span><span class="mi">010237</span><span class="w">  </span><span class="mi">177570</span><span class="w">                  </span><span class="n">MOV</span><span class="w">     </span><span class="n">R2</span><span class="p">,</span><span class="err">@</span><span class="n">#177570</span><span class="w">     </span><span class="p">;</span><span class="k">UPDATE</span><span class="w"> </span><span class="n">DISPLAY</span><span class="w"> </span><span class="n">REG</span><span class="w"></span>
+<span class="mi">001036</span><span class="w">  </span><span class="mi">012700</span><span class="w">  </span><span class="mi">177404</span><span class="w">                  </span><span class="n">MOV</span><span class="w">     </span><span class="n">#RKCS</span><span class="p">,</span><span class="n">R0</span><span class="w">        </span><span class="p">;</span><span class="k">GET</span><span class="w"> </span><span class="n">RKCS</span><span class="w"> </span><span class="n">ADDRESS</span><span class="w"></span>
+<span class="mi">001042</span><span class="w">  </span><span class="mi">012710</span><span class="w">  </span><span class="mi">007560</span><span class="w">                  </span><span class="n">MOV</span><span class="w">     </span><span class="n">#7560</span><span class="p">,</span><span class="nv">@R0</span><span class="w">       </span><span class="p">;</span><span class="k">SET</span><span class="w"> </span><span class="n">RESET</span><span class="w"> </span><span class="n">CTRLR</span><span class="w"> </span><span class="n">CMD</span><span class="w"></span>
+<span class="mi">001046</span><span class="w">  </span><span class="mi">005210</span><span class="w">                          </span><span class="n">INC</span><span class="w">     </span><span class="nv">@R0</span><span class="w">             </span><span class="p">;</span><span class="k">SET</span><span class="w"> </span><span class="k">GO</span><span class="w"> </span><span class="nc">BIT</span><span class="w"></span>
+<span class="mi">001050</span><span class="w">  </span><span class="mi">005005</span><span class="w">                          </span><span class="n">CLR</span><span class="w">     </span><span class="n">R5</span><span class="w">              </span><span class="p">;</span><span class="n">INIT</span><span class="w"> </span><span class="k">CHECK</span><span class="w"> </span><span class="nf">COUNT</span><span class="w"></span>
+<span class="mi">001052</span><span class="w">  </span><span class="mi">105710</span><span class="w">                  </span><span class="nl">L3</span><span class="p">:</span><span class="w">     </span><span class="n">TSTB</span><span class="w">    </span><span class="nv">@R0</span><span class="w">             </span><span class="p">;</span><span class="k">CHECK</span><span class="w"> </span><span class="n">DONE</span><span class="w"> </span><span class="nc">BIT</span><span class="w"></span>
+<span class="mi">001054</span><span class="w">  </span><span class="mi">100765</span><span class="w">                          </span><span class="n">BMI</span><span class="w">     </span><span class="n">L2</span><span class="w">              </span><span class="p">;</span><span class="k">IF</span><span class="w"> </span><span class="k">SET</span><span class="p">,</span><span class="w"> </span><span class="k">NEXT</span><span class="w"> </span><span class="n">MAIN</span><span class="w"> </span><span class="n">LOOP</span><span class="w"></span>
+<span class="mi">001056</span><span class="w">  </span><span class="mi">005205</span><span class="w">                          </span><span class="n">INC</span><span class="w">     </span><span class="n">R5</span><span class="w">              </span><span class="p">;</span><span class="n">OTHERWISE</span><span class="w"> </span><span class="n">INC</span><span class="w"> </span><span class="k">CHECK</span><span class="w"> </span><span class="nf">COUNT</span><span class="w"></span>
+<span class="mi">001060</span><span class="w">  </span><span class="mi">001374</span><span class="w">                          </span><span class="n">BNE</span><span class="w">     </span><span class="n">L3</span><span class="w">              </span><span class="p">;</span><span class="k">IF</span><span class="w"> </span><span class="ow">NOT</span><span class="w"> </span><span class="n">EXPIRED</span><span class="w"> </span><span class="k">GO</span><span class="w"> </span><span class="k">CHECK</span><span class="w"> </span><span class="n">AGAIN</span><span class="w"></span>
+<span class="mi">001062</span><span class="w">  </span><span class="mi">000000</span><span class="w">                          </span><span class="n">HALT</span><span class="w">                    </span><span class="p">;</span><span class="n">OTHERWISE</span><span class="p">,</span><span class="w"> </span><span class="n">HALT</span><span class="w"> </span><span class="n">HERE</span><span class="w"></span>
+<span class="w">        </span><span class="mi">001000</span><span class="w">                          </span><span class="p">.</span><span class="k">END</span><span class="w">    </span><span class="k">START</span><span class="w"></span>
+</code></pre></div>
+</td></tr></table>
+
+<p>Running this code, the error is easily reproduced -- the machine traps on a bus timeout and halts after 
+anywhere from a few dozen to a few hundred iterations.  Put the logic analyzer on MSYN and SSYN at the
+back M105 address decode module on the RK11-C backplane and set up a trigger for long bus cycles, but
+surprisingly this was not triggering even though the processor was taking a trap 4.  Verified that the
+trigger itself was working fine by accessing a non-existent memory location from the front panel.  Hmmm...</p>
+<p>Next step then was to move back to the CPU, and throw the UBC card out on extenders to get more visibility
+into the trap.  A further surprise here -- the problem went away when the UBC was on the extender!  I was
+able to run the test code above for hundreds of thousands of iterations without timeouts, and the original
+ZRKJE0 diagnostic ran for over half an hour this way.</p>
+<p>Took the UBC back off the extender, and the problem re-occurred, so apparently not just a bad seat.  Hooked
+the logic analyzer up to BUS A MSYN L, BUS A SSYN L, and UBCB TIMEOUT (1) H on the 11/45 backplane.  With
+this, I was able to capture lots of traces of the failure mode, which looks like this:</p>
+<p><img src='/images/pdp11/timeout-trace.jpg'/></p>
+<p>Here a glitch on the timeout signal is clearly visible, even though the MSYN/SSYN interval is well under
+the bus timeout.  The interesting thing is that bus cycles that result in a glitch all have a MSYN/SSYN
+interval of 568 nanosceconds, to within a nanosecond.  Cycles with a slightly different interval do not
+timeout.  This jibes with what I saw with the card extender also.  As a further verification, replaced
+the M920 bus jumper I'd been using with a 2-foot BC11, and the problem disappeared again.</p>
+<p>At this point, Don over on the VCFED forum pointed out that the M920 I had been using was discontinued early
+on due to negative effects on bus signal integrity, and was replaced with the M9202 (which itself contains 2 
+feet of BC11).  The issue with the M920 is apprently that it provides so little separation that the connected
+loads appear to the bus overall as a single lumped load.  The M9202 separates the loads on the bus to smear
+out reflections and ringing and avoid false triggers.  I have tracked down an M9202 on eBay, and have also
+put an inexpensive digital storage scope on order so I can start to investigate signal integrity issues like
+this that are not apparent on a logic analyzer.</p></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
         <a href="https://fritzm.github.io/rk11.html"><h1>PDP-11/45: RK11</h1></a>
 Sun 29 January 2017
 
@@ -931,58 +1026,6 @@ meantime, I'll do some reading on the FP11 in preparation for microcode-step deb
     <hr />
 </div>
     
-
-        
-
-<div class='article'>
-    <div class="content-title">
-        <a href="https://fritzm.github.io/diagnostics-7.html"><h1>PDP-11/45: Diagnostics VII - KT11 MMU</h1></a>
-Sat 13 August 2016
-
-by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
- 
-    </div>
-    
-    <div><p>Moving on to the KT11 MMU: running the first diagnostic in the CKT suite, got error reports at 010340, 010560, and
-011000.  Consulted the diagnostic listings, and these particular tests have to do with D-space translations from
-kernel, supervisor, and user modes.  The D-space logic is largely on module SSR, so I swapped this out for a spare.
-After that, I was able to pass the full suite of basic MMU tests:</p>
-<style>
-.diaglist { display: inline; border-collapse: collapse; margin-right: 1em; }
-.diaglist caption { font-weight: bold; }
-.diaglist tr:nth-child(even) { background-color: #f2f2f2; }
-.diaglist th, .diaglist td { padding: 5px; }
-.diaglist td { border: 1px solid lightgray; font-family: Menlo,Consolas,monospace; }
-</style>
-
-<table class="diaglist">
-<thead>
-<tr><th>Diagnostic</th><th>BEL</th><th>Description</th><th>Status</th></tr>
-</thead>
-<tbody>
-<tr><td>CKTAB0.BIC</td><td>017412</td><td>KT11-C basic logic part 1</td><td>pass</td></tr>
-<tr><td>CKTBC0.BIC</td><td>015674</td><td>KT11-C basic logic part 2</td><td>pass</td></tr>
-<tr><td>CKTCA0.BIC</td><td>023304</td><td>KT11-C access keys</td><td>pass</td></tr>
-<tr><td>CKTDA0.BIC</td><td>016360</td><td>KT11-C MTPD and MTPI</td><td>pass</td></tr>
-<tr><td>CKTEB0.BIC</td><td>015310</td><td>KT11-C MFPD and MFPI</td><td>pass</td></tr>
-<tr><td>CKTFD0.BIC</td><td>016422</td><td>KT11-C aborts</td><td>pass</td></tr>
-</tbody>
-</table>
-
-<p>Put the failing SSE module in the repair queue along with the other failed spares I've identified along the way, and
-will return to troubleshoot/repair it later.  For now, things are looking pretty good with the CPU!  I still need to
-run and pass the more heavyweight diagnostics: the 11/45 instruction exerciser, KT11 exerciser, and MS11-L exerciser.
-All three of these still seem to have halts, but they are quite complicated diagnostics in comparison to the rest,
-making use of additional peripherals, etc.  I'll need to study these a bit before I can be sure I am using them
-correctly.  I have also skipped the power fail diagnostics for now as I will need to restore some core memory in order
-for these to work correctly.</p>
-<p>Next up will be to work on the FPU...</p></div>
-    <hr />
-</div>
-    
 <div class="pagination">
 <ul>
     <li class="prev"><a href="https://fritzm.github.io/tag/pdp-112.html">&larr; Previous</a></li>
@@ -1057,7 +1100,7 @@ for these to work correctly.</p>
     </div>     </div> 
 <footer>
 <br />
-<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2019</p>
+<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2020</p>
 </footer>
 
 </div> <!-- /container -->

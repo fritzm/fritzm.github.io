@@ -74,6 +74,42 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="https://fritzm.github.io/vt52.html"><h1>PDP-11/45: VT52</h1></a>
+Sun 03 January 2016
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p>Spent some time reviving a VT52 that I intend to use with the PDP-11.  This was a pretty nice eBay find. 
+There was some oxidation and flakiness with the connectors to the chargen ROM daughter card (I remember this
+being typical of VT52s even back in the day).  A little more difficult to track down were some flaky solder
+joints around the clock chip.  But, everything else seems to be in pretty good shape and its working well now!
+Here it is hooked up to a Linux VM on my macbook, compiling some LSST code to generate some output as a test
+drive:</p>
+<p><img src='/images/pdp11/vt52_thumbnail_tall.jpg' title='VT52 hooked up to a Linux VM for a test drive' onclick='pswipe("pdp11",17);'/></p>
+<p>Man, seeing that funky font again, with its non-descending-descenders, is really great!  Surprisingly, it
+doesn't seem to be available in digital format anywhere, unlike the later VT100 fonts, etc.  Try as I might, I
+couldn't seem to find the chargen ROM listing in any of the DEC documentation archives, either.</p>
+<p>Well, I do have a Digilent FPGA eval card and some level conversion chips laying around, so as a holiday hack
+project I put together a quick ROM scanner in Verilog, interfaced it to the VT52 chargen on a breadboard, and
+scanned out the contents.  Here's a picture of the scanner in action, and the produced output:</p>
+<p><img src='/images/pdp11/rom-scanner_thumbnail_tall.jpg' title='Homemade FPGA ROM scanner used to read out the VT52 character generator ROM' onclick='pswipe("pdp11",18);'/></p>
+<p>The yellowish board on the right is the VT52 chargen.  The Verilog source for the scanner, the scanned data,
+and some preliminary attempts to convert the data to a few modern font formats are available on my github over
+at <a href="https://github.com/fritzm/vt52">https://github.com/fritzm/vt52</a>.  I need to learn some more about font formats to make some better font
+files; if I do I will update that repo.  Any help from fontophiles gladly accepted!</p></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
         <a href="https://fritzm.github.io/backplane-and-logic.html"><h1>PDP-11/45: CPU Backplane and logic</h1></a>
 Fri 03 July 2015
 
@@ -506,7 +542,7 @@ by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">F
     </div>     </div> 
 <footer>
 <br />
-<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2019</p>
+<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2020</p>
 </footer>
 
 </div> <!-- /container -->
