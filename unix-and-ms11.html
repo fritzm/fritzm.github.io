@@ -105,298 +105,547 @@ successively refining the following test code, and repairing identified problems
 along the way.  This code maps and tests every memory location on the MS11-L, using KT11 memory management.
 It relocates itself so it can test the lowest physical bank as well.  Tests include all-ones, all-zeros,
 write address to location, and a "random" data test which just uses program code test sequence:</p>
-<div class="highlight"><pre><span></span>        KIPDR0=172300
-        KIPDR1=172302
-        KIPDR2=172304
-        KIPDR3=172306
-        KIPDR4=172310
-        KIPDR5=172312
-        KIPDR6=172314
-        KIPDR7=172316
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
+  2
+  3
+  4
+  5
+  6
+  7
+  8
+  9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
+ 30
+ 31
+ 32
+ 33
+ 34
+ 35
+ 36
+ 37
+ 38
+ 39
+ 40
+ 41
+ 42
+ 43
+ 44
+ 45
+ 46
+ 47
+ 48
+ 49
+ 50
+ 51
+ 52
+ 53
+ 54
+ 55
+ 56
+ 57
+ 58
+ 59
+ 60
+ 61
+ 62
+ 63
+ 64
+ 65
+ 66
+ 67
+ 68
+ 69
+ 70
+ 71
+ 72
+ 73
+ 74
+ 75
+ 76
+ 77
+ 78
+ 79
+ 80
+ 81
+ 82
+ 83
+ 84
+ 85
+ 86
+ 87
+ 88
+ 89
+ 90
+ 91
+ 92
+ 93
+ 94
+ 95
+ 96
+ 97
+ 98
+ 99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249</pre></div></td><td class="code"><div class="highlight"><pre><span></span>        <span class="nt">KIPDR0</span><span class="o">=</span><span class="nt">172300</span>
+        <span class="nt">KIPDR1</span><span class="o">=</span><span class="nt">172302</span>
+        <span class="nt">KIPDR2</span><span class="o">=</span><span class="nt">172304</span>
+        <span class="nt">KIPDR3</span><span class="o">=</span><span class="nt">172306</span>
+        <span class="nt">KIPDR4</span><span class="o">=</span><span class="nt">172310</span>
+        <span class="nt">KIPDR5</span><span class="o">=</span><span class="nt">172312</span>
+        <span class="nt">KIPDR6</span><span class="o">=</span><span class="nt">172314</span>
+        <span class="nt">KIPDR7</span><span class="o">=</span><span class="nt">172316</span>
 
-        KIPAR0=172340
-        KIPAR1=172342
-        KIPAR2=172344
-        KIPAR3=172346
-        KIPAR4=172350
-        KIPAR5=172352
-        KIPAR6=172354
-        KIPAR7=172356
+        <span class="nt">KIPAR0</span><span class="o">=</span><span class="nt">172340</span>
+        <span class="nt">KIPAR1</span><span class="o">=</span><span class="nt">172342</span>
+        <span class="nt">KIPAR2</span><span class="o">=</span><span class="nt">172344</span>
+        <span class="nt">KIPAR3</span><span class="o">=</span><span class="nt">172346</span>
+        <span class="nt">KIPAR4</span><span class="o">=</span><span class="nt">172350</span>
+        <span class="nt">KIPAR5</span><span class="o">=</span><span class="nt">172352</span>
+        <span class="nt">KIPAR6</span><span class="o">=</span><span class="nt">172354</span>
+        <span class="nt">KIPAR7</span><span class="o">=</span><span class="nt">172356</span>
 
-        SR0=177572
+        <span class="nt">SR0</span><span class="o">=</span><span class="nt">177572</span>
 
-        XCSR=177564
-        XBUF=177566
+        <span class="nt">XCSR</span><span class="o">=</span><span class="nt">177564</span>
+        <span class="nt">XBUF</span><span class="o">=</span><span class="nt">177566</span>
 
-        .ASECT
-        .=1000
-START:
-        MOV     #700,SP         ;INIT STACK POINTER
+        <span class="p">.</span><span class="nc">ASECT</span>
+        <span class="o">.=</span><span class="nt">1000</span>
+<span class="nt">START</span><span class="o">:</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">700</span><span class="o">,</span><span class="nt">SP</span>         <span class="o">;</span><span class="nt">INIT</span> <span class="nt">STACK</span> <span class="nt">POINTER</span>
 
-        ;----- INSTALL TRAP CATCHERS
+        <span class="o">;</span><span class="nt">-----</span> <span class="nt">INSTALL</span> <span class="nt">TRAP</span> <span class="nt">CATCHERS</span>
 
-TRPS:   CLR     R0              ;CURRENT VECTOR
-        MOV     #2,R1           ;VECTOR TARGET
-        CLR     R2              ;HALT INSTR
-        MOV     #100,R3         ;END VECTOR
-1$:     MOV     R1,(R0)+        ;STORE TARGET AND ADVANCE
-        MOV     R2,(R0)+        ;STORE HALT AND ADVANCE
-        ADD     #4,R1           ;UPDATE TARGET
-        SOB     R3,1$           ;LOOP OVER VECTORS
+<span class="nt">TRPS</span><span class="o">:</span>   <span class="nt">CLR</span>     <span class="nt">R0</span>              <span class="o">;</span><span class="nt">CURRENT</span> <span class="nt">VECTOR</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">2</span><span class="o">,</span><span class="nt">R1</span>           <span class="o">;</span><span class="nt">VECTOR</span> <span class="nt">TARGET</span>
+        <span class="nt">CLR</span>     <span class="nt">R2</span>              <span class="o">;</span><span class="nt">HALT</span> <span class="nt">INSTR</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">100</span><span class="o">,</span><span class="nt">R3</span>         <span class="o">;</span><span class="nt">END</span> <span class="nt">VECTOR</span>
+<span class="nt">1</span><span class="o">$:</span>     <span class="nt">MOV</span>     <span class="nt">R1</span><span class="o">,(</span><span class="nt">R0</span><span class="o">)+</span>        <span class="o">;</span><span class="nt">STORE</span> <span class="nt">TARGET</span> <span class="nt">AND</span> <span class="nt">ADVANCE</span>
+        <span class="nt">MOV</span>     <span class="nt">R2</span><span class="o">,(</span><span class="nt">R0</span><span class="o">)+</span>        <span class="o">;</span><span class="nt">STORE</span> <span class="nt">HALT</span> <span class="nt">AND</span> <span class="nt">ADVANCE</span>
+        <span class="nt">ADD</span>     <span class="p">#</span><span class="nn">4</span><span class="o">,</span><span class="nt">R1</span>           <span class="o">;</span><span class="nt">UPDATE</span> <span class="nt">TARGET</span>
+        <span class="nt">SOB</span>     <span class="nt">R3</span><span class="o">,</span><span class="nt">1</span><span class="o">$</span>           <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">OVER</span> <span class="nt">VECTORS</span>
 
-        ;----- INIT AND ENABLE MEMORY MAPPING
+        <span class="o">;</span><span class="nt">-----</span> <span class="nt">INIT</span> <span class="nt">AND</span> <span class="nt">ENABLE</span> <span class="nt">MEMORY</span> <span class="nt">MAPPING</span>
 
-INITM:  MOV     #IPDRS,R0       ;SRC PDR INIT TABLE
-        MOV     #KIPDR0,R1      ;DST KIPDR0
-        MOV     #10,R2          ;DO EIGHT PDRS
-        MOV     (R0)+,(R1)+     ;COPY AND ADVANCE
-        SOB     R2,.-2          ;LOOP OVER PDRS
-        MOV     #IPARS,R0       ;SRC PAR INIT TABLE
-        MOV     #KIPAR0,R1      ;DST KIPAR0
-        MOV     #10,R2          ;DO EIGHT PARS
-        MOV     (R0)+,(R1)+     ;COPY AND ADVANCE
-        SOB     R2,.-2          ;LOOP OVER PARS
-        MOV     #1,@#SR0        ;ENABLE MEMORY MGMT
+<span class="nt">INITM</span><span class="o">:</span>  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">IPDRS</span><span class="o">,</span><span class="nt">R0</span>       <span class="o">;</span><span class="nt">SRC</span> <span class="nt">PDR</span> <span class="nt">INIT</span> <span class="nt">TABLE</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">KIPDR0</span><span class="o">,</span><span class="nt">R1</span>      <span class="o">;</span><span class="nt">DST</span> <span class="nt">KIPDR0</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">10</span><span class="o">,</span><span class="nt">R2</span>          <span class="o">;</span><span class="nt">DO</span> <span class="nt">EIGHT</span> <span class="nt">PDRS</span>
+        <span class="nt">MOV</span>     <span class="o">(</span><span class="nt">R0</span><span class="o">)+,(</span><span class="nt">R1</span><span class="o">)+</span>     <span class="o">;</span><span class="nt">COPY</span> <span class="nt">AND</span> <span class="nt">ADVANCE</span>
+        <span class="nt">SOB</span>     <span class="nt">R2</span><span class="o">,</span><span class="p">.</span><span class="nc">-2</span>          <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">OVER</span> <span class="nt">PDRS</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">IPARS</span><span class="o">,</span><span class="nt">R0</span>       <span class="o">;</span><span class="nt">SRC</span> <span class="nt">PAR</span> <span class="nt">INIT</span> <span class="nt">TABLE</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">KIPAR0</span><span class="o">,</span><span class="nt">R1</span>      <span class="o">;</span><span class="nt">DST</span> <span class="nt">KIPAR0</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">10</span><span class="o">,</span><span class="nt">R2</span>          <span class="o">;</span><span class="nt">DO</span> <span class="nt">EIGHT</span> <span class="nt">PARS</span>
+        <span class="nt">MOV</span>     <span class="o">(</span><span class="nt">R0</span><span class="o">)+,(</span><span class="nt">R1</span><span class="o">)+</span>     <span class="o">;</span><span class="nt">COPY</span> <span class="nt">AND</span> <span class="nt">ADVANCE</span>
+        <span class="nt">SOB</span>     <span class="nt">R2</span><span class="o">,</span><span class="p">.</span><span class="nc">-2</span>          <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">OVER</span> <span class="nt">PARS</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">1</span><span class="o">,@</span><span class="p">#</span><span class="nn">SR0</span>        <span class="o">;</span><span class="nt">ENABLE</span> <span class="nt">MEMORY</span> <span class="nt">MGMT</span>
 
-        ;----- TEST 32K MS11 BANKS AT PA 100000 THRU 700000,
-        ;      RELOCATE, THEN TEST BANK AT PA 000000 
+        <span class="o">;</span><span class="nt">-----</span> <span class="nt">TEST</span> <span class="nt">32K</span> <span class="nt">MS11</span> <span class="nt">BANKS</span> <span class="nt">AT</span> <span class="nt">PA</span> <span class="nt">100000</span> <span class="nt">THRU</span> <span class="nt">700000</span><span class="o">,</span>
+        <span class="o">;</span>      <span class="nt">RELOCATE</span><span class="o">,</span> <span class="nt">THEN</span> <span class="nt">TEST</span> <span class="nt">BANK</span> <span class="nt">AT</span> <span class="nt">PA</span> <span class="nt">000000</span>
 
-DOPASS: MOV     #1000,R0        ;PAR FOR PA 100000
-        JSR     PC,DOBANK       ;TEST IT
-        MOV     #2000,R0        ;PAR FOR PA 200000
-        JSR     PC,DOBANK       ;TEST IT
-        MOV     #3000,R0        ;PAR FOR PA 300000
-        JSR     PC,DOBANK       ;TEST IT
-        MOV     #4000,R0        ;PAR FOR PA 400000
-        JSR     PC,DOBANK       ;TEST IT
-        MOV     #5000,R0        ;PAR FOR PA 500000
-        JSR     PC,DOBANK       ;TEST IT
-        MOV     #6000,R0        ;PAR FOR PA 600000
-        JSR     PC,DOBANK       ;TEST IT
-        MOV     #7000,R0        ;PAR FOR PA 700000
-        JSR     PC,DOBANK       ;TEST IT
-        MOV     #1000,R5        ;RELOC TARGET PA:100000
-        JSR     PC,RELOC        ;GO DO IT
-        MOV     #0000,R0        ;PAR FOR PA 000000
-        JSR     PC,DOBANK       ;TEST IT
+<span class="nt">DOPASS</span><span class="o">:</span> <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">1000</span><span class="o">,</span><span class="nt">R0</span>        <span class="o">;</span><span class="nt">PAR</span> <span class="nt">FOR</span> <span class="nt">PA</span> <span class="nt">100000</span>
+        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">DOBANK</span>       <span class="o">;</span><span class="nt">TEST</span> <span class="nt">IT</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">2000</span><span class="o">,</span><span class="nt">R0</span>        <span class="o">;</span><span class="nt">PAR</span> <span class="nt">FOR</span> <span class="nt">PA</span> <span class="nt">200000</span>
+        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">DOBANK</span>       <span class="o">;</span><span class="nt">TEST</span> <span class="nt">IT</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">3000</span><span class="o">,</span><span class="nt">R0</span>        <span class="o">;</span><span class="nt">PAR</span> <span class="nt">FOR</span> <span class="nt">PA</span> <span class="nt">300000</span>
+        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">DOBANK</span>       <span class="o">;</span><span class="nt">TEST</span> <span class="nt">IT</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">4000</span><span class="o">,</span><span class="nt">R0</span>        <span class="o">;</span><span class="nt">PAR</span> <span class="nt">FOR</span> <span class="nt">PA</span> <span class="nt">400000</span>
+        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">DOBANK</span>       <span class="o">;</span><span class="nt">TEST</span> <span class="nt">IT</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">5000</span><span class="o">,</span><span class="nt">R0</span>        <span class="o">;</span><span class="nt">PAR</span> <span class="nt">FOR</span> <span class="nt">PA</span> <span class="nt">500000</span>
+        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">DOBANK</span>       <span class="o">;</span><span class="nt">TEST</span> <span class="nt">IT</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">6000</span><span class="o">,</span><span class="nt">R0</span>        <span class="o">;</span><span class="nt">PAR</span> <span class="nt">FOR</span> <span class="nt">PA</span> <span class="nt">600000</span>
+        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">DOBANK</span>       <span class="o">;</span><span class="nt">TEST</span> <span class="nt">IT</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">7000</span><span class="o">,</span><span class="nt">R0</span>        <span class="o">;</span><span class="nt">PAR</span> <span class="nt">FOR</span> <span class="nt">PA</span> <span class="nt">700000</span>
+        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">DOBANK</span>       <span class="o">;</span><span class="nt">TEST</span> <span class="nt">IT</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">1000</span><span class="o">,</span><span class="nt">R5</span>        <span class="o">;</span><span class="nt">RELOC</span> <span class="nt">TARGET</span> <span class="nt">PA</span><span class="p">:</span><span class="nd">100000</span>
+        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">RELOC</span>        <span class="o">;</span><span class="nt">GO</span> <span class="nt">DO</span> <span class="nt">IT</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">0000</span><span class="o">,</span><span class="nt">R0</span>        <span class="o">;</span><span class="nt">PAR</span> <span class="nt">FOR</span> <span class="nt">PA</span> <span class="nt">000000</span>
+        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">DOBANK</span>       <span class="o">;</span><span class="nt">TEST</span> <span class="nt">IT</span>
 
-        ;----- ALL DONE WITH PASS
+        <span class="o">;</span><span class="nt">-----</span> <span class="nt">ALL</span> <span class="nt">DONE</span> <span class="nt">WITH</span> <span class="nt">PASS</span>
 
-        MOV     #0000,R5        ;RELOC TARGET PA:000000
-        JSR     PC,RELOC        ;GO DO IT
-        CLR     @#SR0           ;DISABLE MEMORY MGMT
-        MOV     #PCOMPL,R5      ;GET PASS COMPLETE MSG
-        JSR     PC,PRSTR        ;PRINT IT
-        HALT                    ;ALL DONE
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">0000</span><span class="o">,</span><span class="nt">R5</span>        <span class="o">;</span><span class="nt">RELOC</span> <span class="nt">TARGET</span> <span class="nt">PA</span><span class="p">:</span><span class="nd">000000</span>
+        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">RELOC</span>        <span class="o">;</span><span class="nt">GO</span> <span class="nt">DO</span> <span class="nt">IT</span>
+        <span class="nt">CLR</span>     <span class="o">@</span><span class="p">#</span><span class="nn">SR0</span>           <span class="o">;</span><span class="nt">DISABLE</span> <span class="nt">MEMORY</span> <span class="nt">MGMT</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">PCOMPL</span><span class="o">,</span><span class="nt">R5</span>      <span class="o">;</span><span class="nt">GET</span> <span class="nt">PASS</span> <span class="nt">COMPLETE</span> <span class="nt">MSG</span>
+        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRSTR</span>        <span class="o">;</span><span class="nt">PRINT</span> <span class="nt">IT</span>
+        <span class="nt">HALT</span>                    <span class="o">;</span><span class="nt">ALL</span> <span class="nt">DONE</span>
 
-        ;----- MAP A SINGLE 32K BANK AT VA 20000
+        <span class="o">;</span><span class="nt">-----</span> <span class="nt">MAP</span> <span class="nt">A</span> <span class="nt">SINGLE</span> <span class="nt">32K</span> <span class="nt">BANK</span> <span class="nt">AT</span> <span class="nt">VA</span> <span class="nt">20000</span>
 
-DOBANK: MOV     #KIPAR1,R1      ;WILL MAP USING KIPAR1 THRU KIPAR4
-        MOV     #4,R3           ;FOUR KIPARS TO SET
-        CMP     R0,#7000        ;UNLESS WE ARE IN PA 700000 BANK...      
-        BNE     1$              ;IF NOT, SKIP AHEAD
-        MOV     #3,R3           ;OTHERWISE, SCALE BACK TO 3 KIPARS
-1$:     MOV     R0,(R1)+        ;SET A KIPAR AND ADVANCE
-        ADD     #200,R0         ;INCREMENT VALUE FOR NEXT KIPAR
-        SOB     R3,1$           ;LOOP OVER KIPARS
+<span class="nt">DOBANK</span><span class="o">:</span> <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">KIPAR1</span><span class="o">,</span><span class="nt">R1</span>      <span class="o">;</span><span class="nt">WILL</span> <span class="nt">MAP</span> <span class="nt">USING</span> <span class="nt">KIPAR1</span> <span class="nt">THRU</span> <span class="nt">KIPAR4</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">4</span><span class="o">,</span><span class="nt">R3</span>           <span class="o">;</span><span class="nt">FOUR</span> <span class="nt">KIPARS</span> <span class="nt">TO</span> <span class="nt">SET</span>
+        <span class="nt">CMP</span>     <span class="nt">R0</span><span class="o">,</span><span class="p">#</span><span class="nn">7000</span>        <span class="o">;</span><span class="nt">UNLESS</span> <span class="nt">WE</span> <span class="nt">ARE</span> <span class="nt">IN</span> <span class="nt">PA</span> <span class="nt">700000</span> <span class="nt">BANK</span><span class="o">...</span>      
+        <span class="nt">BNE</span>     <span class="nt">1</span><span class="o">$</span>              <span class="o">;</span><span class="nt">IF</span> <span class="nt">NOT</span><span class="o">,</span> <span class="nt">SKIP</span> <span class="nt">AHEAD</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">3</span><span class="o">,</span><span class="nt">R3</span>           <span class="o">;</span><span class="nt">OTHERWISE</span><span class="o">,</span> <span class="nt">SCALE</span> <span class="nt">BACK</span> <span class="nt">TO</span> <span class="nt">3</span> <span class="nt">KIPARS</span>
+<span class="nt">1</span><span class="o">$:</span>     <span class="nt">MOV</span>     <span class="nt">R0</span><span class="o">,(</span><span class="nt">R1</span><span class="o">)+</span>        <span class="o">;</span><span class="nt">SET</span> <span class="nt">A</span> <span class="nt">KIPAR</span> <span class="nt">AND</span> <span class="nt">ADVANCE</span>
+        <span class="nt">ADD</span>     <span class="p">#</span><span class="nn">200</span><span class="o">,</span><span class="nt">R0</span>         <span class="o">;</span><span class="nt">INCREMENT</span> <span class="nt">VALUE</span> <span class="nt">FOR</span> <span class="nt">NEXT</span> <span class="nt">KIPAR</span>
+        <span class="nt">SOB</span>     <span class="nt">R3</span><span class="o">,</span><span class="nt">1</span><span class="o">$</span>           <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">OVER</span> <span class="nt">KIPARS</span>
 
-        ;----- CALCULATE END VA
+        <span class="o">;</span><span class="nt">-----</span> <span class="nt">CALCULATE</span> <span class="nt">END</span> <span class="nt">VA</span>
 
-        MOV     #120000,R1      ;MAPPED BANK END IS VA 120000
-        CMP     @#KIPAR1,#7000  ;UNLESS WE ARE IN PA 700000 BANK...
-        BNE     ZEROS           ;IF NOT, SKIP AHEAD
-        MOV     #100000,R1      ;OTHERWISE, END IS VA 100000
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">120000</span><span class="o">,</span><span class="nt">R1</span>      <span class="o">;</span><span class="nt">MAPPED</span> <span class="nt">BANK</span> <span class="nt">END</span> <span class="nt">IS</span> <span class="nt">VA</span> <span class="nt">120000</span>
+        <span class="nt">CMP</span>     <span class="o">@</span><span class="p">#</span><span class="nn">KIPAR1</span><span class="o">,</span><span class="p">#</span><span class="nn">7000</span>  <span class="o">;</span><span class="nt">UNLESS</span> <span class="nt">WE</span> <span class="nt">ARE</span> <span class="nt">IN</span> <span class="nt">PA</span> <span class="nt">700000</span> <span class="nt">BANK</span><span class="o">...</span>
+        <span class="nt">BNE</span>     <span class="nt">ZEROS</span>           <span class="o">;</span><span class="nt">IF</span> <span class="nt">NOT</span><span class="o">,</span> <span class="nt">SKIP</span> <span class="nt">AHEAD</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">100000</span><span class="o">,</span><span class="nt">R1</span>      <span class="o">;</span><span class="nt">OTHERWISE</span><span class="o">,</span> <span class="nt">END</span> <span class="nt">IS</span> <span class="nt">VA</span> <span class="nt">100000</span>
 
-        ;----- ZEROS TEST
+        <span class="o">;</span><span class="nt">-----</span> <span class="nt">ZEROS</span> <span class="nt">TEST</span>
 
-ZEROS:  CLR     R2              ;EXPECTED VALUE IS 000000
-        MOV     #20000,R0       ;START AT VA 20000
-1$:     MOV     R2,(R0)+        ;CLEAR A WORD AND ADVANCE
-        CMP     R0,R1           ;AT END?
-        BNE     1$              ;IF NOT, LOOP
-        MOV     #20000,R0       ;START AT VA 20000
-2$:     TST     (R0)+           ;CHECK A WORD AND ADVANCE
-        BEQ     3$              ;IF ZERO, SKIP AHEAD
-        JSR     PC,PRERR        ;OTHERWISE, REPORT ERROR
-3$:     CMP     R0,R1           ;AT END?
-        BNE     2$              ;IF NOT, LOOP
+<span class="nt">ZEROS</span><span class="o">:</span>  <span class="nt">CLR</span>     <span class="nt">R2</span>              <span class="o">;</span><span class="nt">EXPECTED</span> <span class="nt">VALUE</span> <span class="nt">IS</span> <span class="nt">000000</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">20000</span><span class="o">,</span><span class="nt">R0</span>       <span class="o">;</span><span class="nt">START</span> <span class="nt">AT</span> <span class="nt">VA</span> <span class="nt">20000</span>
+<span class="nt">1</span><span class="o">$:</span>     <span class="nt">MOV</span>     <span class="nt">R2</span><span class="o">,(</span><span class="nt">R0</span><span class="o">)+</span>        <span class="o">;</span><span class="nt">CLEAR</span> <span class="nt">A</span> <span class="nt">WORD</span> <span class="nt">AND</span> <span class="nt">ADVANCE</span>
+        <span class="nt">CMP</span>     <span class="nt">R0</span><span class="o">,</span><span class="nt">R1</span>           <span class="o">;</span><span class="nt">AT</span> <span class="nt">END</span><span class="o">?</span>
+        <span class="nt">BNE</span>     <span class="nt">1</span><span class="o">$</span>              <span class="o">;</span><span class="nt">IF</span> <span class="nt">NOT</span><span class="o">,</span> <span class="nt">LOOP</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">20000</span><span class="o">,</span><span class="nt">R0</span>       <span class="o">;</span><span class="nt">START</span> <span class="nt">AT</span> <span class="nt">VA</span> <span class="nt">20000</span>
+<span class="nt">2</span><span class="o">$:</span>     <span class="nt">TST</span>     <span class="o">(</span><span class="nt">R0</span><span class="o">)+</span>           <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">A</span> <span class="nt">WORD</span> <span class="nt">AND</span> <span class="nt">ADVANCE</span>
+        <span class="nt">BEQ</span>     <span class="nt">3</span><span class="o">$</span>              <span class="o">;</span><span class="nt">IF</span> <span class="nt">ZERO</span><span class="o">,</span> <span class="nt">SKIP</span> <span class="nt">AHEAD</span>
+        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRERR</span>        <span class="o">;</span><span class="nt">OTHERWISE</span><span class="o">,</span> <span class="nt">REPORT</span> <span class="nt">ERROR</span>
+<span class="nt">3</span><span class="o">$:</span>     <span class="nt">CMP</span>     <span class="nt">R0</span><span class="o">,</span><span class="nt">R1</span>           <span class="o">;</span><span class="nt">AT</span> <span class="nt">END</span><span class="o">?</span>
+        <span class="nt">BNE</span>     <span class="nt">2</span><span class="o">$</span>              <span class="o">;</span><span class="nt">IF</span> <span class="nt">NOT</span><span class="o">,</span> <span class="nt">LOOP</span>
 
-        ;----- ONES TEST
+        <span class="o">;</span><span class="nt">-----</span> <span class="nt">ONES</span> <span class="nt">TEST</span>
 
-ONES:   MOV     #177777,R2      ;EXPECTED VALUE US 177777       
-        MOV     #20000,R0       ;START AT VA 20000
-1$:     MOV     R2,(R0)+        ;WRITE A WORD AND ADVANCE
-        CMP     R0,R1           ;AT END?
-        BNE     1$              ;IF NOT, LOOP
-        MOV     #20000,R0       ;START AT VA 20000
-2$:     CMP     (R0)+,R2        ;CHECK A WORD AND ADVANCE
-        BEQ     3$              ;IF EXPECTED VALUE, SKIP AHEAD
-        JSR     PC,PRERR        ;OTHERWISE, REPORT ERROR
-3$:     CMP     R0,R1           ;AT END?
-        BNE     2$              ;IF NOT, LOOP
+<span class="nt">ONES</span><span class="o">:</span>   <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">177777</span><span class="o">,</span><span class="nt">R2</span>      <span class="o">;</span><span class="nt">EXPECTED</span> <span class="nt">VALUE</span> <span class="nt">US</span> <span class="nt">177777</span>       
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">20000</span><span class="o">,</span><span class="nt">R0</span>       <span class="o">;</span><span class="nt">START</span> <span class="nt">AT</span> <span class="nt">VA</span> <span class="nt">20000</span>
+<span class="nt">1</span><span class="o">$:</span>     <span class="nt">MOV</span>     <span class="nt">R2</span><span class="o">,(</span><span class="nt">R0</span><span class="o">)+</span>        <span class="o">;</span><span class="nt">WRITE</span> <span class="nt">A</span> <span class="nt">WORD</span> <span class="nt">AND</span> <span class="nt">ADVANCE</span>
+        <span class="nt">CMP</span>     <span class="nt">R0</span><span class="o">,</span><span class="nt">R1</span>           <span class="o">;</span><span class="nt">AT</span> <span class="nt">END</span><span class="o">?</span>
+        <span class="nt">BNE</span>     <span class="nt">1</span><span class="o">$</span>              <span class="o">;</span><span class="nt">IF</span> <span class="nt">NOT</span><span class="o">,</span> <span class="nt">LOOP</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">20000</span><span class="o">,</span><span class="nt">R0</span>       <span class="o">;</span><span class="nt">START</span> <span class="nt">AT</span> <span class="nt">VA</span> <span class="nt">20000</span>
+<span class="nt">2</span><span class="o">$:</span>     <span class="nt">CMP</span>     <span class="o">(</span><span class="nt">R0</span><span class="o">)+,</span><span class="nt">R2</span>        <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">A</span> <span class="nt">WORD</span> <span class="nt">AND</span> <span class="nt">ADVANCE</span>
+        <span class="nt">BEQ</span>     <span class="nt">3</span><span class="o">$</span>              <span class="o">;</span><span class="nt">IF</span> <span class="nt">EXPECTED</span> <span class="nt">VALUE</span><span class="o">,</span> <span class="nt">SKIP</span> <span class="nt">AHEAD</span>
+        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRERR</span>        <span class="o">;</span><span class="nt">OTHERWISE</span><span class="o">,</span> <span class="nt">REPORT</span> <span class="nt">ERROR</span>
+<span class="nt">3</span><span class="o">$:</span>     <span class="nt">CMP</span>     <span class="nt">R0</span><span class="o">,</span><span class="nt">R1</span>           <span class="o">;</span><span class="nt">AT</span> <span class="nt">END</span><span class="o">?</span>
+        <span class="nt">BNE</span>     <span class="nt">2</span><span class="o">$</span>              <span class="o">;</span><span class="nt">IF</span> <span class="nt">NOT</span><span class="o">,</span> <span class="nt">LOOP</span>
 
-        ;----- WRITE LOCATION WITH ITS VA TEST
+        <span class="o">;</span><span class="nt">-----</span> <span class="nt">WRITE</span> <span class="nt">LOCATION</span> <span class="nt">WITH</span> <span class="nt">ITS</span> <span class="nt">VA</span> <span class="nt">TEST</span>
 
-ADDRS:  MOV     #20000,R0       ;START AT VA 20000
-1$:     MOV     R0,R2           ;USE VA AS TEST VALUE
-        MOV     R2,(R0)+        ;WRITE A WORD AND ADVANCE
-        CMP     R0,R1           ;AT END?
-        BNE     1$              ;IF NOT, LOOP
-        MOV     #20000,R0       ;START AT VA 20000
-2$:     MOV     R0,R2           ;USE VA AS TEST VALUE
-        CMP     (R0)+,R2        ;CHECK A WORD AND ADVANCE
-        BEQ     3$              ;IF EXPECTED VALUE, SKIP AHEAD
-        JSR     PC,PRERR        ;REPORT ERROR
-3$:     CMP     R0,R1           ;AT END?
-        BNE     2$
+<span class="nt">ADDRS</span><span class="o">:</span>  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">20000</span><span class="o">,</span><span class="nt">R0</span>       <span class="o">;</span><span class="nt">START</span> <span class="nt">AT</span> <span class="nt">VA</span> <span class="nt">20000</span>
+<span class="nt">1</span><span class="o">$:</span>     <span class="nt">MOV</span>     <span class="nt">R0</span><span class="o">,</span><span class="nt">R2</span>           <span class="o">;</span><span class="nt">USE</span> <span class="nt">VA</span> <span class="nt">AS</span> <span class="nt">TEST</span> <span class="nt">VALUE</span>
+        <span class="nt">MOV</span>     <span class="nt">R2</span><span class="o">,(</span><span class="nt">R0</span><span class="o">)+</span>        <span class="o">;</span><span class="nt">WRITE</span> <span class="nt">A</span> <span class="nt">WORD</span> <span class="nt">AND</span> <span class="nt">ADVANCE</span>
+        <span class="nt">CMP</span>     <span class="nt">R0</span><span class="o">,</span><span class="nt">R1</span>           <span class="o">;</span><span class="nt">AT</span> <span class="nt">END</span><span class="o">?</span>
+        <span class="nt">BNE</span>     <span class="nt">1</span><span class="o">$</span>              <span class="o">;</span><span class="nt">IF</span> <span class="nt">NOT</span><span class="o">,</span> <span class="nt">LOOP</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">20000</span><span class="o">,</span><span class="nt">R0</span>       <span class="o">;</span><span class="nt">START</span> <span class="nt">AT</span> <span class="nt">VA</span> <span class="nt">20000</span>
+<span class="nt">2</span><span class="o">$:</span>     <span class="nt">MOV</span>     <span class="nt">R0</span><span class="o">,</span><span class="nt">R2</span>           <span class="o">;</span><span class="nt">USE</span> <span class="nt">VA</span> <span class="nt">AS</span> <span class="nt">TEST</span> <span class="nt">VALUE</span>
+        <span class="nt">CMP</span>     <span class="o">(</span><span class="nt">R0</span><span class="o">)+,</span><span class="nt">R2</span>        <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">A</span> <span class="nt">WORD</span> <span class="nt">AND</span> <span class="nt">ADVANCE</span>
+        <span class="nt">BEQ</span>     <span class="nt">3</span><span class="o">$</span>              <span class="o">;</span><span class="nt">IF</span> <span class="nt">EXPECTED</span> <span class="nt">VALUE</span><span class="o">,</span> <span class="nt">SKIP</span> <span class="nt">AHEAD</span>
+        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRERR</span>        <span class="o">;</span><span class="nt">REPORT</span> <span class="nt">ERROR</span>
+<span class="nt">3</span><span class="o">$:</span>     <span class="nt">CMP</span>     <span class="nt">R0</span><span class="o">,</span><span class="nt">R1</span>           <span class="o">;</span><span class="nt">AT</span> <span class="nt">END</span><span class="o">?</span>
+        <span class="nt">BNE</span>     <span class="nt">2</span><span class="o">$</span>
 
-        ;----- &quot;RANDOM&quot; DATA TEST (PROGRAM AS TEST DATA)
+        <span class="o">;</span><span class="nt">-----</span> <span class="s2">&quot;RANDOM&quot;</span> <span class="nt">DATA</span> <span class="nt">TEST</span> <span class="o">(</span><span class="nt">PROGRAM</span> <span class="nt">AS</span> <span class="nt">TEST</span> <span class="nt">DATA</span><span class="o">)</span>
 
-RNDM:   MOV     #START,R2       ;SRC: START OF PROGRAM
-        MOV     #20000,R0       ;DST: VA 20000
-1$:     MOV     (R2)+,(R0)+     ;WRITE A WORD AND ADVANCE
-        CMP     R0,R1           ;AT END?
-        BEQ     2$              ;IF SO, SKIP AHEAD
-        CMP     R2,#END         ;TIME TO RESET SRC?
-        BLO     1$              ;IF NOT, GO DO ANOTHER
-        MOV     #START,R2       ;OTHERWISE RESET SRC
-        BR      1$              ;AND GO DO ANOTHER
-2$:     MOV     #START,R2       ;SRC1: START OF PROGRAM
-        MOV     #20000,R0       ;SRC2: VA 20000
-3$:     CMP     (R2)+,(R0)+     ;COMPARE ONE WORD AND ADVANCE
-        BEQ     4$              ;IF SAME, SKIP AHEAD
-        MOV     R2,-(SP)        ;SAVE SRC1
-        MOV     -2(R2),R2       ;FETCH EXPECTED VALUE
-        JSR     PC,PRERR        ;REPORT ERROR
-        MOV     (SP)+,R2        ;RESTORE SRC1
-4$:     CMP     R0,R1           ;AT END?
-        BEQ     5$              ;IF SO, SKIP AHEAD
-        CMP     R2,#END         ;TIME TO RESET SRC1?
-        BLO     3$              ;IF NOT, GO DO ANOTHER
-        MOV     #START,R2       ;OTHERWISE RESET SRC1
-        BR      3$              ;AND GO DO ANOTHER
+<span class="nt">RNDM</span><span class="o">:</span>   <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">START</span><span class="o">,</span><span class="nt">R2</span>       <span class="o">;</span><span class="nt">SRC</span><span class="o">:</span> <span class="nt">START</span> <span class="nt">OF</span> <span class="nt">PROGRAM</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">20000</span><span class="o">,</span><span class="nt">R0</span>       <span class="o">;</span><span class="nt">DST</span><span class="o">:</span> <span class="nt">VA</span> <span class="nt">20000</span>
+<span class="nt">1</span><span class="o">$:</span>     <span class="nt">MOV</span>     <span class="o">(</span><span class="nt">R2</span><span class="o">)+,(</span><span class="nt">R0</span><span class="o">)+</span>     <span class="o">;</span><span class="nt">WRITE</span> <span class="nt">A</span> <span class="nt">WORD</span> <span class="nt">AND</span> <span class="nt">ADVANCE</span>
+        <span class="nt">CMP</span>     <span class="nt">R0</span><span class="o">,</span><span class="nt">R1</span>           <span class="o">;</span><span class="nt">AT</span> <span class="nt">END</span><span class="o">?</span>
+        <span class="nt">BEQ</span>     <span class="nt">2</span><span class="o">$</span>              <span class="o">;</span><span class="nt">IF</span> <span class="nt">SO</span><span class="o">,</span> <span class="nt">SKIP</span> <span class="nt">AHEAD</span>
+        <span class="nt">CMP</span>     <span class="nt">R2</span><span class="o">,</span><span class="p">#</span><span class="nn">END</span>         <span class="o">;</span><span class="nt">TIME</span> <span class="nt">TO</span> <span class="nt">RESET</span> <span class="nt">SRC</span><span class="o">?</span>
+        <span class="nt">BLO</span>     <span class="nt">1</span><span class="o">$</span>              <span class="o">;</span><span class="nt">IF</span> <span class="nt">NOT</span><span class="o">,</span> <span class="nt">GO</span> <span class="nt">DO</span> <span class="nt">ANOTHER</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">START</span><span class="o">,</span><span class="nt">R2</span>       <span class="o">;</span><span class="nt">OTHERWISE</span> <span class="nt">RESET</span> <span class="nt">SRC</span>
+        <span class="nt">BR</span>      <span class="nt">1</span><span class="o">$</span>              <span class="o">;</span><span class="nt">AND</span> <span class="nt">GO</span> <span class="nt">DO</span> <span class="nt">ANOTHER</span>
+<span class="nt">2</span><span class="o">$:</span>     <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">START</span><span class="o">,</span><span class="nt">R2</span>       <span class="o">;</span><span class="nt">SRC1</span><span class="o">:</span> <span class="nt">START</span> <span class="nt">OF</span> <span class="nt">PROGRAM</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">20000</span><span class="o">,</span><span class="nt">R0</span>       <span class="o">;</span><span class="nt">SRC2</span><span class="o">:</span> <span class="nt">VA</span> <span class="nt">20000</span>
+<span class="nt">3</span><span class="o">$:</span>     <span class="nt">CMP</span>     <span class="o">(</span><span class="nt">R2</span><span class="o">)+,(</span><span class="nt">R0</span><span class="o">)+</span>     <span class="o">;</span><span class="nt">COMPARE</span> <span class="nt">ONE</span> <span class="nt">WORD</span> <span class="nt">AND</span> <span class="nt">ADVANCE</span>
+        <span class="nt">BEQ</span>     <span class="nt">4</span><span class="o">$</span>              <span class="o">;</span><span class="nt">IF</span> <span class="nt">SAME</span><span class="o">,</span> <span class="nt">SKIP</span> <span class="nt">AHEAD</span>
+        <span class="nt">MOV</span>     <span class="nt">R2</span><span class="o">,</span><span class="nt">-</span><span class="o">(</span><span class="nt">SP</span><span class="o">)</span>        <span class="o">;</span><span class="nt">SAVE</span> <span class="nt">SRC1</span>
+        <span class="nt">MOV</span>     <span class="nt">-2</span><span class="o">(</span><span class="nt">R2</span><span class="o">),</span><span class="nt">R2</span>       <span class="o">;</span><span class="nt">FETCH</span> <span class="nt">EXPECTED</span> <span class="nt">VALUE</span>
+        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRERR</span>        <span class="o">;</span><span class="nt">REPORT</span> <span class="nt">ERROR</span>
+        <span class="nt">MOV</span>     <span class="o">(</span><span class="nt">SP</span><span class="o">)+,</span><span class="nt">R2</span>        <span class="o">;</span><span class="nt">RESTORE</span> <span class="nt">SRC1</span>
+<span class="nt">4</span><span class="o">$:</span>     <span class="nt">CMP</span>     <span class="nt">R0</span><span class="o">,</span><span class="nt">R1</span>           <span class="o">;</span><span class="nt">AT</span> <span class="nt">END</span><span class="o">?</span>
+        <span class="nt">BEQ</span>     <span class="nt">5</span><span class="o">$</span>              <span class="o">;</span><span class="nt">IF</span> <span class="nt">SO</span><span class="o">,</span> <span class="nt">SKIP</span> <span class="nt">AHEAD</span>
+        <span class="nt">CMP</span>     <span class="nt">R2</span><span class="o">,</span><span class="p">#</span><span class="nn">END</span>         <span class="o">;</span><span class="nt">TIME</span> <span class="nt">TO</span> <span class="nt">RESET</span> <span class="nt">SRC1</span><span class="o">?</span>
+        <span class="nt">BLO</span>     <span class="nt">3</span><span class="o">$</span>              <span class="o">;</span><span class="nt">IF</span> <span class="nt">NOT</span><span class="o">,</span> <span class="nt">GO</span> <span class="nt">DO</span> <span class="nt">ANOTHER</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">START</span><span class="o">,</span><span class="nt">R2</span>       <span class="o">;</span><span class="nt">OTHERWISE</span> <span class="nt">RESET</span> <span class="nt">SRC1</span>
+        <span class="nt">BR</span>      <span class="nt">3</span><span class="o">$</span>              <span class="o">;</span><span class="nt">AND</span> <span class="nt">GO</span> <span class="nt">DO</span> <span class="nt">ANOTHER</span>
 
-5$:     RTS     PC              ;TESTS DONE, RETURN TO CALLER
+<span class="nt">5</span><span class="o">$:</span>     <span class="nt">RTS</span>     <span class="nt">PC</span>              <span class="o">;</span><span class="nt">TESTS</span> <span class="nt">DONE</span><span class="o">,</span> <span class="nt">RETURN</span> <span class="nt">TO</span> <span class="nt">CALLER</span>
 
-        ;----- RELOCATE
+        <span class="o">;</span><span class="nt">-----</span> <span class="nt">RELOCATE</span>
 
-RELOC:  MOV     R5,@#KIPAR1     ;MAP VA:020000 -&gt; PA:(R5&lt;&lt;6) 
-        CLR     R0              ;SRC VA:000000 
-        MOV     #20000,R1       ;DST VA:020000
-        MOV     R1,R2           ;FULL PAGE (4K WORDS)
-        MOV     (R0)+,(R1)+     ;COPY A WORD
-        SOB     R2,.-2          ;LOOP UNTIL DONE
-        MOV     R5,@#KIPAR0     ;MAP VA:000000 -&gt; PA:(R5&lt;&lt;6)
-        MOV     #RELSTR,R5      ;GET RELOCATED STRING
-        JSR     PC,PRSTR        ;PRINT IT
-        MOV     @#KIPAR1,R5     ;GET RELOCATION TARGET
-        ASHC    #6,R4           ;SHIFT OVER FOR PA IN R4:R5
-        JSR     PC,PRW18        ;PRINT IT
-        MOV     #CRLF,R5        ;GET CRLF
-        JSR     PC,PRSTR        ;PRINT IT
-        RTS     PC              ;RETURN TO CALLER
+<span class="nt">RELOC</span><span class="o">:</span>  <span class="nt">MOV</span>     <span class="nt">R5</span><span class="o">,@</span><span class="p">#</span><span class="nn">KIPAR1</span>     <span class="o">;</span><span class="nt">MAP</span> <span class="nt">VA</span><span class="p">:</span><span class="nd">020000</span> <span class="nt">-</span><span class="o">&gt;</span> <span class="nt">PA</span><span class="o">:(</span><span class="nt">R5</span><span class="o">&lt;&lt;</span><span class="nt">6</span><span class="o">)</span> 
+        <span class="nt">CLR</span>     <span class="nt">R0</span>              <span class="o">;</span><span class="nt">SRC</span> <span class="nt">VA</span><span class="p">:</span><span class="nd">000000</span> 
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">20000</span><span class="o">,</span><span class="nt">R1</span>       <span class="o">;</span><span class="nt">DST</span> <span class="nt">VA</span><span class="p">:</span><span class="nd">020000</span>
+        <span class="nt">MOV</span>     <span class="nt">R1</span><span class="o">,</span><span class="nt">R2</span>           <span class="o">;</span><span class="nt">FULL</span> <span class="nt">PAGE</span> <span class="o">(</span><span class="nt">4K</span> <span class="nt">WORDS</span><span class="o">)</span>
+        <span class="nt">MOV</span>     <span class="o">(</span><span class="nt">R0</span><span class="o">)+,(</span><span class="nt">R1</span><span class="o">)+</span>     <span class="o">;</span><span class="nt">COPY</span> <span class="nt">A</span> <span class="nt">WORD</span>
+        <span class="nt">SOB</span>     <span class="nt">R2</span><span class="o">,</span><span class="p">.</span><span class="nc">-2</span>          <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">UNTIL</span> <span class="nt">DONE</span>
+        <span class="nt">MOV</span>     <span class="nt">R5</span><span class="o">,@</span><span class="p">#</span><span class="nn">KIPAR0</span>     <span class="o">;</span><span class="nt">MAP</span> <span class="nt">VA</span><span class="p">:</span><span class="nd">000000</span> <span class="nt">-</span><span class="o">&gt;</span> <span class="nt">PA</span><span class="o">:(</span><span class="nt">R5</span><span class="o">&lt;&lt;</span><span class="nt">6</span><span class="o">)</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">RELSTR</span><span class="o">,</span><span class="nt">R5</span>      <span class="o">;</span><span class="nt">GET</span> <span class="nt">RELOCATED</span> <span class="nt">STRING</span>
+        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRSTR</span>        <span class="o">;</span><span class="nt">PRINT</span> <span class="nt">IT</span>
+        <span class="nt">MOV</span>     <span class="o">@</span><span class="p">#</span><span class="nn">KIPAR1</span><span class="o">,</span><span class="nt">R5</span>     <span class="o">;</span><span class="nt">GET</span> <span class="nt">RELOCATION</span> <span class="nt">TARGET</span>
+        <span class="nt">ASHC</span>    <span class="p">#</span><span class="nn">6</span><span class="o">,</span><span class="nt">R4</span>           <span class="o">;</span><span class="nt">SHIFT</span> <span class="nt">OVER</span> <span class="nt">FOR</span> <span class="nt">PA</span> <span class="nt">IN</span> <span class="nt">R4</span><span class="p">:</span><span class="nd">R5</span>
+        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRW18</span>        <span class="o">;</span><span class="nt">PRINT</span> <span class="nt">IT</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">CRLF</span><span class="o">,</span><span class="nt">R5</span>        <span class="o">;</span><span class="nt">GET</span> <span class="nt">CRLF</span>
+        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRSTR</span>        <span class="o">;</span><span class="nt">PRINT</span> <span class="nt">IT</span>
+        <span class="nt">RTS</span>     <span class="nt">PC</span>              <span class="o">;</span><span class="nt">RETURN</span> <span class="nt">TO</span> <span class="nt">CALLER</span>
 
-        ;----- REPORT AN ERROR
+        <span class="o">;</span><span class="nt">-----</span> <span class="nt">REPORT</span> <span class="nt">AN</span> <span class="nt">ERROR</span>
 
-PRERR:  MOV     @#KIPAR1,R5     ;GET KIPAR FOR MAPPED BASE      
-        ASHC    #6,R4           ;SHIFT OVER FOR PA IN R4:R5
-        ADD     R0,R5           ;ADD IN ERROR VA
-        ADC     R4              ;CARRY IF NECESSSARY
-        SUB     #20002,R5       ;SUB VA OFFSET AND BACK UP ONE
-        SBC     R4              ;BORROW IF NECESSARY
-        JSR     PC,PRW18        ;PRINT PHYSICAL ADDRESS
-        MOV     #DELIM1,R5      ;GET DELIMITER
-        JSR     PC,PRSTR        ;PRINT IT
-        MOV     R2,R5           ;GET EXPECTED VALUE
-        JSR     PC,PRW16        ;PRINT IT
-        MOV     #DELIM2,R5      ;GET DELIMETER
-        JSR     PC,PRSTR        ;PRINT IT
-        MOV     R0,R4           ;GET ADDRESS AFTER ERROR
-        MOV     -(R4),R5        ;BACK UP AND GET ERROR VALUE
-        JSR     PC,PRW16        ;PRINT IT
-        MOV     #CRLF,R5        ;GET CRLF
-        JSR     PC,PRSTR        ;PRINT IT
-        RTS     PC              ;RETURN TO CALLER
+<span class="nt">PRERR</span><span class="o">:</span>  <span class="nt">MOV</span>     <span class="o">@</span><span class="p">#</span><span class="nn">KIPAR1</span><span class="o">,</span><span class="nt">R5</span>     <span class="o">;</span><span class="nt">GET</span> <span class="nt">KIPAR</span> <span class="nt">FOR</span> <span class="nt">MAPPED</span> <span class="nt">BASE</span>      
+        <span class="nt">ASHC</span>    <span class="p">#</span><span class="nn">6</span><span class="o">,</span><span class="nt">R4</span>           <span class="o">;</span><span class="nt">SHIFT</span> <span class="nt">OVER</span> <span class="nt">FOR</span> <span class="nt">PA</span> <span class="nt">IN</span> <span class="nt">R4</span><span class="p">:</span><span class="nd">R5</span>
+        <span class="nt">ADD</span>     <span class="nt">R0</span><span class="o">,</span><span class="nt">R5</span>           <span class="o">;</span><span class="nt">ADD</span> <span class="nt">IN</span> <span class="nt">ERROR</span> <span class="nt">VA</span>
+        <span class="nt">ADC</span>     <span class="nt">R4</span>              <span class="o">;</span><span class="nt">CARRY</span> <span class="nt">IF</span> <span class="nt">NECESSSARY</span>
+        <span class="nt">SUB</span>     <span class="p">#</span><span class="nn">20002</span><span class="o">,</span><span class="nt">R5</span>       <span class="o">;</span><span class="nt">SUB</span> <span class="nt">VA</span> <span class="nt">OFFSET</span> <span class="nt">AND</span> <span class="nt">BACK</span> <span class="nt">UP</span> <span class="nt">ONE</span>
+        <span class="nt">SBC</span>     <span class="nt">R4</span>              <span class="o">;</span><span class="nt">BORROW</span> <span class="nt">IF</span> <span class="nt">NECESSARY</span>
+        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRW18</span>        <span class="o">;</span><span class="nt">PRINT</span> <span class="nt">PHYSICAL</span> <span class="nt">ADDRESS</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">DELIM1</span><span class="o">,</span><span class="nt">R5</span>      <span class="o">;</span><span class="nt">GET</span> <span class="nt">DELIMITER</span>
+        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRSTR</span>        <span class="o">;</span><span class="nt">PRINT</span> <span class="nt">IT</span>
+        <span class="nt">MOV</span>     <span class="nt">R2</span><span class="o">,</span><span class="nt">R5</span>           <span class="o">;</span><span class="nt">GET</span> <span class="nt">EXPECTED</span> <span class="nt">VALUE</span>
+        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRW16</span>        <span class="o">;</span><span class="nt">PRINT</span> <span class="nt">IT</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">DELIM2</span><span class="o">,</span><span class="nt">R5</span>      <span class="o">;</span><span class="nt">GET</span> <span class="nt">DELIMETER</span>
+        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRSTR</span>        <span class="o">;</span><span class="nt">PRINT</span> <span class="nt">IT</span>
+        <span class="nt">MOV</span>     <span class="nt">R0</span><span class="o">,</span><span class="nt">R4</span>           <span class="o">;</span><span class="nt">GET</span> <span class="nt">ADDRESS</span> <span class="nt">AFTER</span> <span class="nt">ERROR</span>
+        <span class="nt">MOV</span>     <span class="nt">-</span><span class="o">(</span><span class="nt">R4</span><span class="o">),</span><span class="nt">R5</span>        <span class="o">;</span><span class="nt">BACK</span> <span class="nt">UP</span> <span class="nt">AND</span> <span class="nt">GET</span> <span class="nt">ERROR</span> <span class="nt">VALUE</span>
+        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRW16</span>        <span class="o">;</span><span class="nt">PRINT</span> <span class="nt">IT</span>
+        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">CRLF</span><span class="o">,</span><span class="nt">R5</span>        <span class="o">;</span><span class="nt">GET</span> <span class="nt">CRLF</span>
+        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRSTR</span>        <span class="o">;</span><span class="nt">PRINT</span> <span class="nt">IT</span>
+        <span class="nt">RTS</span>     <span class="nt">PC</span>              <span class="o">;</span><span class="nt">RETURN</span> <span class="nt">TO</span> <span class="nt">CALLER</span>
 
-        ;----- PRINT SIX DIGIT OCTAL NUMBER
+        <span class="o">;</span><span class="nt">-----</span> <span class="nt">PRINT</span> <span class="nt">SIX</span> <span class="nt">DIGIT</span> <span class="nt">OCTAL</span> <span class="nt">NUMBER</span>
 
-PRW16:  CLR     R4              ;CLEAR UPPER WORD
-PRW18:  MOV     #6,R3           ;SIX DIGITS TO PRINT
-        ASHC    #1,R4           ;SHIFT IN MSB OF LOW WORD
-1$:     ADD     #60,R4          ;MAKE INTO ASCII DIGIT
-        MOV     R4,@#XBUF       ;PRINT IT
-        TSTB    @#XCSR          ;CHECK IF XMIT DONE
-        BPL     .-4             ;LOOP UNTIL SO
-        CLR     R4              ;RESET OUTPUT CHAR
-        ASHC    #3,R4           ;SHIFT IN NEXT THREE BITS
-        SOB     R3,1$           ;LOOP DIGITS
-        RTS     PC              ;RETURN TO CALLER
+<span class="nt">PRW16</span><span class="o">:</span>  <span class="nt">CLR</span>     <span class="nt">R4</span>              <span class="o">;</span><span class="nt">CLEAR</span> <span class="nt">UPPER</span> <span class="nt">WORD</span>
+<span class="nt">PRW18</span><span class="o">:</span>  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">6</span><span class="o">,</span><span class="nt">R3</span>           <span class="o">;</span><span class="nt">SIX</span> <span class="nt">DIGITS</span> <span class="nt">TO</span> <span class="nt">PRINT</span>
+        <span class="nt">ASHC</span>    <span class="p">#</span><span class="nn">1</span><span class="o">,</span><span class="nt">R4</span>           <span class="o">;</span><span class="nt">SHIFT</span> <span class="nt">IN</span> <span class="nt">MSB</span> <span class="nt">OF</span> <span class="nt">LOW</span> <span class="nt">WORD</span>
+<span class="nt">1</span><span class="o">$:</span>     <span class="nt">ADD</span>     <span class="p">#</span><span class="nn">60</span><span class="o">,</span><span class="nt">R4</span>          <span class="o">;</span><span class="nt">MAKE</span> <span class="nt">INTO</span> <span class="nt">ASCII</span> <span class="nt">DIGIT</span>
+        <span class="nt">MOV</span>     <span class="nt">R4</span><span class="o">,@</span><span class="p">#</span><span class="nn">XBUF</span>       <span class="o">;</span><span class="nt">PRINT</span> <span class="nt">IT</span>
+        <span class="nt">TSTB</span>    <span class="o">@</span><span class="p">#</span><span class="nn">XCSR</span>          <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">IF</span> <span class="nt">XMIT</span> <span class="nt">DONE</span>
+        <span class="nt">BPL</span>     <span class="p">.</span><span class="nc">-4</span>             <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">UNTIL</span> <span class="nt">SO</span>
+        <span class="nt">CLR</span>     <span class="nt">R4</span>              <span class="o">;</span><span class="nt">RESET</span> <span class="nt">OUTPUT</span> <span class="nt">CHAR</span>
+        <span class="nt">ASHC</span>    <span class="p">#</span><span class="nn">3</span><span class="o">,</span><span class="nt">R4</span>           <span class="o">;</span><span class="nt">SHIFT</span> <span class="nt">IN</span> <span class="nt">NEXT</span> <span class="nt">THREE</span> <span class="nt">BITS</span>
+        <span class="nt">SOB</span>     <span class="nt">R3</span><span class="o">,</span><span class="nt">1</span><span class="o">$</span>           <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">DIGITS</span>
+        <span class="nt">RTS</span>     <span class="nt">PC</span>              <span class="o">;</span><span class="nt">RETURN</span> <span class="nt">TO</span> <span class="nt">CALLER</span>
 
-        ;----- PRINT NULL-TERMINATED STRING
+        <span class="o">;</span><span class="nt">-----</span> <span class="nt">PRINT</span> <span class="nt">NULL-TERMINATED</span> <span class="nt">STRING</span>
 
-PRSTR:  MOVB    (R5)+,@#XBUF    ;PRINT ONE CHAR AND ADVANCE
-        TSTB    @#XCSR          ;CHECK IF XMIT DONE
-        BPL     .-4             ;LOOP UNTIL SO
-        TSTB    @R5             ;CHECK IF END OF STRING
-        BNE     PRSTR           ;LOOP IF NOT
-        RTS     PC              ;ELSE RETURN TO CALLER
+<span class="nt">PRSTR</span><span class="o">:</span>  <span class="nt">MOVB</span>    <span class="o">(</span><span class="nt">R5</span><span class="o">)+,@</span><span class="p">#</span><span class="nn">XBUF</span>    <span class="o">;</span><span class="nt">PRINT</span> <span class="nt">ONE</span> <span class="nt">CHAR</span> <span class="nt">AND</span> <span class="nt">ADVANCE</span>
+        <span class="nt">TSTB</span>    <span class="o">@</span><span class="p">#</span><span class="nn">XCSR</span>          <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">IF</span> <span class="nt">XMIT</span> <span class="nt">DONE</span>
+        <span class="nt">BPL</span>     <span class="p">.</span><span class="nc">-4</span>             <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">UNTIL</span> <span class="nt">SO</span>
+        <span class="nt">TSTB</span>    <span class="p">@</span><span class="k">R5</span>             <span class="p">;</span><span class="nt">CHECK</span> <span class="nt">IF</span> <span class="nt">END</span> <span class="nt">OF</span> <span class="nt">STRING</span>
+        <span class="nt">BNE</span>     <span class="nt">PRSTR</span>           <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">IF</span> <span class="nt">NOT</span>
+        <span class="nt">RTS</span>     <span class="nt">PC</span>              <span class="o">;</span><span class="nt">ELSE</span> <span class="nt">RETURN</span> <span class="nt">TO</span> <span class="nt">CALLER</span>
 
-IPDRS:  .WORD   077406,077406,077406,077406
-        .WORD   077406,000000,000000,077406
+<span class="nt">IPDRS</span><span class="o">:</span>  <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">077406</span><span class="o">,</span><span class="nt">077406</span><span class="o">,</span><span class="nt">077406</span><span class="o">,</span><span class="nt">077406</span>
+        <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">077406</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">077406</span>
 
-IPARS:  .WORD   000000,000200,000400,000600
-        .WORD   001000,000000,000000,007600
+<span class="nt">IPARS</span><span class="o">:</span>  <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">000000</span><span class="o">,</span><span class="nt">000200</span><span class="o">,</span><span class="nt">000400</span><span class="o">,</span><span class="nt">000600</span>
+        <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">001000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">007600</span>
 
-DELIM1: .ASCIZ  /: /            ;POST-ADDRESS DELIMETER
-DELIM2: .ASCIZ  / /             ;POST-CRC DELIMETER
-CRLF:   .ASCIZ  &lt;15&gt;&lt;12&gt;        ;LINE DELIMETER
-RELSTR: .ASCIZ  /RELOCATED TO PA:/
-PCOMPL: .ASCIZ  /PASS COMPLETED/&lt;15&gt;&lt;12&gt;&lt;15&gt;&lt;12&gt;
+<span class="nt">DELIM1</span><span class="o">:</span> <span class="p">.</span><span class="nc">ASCIZ</span>  <span class="o">/:</span> <span class="o">/</span>            <span class="o">;</span><span class="nt">POST-ADDRESS</span> <span class="nt">DELIMETER</span>
+<span class="nt">DELIM2</span><span class="o">:</span> <span class="p">.</span><span class="nc">ASCIZ</span>  <span class="o">/</span> <span class="o">/</span>             <span class="o">;</span><span class="nt">POST-CRC</span> <span class="nt">DELIMETER</span>
+<span class="nt">CRLF</span><span class="o">:</span>   <span class="p">.</span><span class="nc">ASCIZ</span>  <span class="o">&lt;</span><span class="nt">15</span><span class="o">&gt;&lt;</span><span class="nt">12</span><span class="o">&gt;</span>        <span class="o">;</span><span class="nt">LINE</span> <span class="nt">DELIMETER</span>
+<span class="nt">RELSTR</span><span class="o">:</span> <span class="p">.</span><span class="nc">ASCIZ</span>  <span class="o">/</span><span class="nt">RELOCATED</span> <span class="nt">TO</span> <span class="nt">PA</span><span class="o">:/</span>
+<span class="nt">PCOMPL</span><span class="o">:</span> <span class="p">.</span><span class="nc">ASCIZ</span>  <span class="o">/</span><span class="nt">PASS</span> <span class="nt">COMPLETED</span><span class="o">/&lt;</span><span class="nt">15</span><span class="o">&gt;&lt;</span><span class="nt">12</span><span class="o">&gt;&lt;</span><span class="nt">15</span><span class="o">&gt;&lt;</span><span class="nt">12</span><span class="o">&gt;</span>
 
-END:    .END    START
+<span class="nt">END</span><span class="o">:</span>    <span class="p">.</span><span class="nc">END</span>    <span class="nt">START</span>
 </pre></div>
-
+</td></tr></table>
 
 <p>The code above is the end result of quite a bit of successive refinement.  Things learned along the way:</p>
 <ul>
 <li>
 <p>At first the tests consisted only of writing and checking all-ones and all-zeros to each location.  This did
-uncover one more bank with a stuck bit at only some addresses, that my previous spot-checking had missed.
-Lesson: you really gotta check every byte.  Removed, socketed, and replaced the implicated DRAM, and my tests
-passed.</p>
+  uncover one more bank with a stuck bit at only some addresses, that my previous spot-checking had missed.
+  Lesson: you really gotta check every byte.  Removed, socketed, and replaced the implicated DRAM, and my
+  tests passed.</p>
 </li>
 <li>
 <p>Maybe I fixed it, so after this I invested the download time to try the the DEC ZQMC diagnostic again.  It
-ran better than I had seen before, proceeding through a few subtests, but soon started flagging a lot of
-errors that my diagnostic missed. Hmmm.  Inspecting the DEC code, it seemed to be writing and checking random
-data at the time, not just all ones an zeros.  Went ahead and implemented "random" data test in my diagnostic,
-and it immediately started implicating the same chips.  Lesson: all-ones, all-zeros isn't good enough...</p>
+  ran better than I had seen before, proceeding through a few subtests, but soon started flagging a lot of
+  errors that my diagnostic missed. Hmmm.  Inspecting the DEC code, it seemed to be writing and checking
+  random data at the time, not just all ones an zeros.  Went ahead and implemented "random" data test in my
+  diagnostic, and it immediately started implicating the same chips.  Lesson: all-ones, all-zeros isn't good
+  enough...</p>
 </li>
 <li>
 <p>While I was at it, I implemented an additional "write/check each byte with its virtual address" test.
-Interestingly, this found <em>most</em>, but not <em>all</em> of the same chips as the random data test.  Lesson: all-ones,
-all-zeros, and address in each word isn't good enough, either; you really do gotta have that "random" data
-test, too. At this point, went ahead and replaced three more implicated DRAMS, and my tests once again passed
-clean...</p>
+  Interestingly, this found <em>most</em>, but not <em>all</em> of the same chips as the random data test.  Lesson:
+  all-ones, all-zeros, and address in each word isn't good enough, either; you really do gotta have that
+  "random" data test, too. At this point, went ahead and replaced three more implicated DRAMS, and my tests
+  once again passed clean...</p>
 </li>
 <li>
 <p>In the meantime, I did some more code reading on the DEC diagnostic, and found that various features could
-be enabled/disabled via the front panel switches.  With some care, the diagnostic might also be restartable
-without having to wait for an entire re-download, if stopped carefully and in the right place.  So I spent the
-time to re-download, and found with experimentation that the DEC diagnostic would now pass all banks of memory
-cleanly, as long as <em>parity checking was disabled</em>.  Hmm...</p>
+  be enabled/disabled via the front panel switches.  With some care, the diagnostic might also be restartable
+  without having to wait for an entire re-download, if stopped carefully and in the right place.  So I spent
+  the time to re-download, and found with experimentation that the DEC diagnostic would now pass all banks of
+  memory cleanly, as long as <em>parity checking was disabled</em>.  Hmm...</p>
 </li>
 <li>
 <p>Moving back to my diagnostic, I noticed that while it ran clean now on all banks, on a fresh power-up it
-would usually light the parity-error LED on the MS11-L on its first pass.  Subsequent passes, after every
-location had been written at least once, were fine.  Since the MS11-L doesn't have any fancy power-up init
-logic, it would make sense to see this if the program read locations without writing them first, but I didn't
-think my code did that.  Enabling parity traps let me catch it in the act, and it was happening on a <code>CLR</code>
-instruction that I was using to init memory!  Lesson: on an 11/45, <code>CLR</code> is implemented like other single-
-operand, modifying instructions, and actually does a DATIP bus cycle from the destination before writing back
-a zero!  So use <code>MOV</code> instead of <code>CLR</code> to init memory if you are worried about tripping parity errors...
-Cleaned this up in my code, and my diagnostic now runs clean on my machine in all circumstances without ever
-tripping a parity error.</p>
+  would usually light the parity-error LED on the MS11-L on its first pass.  Subsequent passes, after every
+  location had been written at least once, were fine.  Since the MS11-L doesn't have any fancy power-up init
+  logic, it would make sense to see this if the program read locations without writing them first, but I
+  didn't think my code did that.  Enabling parity traps let me catch it in the act, and it was happening on a
+  <code>CLR</code> instruction that I was using to init memory!  Lesson: on an 11/45, <code>CLR</code> is implemented like other
+  single- operand, modifying instructions, and actually does a DATIP bus cycle from the destination before
+  writing back a zero!  So use <code>MOV</code> instead of <code>CLR</code> to init memory if you are worried about tripping parity
+  errors... Cleaned this up in my code, and my diagnostic now runs clean on my machine in all circumstances
+  without ever tripping a parity error.</p>
 </li>
 </ul>
 <p>So, a lot of issues found and repaired on the MS11-L.  Maybe still some issues with parity error handling,

@@ -136,7 +136,54 @@ TIMOUT,PC=004536
 
 
 <p>And the relevant bit of the diagnostic listing:</p>
-<div class="highlight"><pre><span></span>014362  2$:     MOV     RKVEC,R1
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48</pre></div></td><td class="code"><div class="highlight"><pre><span></span>014362  2$:     MOV     RKVEC,R1
 014366          MOV     #3$,(R1)+               ;SET UP VECTOR ADRES FOR RK11 INTERUPT
 014372          MOV     #340,(R1)               ;SET UP PSW ON INTERRUPT
 014376          BIS     #40,@RKDA               ;ADRES CYLINDER #1
@@ -185,7 +232,7 @@ TIMOUT,PC=004536
 014526          ERROR   53                      ;SCP DID NOT SET AFTER RK11 INTERRUPTED
                                                 ;INDICATING SEEK WAS
 </pre></div>
-
+</td></tr></table>
 
 <p>So, based on the fact that we don't hit error 75 from 14426 (and the fact that the previous test, #36, in
 this diagnostic is passing) unlike some previous issues the RK11 here <em>is</em> able to generate interrupts and the
