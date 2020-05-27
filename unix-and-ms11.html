@@ -105,7 +105,7 @@ successively refining the following test code, and repairing identified problems
 along the way.  This code maps and tests every memory location on the MS11-L, using KT11 memory management.
 It relocates itself so it can test the lowest physical bank as well.  Tests include all-ones, all-zeros,
 write address to location, and a "random" data test which just uses program code test sequence:</p>
-<div class="highlight"><pre><span></span><code>        KIPDR0=172300
+<div class="highlight"><pre><span></span>        KIPDR0=172300
         KIPDR1=172302
         KIPDR2=172304
         KIPDR3=172306
@@ -354,7 +354,7 @@ RELSTR: .ASCIZ  /RELOCATED TO PA:/
 PCOMPL: .ASCIZ  /PASS COMPLETED/&lt;15&gt;&lt;12&gt;&lt;15&gt;&lt;12&gt;
 
 END:    .END    START
-</code></pre></div>
+</pre></div>
 
 
 <p>The code above is the end result of quite a bit of successive refinement.  Things learned along the way:</p>

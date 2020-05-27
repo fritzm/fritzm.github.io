@@ -96,10 +96,10 @@ go ready again almost immediately.</p>
 establishes consistent preconditions (shift register full, buffer empty) before the BIS.  Success rate went to 100%:</p>
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
 2
-3</pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="err">        MOV     #40,@#177566    ;ENSURE XMIT SHIFT REGISTER HAS SOMETHING TO CHEW ON</span>
-<span class="c">L0:     TSTB    @#TTCSR         ;CHECK XMIT BUFFER</span>
-<span class="c">        BPL     L0              ;LOOP UNTIL READY, ENSURES INT IMMEDIATELY AFTER BIS</span>
-</code></pre></div>
+3</pre></div></td><td class="code"><div class="highlight"><pre><span></span>        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">40</span><span class="o">,@</span><span class="p">#</span><span class="nn">177566</span>    <span class="o">;</span><span class="nt">ENSURE</span> <span class="nt">XMIT</span> <span class="nt">SHIFT</span> <span class="nt">REGISTER</span> <span class="nt">HAS</span> <span class="nt">SOMETHING</span> <span class="nt">TO</span> <span class="nt">CHEW</span> <span class="nt">ON</span>
+<span class="nt">L0</span><span class="o">:</span>     <span class="nt">TSTB</span>    <span class="o">@</span><span class="p">#</span><span class="nn">TTCSR</span>         <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">XMIT</span> <span class="nt">BUFFER</span>
+        <span class="nt">BPL</span>     <span class="nt">L0</span>              <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">UNTIL</span> <span class="nt">READY</span><span class="o">,</span> <span class="nt">ENSURES</span> <span class="nt">INT</span> <span class="nt">IMMEDIATELY</span> <span class="nt">AFTER</span> <span class="nt">BIS</span>
+</pre></div>
 </td></tr></table>
 
 <p>I then further verified that the unmodified original diagnostic suite passes 100% if I turn the M7800 down to 4800

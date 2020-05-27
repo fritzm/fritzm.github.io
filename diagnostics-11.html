@@ -99,24 +99,24 @@ end up incorrectly set in the result at D3:</p>
 14
 15
 16
-17</pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="err">        000000                          AC0=%0</span>
-<span class="err">        000001                          AC1=%1</span>
-<span class="err">000000                                  .ASECT</span>
-<span class="err">        001000                          .=1000</span>
-<span class="err">001000  170011                  START:  SETD                ;SET DOUBLE PRECISION MODE</span>
-<span class="err">001002  172467  000014                  LDD     D1,AC0      ;FETCH FIRST ADDEND FROM D1</span>
-<span class="err">001006  172567  000020                  LDD     D2,AC1      ;FETCH SECOND ADDEND FROM D2</span>
-<span class="err">001012  172100                          ADDD    AC0,AC1     ;ADD THEM (RESULT IN AC1)</span>
-<span class="err">001014  174167  000022                  STD     AC1,D3      ;STORE RESULT TO D3</span>
-<span class="err">001020  000000                          HALT</span>
-<span class="err">001022  040200  000000  000000  D1:     .WORD   040000,000000,000000,000000 ;0.5</span>
-<span class="err">001030  000000</span>
-<span class="err">001032  040200  000000  000000  D2:     .WORD   040000,000000,000000,000000 ;0.5</span>
-<span class="err">001040  000000</span>
-<span class="err">001042  000000  000000  000000  D3:     .WORD   000000,000000,000000,000000</span>
-<span class="err">001050  000000</span>
-<span class="err">        001000                          .END    START</span>
-</code></pre></div>
+17</pre></div></td><td class="code"><div class="highlight"><pre><span></span>        <span class="nt">000000</span>                          <span class="nt">AC0</span><span class="o">=%</span><span class="nt">0</span>
+        <span class="nt">000001</span>                          <span class="nt">AC1</span><span class="o">=%</span><span class="nt">1</span>
+<span class="nt">000000</span>                                  <span class="p">.</span><span class="nc">ASECT</span>
+        <span class="nt">001000</span>                          <span class="o">.=</span><span class="nt">1000</span>
+<span class="nt">001000</span>  <span class="nt">170011</span>                  <span class="nt">START</span><span class="o">:</span>  <span class="nt">SETD</span>                <span class="o">;</span><span class="nt">SET</span> <span class="nt">DOUBLE</span> <span class="nt">PRECISION</span> <span class="nt">MODE</span>
+<span class="nt">001002</span>  <span class="nt">172467</span>  <span class="nt">000014</span>                  <span class="nt">LDD</span>     <span class="nt">D1</span><span class="o">,</span><span class="nt">AC0</span>      <span class="o">;</span><span class="nt">FETCH</span> <span class="nt">FIRST</span> <span class="nt">ADDEND</span> <span class="nt">FROM</span> <span class="nt">D1</span>
+<span class="nt">001006</span>  <span class="nt">172567</span>  <span class="nt">000020</span>                  <span class="nt">LDD</span>     <span class="nt">D2</span><span class="o">,</span><span class="nt">AC1</span>      <span class="o">;</span><span class="nt">FETCH</span> <span class="nt">SECOND</span> <span class="nt">ADDEND</span> <span class="nt">FROM</span> <span class="nt">D2</span>
+<span class="nt">001012</span>  <span class="nt">172100</span>                          <span class="nt">ADDD</span>    <span class="nt">AC0</span><span class="o">,</span><span class="nt">AC1</span>     <span class="o">;</span><span class="nt">ADD</span> <span class="nt">THEM</span> <span class="o">(</span><span class="nt">RESULT</span> <span class="nt">IN</span> <span class="nt">AC1</span><span class="o">)</span>
+<span class="nt">001014</span>  <span class="nt">174167</span>  <span class="nt">000022</span>                  <span class="nt">STD</span>     <span class="nt">AC1</span><span class="o">,</span><span class="nt">D3</span>      <span class="o">;</span><span class="nt">STORE</span> <span class="nt">RESULT</span> <span class="nt">TO</span> <span class="nt">D3</span>
+<span class="nt">001020</span>  <span class="nt">000000</span>                          <span class="nt">HALT</span>
+<span class="nt">001022</span>  <span class="nt">040200</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D1</span><span class="o">:</span>     <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">040000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span> <span class="o">;</span><span class="nt">0</span><span class="p">.</span><span class="nc">5</span>
+<span class="nt">001030</span>  <span class="nt">000000</span>
+<span class="nt">001032</span>  <span class="nt">040200</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D2</span><span class="o">:</span>     <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">040000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span> <span class="o">;</span><span class="nt">0</span><span class="p">.</span><span class="nc">5</span>
+<span class="nt">001040</span>  <span class="nt">000000</span>
+<span class="nt">001042</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D3</span><span class="o">:</span>     <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span>
+<span class="nt">001050</span>  <span class="nt">000000</span>
+        <span class="nt">001000</span>                          <span class="p">.</span><span class="nc">END</span>    <span class="nt">START</span>
+</pre></div>
 </td></tr></table>
 
 <p>So, the usual procedure: KM11 in the floating point slot, and FRL (where these bits are handled) out on

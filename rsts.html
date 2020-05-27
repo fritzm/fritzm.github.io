@@ -122,21 +122,21 @@ and provide a space for it in the memory map.  After that, at ^P at the console 
 prompt. </p>
 </li>
 </ul>
-<div class="highlight"><pre><span></span><code>   Memory allocation table:
+<div class="highlight"><pre><span></span>   Memory allocation table:
 
      0K: 00000000 - 00123777 (  21K) : EXEC
     21K: 00124000 - 00213777 (  14K) : RTS (BASIC)
     35K: 00214000 - 00227777 (   3K) : ODT
     38K: 00230000 - 00757777 (  86K) : USER
    124K: 00760000 - End              : NXM
-</code></pre></div>
+</pre></div>
 
 
 <ul>
 <li>A handy way to query the RSTS symbol table is to use the "PATCH" command at the boot prompt (one can also
 look through the .MAP files generated during sysgen):</li>
 </ul>
-<div class="highlight"><pre><span></span><code>   Option: PA
+<div class="highlight"><pre><span></span>   Option: PA
    File to patch? 
    Module name? 
    Base address? ERL
@@ -145,13 +145,13 @@ look through the .MAP files generated during sysgen):</li>
    041314  000000  005267  ? ^Z
    Offset address? ^Z
    Base address? 
-</code></pre></div>
+</pre></div>
 
 
 <ul>
 <li>Paul also provided this procedure for triggering a crash dump from an ODT breakpoint under RSTS:</li>
 </ul>
-<div class="highlight"><pre><span></span><code>1. Make sure crash dump is enabled (in the &quot;default&quot; option).  Start the system.  Let it run for at least one minute.  (I&#39;m not entirely sure about older versions, but I think that a crash within one minute of startup is handled differently and doesn&#39;t do all the usual dump and restart machinery.)
+<div class="highlight"><pre><span></span>1. Make sure crash dump is enabled (in the &quot;default&quot; option).  Start the system.  Let it run for at least one minute.  (I&#39;m not entirely sure about older versions, but I think that a crash within one minute of startup is handled differently and doesn&#39;t do all the usual dump and restart machinery.)
 
 2. Set the data switches all UP.  (In SIMH, enter &quot;D SR 177777&quot;.)
 
@@ -168,7 +168,7 @@ look through the .MAP files generated during sysgen):</li>
   The system will write the crashdump and then automatically restart.
 
 5. You should now have the crash dump in [0,1]CRASH.SYS
-</code></pre></div>
+</pre></div>
 
 
 <p>Further experiments coordinated by Paul then led to the conclusion that an error like this could reasonably be
@@ -176,7 +176,7 @@ expected to be triggered by a corrupted INIT.BAC or BASIC.RTS file.  This led me
 disk pack contents really matched the image file I was running successfully under simh.  Some standalone code
 to dump a CRC of every sector on the pack seemed like it would be useful in this regard, so I coded up the
 following:</p>
-<div class="highlight"><pre><span></span><code>        RKDS=177400
+<div class="highlight"><pre><span></span>        RKDS=177400
         RKER=177402
         RKCS=177404
         RKWC=177406
@@ -307,7 +307,7 @@ CRCTBL: .BLKW   400             ;CRC LOOKUP TABLE
 DBUF:   .BLKW   4000            ;DISK DATA BUFFER
 
         .END    START
-</code></pre></div>
+</pre></div>
 
 
 <p>Running this indicated the RSTS pack was in good shape, and not corrupt.  So, maybe I have had a lurking

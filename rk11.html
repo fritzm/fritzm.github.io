@@ -101,18 +101,18 @@ appropriate replacement connectors.</p>
 pass diagnostics loaded via PDP11GUI.  So, Unibus still working with the BC11 cable in place and termination
 out at the RK11.</p>
 <p>Started in with diagnostic ZRKJE0.BIC, which is the controller-only static test.  This indicated:</p>
-<div class="highlight"><pre><span></span><code><span class="err">REGISTER NOT CLEARED</span>
-<span class="err">  PC   REGADD    RECVD</span>
-<span class="err">002560  177416  040000</span>
-</code></pre></div>
+<div class="highlight"><pre><span></span>REGISTER NOT CLEARED
+  PC   REGADD    RECVD
+002560  177416  040000
+</pre></div>
 
 
 <p>This is the RKDB register, implemented by two M203 R/S flip-flop modules in slots A21 and B21 (see sheet
 RK11-C-10 in the RK11-C engineering drawings).  Swapped these, and the stuck bit moved to the other half of
 of the register, so looks like failed gate.  Pulled, socketed, replaced, and diagnostic no longer reports
 any stuck bits.  Next diagnostic fail is:</p>
-<div class="highlight"><pre><span></span><code><span class="err">UNEXPECTED TIME OUT AT PC=004300</span>
-</code></pre></div>
+<div class="highlight"><pre><span></span>UNEXPECTED TIME OUT AT PC=004300
+</pre></div>
 
 
 <p>This is test #21 of the diagnostic, testing controller reset.  Will need to do some reading up on the design

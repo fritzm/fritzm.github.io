@@ -249,8 +249,8 @@ will get you started.</p>
 <p>My machine currently has one MS11-L, which has the newer CSR layout referred to by Paul above (different
 than the much older MS11-B/C CSR layout depicted at the top of this article; see MS11-L docs for further
 details). RSTS init defaults-&gt;memory-&gt;parity on my system reports (correctly):</p>
-<div class="highlight"><pre><span></span><code> 0K: 00000000 - 00757777 ( 124K) : 00
-</code></pre></div>
+<div class="highlight"><pre><span></span> 0K: 00000000 - 00757777 ( 124K) : 00
+</pre></div>
 
 
 <p>Presumeably, RSTS carries out this identification activity with the CSR report enable bits off, and the
@@ -350,7 +350,7 @@ successively refining the following test code, and repairing identified problems
 along the way.  This code maps and tests every memory location on the MS11-L, using KT11 memory management.
 It relocates itself so it can test the lowest physical bank as well.  Tests include all-ones, all-zeros,
 write address to location, and a "random" data test which just uses program code test sequence:</p>
-<div class="highlight"><pre><span></span><code>        KIPDR0=172300
+<div class="highlight"><pre><span></span>        KIPDR0=172300
         KIPDR1=172302
         KIPDR2=172304
         KIPDR3=172306
@@ -599,7 +599,7 @@ RELSTR: .ASCIZ  /RELOCATED TO PA:/
 PCOMPL: .ASCIZ  /PASS COMPLETED/&lt;15&gt;&lt;12&gt;&lt;15&gt;&lt;12&gt;
 
 END:    .END    START
-</code></pre></div>
+</pre></div>
 
 
 <p>The code above is the end result of quite a bit of successive refinement.  Things learned along the way:</p>
@@ -717,21 +717,21 @@ and provide a space for it in the memory map.  After that, at ^P at the console 
 prompt. </p>
 </li>
 </ul>
-<div class="highlight"><pre><span></span><code>   Memory allocation table:
+<div class="highlight"><pre><span></span>   Memory allocation table:
 
      0K: 00000000 - 00123777 (  21K) : EXEC
     21K: 00124000 - 00213777 (  14K) : RTS (BASIC)
     35K: 00214000 - 00227777 (   3K) : ODT
     38K: 00230000 - 00757777 (  86K) : USER
    124K: 00760000 - End              : NXM
-</code></pre></div>
+</pre></div>
 
 
 <ul>
 <li>A handy way to query the RSTS symbol table is to use the "PATCH" command at the boot prompt (one can also
 look through the .MAP files generated during sysgen):</li>
 </ul>
-<div class="highlight"><pre><span></span><code>   Option: PA
+<div class="highlight"><pre><span></span>   Option: PA
    File to patch? 
    Module name? 
    Base address? ERL
@@ -740,13 +740,13 @@ look through the .MAP files generated during sysgen):</li>
    041314  000000  005267  ? ^Z
    Offset address? ^Z
    Base address? 
-</code></pre></div>
+</pre></div>
 
 
 <ul>
 <li>Paul also provided this procedure for triggering a crash dump from an ODT breakpoint under RSTS:</li>
 </ul>
-<div class="highlight"><pre><span></span><code>1. Make sure crash dump is enabled (in the &quot;default&quot; option).  Start the system.  Let it run for at least one minute.  (I&#39;m not entirely sure about older versions, but I think that a crash within one minute of startup is handled differently and doesn&#39;t do all the usual dump and restart machinery.)
+<div class="highlight"><pre><span></span>1. Make sure crash dump is enabled (in the &quot;default&quot; option).  Start the system.  Let it run for at least one minute.  (I&#39;m not entirely sure about older versions, but I think that a crash within one minute of startup is handled differently and doesn&#39;t do all the usual dump and restart machinery.)
 
 2. Set the data switches all UP.  (In SIMH, enter &quot;D SR 177777&quot;.)
 
@@ -763,7 +763,7 @@ look through the .MAP files generated during sysgen):</li>
   The system will write the crashdump and then automatically restart.
 
 5. You should now have the crash dump in [0,1]CRASH.SYS
-</code></pre></div>
+</pre></div>
 
 
 <p>Further experiments coordinated by Paul then led to the conclusion that an error like this could reasonably be
@@ -771,7 +771,7 @@ expected to be triggered by a corrupted INIT.BAC or BASIC.RTS file.  This led me
 disk pack contents really matched the image file I was running successfully under simh.  Some standalone code
 to dump a CRC of every sector on the pack seemed like it would be useful in this regard, so I coded up the
 following:</p>
-<div class="highlight"><pre><span></span><code>        RKDS=177400
+<div class="highlight"><pre><span></span>        RKDS=177400
         RKER=177402
         RKCS=177404
         RKWC=177406
@@ -902,7 +902,7 @@ CRCTBL: .BLKW   400             ;CRC LOOKUP TABLE
 DBUF:   .BLKW   4000            ;DISK DATA BUFFER
 
         .END    START
-</code></pre></div>
+</pre></div>
 
 
 <p>Running this indicated the RSTS pack was in good shape, and not corrupt.  So, maybe I have had a lurking
@@ -959,7 +959,7 @@ guess RT-11 makes use of this feature.</p>
 <p>I got the machine home and reassembled, and verified that the problem was still manifesting.  Then many months
 passed, until I found some time to dig deeper into the problem just last night.  The relevant failing
 diagnostic is ZRKK test 37, and the output is:</p>
-<div class="highlight"><pre><span></span><code>DRIVE 0
+<div class="highlight"><pre><span></span>DRIVE 0
 
 RK11 DIDN&#39;T INTRUPT AFTER SK COMPLETED
   PC     RKCS    RKER    RKDS
@@ -982,59 +982,59 @@ SCP DIDN&#39;T SET AFTER SEEK WAS DONE
 
 
 TIMOUT,PC=004536
-</code></pre></div>
+</pre></div>
 
 
 <p>And the relevant bit of the diagnostic listing:</p>
-<div class="highlight"><pre><span></span><code><span class="mi">014362</span><span class="w">  </span><span class="mi">2</span><span class="err">$:</span><span class="w">     </span><span class="n">MOV</span><span class="w">     </span><span class="n">RKVEC</span><span class="p">,</span><span class="n">R1</span><span class="w"></span>
-<span class="mi">014366</span><span class="w">          </span><span class="n">MOV</span><span class="w">     </span><span class="n">#3</span><span class="err">$</span><span class="p">,(</span><span class="n">R1</span><span class="p">)</span><span class="o">+</span><span class="w">               </span><span class="p">;</span><span class="k">SET</span><span class="w"> </span><span class="n">UP</span><span class="w"> </span><span class="n">VECTOR</span><span class="w"> </span><span class="n">ADRES</span><span class="w"> </span><span class="k">FOR</span><span class="w"> </span><span class="n">RK11</span><span class="w"> </span><span class="n">INTERUPT</span><span class="w"></span>
-<span class="mi">014372</span><span class="w">          </span><span class="n">MOV</span><span class="w">     </span><span class="n">#340</span><span class="p">,(</span><span class="n">R1</span><span class="p">)</span><span class="w">               </span><span class="p">;</span><span class="k">SET</span><span class="w"> </span><span class="n">UP</span><span class="w"> </span><span class="n">PSW</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">INTERRUPT</span><span class="w"></span>
-<span class="mi">014376</span><span class="w">          </span><span class="n">BIS</span><span class="w">     </span><span class="n">#40</span><span class="p">,</span><span class="nv">@RKDA</span><span class="w">               </span><span class="p">;</span><span class="n">ADRES</span><span class="w"> </span><span class="n">CYLINDER</span><span class="w"> </span><span class="n">#1</span><span class="w"></span>
-<span class="mi">014404</span><span class="w">          </span><span class="n">MOV</span><span class="w">     </span><span class="n">#111</span><span class="p">,</span><span class="nv">@R0</span><span class="w">                </span><span class="p">;</span><span class="n">SEEK</span><span class="p">,</span><span class="w"> </span><span class="k">GO</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="n">IDE</span><span class="w"> </span><span class="k">SET</span><span class="w"></span>
-<span class="mi">014410</span><span class="w">          </span><span class="n">WAT</span><span class="p">.</span><span class="nc">INT</span><span class="w"> </span><span class="p">,</span><span class="mi">300</span><span class="w">                    </span><span class="p">;</span><span class="n">WAIT</span><span class="w"> </span><span class="k">FOR</span><span class="w"> </span><span class="n">THE</span><span class="w"> </span><span class="n">DRIVE</span><span class="w"> </span><span class="k">TO</span><span class="w"></span>
-<span class="w">                                                </span><span class="p">;</span><span class="n">INTERRUPT</span><span class="w"> </span><span class="k">AFTER</span><span class="w"> </span><span class="n">ADRES</span><span class="w"> </span><span class="n">WAS</span><span class="w"> </span><span class="n">RECVD</span><span class="w"></span>
-<span class="w">                                                </span><span class="p">;</span><span class="n">WAITING</span><span class="w"> </span><span class="nc">TIME</span><span class="o">=</span><span class="w"> </span><span class="mf">1.4</span><span class="w"> </span><span class="n">MS</span><span class="w"> </span><span class="k">FOR</span><span class="w"> </span><span class="mi">11</span><span class="o">/</span><span class="mi">20</span><span class="w"></span>
-<span class="w">                                                </span><span class="p">;</span><span class="mi">280</span><span class="w"> </span><span class="n">US</span><span class="w"> </span><span class="k">FOR</span><span class="w"> </span><span class="mi">11</span><span class="o">/</span><span class="mi">45</span><span class="w"></span>
-<span class="w">                                                </span><span class="p">;</span><span class="n">ERROR</span><span class="p">,</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="n">INTERUPT</span><span class="w"> </span><span class="n">DID</span><span class="w"> </span><span class="ow">NOT</span><span class="w"> </span><span class="n">OCCUR</span><span class="w"></span>
-<span class="w">                                                </span><span class="p">;</span><span class="k">BY</span><span class="w"> </span><span class="n">NOW</span><span class="w"></span>
-<span class="mi">014414</span><span class="w">          </span><span class="n">MOV</span><span class="w">     </span><span class="n">#BADINT</span><span class="p">,</span><span class="nv">@RKVEC</span><span class="w">          </span><span class="p">;</span><span class="k">RESTORE</span><span class="w"> </span><span class="n">UNEXPECTED</span><span class="w"> </span><span class="n">RK11</span><span class="w"> </span><span class="n">INTERRUPT</span><span class="w"></span>
-<span class="mi">014422</span><span class="w">          </span><span class="n">MOV</span><span class="w">     </span><span class="nv">@R0</span><span class="p">,</span><span class="err">$</span><span class="n">REG0</span><span class="w">               </span><span class="p">;</span><span class="k">GET</span><span class="w"> </span><span class="n">RKCS</span><span class="w"></span>
-<span class="mi">014426</span><span class="w">          </span><span class="n">ERROR</span><span class="w">   </span><span class="mi">75</span><span class="w">                      </span><span class="p">;</span><span class="n">INTERRUPT</span><span class="w"> </span><span class="n">DID</span><span class="w"> </span><span class="ow">NOT</span><span class="w"> </span><span class="n">OCCUR</span><span class="w"> </span><span class="k">AFTER</span><span class="w"></span>
-<span class="w">                                                </span><span class="p">;</span><span class="n">SEEK</span><span class="w"> </span><span class="n">WAS</span><span class="w"> </span><span class="n">INITIATED</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="n">IDE</span><span class="w"> </span><span class="k">SET</span><span class="w"></span>
-<span class="mi">014430</span><span class="w">          </span><span class="n">BR</span><span class="w">      </span><span class="mi">3</span><span class="err">$</span><span class="o">+</span><span class="mi">4</span><span class="w"></span>
-<span class="mi">014432</span><span class="w">  </span><span class="mi">3</span><span class="err">$:</span><span class="w">     </span><span class="n">CMP</span><span class="w">     </span><span class="p">(</span><span class="n">SP</span><span class="p">)</span><span class="o">+</span><span class="p">,(</span><span class="n">SP</span><span class="p">)</span><span class="o">+</span><span class="w">             </span><span class="p">;</span><span class="n">OK</span><span class="p">,</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="n">RK11</span><span class="w"> </span><span class="n">INTERRUPTED</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="n">THIS</span><span class="w"></span>
-<span class="w">                                                </span><span class="p">;</span><span class="k">RESTORE</span><span class="w"> </span><span class="n">STACK</span><span class="w"> </span><span class="n">POINTER</span><span class="w"> </span><span class="p">(</span><span class="k">FROM</span><span class="w"> </span><span class="n">RK11</span><span class="w"> </span><span class="n">INTERRUPT</span><span class="p">)</span><span class="w"></span>
-<span class="mi">014434</span><span class="w">          </span><span class="n">CMP</span><span class="w">     </span><span class="p">(</span><span class="n">SP</span><span class="p">)</span><span class="o">+</span><span class="p">,(</span><span class="n">SP</span><span class="p">)</span><span class="o">+</span><span class="w">             </span><span class="p">;</span><span class="k">RESTORE</span><span class="w"> </span><span class="n">STACK</span><span class="w"> </span><span class="n">POINTER</span><span class="w"> </span><span class="p">(</span><span class="k">FROM</span><span class="w"></span>
-<span class="w">                                                </span><span class="p">;</span><span class="n">WAT</span><span class="p">.</span><span class="nc">INT</span><span class="p">)</span><span class="w"></span>
-<span class="mi">014436</span><span class="w">          </span><span class="n">MOV</span><span class="w">     </span><span class="n">#5</span><span class="err">$</span><span class="p">,</span><span class="nv">@RKVEC</span><span class="w">              </span><span class="p">;</span><span class="k">SET</span><span class="w"> </span><span class="n">UP</span><span class="w"> </span><span class="k">NEW</span><span class="w"> </span><span class="n">VECTOR</span><span class="w"> </span><span class="n">ADRES</span><span class="w"> </span><span class="k">FOR</span><span class="w"> </span><span class="n">RK11</span><span class="w"></span>
-<span class="mi">014444</span><span class="w">          </span><span class="nc">BIT</span><span class="w">     </span><span class="n">#20000</span><span class="p">,</span><span class="nv">@R0</span><span class="w">              </span><span class="p">;</span><span class="k">IS</span><span class="w"> </span><span class="n">SCP</span><span class="w"> </span><span class="n">CLEAR</span><span class="w"></span>
-<span class="mi">014450</span><span class="w">          </span><span class="n">BEQ</span><span class="w">     </span><span class="mi">4</span><span class="err">$</span><span class="w">                      </span><span class="p">;</span><span class="n">YES</span><span class="p">,</span><span class="w"> </span><span class="n">BRANCH</span><span class="w"></span>
-<span class="mi">014452</span><span class="w">          </span><span class="n">MOV</span><span class="w">     </span><span class="nv">@R0</span><span class="p">,</span><span class="err">$</span><span class="n">REG0</span><span class="w">               </span><span class="p">;</span><span class="k">GET</span><span class="w"> </span><span class="n">RKCS</span><span class="w"></span>
-<span class="mi">014456</span><span class="w">          </span><span class="n">ERROR</span><span class="w">   </span><span class="mi">76</span><span class="w">                      </span><span class="p">;</span><span class="n">SCP</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="k">BEFORE</span><span class="w"> </span><span class="n">SEEK</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="k">LAST</span><span class="w"></span>
-<span class="w">                                                </span><span class="p">;</span><span class="n">CYLINDER</span><span class="w"> </span><span class="n">WAS</span><span class="w"> </span><span class="n">DONE</span><span class="w"></span>
-<span class="mi">014460</span><span class="w">  </span><span class="mi">4</span><span class="err">$:</span><span class="w">     </span><span class="n">WAT</span><span class="p">.</span><span class="nc">INT</span><span class="w"> </span><span class="p">,</span><span class="mi">56700</span><span class="w">                  </span><span class="p">;</span><span class="n">WAIT</span><span class="w"> </span><span class="k">FOR</span><span class="w"> </span><span class="n">DRIVE</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="n">INTERRUPT</span><span class="w"></span>
-<span class="w">                                                </span><span class="p">;</span><span class="k">AFTER</span><span class="w"> </span><span class="n">SEEK</span><span class="w"> </span><span class="n">WAS</span><span class="w"> </span><span class="n">COMPLETED</span><span class="w"></span>
-<span class="w">                                                </span><span class="p">;</span><span class="n">WAITING</span><span class="w"> </span><span class="nc">TIME</span><span class="o">=</span><span class="mi">180</span><span class="w"> </span><span class="n">MS</span><span class="w"> </span><span class="k">FOR</span><span class="w"> </span><span class="mi">11</span><span class="o">/</span><span class="mi">20</span><span class="w"></span>
-<span class="w">                                                </span><span class="p">;</span><span class="mi">36</span><span class="w"> </span><span class="n">MS</span><span class="w"> </span><span class="k">FOR</span><span class="w"> </span><span class="mi">11</span><span class="o">/</span><span class="mi">45</span><span class="w"></span>
-<span class="mi">014464</span><span class="w">          </span><span class="n">MOV</span><span class="w">     </span><span class="n">#BADINT</span><span class="p">,</span><span class="nv">@RKVEC</span><span class="w">          </span><span class="err">:</span><span class="n">IT</span><span class="err">&#39;</span><span class="n">S</span><span class="w"> </span><span class="n">AN</span><span class="w"> </span><span class="n">ERROR</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">THIS</span><span class="w"> </span><span class="nc">TIME</span><span class="w"></span>
-<span class="w">                                                </span><span class="p">;</span><span class="n">INTERRUPT</span><span class="w"> </span><span class="n">HAS</span><span class="w"> </span><span class="ow">NOT</span><span class="w"> </span><span class="n">OCCURERED</span><span class="w"></span>
-<span class="mi">014472</span><span class="w">          </span><span class="n">JSR</span><span class="w">     </span><span class="n">PC</span><span class="p">,</span><span class="n">GT3RG</span><span class="w">                </span><span class="p">;</span><span class="k">GO</span><span class="w"> </span><span class="k">GET</span><span class="w"> </span><span class="n">RKCS</span><span class="p">,</span><span class="w"> </span><span class="n">ER</span><span class="p">,</span><span class="w"> </span><span class="n">DS</span><span class="w"></span>
-<span class="mi">014476</span><span class="w">          </span><span class="n">ERROR</span><span class="w">   </span><span class="mi">77</span><span class="w">                      </span><span class="p">;</span><span class="n">RK11</span><span class="w"> </span><span class="n">DID</span><span class="w"> </span><span class="ow">NOT</span><span class="w"> </span><span class="n">INTERRUPT</span><span class="w"> </span><span class="k">AFTER</span><span class="w"> </span><span class="n">SEEK</span><span class="w"> </span><span class="p">(</span><span class="k">TO</span><span class="w"></span>
-<span class="w">                                                </span><span class="p">;</span><span class="k">LAST</span><span class="w"> </span><span class="n">CYLINDER</span><span class="p">)</span><span class="w"> </span><span class="n">WAS</span><span class="w"> </span><span class="n">DONE</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="n">IDE</span><span class="w"> </span><span class="k">SET</span><span class="w"></span>
-<span class="mi">014500</span><span class="w">          </span><span class="n">BR</span><span class="w">      </span><span class="mi">5</span><span class="err">$</span><span class="o">+</span><span class="mi">2</span><span class="w"></span>
-<span class="mi">014502</span><span class="w">  </span><span class="mi">5</span><span class="err">$:</span><span class="w">     </span><span class="n">CMP</span><span class="w">     </span><span class="p">(</span><span class="n">SP</span><span class="p">)</span><span class="o">+</span><span class="p">,(</span><span class="n">SP</span><span class="p">)</span><span class="o">+</span><span class="w">             </span><span class="p">;</span><span class="n">OK</span><span class="p">,</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="n">RK11</span><span class="w"> </span><span class="n">INTERUPTED</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="n">THIS</span><span class="w"> </span><span class="k">AFTER</span><span class="w"></span>
-<span class="w">                                                </span><span class="p">;</span><span class="n">SEEK</span><span class="w"> </span><span class="n">WAS</span><span class="w"> </span><span class="n">COMPLETED</span><span class="p">.</span><span class="w"> </span><span class="k">RESTORE</span><span class="w"></span>
-<span class="w">                                                </span><span class="p">;</span><span class="n">STACK</span><span class="w"> </span><span class="n">POINTER</span><span class="w"> </span><span class="p">(</span><span class="k">FROM</span><span class="w"> </span><span class="n">RK11</span><span class="w"> </span><span class="n">INTERRUPT</span><span class="p">)</span><span class="w"></span>
-<span class="mi">014504</span><span class="w">          </span><span class="n">CMP</span><span class="w">     </span><span class="p">(</span><span class="n">SP</span><span class="p">)</span><span class="o">+</span><span class="p">,(</span><span class="n">SP</span><span class="p">)</span><span class="o">+</span><span class="w">             </span><span class="p">;</span><span class="k">RESTORE</span><span class="w"> </span><span class="n">STACK</span><span class="w"> </span><span class="n">POINTER</span><span class="w"> </span><span class="p">(</span><span class="k">FROM</span><span class="w"></span>
-<span class="w">                                                </span><span class="p">;</span><span class="n">WAT</span><span class="p">.</span><span class="nc">INT</span><span class="p">)</span><span class="w"></span>
-<span class="mi">014506</span><span class="w">          </span><span class="n">MOV</span><span class="w">     </span><span class="n">#BADINT</span><span class="p">,</span><span class="nv">@RKVEC</span><span class="w">          </span><span class="p">;</span><span class="k">RESTORE</span><span class="w"> </span><span class="n">RK11</span><span class="w"> </span><span class="n">INTERRUPT</span><span class="w"> </span><span class="n">VECTOR</span><span class="w"> </span><span class="n">ADRES</span><span class="w"></span>
-<span class="w">                                                </span><span class="p">;</span><span class="k">FOR</span><span class="w"> </span><span class="n">UNEXPECTED</span><span class="w"> </span><span class="n">INTERUTS</span><span class="w"></span>
-<span class="mi">014514</span><span class="w">          </span><span class="nc">BIT</span><span class="w">     </span><span class="n">#20000</span><span class="p">,</span><span class="nv">@R0</span><span class="w">              </span><span class="p">;</span><span class="n">DID</span><span class="w"> </span><span class="n">SCP</span><span class="w"> </span><span class="nc">BIT</span><span class="w"> </span><span class="k">SET</span><span class="vm">?</span><span class="w"></span>
-<span class="mi">014520</span><span class="w">          </span><span class="n">BNE</span><span class="w">     </span><span class="mi">6</span><span class="err">$</span><span class="w">                      </span><span class="p">;</span><span class="n">YES</span><span class="p">,</span><span class="w"> </span><span class="n">BRANCH</span><span class="w"></span>
-<span class="mi">014522</span><span class="w">          </span><span class="n">MOV</span><span class="w">     </span><span class="nv">@R0</span><span class="p">,</span><span class="err">$</span><span class="n">REG0</span><span class="w">               </span><span class="p">;</span><span class="k">GET</span><span class="w"> </span><span class="n">RKCS</span><span class="w"></span>
-<span class="mi">014526</span><span class="w">          </span><span class="n">ERROR</span><span class="w">   </span><span class="mi">53</span><span class="w">                      </span><span class="p">;</span><span class="n">SCP</span><span class="w"> </span><span class="n">DID</span><span class="w"> </span><span class="ow">NOT</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="k">AFTER</span><span class="w"> </span><span class="n">RK11</span><span class="w"> </span><span class="n">INTERRUPTED</span><span class="w"></span>
-<span class="w">                                                </span><span class="p">;</span><span class="n">INDICATING</span><span class="w"> </span><span class="n">SEEK</span><span class="w"> </span><span class="n">WAS</span><span class="w"></span>
-</code></pre></div>
+<div class="highlight"><pre><span></span>014362  2$:     MOV     RKVEC,R1
+014366          MOV     #3$,(R1)+               ;SET UP VECTOR ADRES FOR RK11 INTERUPT
+014372          MOV     #340,(R1)               ;SET UP PSW ON INTERRUPT
+014376          BIS     #40,@RKDA               ;ADRES CYLINDER #1
+014404          MOV     #111,@R0                ;SEEK, GO WITH IDE SET
+014410          WAT.INT ,300                    ;WAIT FOR THE DRIVE TO
+                                                ;INTERRUPT AFTER ADRES WAS RECVD
+                                                ;WAITING TIME= 1.4 MS FOR 11/20
+                                                ;280 US FOR 11/45
+                                                ;ERROR, IF INTERUPT DID NOT OCCUR
+                                                ;BY NOW
+014414          MOV     #BADINT,@RKVEC          ;RESTORE UNEXPECTED RK11 INTERRUPT
+014422          MOV     @R0,$REG0               ;GET RKCS
+014426          ERROR   75                      ;INTERRUPT DID NOT OCCUR AFTER
+                                                ;SEEK WAS INITIATED WITH IDE SET
+014430          BR      3$+4
+014432  3$:     CMP     (SP)+,(SP)+             ;OK, IF RK11 INTERRUPTED TO THIS
+                                                ;RESTORE STACK POINTER (FROM RK11 INTERRUPT)
+014434          CMP     (SP)+,(SP)+             ;RESTORE STACK POINTER (FROM
+                                                ;WAT.INT)
+014436          MOV     #5$,@RKVEC              ;SET UP NEW VECTOR ADRES FOR RK11
+014444          BIT     #20000,@R0              ;IS SCP CLEAR
+014450          BEQ     4$                      ;YES, BRANCH
+014452          MOV     @R0,$REG0               ;GET RKCS
+014456          ERROR   76                      ;SCP SET BEFORE SEEK TO LAST
+                                                ;CYLINDER WAS DONE
+014460  4$:     WAT.INT ,56700                  ;WAIT FOR DRIVE TO INTERRUPT
+                                                ;AFTER SEEK WAS COMPLETED
+                                                ;WAITING TIME=180 MS FOR 11/20
+                                                ;36 MS FOR 11/45
+014464          MOV     #BADINT,@RKVEC          :IT&#39;S AN ERROR IF BY THIS TIME
+                                                ;INTERRUPT HAS NOT OCCURERED
+014472          JSR     PC,GT3RG                ;GO GET RKCS, ER, DS
+014476          ERROR   77                      ;RK11 DID NOT INTERRUPT AFTER SEEK (TO
+                                                ;LAST CYLINDER) WAS DONE WITH IDE SET
+014500          BR      5$+2
+014502  5$:     CMP     (SP)+,(SP)+             ;OK, IF RK11 INTERUPTED TO THIS AFTER
+                                                ;SEEK WAS COMPLETED. RESTORE
+                                                ;STACK POINTER (FROM RK11 INTERRUPT)
+014504          CMP     (SP)+,(SP)+             ;RESTORE STACK POINTER (FROM
+                                                ;WAT.INT)
+014506          MOV     #BADINT,@RKVEC          ;RESTORE RK11 INTERRUPT VECTOR ADRES
+                                                ;FOR UNEXPECTED INTERUTS
+014514          BIT     #20000,@R0              ;DID SCP BIT SET?
+014520          BNE     6$                      ;YES, BRANCH
+014522          MOV     @R0,$REG0               ;GET RKCS
+014526          ERROR   53                      ;SCP DID NOT SET AFTER RK11 INTERRUPTED
+                                                ;INDICATING SEEK WAS
+</pre></div>
 
 
 <p>So, based on the fact that we don't hit error 75 from 14426 (and the fact that the previous test, #36, in

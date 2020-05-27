@@ -137,43 +137,43 @@ utility that I can toggle in from the front panel.  Came up with this:</p>
 33
 34
 35
-36</pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="err">001000  012705  START:  MOV     #177564,R5      ;CONSOLE XCSR</span>
-<span class="err">        177564</span>
-<span class="err">001004  012700  L0:     MOV     #177570,R0      ;SWITCH REGISTER</span>
-<span class="err">        177570</span>
-<span class="err">001010  000000          HALT</span>
-<span class="err">001012  011004          MOV     @R0,R4          ;READ ADDR FROM SWITCHES</span>
-<span class="err">001014  000000          HALT</span>
-<span class="err">001016  011003          MOV     @R0,R3          ;READ COUNT FROM SWITCHES</span>
-<span class="err">001020  012401  L1:     MOV     (R4)+,R1        ;GET NEXT WORD TO DUMP</span>
-<span class="err">001022  012702          MOV     #6,R2           ;SIX DIGITS TO PRINT</span>
-<span class="err">        000006</span>
-<span class="err">001026  005000          CLR     R0              ;R0 GETS MSB R1</span>
-<span class="err">001030  073027          ASHC    #1,R0</span>
-<span class="err">        000001</span>
-<span class="err">001034  062700  L2:     ADD     #60,R0          ;MAKE INTO ASCII DIGIT</span>
-<span class="err">        000060</span>
-<span class="err">001040  010065          MOV     R0,2(R5)        ;OUTPUT</span>
-<span class="err">        000002</span>
-<span class="err">001044  105715          TSTB    (R5)</span>
-<span class="err">001046  100376          BPL     .-2</span>
-<span class="err">001050  005000          CLR     R0              ;R0 GETS 3 MSB R1</span>
-<span class="err">001052  073027          ASHC    #3,R0</span>
-<span class="err">        000003</span>
-<span class="err">001056  077212          SOB     R2,L2           ;LOOP DIGITS</span>
-<span class="err">001060  012765          MOV     #15,2(R5)       ;OUTPUT &#39;\R&#39;</span>
-<span class="err">        000015</span>
-<span class="err">        000002</span>
-<span class="err">001066  105715          TSTB    (R5)</span>
-<span class="err">001070  100376          BPL     .-2</span>
-<span class="err">001072  012765          MOV     #12,2(R5)       ;OUTPUT &#39;\N&#39;</span>
-<span class="err">        000012</span>
-<span class="err">        000002</span>
-<span class="err">001100  105715          TSTB    (R5)</span>
-<span class="err">001102  100376          BPL     .-2</span>
-<span class="err">001104  077333          SOB     R3,L1           ;LOOP WORDS</span>
-<span class="err">001106  000736          BR      L0              ;START OVER</span>
-</code></pre></div>
+36</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">001000</span>  <span class="nt">012705</span>  <span class="nt">START</span><span class="o">:</span>  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">177564</span><span class="o">,</span><span class="nt">R5</span>      <span class="o">;</span><span class="nt">CONSOLE</span> <span class="nt">XCSR</span>
+        <span class="nt">177564</span>
+<span class="nt">001004</span>  <span class="nt">012700</span>  <span class="nt">L0</span><span class="o">:</span>     <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">177570</span><span class="o">,</span><span class="nt">R0</span>      <span class="o">;</span><span class="nt">SWITCH</span> <span class="nt">REGISTER</span>
+        <span class="nt">177570</span>
+<span class="nt">001010</span>  <span class="nt">000000</span>          <span class="nt">HALT</span>
+<span class="nt">001012</span>  <span class="nt">011004</span>          <span class="nt">MOV</span>     <span class="p">@</span><span class="k">R0</span><span class="o">,</span><span class="nt">R4</span>          <span class="p">;</span><span class="nt">READ</span> <span class="nt">ADDR</span> <span class="nt">FROM</span> <span class="nt">SWITCHES</span>
+<span class="nt">001014</span>  <span class="nt">000000</span>          <span class="nt">HALT</span>
+<span class="nt">001016</span>  <span class="nt">011003</span>          <span class="nt">MOV</span>     <span class="p">@</span><span class="k">R0</span><span class="o">,</span><span class="nt">R3</span>          <span class="p">;</span><span class="nt">READ</span> <span class="nt">COUNT</span> <span class="nt">FROM</span> <span class="nt">SWITCHES</span>
+<span class="nt">001020</span>  <span class="nt">012401</span>  <span class="nt">L1</span><span class="o">:</span>     <span class="nt">MOV</span>     <span class="o">(</span><span class="nt">R4</span><span class="o">)+,</span><span class="nt">R1</span>        <span class="o">;</span><span class="nt">GET</span> <span class="nt">NEXT</span> <span class="nt">WORD</span> <span class="nt">TO</span> <span class="nt">DUMP</span>
+<span class="nt">001022</span>  <span class="nt">012702</span>          <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">6</span><span class="o">,</span><span class="nt">R2</span>           <span class="o">;</span><span class="nt">SIX</span> <span class="nt">DIGITS</span> <span class="nt">TO</span> <span class="nt">PRINT</span>
+        <span class="nt">000006</span>
+<span class="nt">001026</span>  <span class="nt">005000</span>          <span class="nt">CLR</span>     <span class="nt">R0</span>              <span class="o">;</span><span class="nt">R0</span> <span class="nt">GETS</span> <span class="nt">MSB</span> <span class="nt">R1</span>
+<span class="nt">001030</span>  <span class="nt">073027</span>          <span class="nt">ASHC</span>    <span class="p">#</span><span class="nn">1</span><span class="o">,</span><span class="nt">R0</span>
+        <span class="nt">000001</span>
+<span class="nt">001034</span>  <span class="nt">062700</span>  <span class="nt">L2</span><span class="o">:</span>     <span class="nt">ADD</span>     <span class="p">#</span><span class="nn">60</span><span class="o">,</span><span class="nt">R0</span>          <span class="o">;</span><span class="nt">MAKE</span> <span class="nt">INTO</span> <span class="nt">ASCII</span> <span class="nt">DIGIT</span>
+        <span class="nt">000060</span>
+<span class="nt">001040</span>  <span class="nt">010065</span>          <span class="nt">MOV</span>     <span class="nt">R0</span><span class="o">,</span><span class="nt">2</span><span class="o">(</span><span class="nt">R5</span><span class="o">)</span>        <span class="o">;</span><span class="nt">OUTPUT</span>
+        <span class="nt">000002</span>
+<span class="nt">001044</span>  <span class="nt">105715</span>          <span class="nt">TSTB</span>    <span class="o">(</span><span class="nt">R5</span><span class="o">)</span>
+<span class="nt">001046</span>  <span class="nt">100376</span>          <span class="nt">BPL</span>     <span class="p">.</span><span class="nc">-2</span>
+<span class="nt">001050</span>  <span class="nt">005000</span>          <span class="nt">CLR</span>     <span class="nt">R0</span>              <span class="o">;</span><span class="nt">R0</span> <span class="nt">GETS</span> <span class="nt">3</span> <span class="nt">MSB</span> <span class="nt">R1</span>
+<span class="nt">001052</span>  <span class="nt">073027</span>          <span class="nt">ASHC</span>    <span class="p">#</span><span class="nn">3</span><span class="o">,</span><span class="nt">R0</span>
+        <span class="nt">000003</span>
+<span class="nt">001056</span>  <span class="nt">077212</span>          <span class="nt">SOB</span>     <span class="nt">R2</span><span class="o">,</span><span class="nt">L2</span>           <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">DIGITS</span>
+<span class="nt">001060</span>  <span class="nt">012765</span>          <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">15</span><span class="o">,</span><span class="nt">2</span><span class="o">(</span><span class="nt">R5</span><span class="o">)</span>       <span class="o">;</span><span class="nt">OUTPUT</span> <span class="s1">&#39;\R&#39;</span>
+        <span class="nt">000015</span>
+        <span class="nt">000002</span>
+<span class="nt">001066</span>  <span class="nt">105715</span>          <span class="nt">TSTB</span>    <span class="o">(</span><span class="nt">R5</span><span class="o">)</span>
+<span class="nt">001070</span>  <span class="nt">100376</span>          <span class="nt">BPL</span>     <span class="p">.</span><span class="nc">-2</span>
+<span class="nt">001072</span>  <span class="nt">012765</span>          <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">12</span><span class="o">,</span><span class="nt">2</span><span class="o">(</span><span class="nt">R5</span><span class="o">)</span>       <span class="o">;</span><span class="nt">OUTPUT</span> <span class="s1">&#39;\N&#39;</span>
+        <span class="nt">000012</span>
+        <span class="nt">000002</span>
+<span class="nt">001100</span>  <span class="nt">105715</span>          <span class="nt">TSTB</span>    <span class="o">(</span><span class="nt">R5</span><span class="o">)</span>
+<span class="nt">001102</span>  <span class="nt">100376</span>          <span class="nt">BPL</span>     <span class="p">.</span><span class="nc">-2</span>
+<span class="nt">001104</span>  <span class="nt">077333</span>          <span class="nt">SOB</span>     <span class="nt">R3</span><span class="o">,</span><span class="nt">L1</span>           <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">WORDS</span>
+<span class="nt">001106</span>  <span class="nt">000736</span>          <span class="nt">BR</span>      <span class="nt">L0</span>              <span class="o">;</span><span class="nt">START</span> <span class="nt">OVER</span>
+</pre></div>
 </td></tr></table>
 
 <p>Executed this a few times and got slightly different results, then things settled into a pattern where the
