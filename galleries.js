@@ -84,5 +84,6 @@ var galleries = {
                             {src:"/images/pdp11/dap-corner.png", w:4032, h:3024, title:"Corner of one of my DAP boards.  Note missing R17."},
                             {src:"/images/pdp11/ubc-layout.png", w:1562, h:1116, title:"Corner of UBC layout from 1974 drawings"},
                             {src:"/images/pdp11/ubc-corner.jpeg", w:3905, h:2928, title:"Corner of one of my UBC boards.  Note missing W1, R161, and unpopulated E57."},
+                            {src:"/images/pdp11/DAP-E42.jpeg", w:2015, h:2015, title:"Evidence of FCO M8100-A00002A around E42 on DAP board"},
                     ],
     };
