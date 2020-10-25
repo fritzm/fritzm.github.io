@@ -152,7 +152,6 @@ a similar test program for this instruction:</p>
         <span class="nt">001000</span>                          <span class="p">.</span><span class="nc">END</span>    <span class="nt">START</span>
 </pre></div>
 </td></tr></table>
-
 <p>This does show a problem: after exection, the integer result at D4 seems correct, but the fractional result
 in D3 is incorrect (037777 177777 177777 177777).  Verified the correct microflow with the KM11.</p>
 <p>Stopped in microstate MOD.22, and examined ALUs on FRL where the fractional result is masked.  ALU function

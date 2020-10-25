@@ -148,7 +148,6 @@ this a little further, the first failing sub-test is T65:</p>
 <span class="nt">010626</span> <span class="nt">000000</span>                          <span class="nt">HLT</span>                      <span class="o">;</span><span class="nt">ERROR</span><span class="o">!</span>
 </pre></div>
 </td></tr></table>
-
 <p>This runs amok on the MFPD instruction at 010574, which should push the user stack pointer onto the user stack.
 Instead, the user stack pointer is pushed to memory at an incorrect address; 010676 instead of 000676.  This actually
 overwrites subsequent test code. Since the value pushed is 000700, a hard-coded loop is created that prevents the

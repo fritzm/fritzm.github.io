@@ -118,7 +118,6 @@ end up incorrectly set in the result at D3:</p>
         <span class="nt">001000</span>                          <span class="p">.</span><span class="nc">END</span>    <span class="nt">START</span>
 </pre></div>
 </td></tr></table>
-
 <p>So, the usual procedure: KM11 in the floating point slot, and FRL (where these bits are handled) out on
 extenders.  First step is to verify the microcode sequencing with the KM11 and front panel, and it looks good.
 In particular, the FPU is sequencing through states ADD.04 and ADD.06 per expectation for double-precision,

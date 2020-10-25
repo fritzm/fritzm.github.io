@@ -115,7 +115,6 @@ RC clock.</p>
 <span class="nt">001000</span>                          <span class="p">.</span><span class="nc">END</span>    <span class="nt">START</span>
 </pre></div>
 </td></tr></table>
-
 <p>This would be expected to produce the 000014 "Floating Undefined Variable" (minus-zero) exception code in R0, but I see
 an incorrect value of 177417.  Using the KM11 on the FPU shows the -0 trap and STST microstate flow is per expectation.</p>
 <p>Put the FRL out on the extender and started stepping the microcode, examining the state of the pins at the AC register

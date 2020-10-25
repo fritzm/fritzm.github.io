@@ -134,7 +134,6 @@ SCP DIDN&#39;T SET AFTER SEEK WAS DONE
 TIMOUT,PC=004536
 </pre></div>
 
-
 <p>And the relevant bit of the diagnostic listing:</p>
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
@@ -233,7 +232,6 @@ TIMOUT,PC=004536
                                                 ;INDICATING SEEK WAS
 </pre></div>
 </td></tr></table>
-
 <p>So, based on the fact that we don't hit error 75 from 14426 (and the fact that the previous test, #36, in
 this diagnostic is passing) unlike some previous issues the RK11 here <em>is</em> able to generate interrupts and the
 11/45 CPU is fielding them.  The issue seems related to the seek completion polling circuitry on the RK11.</p>

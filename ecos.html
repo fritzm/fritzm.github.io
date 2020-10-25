@@ -196,9 +196,7 @@ Change disable gate in priority arbitration.
 <ul><blockquote>
 Corrects FP TRAPS to location 4 where BRs below 7 occur at the same time.
 </ul>
-
 </blockquote>
-
 <p>The troubleshooting guide also calls out several "clusters" of interdependent ECOs:</p>
 <ul>
 <li>
@@ -250,14 +248,12 @@ Correction: Modify trap vector logic<br>
 Required on all 11/45 systems with parity</p>
 </blockquote>
 <p>
-
 <blockquote>
 <p>M8103-C0005  CODE: F CS F  MAR-73  [FCO]</p>
 <p>Problem: Parity errors need special abort logic to assert ZAP signal<br>
 Correction:  Modify ZAP gate on RACA</p>
 </blockquote>
 <p>
-
 <blockquote>
 <p>M8105-D0005  CODE: F   CS F  MAR-73  [FCO]</p>
 <p>Parity errors are time consuming to detect through vector 4.  Core parity requires these changes:
@@ -267,21 +263,18 @@ M8100-D0003, M8103-D0005, M8105-D0005, M8106-D0007, KB11A-D0015 and M8106-D0008<
 with these FCOs. A new M8110 is being designed to function with these FCOs.</p>
 </blockquote>
 <p>
-
 <blockquote>
 <p>M8106-D0007  CODE: F   CS:  J  [FCO]</p>
 <p>Problem: Parity errors are time consuming to detect through vector 4<br>
 Correction Allow processor to trap to 114 for parity errors.</p>
 </blockquote>
 <p>
-
 <blockquote>
 <p>M8106-D0008  CODE: F  CS:  K  MAR-73  [FCO]</p>
 <p>Problem: UNIBUS parity errors cause machine to halt<br>
 Correction: Disable UBCB UNI PERF [ 1 ] L from generating UBCB PARITY ERR SET L.</p>
 </blockquote>
 <p>
-
 <blockquote>
 <p>M8106-C0012  CODE: F  CS:  M  JUN-73  [FCO]</p>
 <p>Problem: MOS Parity memory is too tight<br>
@@ -293,7 +286,6 @@ PDP11-45s at next PM.</p>
 <p>The rework procedure in M8106-C0012 in steps #25 and #26 incorrectly references an R22.  Should be R20.</p>
 </blockquote>
 <p>
-
 <blockquote>
 <p>KB11A-D0015 CODE: F  DD:M  WL:L  [FCO]  MAR-73</p>
 <p>Problem: Detection of parity errors through vector 4 is slow.<br>
@@ -383,7 +375,6 @@ Correction: Add logic changes.<br>
 NOTE: This FCO must be installed in conjunction with FCO KB11A-A0012</p>
 </blockquote>
 <p>
-
 <blockquote>
 <p>M8106-A005A  CODE: F  JAN-73  [FCO]</p>
 <p>Problem 1: Rework procedure in M8106-A0005 is incorrect.<br>
@@ -394,7 +385,6 @@ Problem 2: The assembly hole drawing does not specify which side of the board et
 Correction 2:  Side 2</p>
 </blockquote>
 <p>
-
 <blockquote>
 <p>KB11A-A0012  CODE: F  DD: J  WL: J  DEC-72 [FCO]</p>
 <p>Problem: 11/45 processor does not meet UNIBUS cycle time specification.<br>
@@ -402,14 +392,12 @@ Correction: Correct KB11-A back panel attached ADD/DELETE sheet and install FCO 
 module.</p>
 </blockquote>
 <p>
-
 <blockquote>
 <p>KB11A-A012A  CODE: F  DEC-72 [FCO]</p>
 <p>Problem: Not all the add/deletes listed on sheet 2 of KB11A-A0012 are necessary for this retrofit.<br>
 Correction: use the ADD/DELETE sheet included in this supplement for FCO KB11A-A0012.</p>
 </blockquote>
 <p>
-
 <blockquote>
 <p>KB11A-E0013 CODE: F  DD: K  WL: K  JAN-73 [FCO]</p>
 <p>Problem: Improve performance of PDP-11/45 processor as UNIBUS master.<br>

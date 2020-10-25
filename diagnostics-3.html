@@ -143,7 +143,6 @@ binary.  This makes it a little easier to follow along while debugging the newer
 <span class="nt">013740</span> <span class="nt">000000</span>                          <span class="nt">HLT</span>                     <span class="o">;</span><span class="nt">ERROR</span><span class="o">!</span> <span class="nt">DID</span> <span class="nt">NOT</span> <span class="nt">DO</span> <span class="nt">INC</span> <span class="nt">INST</span> <span class="nt">AFTER</span> <span class="nt">INTERRUPT</span>
 </pre></div>
 </td></tr></table>
-
 <p>This test seems to be designed to return from an interrupt handler to a WAIT instruction, with the T bit set in
 the PSW and a serial xmit interrupt pending.  It verifies that the WAIT still "waits" in this circumstance.  It also
 verifies that a trace trap <em>does</em> occur after the immediately following INC instruction when the xmit interrupt

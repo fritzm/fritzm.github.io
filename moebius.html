@@ -81,11 +81,8 @@ by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">F
 	
         <div><p>Here are some animated GIFs that I created a few years ago with MATLAB.  These characterize the action of the four classes of Moebius transformations, mapping the complex plane to itself.  They were inspired by the illustrations and analysis in a section of Tristan Needham's excellent book <a href="http://books.google.com/books?vid=ISBN0198534469"><em>Visual Complex Analysis</em></a>:</p>
 <figure><img src="/images/moebius/elliptic.gif"><figcaption>elliptic</figcaption></figure>
-
 <figure><img src="/images/moebius/hyperbolic.gif"><figcaption>hyperbolic</figcaption></figure>
-
 <figure><img src="/images/moebius/loxodromic.gif"><figcaption>loxodromic</figcaption></figure>
-
 <figure><img src="/images/moebius/parabolic.gif"><figcaption>parabolic</figcaption></figure>
 
 <p>So what's it all about?  A Moebius transformation is a mapping on the complex numbers of the form </p>
@@ -103,7 +100,6 @@ by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">F
 <p>Now it turns out that Moebius transformations with fixed points at both <span class="math">\(0\)</span> and <span class="math">\(\infty\)</span> reduce to a particularly simple form — that of a single complex multiplication, i.e. just a dilation and/or rotation about the origin of the complex plane.  See Needham for exposition of this.  The elliptic, hyperbolic, and loxodromic classes of Moebius transformations turn out to be those whose corresponding <span class="math">\(\widetilde{M}\)</span> is a pure rotation, pure dilation, or general combination of the two, respectively.</p>
 <p>To generate these GIFs, we decorate the complex plane on the <span class="math">\(\widetilde{M}\)</span> side like a circular checkerboard or dart board, and represent the action of a given class of <span class="math">\(\widetilde{M}\)</span> transformations by rotating it, dilating it, or a combination of both, e.g.:</p>
 <figure><img src="/images/moebius/pre-elliptic.gif"><figcaption>elliptic \(\widetilde{M}\)</figcaption></figure>
-
 <figure><img src="/images/moebius/pre-hyperbolic.gif"><figcaption>hyperbolic \(\widetilde{M}\)</figcaption></figure>
 
 <p>On the <span class="math">\(M\)</span> side, we can pick fixed points <span class="math">\(\xi_+\)</span>, <span class="math">\(\xi_-\)</span> wherever we like, and then derive the corresponding <span class="math">\(F\)</span> as above.  For each frame, we take each point on the <span class="math">\(M\)</span> side, map it through <span class="math">\(F\)</span> to find the corresponding point on the <span class="math">\(\widetilde{M}\)</span> side, and check that against a dynamic checkerboard model to see if the point should be black or white in this frame.</p>
@@ -122,7 +118,7 @@ by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">F
 <span class="n">im</span> <span class="p">=</span> <span class="p">[];</span> <span class="n">g1</span> <span class="p">=</span> <span class="p">[];</span> <span class="n">g2</span> <span class="p">=</span> <span class="p">[];</span>
 
 <span class="k">for</span> <span class="n">frame</span> <span class="p">=</span> <span class="mi">1</span><span class="p">:</span><span class="mi">30</span>
-    <span class="n">g1</span> <span class="p">=</span> <span class="nb">mod</span><span class="p">(</span><span class="nb">log</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">Z</span><span class="p">))</span><span class="o">*</span><span class="mi">4</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="o">&lt;</span><span class="mi">1</span><span class="p">;</span>           <span class="c">% radial, static</span>
+    <span class="n">g1</span> <span class="p">=</span> <span class="nb">mod</span><span class="p">(</span><span class="nb">log</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">Z</span><span class="p">))</span><span class="o">*</span><span class="mi">4</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="mi">1</span><span class="p">;</span>           <span class="c">% radial, static</span>
 <span class="c">%    g1 = mod(log(abs(Z))*4+(frame-1)/15,2)&lt;1; % radial, dynamic</span>
 <span class="c">%    g1 = mod(real(Z)+(frame-1)*.8/30,.8)&lt;.4;  % vertical, dynamic</span>
 <span class="c">%    g2 = mod(angle(Z), pi/6)&lt;(pi/12);         % circumferential, static</span>
@@ -135,7 +131,6 @@ by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">F
 <span class="n">mov</span> <span class="p">=</span> <span class="n">immovie</span><span class="p">(</span><span class="mi">255</span><span class="o">*</span><span class="n">im</span><span class="p">,</span><span class="n">gray</span><span class="p">(</span><span class="mi">255</span><span class="p">));</span>
 <span class="n">movie</span><span class="p">(</span><span class="n">mov</span><span class="p">,</span><span class="mi">50</span><span class="p">);</span>
 </pre></div>
-
 
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
