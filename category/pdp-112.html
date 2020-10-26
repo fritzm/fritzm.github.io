@@ -74,6 +74,72 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="https://fritzm.github.io/la30-repair.html"><h1>PDP-11/45: LA30 repair</h1></a>
+Sat 25 November 2017
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p>Once again its been a little while since I've had to work on PDP-11 stuff or put any updates here; the <a href="https://www.lsst.org">day
+gig</a> has been pretty intense lately.</p>
+<p>Recent efforts have been focused on restoration of an LA30 printing terminal.  This was really filthy
+(including a mouse nest, yuck) so in addition to the usual electronics work it had to be completely
+disassembled for proper cleaning and lubrication.</p>
+<p>First off, the H735 power supply.  This is a pretty straightforward supply, but has an oil cap in the ferro-
+resonant circuit that is listed as a PCB-containing component; replaced this with a <a href="https://www.digikey.com/product-detail/en/cornell-dubilier-electronics-cde/SFA66S2K156B-F/338-1885-ND/1551444">modern
+equivalent</a>.
+Also pulled and reformed all the large electrolytic caps on the
+bench per usual.  No real trouble or surprises with this supply.</p>
+<p>Logic assembly looks good; everything is there (mine is an LA30-P, the parallel interface version) with no
+obvious scorches or toast.  Backplane intact and chip pin corrosion doesn't look too bad.  Needed some
+compressed air to blow out all the dust bunnies.</p>
+<p>Print head also looks to be in decent shape; all of the pins fire freely when activated momentarily with a 15
+VDC bench supply.</p>
+<p>Most of the work here was involved in disassembling the top section of the terminal, including the keyboard
+and carriage assembles, where most of the filth had accumulated. There are a lot of parts and pieces, with
+castings, bearings, machined shafts, stainless and brass throughout.  This thing was really well built!</p>
+<p>The ribbon-like paper drag springs were all either torn, mangled, or cracked/cracking; I fashioned some
+replacements by cutting and drilling 1/2" x 3" strips of .002 steel shim stock.  The rubber shock isolation
+mounts for the carriage assembly had also hardened and decayed.
+<a href="http://www.vibrationmounts.com/RFQ/VM07003.htm">These</a> look very close to the original; I put some on order.
+Replaced the bumpers on the carriage rails with some less expensive 3/8" chassis grommets.  After cleaning,
+hit the slide rails with dry film silicone lubricant (Molykote 557) and pivot and carriage cam plates pins
+with a good lithium grease (Molykote BR2 Plus).</p>
+<p>Ribbon drive motor bearings were very gummy, and one of the ribbon motors had seized.  These motors are quite
+serviceable though; you can pull the bottom bearing cap and remove the rotor, clean the rotor shaft and
+bearings of old lubricants, apply fresh and reassemble.  These are self-aligning bearings, so don't forget to
+give the assembly a few taps all around with a mallet after reassembly to shake them into true.</p>
+<p>Consumables: compatible ribbons are still plentiful on eBay, so I ordered a few.  Paper is an unusual width at
+9-7/8".  A few vendors on Amazon still seem to carry it, but it might be wise to lay in stock of a carton or
+two while it is still obtainable.</p>
+<p>Fired it up after reassembly.  No smoke (good!) and it feeps once reassuringly at power on.  Ribbon motors and
+clutches seem to be working, and the ribbon advances.  Activating the ribbon reverse switches manually
+reverses the ribbon movement per expectation.</p>
+<p>If the carriage is closed with paper loaded, the print head will home left and then move right after about a
+second or so (per expectation; "last character visibility" feature) and ribbon advance halts.  Local line feed
+from the front panel switch works.  All of this indicates a good deal of the logic and the motor drive are
+already working correctly.</p>
+<p>However: the front panel "ready" indicator does not light, and a quick loopback test (jumper A15R2 to A15C2 on
+the backplane) does not print any characters in response to the keyboard.  Will pick up here with logic
+debug next time.</p>
+<p><img src='/images/pdp11/la30-cap_thumbnail_tall.jpg' title='PCB-containing cap from ferro-resonant supply; to be replaced' onclick='pswipe("pdp11",68);'/>
+<img src='/images/pdp11/la30-supply_thumbnail_tall.jpg' title='LA30 H735 supply, pulled to bench for clean/refurb' onclick='pswipe("pdp11",69);'/>
+<img src='/images/pdp11/la30-cards_thumbnail_tall.jpg' title='LA30 internal controller card cage' onclick='pswipe("pdp11",70);'/>
+<img src='/images/pdp11/la30-head_thumbnail_tall.jpg' title='LA30 print head' onclick='pswipe("pdp11",71);'/>
+<img src='/images/pdp11/la30-carriage_thumbnail_tall.jpg' title='LA30 carriage, disassembled for clean, repairs, and lube.  A mangled paper drag spring is visible on the print bar assembly.' onclick='pswipe("pdp11",72);'/>
+<img src='/images/pdp11/la30-cleaned_thumbnail_tall.jpg' title='LA30 cleaned and reassembled' onclick='pswipe("pdp11",73);'/></p></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
         <a href="https://fritzm.github.io/vt52-keyboard.html"><h1>PDP-11/45: VT52 Keyboard Repair</h1></a>
 Sat 15 July 2017
 
@@ -657,28 +723,6 @@ the drives and controller!</p>
     <hr />
 </div>
     
-
-        
-
-<div class='article'>
-    <div class="content-title">
-        <a href="https://fritzm.github.io/rk11-4.html"><h1>PDP-11/45: RK11 IV</h1></a>
-Sat 01 April 2017
-
-by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
- 
-    </div>
-    
-    <div><p>A quick note: rejumpered a spare M105 address decoder, and swapped it in for the one that was in the RK11.  SSYN waveform is greatly improved (see before/after shots below), so looks like a bad driver on 
-the original M105.</p>
-<p><a href="https://fritzm.github.io/images/pdp11/rkcs-fixed.jpg"><img src='/images/pdp11/rkcs-fixed_thumbnail_tall.jpg'/></a>
-<a href="https://fritzm.github.io/images/pdp11/rkcs-really-fixed.jpg"><img src='/images/pdp11/rkcs-really-fixed_thumbnail_tall.jpg'/></a></p></div>
-    <hr />
-</div>
-    
 <div class="pagination">
 <ul>
     <li class="prev"><a href="https://fritzm.github.io/category/pdp-11.html">&larr; Previous</a></li>
@@ -689,6 +733,7 @@ the original M105.</p>
     <li class=""><a href="https://fritzm.github.io/category/pdp-114.html">4</a></li>
     <li class=""><a href="https://fritzm.github.io/category/pdp-115.html">5</a></li>
     <li class=""><a href="https://fritzm.github.io/category/pdp-116.html">6</a></li>
+    <li class=""><a href="https://fritzm.github.io/category/pdp-117.html">7</a></li>
 
     <li class="next"><a href="https://fritzm.github.io/category/pdp-113.html">Next &rarr;</a></li>
 
