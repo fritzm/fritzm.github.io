@@ -74,6 +74,37 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="https://fritzm.github.io/diagnostics-2.html"><h1>PDP-11/45: Diagnostics II</h1></a>
+Mon 04 July 2016
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p>Investigated some of the halted diagnostics a bit today.  CKBGB0 (SPL instruction test) was halting at 001404.
+Looking at the sources, the diagnostic was waiting at this point for a transmit interrupt from the DL11 that didn't
+seem to be arriving. Some troubleshooting turned up that the vector address on my DL11 was jumpered incorrectly.  Fixed this, and the diagnostic now passes.</p>
+<p>CKBME0 (11/45 traps test) is a bit more complicated.  The halt address of 005320 here indicates that the floating
+point coprocessor is detected but not trapping per design.  Pulled the floating point cards for now; the diagnostic
+now runs through several passes successfully, but regularly hangs up at 013640.  Hitting the halt
+switch when it is hung up displays 000342 in the address lights, then with a couple continues it will start up again,
+run a bunch more passes, but sooner or later hang up at 013640 again with the same behavior.  This behavior is a
+little more difficult to decode because the diagnostic itself is more complicated, and also the binary available from
+classicmp is a later revision than the available source code so the addresses don't quite match up.  So I'll need to
+spend a little more time reading the diagnostic sources and examining the disassembly in PDP11GUI to make sense of this
+one.  And it looks like there will be some downstream work to debug the floating point unit as well; I haven't studied
+its design yet at all.</p></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
         <a href="https://fritzm.github.io/diagnostics.html"><h1>PDP-11/45: Diagnostics with PDP11GUI</h1></a>
 Sun 03 July 2016
 
@@ -502,40 +533,6 @@ and put on order a modern equivalent (OL-6003BP) for the indicator bulbs on the 
 <p>Next steps will be to verify various Unibus signals on the backplane, then maybe play some swap games with CPU
 card spares to see if I can get closer to a working console as a starting point.  All I have time for this
 weekend, though; sorry nothing new to see so no new pictures this time!</p></div>
-    <hr />
-</div>
-    
-
-        
-
-<div class='article'>
-    <div class="content-title">
-        <a href="https://fritzm.github.io/initial-power-on.html"><h1>PDP-11/45: Initial Power On!</h1></a>
-Sun 08 May 2016
-
-by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
- 
-    </div>
-    
-    <div><p>Beeped out the new harness to check for shorts or incorrect pins, then plugged in just the H742s and fired it
-up.  All the DC regulator modules seem to be working, and I was able to trim them up to nominal voltages at
-the CPU end of the harness.  The indicator lamps on all but one of the DC regulators seem to be burned out,
-though, so I put some new lamps on order (at last for the +5V regulators; a modern equivalent for the -15V
-regulators is tougher to find).</p>
-<p>Given that success, I plugged in the CPU side of the harness, took a deep breath, and powered on!  Hmmm.  No
-detonations or smoke, but all data/address/mode lights lit (see below), which is not right...  Front panel
-lamp test and data address mode switches and indicators are working though at least.</p>
-<p>Some investigation on the backplane turned up no +5V to slots 10 though 15, which could be part of the
-problem.  Ah, that's what the mysterious clipped red wire soldered to the backplane might have been about
-(visible in the top right <a href="https://fritzm.github.io/images/pdp11/kb11a-backplane.jpg">here</a>...)  Sure enough, some inspection
-shows the corresponding trace on the backplane looks burnt!  I could hack this red wire into my new harness I
-guess, but I'd rather remove it and try to repair the board trace with a shunt.  So the backplane will have to
-come out.  I guess that's what I get for not investigating the weird red wire and for not beeping out the
-power distribution on the backplane before mounting and populating it...</p>
-<p><img src='/images/pdp11/initial-power-on_thumbnail_tall.jpg' title='Initial power on!  No smoke, but all lights on (not right).  Well, it&#39;s a start!' onclick='pswipe("pdp11",27);'/></p></div>
     <hr />
 </div>
     

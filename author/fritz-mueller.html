@@ -74,6 +74,150 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="https://fritzm.github.io/fp11-again.html"><h1>PDP-11/45: Some more floating point trouble</h1></a>
+Sat 21 November 2020
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p><em>[A catch-up article, documenting events of April/May 2020]</em></p>
+<p>In late April, I offered to give a video demonstration of the '11/45 to some interested work colleagues. Since
+I hadn't had it on in a while, I fired it up to make sure everything was still in working order. The machine
+behaved well from the front panel and was able to boot both V6 Unix and RSTS V06C. Great! Typed a very simple
+demo program in to RSTS (print a multiplication table) and that ran, but produced some very strange results.
+Uh oh... </p>
+<p>Asked RSTS to <code>PRINT PI</code>, and it spat out a value somewhere around 3.7... :-)</p>
+<p>So, time to try the floating point MAINDECS...  Sure enough, failures all over the place, starting with the
+very first diagnostic in the floating point suite, CFPAB0. This diagnostic covers utility operations like
+LDFPS/STFPS, SETI/SETL, SETF/SETD, etc.</p>
+<p>I do not have listings for the diagnostics in this suite, but it is usually simple enough to reproduce
+failures with short toggle-in programs given the names and descriptions of the failing diagnostics. In this
+case, the following simple code to exercise an LDFPS/STFPS sequence from the front panel switches and lights
+showed that bits 10 and 11 of the floating point status/control word would come back erroneously toggled:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">001000</span>  <span class="nt">170137</span>  <span class="nt">START</span><span class="o">:</span>  <span class="nt">LDFPS</span>   <span class="o">@</span><span class="p">#</span><span class="nn">177570</span>        <span class="o">;</span><span class="nt">LOAD</span> <span class="nt">FPS</span> <span class="nt">FROM</span> <span class="nt">SWITCH</span> <span class="nt">REGISTER</span>
+        <span class="nt">177570</span>
+<span class="nt">001004</span>  <span class="nt">170237</span>          <span class="nt">STFPS</span>   <span class="o">@</span><span class="p">#</span><span class="nn">177570</span>        <span class="o">;</span><span class="nt">AND</span> <span class="nt">STORE</span> <span class="nt">BACK</span> <span class="nt">TO</span> <span class="nt">DISPLAY</span> <span class="nt">REGISTER</span>
+        <span class="nt">177570</span>
+<span class="nt">001010</span>  <span class="nt">000773</span>          <span class="nt">BR</span>      <span class="nt">START</span>           <span class="o">;</span><span class="nt">REPEAT</span>
+</pre></div>
+</td></tr></table>
+<p>First things first, check power to the FPU and its clock; these look fine.  Next, plug the KM11 into the
+floating point slot and check the FPU microcode sequences while executing LDFPS and STFPS instructions.
+These also look fine:</p>
+<ul>
+<li>
+<p>For <code>LDFPS @#177570</code> I see <code>RDY.00</code>, <code>RDY.10</code>, <code>RDY.20</code>, <code>RDY.30</code>, <code>RDY.70</code>, <code>LD.50</code></p>
+</li>
+<li>
+<p>For <code>STFPS @#177570</code> I see <code>RDY.00</code>, <code>RDY.10</code>, <code>RDY.20</code>, <code>RDY.30</code>, <code>RDY.80</code>, <code>STR.30</code>, <code>STR.08</code></p>
+</li>
+</ul>
+<p>Most of the data paths of interest regarding the FPS register are on the fraction low (FRL) board, so this
+goes out on extenders so the microcode can be stepped and gate-level logic inspected with a logic probe.</p>
+<p>Here is the block diagram of data paths in the FPU, for reference in discussion below:</p>
+<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/fp11-data-paths.png" 
+title="FP11-B data paths"/></p>
+<p style="text-align: center;"><em>FP11-B data paths</em></p>
+
+<p>So, one thing to note with regard to the FPS register is that it is gated through the ACMX multiplexer and
+written into scratch pad register AC7[0] during microcode state <code>RDY.00</code> which is the first state in the
+common prolog of every FPU instruction:</p>
+<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/fp11-ucode-prolog.png" 
+title="FP11-B microcode prolog" width="200px"/></p>
+<p style="text-align: center;"><em>FP11-B microcode prolog</em></p>
+
+<p>Stopping in state <code>RDY.00</code> and examining the ACMX inputs, selects, and outputs for bits 10 and 11 immediately
+reveals a problem.  These bits of ACMX are implemented by a 74153 dual 4-input mux, E71 on sheet FRLB of the
+FP11-B engineering drawings:</p>
+<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/fp11-acmx-e71.png" 
+title="FP11-B ACMX &gt;11:10&lt;" width="400px"/></p>
+<p style="text-align: center;"><em>FP11-B ACMX &lt;11:10&gt;</em></p>
+
+<p>Inputs from the FPS register on pins 6 and 10 appear correct, as do the selector signals on pins 14 and 2.
+But outputs on pins 7 and 9 appear to be inverted.  So E71 appears bad.  Pulled this, socketed, and replaced.
+After this fix, LDFPS/STFPS function correctly in the toggle-in test program, and MAINDEC CFPAB0 passes.</p>
+<p>Not out of the woods yet, though...  Progressing down the sequence of MAINDECS, diagnostic CFPDC0
+(add/subtract) now fails :-(  For this, we bring back the simple "add two floats" diagnostic used during
+previous FP11 debug:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17</pre></div></td><td class="code"><div class="highlight"><pre><span></span>        <span class="nt">000000</span>                          <span class="nt">AC0</span><span class="o">=%</span><span class="nt">0</span>
+        <span class="nt">000001</span>                          <span class="nt">AC1</span><span class="o">=%</span><span class="nt">1</span>
+<span class="nt">000000</span>                                  <span class="p">.</span><span class="nc">ASECT</span>
+        <span class="nt">001000</span>                          <span class="o">.=</span><span class="nt">1000</span>
+<span class="nt">001000</span>  <span class="nt">170011</span>                  <span class="nt">START</span><span class="o">:</span>  <span class="nt">SETD</span>                <span class="o">;</span><span class="nt">SET</span> <span class="nt">DOUBLE</span> <span class="nt">PRECISION</span> <span class="nt">MODE</span>
+<span class="nt">001002</span>  <span class="nt">172467</span>  <span class="nt">000014</span>                  <span class="nt">LDD</span>     <span class="nt">D1</span><span class="o">,</span><span class="nt">AC0</span>      <span class="o">;</span><span class="nt">FETCH</span> <span class="nt">FIRST</span> <span class="nt">ADDEND</span> <span class="nt">FROM</span> <span class="nt">D1</span>
+<span class="nt">001006</span>  <span class="nt">172567</span>  <span class="nt">000020</span>                  <span class="nt">LDD</span>     <span class="nt">D2</span><span class="o">,</span><span class="nt">AC1</span>      <span class="o">;</span><span class="nt">FETCH</span> <span class="nt">SECOND</span> <span class="nt">ADDEND</span> <span class="nt">FROM</span> <span class="nt">D2</span>
+<span class="nt">001012</span>  <span class="nt">172100</span>                          <span class="nt">ADDD</span>    <span class="nt">AC0</span><span class="o">,</span><span class="nt">AC1</span>     <span class="o">;</span><span class="nt">ADD</span> <span class="nt">THEM</span> <span class="o">(</span><span class="nt">RESULT</span> <span class="nt">IN</span> <span class="nt">AC1</span><span class="o">)</span>
+<span class="nt">001014</span>  <span class="nt">174167</span>  <span class="nt">000022</span>                  <span class="nt">STD</span>     <span class="nt">AC1</span><span class="o">,</span><span class="nt">D3</span>      <span class="o">;</span><span class="nt">STORE</span> <span class="nt">RESULT</span> <span class="nt">TO</span> <span class="nt">D3</span>
+<span class="nt">001020</span>  <span class="nt">000000</span>                          <span class="nt">HALT</span>
+<span class="nt">001022</span>  <span class="nt">040200</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D1</span><span class="o">:</span>     <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">040000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span> <span class="o">;</span><span class="nt">0</span><span class="p">.</span><span class="nc">5</span>
+<span class="nt">001030</span>  <span class="nt">000000</span>
+<span class="nt">001032</span>  <span class="nt">040200</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D2</span><span class="o">:</span>     <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">040000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span> <span class="o">;</span><span class="nt">0</span><span class="p">.</span><span class="nc">5</span>
+<span class="nt">001040</span>  <span class="nt">000000</span>
+<span class="nt">001042</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D3</span><span class="o">:</span>     <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span>
+<span class="nt">001050</span>  <span class="nt">000000</span>
+        <span class="nt">001000</span>                          <span class="p">.</span><span class="nc">END</span>    <span class="nt">START</span>
+</pre></div>
+</td></tr></table>
+<p>Sure enough, this is producing incorrect results.  The microcode flows for add/subtract/compare are a bit more
+involved than the simple load/store sequences above.  The sequence starts with common prolog <code>RDY.00</code>,
+<code>RDY.10</code>, <code>RDY.20</code>, <code>RDY.30</code>, same as above.  The first fork after <code>RDY.30</code> goes to <code>RDY.60</code>, since
+add/subtract/compare are "no memory class" instructions (FP accumulator register operands only).  The second
+fork after <code>RDY.60</code> takes us to <code>ADD.00</code> on sheet FP11 FLOWS 8.</p>
+<p>The left side if FLOWS 8 is a decision tree for zero operands and/or whether or not we are executing a compare
+instruction.  Traversal of these states sets up fraction and exponent operands and, if necessary, a comparison
+of operand exponents in the EALU.  In our case (addition of two double-precision non-zero operands), the
+sequence is: <code>ADD.00</code>, <code>ADD.04</code>, <code>ADD.06</code>, <code>ADD.02</code>, <code>ADD.08</code>, <code>ADD.12</code>.</p>
+<p>We then end up at state <code>ADD.22</code> at the top of the right side of FLOWS 8.  The previously set up exponent
+difference is used to index into a 256x4 "range ROM"; output bits from this ROM inform the subsequent
+microcode fork which determines which operand shift, if any, to apply before the upcoming fraction ALU
+operation.</p>
+<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/fp11-exp-compare.png" 
+title="FP11-B Exponent Comparison Flow"/></p>
+<p>Here a problem is evident.  We should fork to <code>ADD.24</code>, for equal exponents, but instead we end up add
+<code>ADD.30</code>, for destination exponent less than source exponent.  Putting the FXP board out on the extender and
+pausing in this state, the operands and operation codes on the EALU bit-slices appear to be correct, but
+signal FRMH ALU CIN L is erroneously asserted at E34 pin 7 (sheet FXPA).  This extra carry (borrow, really,
+since the operation is a subtract) into the least significant bit-slice causes the EALU output to be -1
+instead of 0.</p>
+<p>Moving back to the source of this signal on the FRM board, it turns out that FRM E20, a 74H40 dual quad-input
+NAND, is outputting an invalid logic level at pin 8.  Pulled this, socketed, replaced, and the problem appears
+to be fixed.</p>
+<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/FRM-E20.png" 
+title="FP11-B FRMH ALU CIN L"/></p>
+<p>After this second repair, the full suite of FP11-B diagnostics is passing again.  And RSTS/E has a much less
+fanciful interpretation of <code>PI</code>...</p></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
         <a href="https://fritzm.github.io/unix-v6-trouble-2.html"><h1>PDP-11/45: V6 Unix Troubleshooting, Part II</h1></a>
 Sun 25 October 2020
 
@@ -89,10 +233,10 @@ by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">F
 entry</a>.  It booted on my machine, but dumped core on the first <code>ls</code> in single-user
 mode, or as soon as I did any heavy lifting in multi-user mode.</p>
 <p>The following is the conclusion of a chronology of the troubleshooting campaign that took place over the next
-month and a half, culminating in a smoking gun hardware fix and successful operation of V6 Unix on the machine
-(part I is <a href="https://fritzm.github.io/unix-v6-trouble-1.html">here</a>.)  This was largely a collaborative effort between Noel
-Chiappa an myself via direct email correspondence, though some help was received from others via the cctalk
-mailing list as well.</p>
+month and a half, culminating in a hardware fix and successful operation of V6 Unix on the machine (part I is
+<a href="https://fritzm.github.io/unix-v6-trouble-1.html">here</a>.)  This was largely a collaborative effort between Noel Chiappa an
+myself via direct email correspondence, though some help was received from others via the cctalk mailing list
+as well.</p>
 <p>By this point, the nature of the <code>ls</code> problem had been fairly well characterized: part of the <code>ls</code> process
 address space ended up holding an incorrect portion of its program text; subsequently, when execution jumped
 to some of these unexpected bits, an out-of-bounds memory access would occur triggering a memory management
@@ -3286,57 +3430,6 @@ be repair of the failed solenoid driver channel, calibrations, then any debug ne
 card for the PDP-11.</p>
 <p><img src='/images/pdp11/kr2736_thumbnail_tall.jpg' title='The SMC KR2736-17 keyboard scanner/encoder in the LA30' onclick='pswipe("pdp11",74);'/>
 <img src='/images/pdp11/G380_thumbnail_tall.jpg' title='G380 solenoid driver card from the LA30, with failed parts pulled' onclick='pswipe("pdp11",75);'/></p></div>
-    <hr />
-</div>
-    
-
-        
-
-<div class='article'>
-    <div class="content-title">
-        <a href="https://fritzm.github.io/la30-2.html"><h1>PDP-11/45: LA30 repair II</h1></a>
-Sun 26 November 2017
-
-by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
- 
-    </div>
-    
-    <div><p>Okay, first thing to debug today is the ready light.  This is lit by RDY LITE L, pin A16D2 (lower right of
-sheet M7721-0-1 in the LA30 engineering drawings).  Logic probe showed this was correctly asserted low. Pulled
-the lamp and checked it with bench supply, and it checked fine.  Verified +10 and ground at the lamp socket as
-well, so why isn't it lit?  Turns out it is polarized, and the socket is soldered in backwards (?!). Corrected
-the socket, and ready light is working.</p>
-<p>Noticed that ribbon is stalling occasionally.  Ribbon tension seems to be overcoming the clutch on the take-up
-side.  It seems tensioning drag on the inactive side is too high.  Not sure what to do about this one yet;
-there is not much adjustable within the clutches, and the service manual only recommends replacement if they
-are out of spec (yeah, good luck finding one!)</p>
-<p>Repeated the experiment with loopback jumper (A15R2 to A15C2).  Turns out I had miscounted backplane pins the
-first time. With jumper placed correctly, I am now get a printing response to the keyboard.  Not quite right,
-but definite progress:</p>
-<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/la30-first-print.jpg"
-title="LA30 first print attempt"/></p>
-<p>Here I had typed <code>:;L</code>, and then some other letters.  You can see evidence of correct pins firing for the
-first three characters, though either head movement or pin timing is off.  Letter spacing appears more or less
-correct for 80 characters per line.</p>
-<p>Okay, hooked up the logic analyzer, and started to take a look at the character generator clocking to see if
-all the the columns are being clocked out correctly.  The logic analyzer shows a malfunction consistent with
-the print behavior: character column clocking resets after two columns rather than proceeding through all
-five:</p>
-<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/la30-chargen-clock-
-trace.jpg" title="LA30 character generator clocking trace.  Resets incorrectly after only two of five
-character columns"/></p>
-<p>This signaling is mediated by a ripple counter on the M7724 character generator card:</p>
-<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/la30-chargen-schem.jpg"
-title="LA30 character generator clocking partial schematic."/></p>
-<p>So it looks like one or more of these 7474 quad flops has failed.  I note on my chargen board that these are
-early 70's Nat Semi parts; Mattis had a very similar issue (search "7474" on <a href="http://www.datormuseum.se/computers/digital-equipment-corporation/pdp-11-04">this
-page</a>) on his LA30 chargen with
-the same parts.</p>
-<p>All I have time for this weekend; next time I'll get the chip clip on these for a closer look, then pull and
-replace the baddies.</p></div>
     <hr />
 </div>
     
