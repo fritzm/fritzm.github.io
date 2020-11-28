@@ -74,6 +74,60 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="https://fritzm.github.io/la30-3.html"><h1>PDP-11/45: LA30 repair III</h1></a>
+Sat 02 December 2017
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p>Digging in on the flip-flops identified as potentially problematic in the previous post, found that E5 had
+failed.  Pulled, socketed, and replaced; character generator now correctly clocks all five character columns:</p>
+<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/la30-chargen-clock-
+trace-fixed.jpg" title="LA30 character generator clocking trace after repair.  Runs correctly to five character columns"/></p>
+<p>After this repair, characters were printing full width, but two problems remained: about half of the
+characters printed in response to typing on the keyboard were the wrong character, and the top row was not
+printing at all on any character:</p>
+<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/la30-second-print.jpg"
+title="LA30 second print attempt -- incorrect characters and top row missing"/></p>
+<p>Looking at the incorrect characters problem first, it was clear that bit 4 was not being received by the
+character generator correctly.  I was a bit worried that the SMC KR2376-17 scanner/ROM on the keyboard
+assembly might be at fault, since Mattis had had some trouble with his.  This is a pretty cool part; a
+combined scanner and code translator, with an internal oscillator, rollover logic, debounce delay, and
+flexible interfacing:</p>
+<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/kr2376-schematic.jpg"
+title="KR2376-17 keyboard scanner/encoder internal schematic"/></p>
+<p>...not to mention the very cool vintage ceramic/gold packaging (see below.)  Fortunately, inspection with an
+oscilloscope showed that the outputs from the scanner were just fine; chasing downstream, the problem was
+found to be just a loose pin (SS) on the keyboard cable Berg connector.  With that sorted, we now have this:</p>
+<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/la30-third-print.jpg"
+title="LA30 third print attempt -- characters correct, but still missing top row"/></p>
+<p>For the final issue with the top row not printing, verified that the problem followed a particular G380
+solenoid driver card when swapping them around, and that with a functional G380 in the appropriate backplane
+slot pin 1 fires and prints correctly. Inspection of the problematic G380 revealed a failed power transistor
+and blown associated micro-fuse; replacement parts on order.</p>
+<p>For the ribbon advance issue, I pulled the ribbon motors and disassembled their top-side reduction gear cases
+in order to gain access to the upper rotor bearings.  Cleaning and lubrication of these bearings, plus a few
+more taps with a mallet after reassembly, achieved an improved bearing alignment.  With the increased output
+torque, the ribbon now advances reliably.</p>
+<p>Other minor items: Replacement vibration isolators arrived, and were installed.  Threaded inserts in the
+fiberglass top shell that had pulled out were reattached with epoxy.</p>
+<p>Have some more travel coming up for work, so may not be able to get back to this for a bit.  Next steps will
+be repair of the failed solenoid driver channel, calibrations, then any debug necessary on the M7910 interface
+card for the PDP-11.</p>
+<p><img src='/images/pdp11/kr2736_thumbnail_tall.jpg' title='The SMC KR2736-17 keyboard scanner/encoder in the LA30' onclick='pswipe("pdp11",74);'/>
+<img src='/images/pdp11/G380_thumbnail_tall.jpg' title='G380 solenoid driver card from the LA30, with failed parts pulled' onclick='pswipe("pdp11",75);'/></p></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
         <a href="https://fritzm.github.io/la30-2.html"><h1>PDP-11/45: LA30 repair II</h1></a>
 Sun 26 November 2017
 
@@ -629,44 +683,6 @@ RKDB.</p>
 (RKDB data path; sheet RK11-C-21; bingo!).  Stuck bit went away on this last swap.  So it looks like a
 failed 7401, E2 on the M149 in slot A23.  Pulled, socketed, and put some 7401 on order at Jameco where I
 can pick them up tomorrow on my way in to work.  Getting closer!</p></div>
-    <hr />
-</div>
-    
-
-        
-
-<div class='article'>
-    <div class="content-title">
-        <a href="https://fritzm.github.io/cpu-debug-6.html"><h1>PDP-11/45: CPU debug VI - RK11 NPRs and first disk boot!</h1></a>
-Sun 14 May 2017
-
-by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
- 
-    </div>
-    
-    <div><p>Took a little of time to sort through BC11 cables to find a good one for drive interfacing, but in the end I
-found one that worked okay and got the seek tester code from the previous post working reliably.  At this
-point I mounted one of the recently cleaned RK05 packs, but found that the M9301 bootstrap would hang the bus
-on the first read operation.</p>
-<p>A little scoping around on the RK11-C showed that it was asserting NPR to the processor, but never receiving
-NPG.  A quick check of NPG continuity on the backplane showed a missing jumper on one slot of my DD11-D.
-Wrapped this on, verified NPG continuity all the way out to the RK11, but still no joy.  Turns out the CPU
-is not asserting NPG at all.</p>
-<p>Threw the CPU UBC card out on extenders and had a go at chasing though the NPG logic with a logic probe.
-Turns out to be a failed 8881 bus driver for NPG at the end of the line (E55 on KB11-A drawing UBCD). Pulled,
-socketed, replaced.</p>
-<p>After this, the CPU was asserting NPG, but the signaling still looked a little squirrelly.  Turns out that
-there are jumpers (W1-W5) on the M9301 bootstrap terminator that need to be installed to provide grant
-pull-ups when they are not otherwise provided internally by the processor (and the 11/45 is one such
-case).  After installing the jumpers, NPG signaling looked solid.</p>
-<p>Tried mounting a booting a few packs.  Packs marked as having RT-11 would run for a short while and then hang.
-But an RKDP pack <em>successfully booted!</em>  Wow, that feels pretty good after about two years of working
-seriously on this restoration.  :-)</p>
-<p>Going to stop here on a high note, and pick up trying to get a good RT-11 boot next time.</p>
-<p><img src='/images/pdp11/rkdp-boot_thumbnail_tall.jpg' title='First boot off disk -- RKDP diagnostics pack!' onclick='pswipe("pdp11",57);'/></p></div>
     <hr />
 </div>
     

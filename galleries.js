@@ -85,5 +85,8 @@ var galleries = {
                             {src:"/images/pdp11/ubc-layout.png", w:1562, h:1116, title:"Corner of UBC layout from 1974 drawings"},
                             {src:"/images/pdp11/ubc-corner.jpeg", w:3905, h:2928, title:"Corner of one of my UBC boards.  Note missing W1, R161, and unpopulated E57."},
                             {src:"/images/pdp11/DAP-E42.jpeg", w:2015, h:2015, title:"Evidence of FCO M8100-A00002A around E42 on DAP board"},
+                            {src:"/images/pdp11/dl11-user-hack.jpg", w:3024, h:4032, title:"DL11 with end-user hack"},
+                            {src:"/images/pdp11/dl11-hack-front.png", w:3024, h:3024, title:"DL11 user hack front"},
+                            {src:"/images/pdp11/dl11-hack-back.png", w:3024, h:3024, title:"DL11 user hack back"},
                     ],
     };

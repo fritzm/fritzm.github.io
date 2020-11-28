@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>fritzm.github.io - PDP-11/45: Reversing a vintage DL11 hack</title>
+    <meta name="description" content="">
+    <meta name="author" content="Fritz Mueller">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+    <script src="https://fritzm.github.io/theme/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="https://fritzm.github.io/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/local.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/pygments.css" rel="stylesheet">
+
+    <!-- Photoswipe -->
+    <link rel="stylesheet" href="https://fritzm.github.io/theme/photoswipe.css">
+    <link rel="stylesheet" href="https://fritzm.github.io/theme/default-skin/default-skin.css">
+    <script src="https://fritzm.github.io/theme/photoswipe.min.js"></script>
+    <script src="https://fritzm.github.io/theme/photoswipe-ui-default.min.js"></script>
+    <script src="https://fritzm.github.io/galleries.js"></script>
+    <script type="text/javascript">
+        var pswipe = function(gname, index) {
+            var pswpElement = document.querySelectorAll('.pswp')[0];
+            var items = galleries[gname];
+            var options = { index: index };
+            var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, options);
+            gallery.init();
+        };
+    </script>
+
+    <!-- So Firefox can bookmark->"abo this site" -->
+        <link href="https://fritzm.github.io/feeds/all.rss.xml" rel="alternate" title="fritzm.github.io" type="application/rss+xml">
+
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="navbar-inner">
+    <div class="container">
+
+         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+         </a>
+
+        <a class="brand" href="https://fritzm.github.io">fritzm.github.io</a>
+
+        <div class="nav-collapse">
+        <ul class="nav">
+            
+        </ul>
+        </div>
+        
+    </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="content">
+    <div class="row">
+
+        <div class="span9">
+    <div class='article'>
+        <div class="content-title">
+            <h1>PDP-11/45: Reversing a vintage DL11 hack</h1>
+Fri 27 November 2020
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+        </div>
+	
+        <div><p>I recently had need to assess and repair several DL11 serial interfaces in my stock of spares. One of these
+had had some sort of end-user hack applied; in the course of putting the board back to factory condition, I
+did some analysis of the hack and its intended purpose, documented here.</p>
+<p><img src='/images/pdp11/dl11-user-hack_thumbnail_tall.jpg' title='DL11 with end-user hack' onclick='pswipe("pdp11",85);'/>
+<img src='/images/pdp11/dl11-hack-front_thumbnail_tall.png' title='DL11 user hack front' onclick='pswipe("pdp11",86);'/>
+<img src='/images/pdp11/dl11-hack-back_thumbnail_tall.png' title='DL11 user hack back' onclick='pswipe("pdp11",87);'/></p>
+<p>Easy enough to beep this out and reverse to a schematic:</p>
+<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/dl11-hack-schem.png" 
+title="Schematic of DL11 hack"/></p>
+<p>So, the hack appears to dynamically alter the CSR address and interrupt vector of the card, choosing between
+two hard-wired presets, based on whether P1A/P1B are connected together or not.</p>
+<p>The CSR jumpers on a stock DL11 operate with pull-ups upstream of the address decode logic, so these can be
+directly driven by the hack so long as the jumpers for the bits-to-be-hacked are left open on the board.  The
+vector address bits, however, must be driven by the DL11 onto to the Unibus contingent on an appropriate
+global enable. On a stock DL11, drivers for <em>all</em> configurable vector bits are activated by a single global
+enable, and jumpers downstream of the drivers control which of these activated bits will be admitted to bus.
+So, for the vector address part of the hack to function, hack control must be asserted instead of the global
+enable for each of the to-be-driven bits, and the corresponding jumpers for these bits must be left in.  And
+indeed, upon inspection of the DL11 there are trace cuts that have been done (marked here with "X") to lift
+the global enable and allow individual hack control of each of the affected bits:</p>
+<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/dl11-hack-cuts.png" 
+title="Trace cuts for DL11 hack"/></p>
+<p></br></p>
+<p>Last, we can look at the board jumpering and the wiring of the hack to determine the specific CSR and
+vector addresses at play:</p>
+<style>
+.bitlist { border-collapse: collapse; margin-left: auto; margin-right: auto; margin-bottom: 2ex; }
+.bitlist caption { font-weight: bold; }
+.bitlist .hacked { font-weight: bold; }
+.bitlist tr:nth-child(even) :not(th) { background-color: #f2f2f2; }
+.bitlist td:nth-child(3n+2) { border-left-color: #000000; }
+.bitlist td:nth-child(3n+1) { border-right-color: #000000; }
+.bitlist th, .bitlist td { padding: 5px; }
+.bitlist td { border: 1px solid lightgray; font-family: Menlo,Consolas,monospace; }
+.bitlist tr:first-child td { border-top-color: #000000; }
+.bitlist tr:last-child td { border-bottom-color: #000000; }
+</style>
+
+<table class="bitlist">
+<thead><tr>
+    <th></th>
+    <th>A11</th><th>A10</th><th>A9</th>
+    <th>A8</th><th>A7</th><th>A6</th>
+    <th>A5</th><th>A4</th><th>A3</th>
+    <th>A2</th><th>A1</th><th>A0</th>
+    <th></th>
+</tr></thead>
+<tbody><tr>
+    <th>P1 Open</th>
+    <td>1</td>
+    <td>1</td>
+    <td class="hacked">0</td>
+    <td>1</td>
+    <td>0</td>
+    <td>1</td>
+    <td class="hacked">0</td>
+    <td class="hacked">0</td>
+    <td class="hacked">1</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+    <th>776510</th>
+</tr><tr>
+    <th>P1 Closed</th>
+    <td>1</td>
+    <td>1</td>
+    <td class="hacked">1</td>
+    <td>1</td>
+    <td>0</td>
+    <td>1</td>
+    <td class="hacked">1</td>
+    <td class="hacked">1</td>
+    <td class="hacked">0</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+    <th>777560</th>
+</tr></tbody>
+</table>
+
+<table class="bitlist">
+<thead><tr>
+    <th></th>
+    <th>V8</th><th>V7</th><th>V6</th>
+    <th>V5</th><th>V4</th><th>V3</th>
+    <th>V2</th><th>V1</th><th>V0</th>
+    <th></th>
+</tr></thead>
+<tbody><tr>
+    <th>P1 Open</th>
+    <td>0</td>
+    <td class="hacked">1</td>
+    <td class="hacked">1</td>
+    <td class="hacked">0</td>
+    <td class="hacked">0</td>
+    <td class="hacked">1</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+    <th>310</th>
+</tr><tr>
+    <th>P1 Closed</th>
+    <td>0</td>
+    <td class="hacked">0</td>
+    <td class="hacked">0</td>
+    <td class="hacked">1</td>
+    <td class="hacked">1</td>
+    <td class="hacked">0</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+    <th>060</th>
+</tr></tbody>
+</table>
+
+<p><br/></p>
+<p>We see from these specific addresses that closing the contacts of P1 would dynamically re-jumper the board
+from assignment as the 2nd non-console interface to assignment as the console interface.  So perhaps this was
+once used (in conjunction with another similarly hacked interface?) to swap console terminals with the flip of
+a single switch.</p></div>
+	
+        <hr>
+
+    </div>
+        </div>
+        
+        <div class="span3">
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Site
+                </li>
+            
+                <li><a href="https://fritzm.github.io/archives.html">Archives</a>
+                <li><a href="https://fritzm.github.io/tags.html">Tags</a>
+
+
+
+                <li><a href="https://fritzm.github.io/feeds/all.rss.xml" rel="alternate">RSS feed</a></li>
+
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Categories
+                </li>
+                
+                <li><a href="https://fritzm.github.io/category/math.html">Math</a></li>
+                <li><a href="https://fritzm.github.io/category/pdp-11.html">PDP-11</a></li>
+                <li><a href="https://fritzm.github.io/category/programming.html">Programming</a></li>
+                   
+            </ul>
+            </div>
+
+
+
+
+            <div class="social">
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Social
+                </li>
+           
+                <li><a href="http://facebook.com/fritzmueller">facebook</a></li>
+                <li><a href="http://twitter.com/infrafritz">twitter</a></li>
+                <li><a href="http://instagram.com/infrafritz">Instagram</a></li>
+                <li><a href="http://www.linkedin.com/pub/fritz-mueller/a/679/62/">LinkedIn</a></li>
+                <li><a href="http://jsfiddle.net/user/fritzm/fiddles/">JSFiddle</a></li>
+                <li><a href="https://github.com/fritzm">GitHub</a></li>
+            </ul>
+            </div>
+            </div>
+
+        </div>  
+    </div>     </div> 
+<footer>
+<br />
+<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2020</p>
+</footer>
+
+</div> <!-- /container -->
+
+<!-- Photoswipe -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="pswp__bg"></div>
+    <div class="pswp__scroll-wrap">
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="https://fritzm.github.io/theme/bootstrap-collapse.js"></script>
+ 
+</body>
+</html>
