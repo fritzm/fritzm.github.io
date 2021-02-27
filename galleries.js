@@ -89,4 +89,18 @@ var galleries = {
                             {src:"/images/pdp11/dl11-hack-front.png", w:3024, h:3024, title:"DL11 user hack front"},
                             {src:"/images/pdp11/dl11-hack-back.png", w:3024, h:3024, title:"DL11 user hack back"},
                     ],
+            radios: [
+                            {src:"/images/radios/travler-5028.jpeg", w:4032, h:3024, title:"A 1948 Trav-ler 5028 portable tube AM radio"},
+                            {src:"/images/radios/travler-chassis.jpeg", w:4032, h:3024, title:"Trav-ler 5028 chassis"},
+                            {src:"/images/radios/travler-beneath.jpeg", w:4032, h:3024, title:"Trav-ler 5028 chassis underside"},
+                            {src:"/images/radios/travler-parts.jpeg", w:4032, h:3024, title:"Trav-ler radio disassembled"},
+                            {src:"/images/radios/hickock.jpeg", w:3024, h:3024, title:"Testing tubes on the Hickock 533A"},
+                            {src:"/images/radios/travler-orig-cap.jpeg", w:3024, h:3024, title:"Original multi-stage filter cap for the Trav-ler"},
+                            {src:"/images/radios/travler-replacement-cap.jpeg", w:3024, h:3024, title:"Replacement multi-stage filter cap for the Trav-ler, made from one inch diameter model-rocketry body tube"},
+                            {src:"/images/radios/travler-rebuild.jpeg", w:4032, h:3024, title:"Trav-ler point-to-point rebuild"},
+                            {src:"/images/radios/travler-if.jpeg", w:3024, h:3024, title:"Opening one of the IF transformer cans from the Trav-ler"},
+                            {src:"/images/radios/travler-if2.jpeg", w:3024, h:3024, title:"Interior detail of IF transformer.  Adjustable ferrite slugs screw inward and outward over two coils; integrated mica capacitors at the bottom have already been removed and their contact legs peeled back."},
+                            {src:"/images/radios/travler-if-tweak.jpeg", w:3024, h:3024, title:"De-capped Trav-ler IF transformers re-installed, and temporary trimmer caps in place"},
+                            {src:"/images/radios/fluke-ac-bridge.jpeg", w:3773, h:2830, title:"Fluke AC bridge, here being used to measure a potential replacement silver mica cap for the Trav-ler IF stage"},
+                    ],
     };

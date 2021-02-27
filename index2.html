@@ -74,6 +74,42 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="https://fritzm.github.io/la30-4.html"><h1>PDP-11/45: LA30 repair IV</h1></a>
+Sat 09 December 2017
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p>Received replacement components for the blown G380 solenoid driver channel.  After this repair, all pins are
+firing and printing correctly.  Calibrated left margin.  Checked pin drive signal, which was within
+specifications and required no adjustment.</p>
+<p>Went to check carriage return pulse timing calibrations, but as it turns out the G396 clock accelerator card
+in this LA30 has not had ECO 2 applied and therefore has no timing calibration pots.  Carriage return seems to
+be functioning correctly and reliably after the left margin adjustment in any case.</p>
+<p>Inspected and cleaned the M7910 interface card; it appears to be in good shape.  Rejumpered the base address
+and interrupt vector for console operation. Slotted it into the PDP-11 in place of the DL11 I had been using
+up until now, and cabled up to the LA30.  Booted to the M9301 monitor and then on into RT-11, and everything
+seems to be working fine!  Here's a short video of the RT-11 boot, followed by the start of a session of
+Adventure:</p>
+<p><span class="videobox">
+                    <iframe width="640" height="390"
+                        src='https://www.youtube.com/embed/gMIL2bvUYIs?rel=0'
+                        frameborder='0' webkitAllowFullScreen
+                        mozallowfullscreen allowFullScreen>
+                    </iframe>
+                </span></p></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
         <a href="https://fritzm.github.io/la30-3.html"><h1>PDP-11/45: LA30 repair III</h1></a>
 Sat 02 December 2017
 
@@ -645,47 +681,6 @@ end. I suspect there will probably be a failed IC on the M7820.</p></div>
     <hr />
 </div>
     
-
-        
-
-<div class='article'>
-    <div class="content-title">
-        <a href="https://fritzm.github.io/rk11-5.html"><h1>PDP-11/45: RK11 V - Checksum issues</h1></a>
-Sun 21 May 2017
-
-by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
- 
-    </div>
-    
-    <div><p>Decided to use the disk utilities provided in PDP11GUI to write a fresh RT-11 pack.  PDP11GUI successfully
-assembled and downloaded a driver, then took a little under 2 hours to download the pack image over the
-console serial line and write the pack without indicating any errors.</p>
-<p>The resulting pack fared no better at boot than any of my existing legacy packs, however.  I attempted
-to verify the pack via PDP11GUI, and noticed that the controller was indicating checksum errors for every
-sector on cylinders 64-127 and 192-202 (that is, whenever bit 11 of the RKDA was set).  Tried this on several
-other packs, including the RKDP pack which had previously booted, and found that these errors were returned
-for these cylinders on <em>all</em> packs, so definitely a controller or drive issue, and not specific to any
-particular pack.</p>
-<p>Verified that bit 11 of the RKDA could be read and written normally, and that when so addressed the RK05
-drive would mechanically seek to the correct cylinders.  Programmed some format-mode reads (these just return
-sector headers) manually via the front panel, and verified that the sector headers were being returned
-correctly from disk for the affected cylinders.</p>
-<p>Tried a few flipchip swaps to see if the affected bit would move: B18 and B19 (adder; sheet RK11-C-14; no
-change), A21 and B21 (RKDB; sheet RK11-C-10; no change).</p>
-<p>Programmed some all-mode reads (these return preamble, header, data, and postamble) manually via the front
-panel.  These showed that during reads of affected cylinders, bit 11 was stuck always on.  When reading
-unaffected cylinders, bit 11 turned on and off normally.  So it seemed bit 11 was "leaking" from RKDA to
-RKDB.</p>
-<p>Seeing this, tried a few more swaps: A15 and B15 (internal bus, sheet RK11-C-20, no change), A23 and B23
-(RKDB data path; sheet RK11-C-21; bingo!).  Stuck bit went away on this last swap.  So it looks like a
-failed 7401, E2 on the M149 in slot A23.  Pulled, socketed, and put some 7401 on order at Jameco where I
-can pick them up tomorrow on my way in to work.  Getting closer!</p></div>
-    <hr />
-</div>
-    
 <div class="pagination">
 <ul>
     <li class="prev"><a href="https://fritzm.github.io/index.html">&larr; Previous</a></li>
@@ -733,6 +728,7 @@ can pick them up tomorrow on my way in to work.  Getting closer!</p></div>
                 <li><a href="https://fritzm.github.io/category/math.html">Math</a></li>
                 <li><a href="https://fritzm.github.io/category/pdp-11.html">PDP-11</a></li>
                 <li><a href="https://fritzm.github.io/category/programming.html">Programming</a></li>
+                <li><a href="https://fritzm.github.io/category/radios.html">Radios</a></li>
                    
             </ul>
             </div>
@@ -761,7 +757,7 @@ can pick them up tomorrow on my way in to work.  Getting closer!</p></div>
     </div>     </div> 
 <footer>
 <br />
-<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2020</p>
+<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2021</p>
 </footer>
 
 </div> <!-- /container -->
