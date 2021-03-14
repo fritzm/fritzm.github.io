@@ -103,4 +103,8 @@ var galleries = {
                             {src:"/images/radios/travler-if-tweak.jpeg", w:3024, h:3024, title:"De-capped Trav-ler IF transformers re-installed, and temporary trimmer caps in place"},
                             {src:"/images/radios/fluke-ac-bridge.jpeg", w:3773, h:2830, title:"Fluke AC bridge, here being used to measure a potential replacement silver mica cap for the Trav-ler IF stage"},
                     ],
+            puzzles: [
+                            {src:"/images/puzzles/pyramid-together.jpeg", w:3024, h:3024, title:"Project Genius pyramid puzzle, assembled"},
+                            {src:"/images/puzzles/pyramid-apart.jpeg", w:3024, h:3024, title:"Project Genius pyramid puzzle, disassembled"},
+                    ],
     };

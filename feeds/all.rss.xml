@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0"><channel><title>fritzm.github.io</title><link>https://fritzm.github.io/</link><description></description><lastBuildDate>Fri, 26 Feb 2021 00:00:00 -0800</lastBuildDate><item><title>Trav-ler 5028 Repair</title><link>https://fritzm.github.io/travler-5028.html</link><description>&lt;p&gt;&lt;em&gt;[A catch-up article, documenting events of June/July/August 2020]&lt;/em&gt;&lt;/p&gt;
+<rss version="2.0"><channel><title>fritzm.github.io</title><link>https://fritzm.github.io/</link><description></description><lastBuildDate>Fri, 26 Feb 2021 00:00:00 -0800</lastBuildDate><item><title>Project Genius pyramid puzzle</title><link>https://fritzm.github.io/pyramid.html</link><description>&lt;p&gt;&lt;em&gt;[A catch-up article from Christmas, 2020]&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;My family knows I have a fondness for puzzles, so my son will typically gift me a few each year at Christmas.
+Among the puzzles received this year was the &lt;a href="https://www.amazon.com/Project-Genius-Teaser-Puzzle-Wooden/dp/B07794JV4F"&gt;Project Genius Pyramid&lt;/a&gt;:&lt;/p&gt;
+&lt;p&gt;&lt;img src='/images/puzzles/pyramid-together_thumbnail_tall.jpeg' title='Project Genius pyramid puzzle, assembled' onclick='pswipe("puzzles",0);'/&gt;
+&lt;img src='/images/puzzles/pyramid-apart_thumbnail_tall.jpeg' title='Project Genius pyramid puzzle, disassembled' onclick='pswipe("puzzles",1);'/&gt;&lt;/p&gt;
+&lt;p&gt;This is pretty entertaining to play with -- since the planes and …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Fritz Mueller</dc:creator><pubDate>Fri, 26 Feb 2021 00:00:00 -0800</pubDate><guid isPermaLink="false">tag:fritzm.github.io,2021-02-26:/pyramid.html</guid><category>Programming</category></item><item><title>Trav-ler 5028 Repair</title><link>https://fritzm.github.io/travler-5028.html</link><description>&lt;p&gt;&lt;em&gt;[A catch-up article, documenting events of June/July/August 2020]&lt;/em&gt;&lt;/p&gt;
 &lt;p&gt;Something a little different this time!  A friend of mine asked if I could help restore a late-40's portable
 AM radio set that had belonged to her grandmother:&lt;/p&gt;
 &lt;p&gt;&lt;img src='/images/radios/travler-5028_thumbnail_tall.jpeg' title='A 1948 Trav-ler 5028 portable tube AM radio' onclick='pswipe("radios",0);'/&gt;
