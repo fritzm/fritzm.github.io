@@ -74,6 +74,46 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="https://fritzm.github.io/rk11-7.html"><h1>PDP-11/45: RK11 VII</h1></a>
+Sun 25 June 2017
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p>Okay, back from travel and picked up the thread on the RK11 interrupt problem this weekend. Put the KM11 in
+the first slot on the RK11 which allows to monitor interrupt request. An interrupt can be very easily
+generated from the front panel by writing bit 6 (Interrupt on Done Enable) on in the RKCS register at 777404.
+Did this, and noticed that interrupt request logic on the RK11 went active, but never cleared.</p>
+<p>Checked bus request and grant continuity all the way through to the CPU backplane and back and that looked
+fine (the RK11 in its default configuration uses BR5).</p>
+<p>Chased bus request with a logic probe all the way to the CPU backplane, and it was being asserted correctly.
+Looking at BG5, however, I noticed it was always asserted, even if BR5 was inactive. Disconnected all
+peripherals and terminated the Unibus directly on the CPU backplane, and this was still the case. So there
+was problem with BG5 in the CPU itself.</p>
+<p>Threw the CPU UBC card out on extenders, and took a look at BG5 logic with a logic probe.  The 8881 driver
+for this signal (E42 on sheet UBCD of the engineering drawings) had failed -- pins 8 and 9 were high, but pin
+10, BG5, was not being driven low. Pulled this chip, put in a socket and a replacement, and the BG was then
+working properly.  That's three repairs total to this poor old UBC card so far!  Was able to then verify from
+the front panel that the processor fielded interrupt 220 in response to
+setting the IDE bit in RKCS. Progress!</p>
+<p>Back to the MAINDEC ZRKK -- interrupt test now passes, and the diagnostic continues. BUT... error output now
+on test octal 57, which is working out the "hardware pole" feature of the controller.  Thought this might
+be due to the RK11 being configured for two RK05 drives, but I have restored/connected only the first.
+Rejumpered the G740 flipchip for a single drive, but this didn't seem to help.  Hmmm, will need to read the
+diagnostic source to see what it is trying to do...</p>
+<p><img src='/images/pdp11/G740_thumbnail_tall.jpg' title='G740 Disk Selection flipchip, jumpered for two drives' onclick='pswipe("pdp11",58);'/></p></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
         <a href="https://fritzm.github.io/rk11-6.html"><h1>PDP-11/45: RK11 VI - "Pole" and Interrupt Issues</h1></a>
 Thu 08 June 2017
 
@@ -563,101 +603,6 @@ of the controller and the diagnostic source to understand how to troubleshoot it
     <hr />
 </div>
     
-
-        
-
-<div class='article'>
-    <div class="content-title">
-        <a href="https://fritzm.github.io/diagnostics-14.html"><h1>PDP-11/45: Diagnostics XIV - CPU, MMU, FPU Complete!</h1></a>
-Mon 16 January 2017
-
-by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
- 
-    </div>
-    
-    <div><p>Okay, after socketing in the replacement 74H10 and reseating a few boards, the output from the floating
-point diagnostic now looks correct:</p>
-<p><span style="font-size: x-small; font-family: monospace; white-space: pre; display: block; line-height: normal; font-weight: bold;">................ ................ ................ ................ .........11..... .........11..... .........11..... .........11.....
-................ ................ ................ ................ ..........11.... ..........11.... ..........11.... ..........11....
-................ ................ ................ ................ ...........11... ...........11... ...........11... ...........11...
-................ ................ ................ ................ ............11.. ............11.. ............11.. ............11..
-................ ................ ................ ................ .............11. .............11. .............11. .............11.
-................ ................ ................ ................ ..............11 ..............11 ..............11 ..............11
-................ ................ ................ ................ ...............1 1..............1 1..............1 1..............1
-.......111...... ................ ................ ................ ................ 11.............. 11.............. 11..............
-.......1111..... ................ ................ ................ ................ .11............. .11............. .11.............
-..........11.... ................ ................ ................ ................ ..11............ ..11............ ..11............
-...........11... ................ ................ ................ ................ ...11........... ...11........... ...11...........
-............11.. ................ ................ ................ ................ ....11.......... ....11.......... ....11..........
-.............11. ................ ................ ................ ................ .....11......... .....11......... .....11.........
-..............11 ................ ................ ................ ................ ......11........ ......11........ ......11........
-...............1 1............... ................ ................ ................ .......11....... .......11....... .......11.......
-................ 11.............. ................ ................ ................ ........11...... ........11...... ........11......
-................ .11............. ................ ................ ................ .........11..... .........11..... .........11.....
-................ ..11............ ................ ................ ................ ..........11.... ..........11.... ..........11....
-................ ...11........... ................ ................ ................ ...........11... ...........11... ...........11...
-................ ....11.......... ................ ................ ................ ............11.. ............11.. ............11..
-................ .....11......... ................ ................ ................ .............11. .............11. .............11.
-................ ......11........ ................ ................ ................ ..............11 ..............11 ..............11
-................ .......11....... ................ ................ ................ ...............1 1..............1 1..............1
-.......111...... ........11...... ................ ................ ................ ................ 11.............. 11..............
-.......1111..... .........11..... ................ ................ ................ ................ .11............. .11.............
-..........11.... ..........11.... ................ ................ ................ ................ ..11............ ..11............
-...........11... ...........11... ................ ................ ................ ................ ...11........... ...11...........
-............11.. ............11.. ................ ................ ................ ................ ....11.......... ....11..........
-.............11. .............11. ................ ................ ................ ................ .....11......... .....11.........
-..............11 ..............11 ................ ................ ................ ................ ......11........ ......11........
-...............1 1..............1 1............... ................ ................ ................ .......11....... .......11.......
-................ 11.............. 11.............. ................ ................ ................ ........11...... ........11......
-................ .11............. .11............. ................ ................ ................ .........11..... .........11.....
-................ ..11............ ..11............ ................ ................ ................ ..........11.... ..........11....
-................ ...11........... ...11........... ................ ................ ................ ...........11... ...........11...
-................ ....11.......... ....11.......... ................ ................ ................ ............11.. ............11..
-................ .....11......... .....11......... ................ ................ ................ .............11. .............11.
-................ ......11........ ......11........ ................ ................ ................ ..............11 ..............11
-................ .......11....... .......11....... ................ ................ ................ ...............1 1..............1
-.......111...... ........11...... ........11...... ................ ................ ................ ................ 11..............
-.......1111..... .........11..... .........11..... ................ ................ ................ ................ .11.............
-..........11.... ..........11.... ..........11.... ................ ................ ................ ................ ..11............
-...........11... ...........11... ...........11... ................ ................ ................ ................ ...11...........
-............11.. ............11.. ............11.. ................ ................ ................ ................ ....11..........
-.............11. .............11. .............11. ................ ................ ................ ................ .....11.........
-..............11 ..............11 ..............11 ................ ................ ................ ................ ......11........
-...............1 1..............1 1..............1 1............... ................ ................ ................ .......11.......
-................ 11.............. 11.............. 11.............. ................ ................ ................ ........11......
-................ .11............. .11............. .11............. ................ ................ ................ .........11.....
-................ ..11............ ..11............ ..11............ ................ ................ ................ ..........11....
-................ ...11........... ...11........... ...11........... ................ ................ ................ ...........11...
-................ ....11.......... ....11.......... ....11.......... ................ ................ ................ ............11..
-................ .....11......... .....11......... .....11......... ................ ................ ................ .............11.
-................ ......11........ ......11........ ......11........ ................ ................ ................ ..............11
-................ .......11....... .......11....... .......11....... ................ ................ ................ ...............1
-.......111...... ........11...... ........11...... ........11...... ................ ................ ................ ................
-.......1111..... .........11..... .........11..... .........11..... ................ ................ ................ ................
-.........11..... .........11..... .........11..... .........11..... ................ ................ ................ ................</span></p>
-<p>With this fix, <strong>the machine is now reliably passing the complete suite of CPU, MMU, and FPU diagnostics</strong>
--- a real milestone!  I also loaded paper tape BASIC via PDP11GUI, swapped the console over to my VT100, and
-played around for a little bit.  Working well, and gratifying to see the machine actually running some
-software other than diagnostics.</p>
-<p>So, now, on to the RK11/RK05 storage subsystem for real.  I retrieved the rest of the cabinetry,
-cleaned and reassembled it, and inspected and cleaned the cabinet-top 860 power controller in the second
-cabinet.  This had the usual dead neon indicator and a blown fuse, but was otherwise in good shape.  At first
-I was puzzled by the relay in the 860 not engaging, but after looking at the schematic is was clear that a
-jumper plug on J4 connecting pins 1 and 2 was required.  I recalled seeing one such banging around loose
-in my spare parts box -- so that's where that came from!  Cleaned up the cabinet-top fan in the second
-cabinet as well.</p>
-<p>I have been running the machine off a GFCI quad box behind my washer/dryer, but at this point there is enough
-leakage through filter caps in the various power supplies that the GFCI has started to trip from time to time.
-Took a pause to rewire the box -- left two of the outlets GFCI protected for the washer/dryer, and rewired two
-as non-protected for use with the PDP-11.</p>
-<p><img src='/images/pdp11/cabinets_thumbnail_tall.jpg' title='Cabinet side panels and decorative top panels cleaned and installed' onclick='pswipe("pdp11",40);'/>
-<img src='/images/pdp11/basic_thumbnail_tall.jpg' title='Running papertape BASIC, loaded via PDP11GUI' onclick='pswipe("pdp11",41);'/></p></div>
-    <hr />
-</div>
-    
 <div class="pagination">
 <ul>
     <li class="prev"><a href="https://fritzm.github.io/index2.html">&larr; Previous</a></li>
@@ -702,6 +647,7 @@ as non-protected for use with the PDP-11.</p>
                 Categories
                 </li>
                 
+                <li><a href="https://fritzm.github.io/category/arcade-games.html">Arcade Games</a></li>
                 <li><a href="https://fritzm.github.io/category/math.html">Math</a></li>
                 <li><a href="https://fritzm.github.io/category/pdp-11.html">PDP-11</a></li>
                 <li><a href="https://fritzm.github.io/category/programming.html">Programming</a></li>

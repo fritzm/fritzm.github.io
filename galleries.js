@@ -107,4 +107,11 @@ var galleries = {
                             {src:"/images/puzzles/pyramid-together.jpeg", w:3024, h:3024, title:"Project Genius pyramid puzzle, assembled"},
                             {src:"/images/puzzles/pyramid-apart.jpeg", w:3024, h:3024, title:"Project Genius pyramid puzzle, disassembled"},
                     ],
+            arcades: [
+                            {src:"/images/arcades/tempests.jpeg", w:3024, h:4032, title:"Atari Tempest cabaret and upright, in for repairs"},
+                            {src:"/images/arcades/tempest-cabaret-guts.jpeg", w:3024, h:4032, title:"Atari Tempest cabaret insides"},
+                            {src:"/images/arcades/tempest-bench.png", w:1911, h:1067, title:"Atari Tempest running on the bench"},
+                            {src:"/images/arcades/wg6100-deflection-parasitic.jpeg", w:1024, h:768, title:"A parasitic oscillation from a conterfeit deflection transistor in a WG6100 vector monitor.  Stimulus is a 1 KHz 8V p-p sine wave.  Parasitic initiates near cross-over."},
+                            {src:"/images/arcades/wg6100-deflection-parasitic-zoomed.jpeg", w:1024, h:768, title:"Zoom in on parasitic oscillation in WG6100 deflection amplifier.  Parasitic is approx 4 MHz 200 mV."},
+                    ],
     };
