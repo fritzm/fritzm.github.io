@@ -74,6 +74,231 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="https://fritzm.github.io/1134.html"><h1>PDP-11/34</h1></a>
+Tue 09 March 2021
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p>This spring I worked on repair/restoration of a friend's PDP-11/34.  The system was in fairly good shape, but
+missing a few bits and pieces and with the usual sorts of issues for 45-year-old kit. Started per usual with
+disassembly, cleaning, and inspection.  The BA11-K chassis was in pretty decent shape; just a few scratches
+requiring some sanding and a little touch-up paint to inhibit future corrosion.</p>
+<p>Date codes on the chassis and CPU cards are from 1976, but other components in the chassis are a bit of
+mix-and-match (a KY11-LB console interface and a third-party Monolithic systems memory board date from 1981,
+and a DL11-W SLU/RTC card is from 1977). Serial number is 2001. There is also a sticker for "OHIO NUCLEAR",
+which was an <a href="https://en.wikipedia.org/wiki/Technicare">early manufacturer of CT devices</a>.</p>
+<p><img src='/images/pdp11/1134-serial_thumbnail_tall.jpeg' title='PDP-11/34: serial number tag' onclick='pswipe("pdp11",88);'/>
+<img src='/images/pdp11/1134-chassis-sticker_thumbnail_tall.jpeg' title='PDP-11/34: BA11-K chassis sticker dating the system to 1976' onclick='pswipe("pdp11",89);'/>
+<img src='/images/pdp11/1134-ohio-nuclear_thumbnail_tall.jpg' title='PDP-11/34: partial sticker for 'Ohio Nuclear' -- manufacturers of CT systems' onclick='pswipe("pdp11",90);'/></p>
+<p>Foam problems here were limited to a decayed air pre-filter at the front of the chassis and some padding on
+the cable retaining bar at the rear.  A heat gun and a paint scraper are your friend for removing the leftover
+cellophane adhesive strips that were used to secure the foam.  For the replacement pre-filter, I opted for 3M
+Filtrete carbon pre-filter sheet (part ‎FAPF-UCTF2PAMZ) which comes in sheets large enough to cover the front
+of the chassis and is easily cut to size with scissors.</p>
+<p>The front panel brackets ended up being a bit of a puzzle to reassemble -- I unfortunately failed to pay close
+attention to how exactly the lower fasteners were configured during disassembly.  Most of the wisdom out in
+the restoration community seems to pertain to a newer, and much more convenient, version of these brackets (or
+the ones that arrived on this system were mismatched?)  Here's a picture of the brackets that I have, and a
+shot of the arrangement I finally opted for for the flange-blinded mounting hole at the bottom of the chassis:
+machine screws driven from the back of the bracket with Keps nuts toward the front.  I also added some 1/8"
+nylon spacers so the pre-filter could be extended across the entire front of the chassis, behind the brackets,
+and everything still remains square when tightened up. A serviceable replacement power knob was tracked down
+<a href="https://www.millsupply.com/knob-fan-speed-grumman-olson-53777.php?p=324629">here</a>.</p>
+<p><img src='/images/pdp11/1134-brackets-2_thumbnail_tall.jpg' title='PDP-11/34: BA11-K front panel mounting bracket' onclick='pswipe("pdp11",91);'/>
+<img src='/images/pdp11/1134-brackets-3_thumbnail_tall.jpeg' title='PDP-11/34: BA11-K front panel mounting detail, with nylon spacers to make room for pre-filter' onclick='pswipe("pdp11",92);'/>
+<img src='/images/pdp11/1134-brackets-4_thumbnail_tall.jpeg' title='PDP-11/34: Front panel mounted with replacement air pre-filter in place behind brackets and replacement power knob' onclick='pswipe("pdp11",93);'/></p>
+<p>The BA11-K chassis has an integrated H765 power supply.  The power-controller unit was in pretty good shape,
+but I replaced the line cord since the old one had some fairly serious nicks in its outer jacket.  Also
+replaced cap C1 (50uF) which seemed to be drifting off value.  Replaced the .1uF across-the-line caps mounted
+on the power transformer with modern X2 safety caps.  The DC regulator modules (2x H744 +5V and 1x H745 -15V)
+were disassembled and cleaned.  Reformed all the large electrolytics, then load tested the reassembled
+regulators individually.  Nothing out of sorts here except the usual replacement of burnt out incandescent
+indicator bulbs.</p>
+<p><img src='/images/pdp11/H765-power-controller_thumbnail_tall.jpeg' title='PDP-11/34: H765 power controller module cleaned with new line cord' onclick='pswipe("pdp11",94);'/>
+<img src='/images/pdp11/H765-transformer_thumbnail_tall.jpeg' title='PDP-11/34: H765 power supply main transformer, with modern X2 safety caps (orange) installed' onclick='pswipe("pdp11",95);'/>
+<img src='/images/pdp11/H744-load-test_thumbnail_tall.png' title='PDP-11/34: Load testing an H744 DC regulator module; 'scope displays switching waveform' onclick='pswipe("pdp11",96);'/></p>
+<p>I filled out the system with a near-side M9301 bootstrap-terminator (recent eBay purchase), some G727 "knuckle
+buster" grant continuity cards, and an M9302 SACK turnaround far-side terminator.  New on this restoration was
+a <a href="http://retrocmp.com/projects/unibone">UniBone Linux-to-Unibus bridge</a>, used to emulate storage devices
+among other things (more on this in a separate article soon).  Checked/adjusted NPR continuity on the
+backplane (continuity wire wraps in place for all slots except slot 9, to accommodate the UniBone).  Module
+utilization as follows:</p>
+<style>
+.module-utilization {
+  font-size: smaller;
+  width: 50em;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+  border-collapse: true; 
+}
+.module-utilization th {
+  padding: .5em;
+  font-weight: normal;
+}
+.module-utilization tr:first-child th {
+  width: 16.67%;
+}
+.module-utilization td {
+  border: 1px solid black;
+  padding: .5em;
+  text-align: center;
+}
+.module-utilization td:empty {
+  background-color: LightGray;
+}
+.module-utilization tr:first-child td:first-child {
+  border: none;
+  visibility: hidden;
+}
+</style>
+
+<table class="module-utilization">
+  <tr><td></td><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th></tr>
+  <tr><th>1</td><td colspan=6>M7266 CPU control</td></tr>
+  <tr><th>2</td><td colspan=6>M7265 CPU data path</td></tr>
+  <tr><th>3</td><td colspan=2>M9301 boot term</td><td colspan=4>M7859 console</td></tr>
+  <tr><th>4</td><td colspan=6>Monolithic Systems 303-0158 64 KiB memory</td></tr>
+  <tr><th>5</td><td colspan=2></td><td colspan=4>M7856 serial / line clock</td></tr>
+  <tr><th>6</td><td colspan=3></td><td colspan=1>G727</td><td colspan=2></td></tr>
+  <tr><th>7</td><td colspan=3></td><td colspan=1>G727</td><td colspan=2></td></tr>
+  <tr><th>8</td><td colspan=3></td><td colspan=1>G727</td><td colspan=2></td></tr>
+  <tr><th>9</td><td colspan=2>M9302 SACK term</td><td colspan=4>UniBone</td></tr>
+</table>
+
+<p>Connected up a VT100 to the serial card, and fired things up.  Good signs of life from the front panel, but
+the machine immediately halted without producing a boot monitor prompt.  Was able to reset the machine from
+the front panel, though, and then examine and deposit various memory locations from there.</p>
+<p>Boot ROM memory locations were readable, and the contents looked correct.  RAM addresses were generally
+readable and writable, but bit 10 appeared incorrect (sometimes always set; sometimes always clear).  I was
+also able to successfully write to the console XBUF register from the front panel and see characters appear on
+the VT100.</p>
+<p>A bus init from the front panel followed by manually punching in the boot ROM entry point produced a
+functional ROM monitor on the VT100.  Deposits and examines to RAM done from the boot monitor produced results
+identical to those seen using the front panel (same bit 10 problem).</p>
+<p>One of the cool features of the KY11-LB console is a maintenance mode that can run Unibus bus cycles on its
+own without a CPU.  This gives a way to do limited testing of cards in isolation: just set up the M7859 on a
+powered, terminated backplane segment and plug in cards to be tested one at a time.  Deposits and examines can
+then be done using the buttons and display on the front panel.</p>
+<p>Interestingly, when running this way with just the console and memory cards in place the bit 10 errors were no
+longer apparent.  Some other card was apparently corrupting bit 10 on the bus; by checking one at a time the
+problem was quickly isolated to the M9301 boot terminator card.</p>
+<p>The M9301 drives the implicated bit onto the Unibus via an 8881 bus driver at position E9, as seen below.  The
+signal coming in from the bottom here is ENAB DATA H, which is meant to enable these drivers only when
+the M9301 detects a valid address decode.  Verified that data was being incorrectly driven on BUS D10 L at E9
+pin 13, regardless of the state of pin 12, indicating a faulty driver.  Pulled this, socketed, and replaced
+(with a compatible ECG 7439), and the bit 10 problem was fixed.</p>
+<p><br><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/m9301-data-drivers.png" title="Part of the data drivers for the M9301 bootstrap terminator"/><br></p>
+<p>There was still some problem with auto-boot to the M9301 monitor, however; the monitor prompt would now begin
+to print at power up, but the machine would halt a few characters in.  The front panel bus init plus manual
+jump to monitor entry point workaround was still working though, so put off further investigation of this
+issue until later.</p>
+<p>At this point, given the workaround, the system was working well enough to begin loading and running MAINDEC
+diagnostics over the serial line with PDP11GUI.  Relevant diagnostics, from the PDP-11/34 System User's
+Manual:</p>
+<p><br><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/1134-diags.png" title="PDP 11/34 Diagnostics"/><br></p>
+<p>DFKAA, DFKAB, and DKFAC all ran without issue.  DFKTG, DZKMA, and DZQMC all reported various errors, so 
+time to look into the memory board.</p>
+<p>The board is a Monolithic Systems 303-0158:</p>
+<p><img src='/images/pdp11/1134-memory_thumbnail_tall.jpeg' title='PDP-11/34: Monolithic Systems memory card' onclick='pswipe("pdp11",97);'/></p>
+<p>I could not find any information on the board on the internet, but much can be figured out by inspection and
+testing.  First, the board is using 4116 (16Kx1) DRAMs, pretty usual for the era.  There is space for 4 banks
+of 18; each bank would be 16K words (16 data bits plus two parity bits per word.)  Here we see two banks
+populated, minus one of the parity chips. So we'd expect to see 32K words (64 KiB) mappable (or 28K words [56
+KiB] with address translation disabled, to accommodate the 4K word [8 KiB] I/O page.)  The missing parity chip
+is unlikely to cause any trouble in this application; in an '11/34, there is no memory parity support without
+the optional M7850 parity board installed, and this system does not have one.</p>
+<p>One of the capabilities of the Unibone is to probe the full 18-bit Unibus address space, looking for active
+pages.  These tests indicated that the memory board as configured was responding to the lower 128 KiB of
+addresses, even though only 64 KiB was populated.  One would suppose that the mapped address range was
+configured via the DIP switches on the board.  Some experimentation with various switch settings yielded the
+following:</p>
+<style>
+.dipswitch {
+  font-size: smaller;
+  width: 30em;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+  border-collapse: true; 
+}
+.dipswitch th {
+  padding: .5em;
+  font-weight: normal;
+}
+.dipswitch td {
+  border: 1px solid black;
+  padding: .5em;
+  text-align: center;
+}
+</style>
+
+<table class="dipswitch">
+  <caption>SW1: Memory start addr, 000000 + values as follows</caption>
+  <tr><th>7</th><th>6</th><th>5</th><th>4</th><th>3</th><th></th></tr>
+  <tr><td>0</td><td>.</td><td>.</td><td>.</td><td>.</td><td>400000</td></tr>
+  <tr><td>.</td><td>0</td><td>.</td><td>.</td><td>.</td><td>200000</td></tr>
+  <tr><td>.</td><td>.</td><td>0</td><td>.</td><td>.</td><td>100000</td></tr>
+  <tr><td>.</td><td>.</td><td>.</td><td>0</td><td>.</td><td>040000</td></tr>
+  <tr><td>.</td><td>.</td><td>.</td><td>.</td><td>0</td><td>020000</td></tr>
+</table>
+
+<table class="dipswitch">
+  <caption>SW2: Memory size, 020000 + values as follows</caption>
+  <tr><th>4</th><th>3</th><th>2</th><th>1</th><th></th></tr>
+  <tr><td>0</td><td>.</td><td>.</td><td>.</td><td>200000</td></tr>
+  <tr><td>.</td><td>0</td><td>.</td><td>.</td><td>100000</td></tr>
+  <tr><td>.</td><td>.</td><td>0</td><td>.</td><td>040000</td></tr>
+  <tr><td>.</td><td>.</td><td>.</td><td>0</td><td>020000</td></tr>
+</table>
+
+<p>After setting the switches appropriately for the amount of memory physically present, memory test errors went
+away and the MAINDEC memory diagnostics (excepting parity tests) also ran successfully.</p>
+<p>So the Last thing to fix was the problem with the boot monitor at startup.  For this, the boot ROM card went
+back out on an extender so I could get at it with a logic analyzer.</p>
+<p><img src='/images/pdp11/1134-M9301_thumbnail_tall.jpeg' title='A troublesome M9301 boot ROM card in a PDP-11/34, out on a card extender for troubleshooting.  This one was acting strangely at power-up; the problem is actually visible in this picture...' onclick='pswipe("pdp11",98);'/></p>
+<p>A PDP-11 generates power down and power up traps, through location 024, based on transitions of the AC LO and
+DC LO Unibus signals.  In handling this trap, the processor first reads the PC from location 024, then the PSW
+from location 026.  Many PDP-11s had core memory or battery-backed RAM; this allowed for orderly recovery from
+power failure events.</p>
+<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/ACLO-DCLO.png" title="Power up/down signals"/></p>
+<p>PDP-11 boot ROM cards like the M9301 or its younger cousin the M9312 use a hack to obtain control at boot.
+They monitor AC LO and DC LO, and when detecting a boot condition they jam higher order address bits on the
+Unibus for a the first couple bus cycles.  This causes the PC and PSW to be fetched from locations within the
+address space of the boot ROM card.  Here is most of the circuitry responsible for this:</p>
+<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/M9301-boot-logic.png" title="M9301 boot logic"/></p>
+<p>The bus drivers that jam the address bus are seen on the right.  The central player here is E21, a 9602 
+one-shot. CLEAR ADDR L is supposed to arrive after the first two bus cycles (fetch of PC and PSW) and
+release the bus; the one-shot is set up to timeout after about 300ms and release the bus in any case.</p>
+<p>On the logic analyzer, we can see an issue here:</p>
+<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/M9301-bad-boot.png" title="M9301 at boot with bus release issue"/></p>
+<p>MSYN delimits bus cycles mastered by the CPU.  Here we can see that CLEAR ADDR L never arrives, and so the
+higher-order address bits remained jammed by the M9301 for the full duration of the one-shot timeout.  This is
+okay for the first few instructions, which are executing out of the ROM anyway, but things quickly go awry...</p>
+<p>Here is the circuitry responsible for CLEAR ADDR L:</p>
+<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/M9301-transfer-logic.png" title="M9301 bus release logic"/></p>
+<p>The desired pulse is mediated by 270 uF capacitor C36 in one leg of gate E20, so this is a good thing to check
+first, and... it is actually missing from the board!  (Visible in the M9301 gallery picture above.)  Replaced
+this cap, and now we are in good shape:</p>
+<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/M9301-repaired-boot.png" title="M9301 at boot with bus release issue repaired"/></p>
+<p>With this, the machine is fully repaired.  Spent a little time with it, booting and running various operating
+systems from emulated storage on the Unibone card.  Frieda also approves:</p>
+<p><img src='/images/pdp11/1134-frieda_thumbnail_tall.jpeg' title='Frieda approved PDP-11/34' onclick='pswipe("pdp11",99);'/></p></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
         <a href="https://fritzm.github.io/tempests.html"><h1>Atari Tempest repairs</h1></a>
 Mon 01 March 2021
 
@@ -467,11 +692,11 @@ the indent to pick up the narrative :-)</p>
 tunable capacitor 50 in parallel form a tunable resonant tank.  Tube 1 provides gain, and the output is
 fed back positively via the second coil of transformer 44, forming a tunable oscillator.  Antenna 43 and the
 other half of ganged tunable capacitor 50 in parallel also form a weakly selective tank, which picks up RF
-and dumps it onto an additional grid of tube 1. Tube 1 is arranged such that the sum (mix) of the two
+and dumps it onto an additional grid of tube 1. Tube 1 is arranged such that the a mix of the two
 signals (oscillator and weakly selected RF) appears at the plate.
 
-<p>The oscillator and RF thus mixed "beat" (heterodyne) against each other, forming frequency images in the
-summed signal at both sum and difference frequencies; the difference frequencies will be of interest to us
+<p>The oscillator and RF thus mixed heterodyne against each other, forming frequency images in the
+output signal at both sum and difference frequencies; the difference frequencies will be of interest to us
 here.  Since the frequencies in the weakly selected RF and the oscillator track each other, their differences
 are always centered on a fixed frequency, called the "intermediate frequency", or "IF".  The remainder of the
 circuit need only be concerned with further selection, detection, and amplification at this fixed IF.  In this
@@ -2838,604 +3063,6 @@ online (e.g. EK-1145-OP-001) are much later.</p>
 </li>
 </ul>
 <p>All for now!</p></div>
-    <hr />
-</div>
-    
-
-        
-
-<div class='article'>
-    <div class="content-title">
-        <a href="https://fritzm.github.io/unix-and-ms11.html"><h1>PDP-11/45: V6 Unix attempts & MS11-L repairs</h1></a>
-Mon 21 January 2019
-
-by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
- 
-    </div>
-    
-    <div><p>Following up on Noel's suggestion, I decided to give V6 Unix a try to see how it fared in comparison to the
-problems seen with RSTS/E V06C.  I recently scored an additional RK05 pack from eBay, and decided to try and
-use that so I could keep my current RSTS/E pack intact.</p>
-<p>Inspected the pack, and it looked in good shape, clean, with no apparent crashes on the media.  Mounted it up
-and was able to do only a partial recovery.  What I got looks like pretty generic RT-11/BASIC-11 stuff, so I'm
-not too concerned about attempting a complete recovery.  Went ahead and reformatted the pack, after which I
-could read/write the entire pack with no bad sectors.  So now I had two clean packs to work with.</p>
-<p>Built a V6 Unix pack image from the Ken Wellsch tape under SIMH (using directions <a href="http://gunkies.org/wiki/Installing_Unix_v6_%28PDP-11%29_on_SIMH">here</a>).  Transferred it over using PDP11GUI, and it
-did boot in single-user mode.  However, it immediately dumped core on the first <code>ls</code> command...  Tried a
-multi-user Unix boot (what's to lose?) and this actually fared a bit better; able to <code>ls</code>, but still dumped
-core when trying to run the C compiler or do anything else memory-intensive.</p>
-<p>So, all of this taken together made me (and others collaborating on the troubleshooting on cctalk) think that
-I might have a memory issue in the machine.  My machine has a 256KB MS11-L; I had previously spot-checked this
-from the front panel by manipulating the KT11-C mapping registers and trying some writes/and reads within each
-bank.  This was enough to identify and repair a few major problems (see <a href="https://fritzm.github.io/ms11-debug.html">this</a> older
-blog post) and to get me this far.  But I had never thoroughly and substantially beat this card up after
-things seemed to be working with RT-11.  There was still also nagging concern that none of the heavier-weight
-KT11, MS11, KB11 "exerciser" MAINDEC diagnostics had yet been run to completion on the restored machine
-either...</p>
-<p>The recommended DEC diagnostic for the MS11-L is ZQMC, but it is complicated, takes a long time to download,
-and the available sources don't exactly match the binary.  So, probably better to work up my own standalone
-diagnostic to catch and fix obvious things...  Thus followed about a week of part-time work working up and
-successively refining the following test code, and repairing identified problems (failed DRAMs) on the MS11-L
-along the way.  This code maps and tests every memory location on the MS11-L, using KT11 memory management.
-It relocates itself so it can test the lowest physical bank as well.  Tests include all-ones, all-zeros,
-write address to location, and a "random" data test which just uses program code test sequence:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
-  2
-  3
-  4
-  5
-  6
-  7
-  8
-  9
- 10
- 11
- 12
- 13
- 14
- 15
- 16
- 17
- 18
- 19
- 20
- 21
- 22
- 23
- 24
- 25
- 26
- 27
- 28
- 29
- 30
- 31
- 32
- 33
- 34
- 35
- 36
- 37
- 38
- 39
- 40
- 41
- 42
- 43
- 44
- 45
- 46
- 47
- 48
- 49
- 50
- 51
- 52
- 53
- 54
- 55
- 56
- 57
- 58
- 59
- 60
- 61
- 62
- 63
- 64
- 65
- 66
- 67
- 68
- 69
- 70
- 71
- 72
- 73
- 74
- 75
- 76
- 77
- 78
- 79
- 80
- 81
- 82
- 83
- 84
- 85
- 86
- 87
- 88
- 89
- 90
- 91
- 92
- 93
- 94
- 95
- 96
- 97
- 98
- 99
-100
-101
-102
-103
-104
-105
-106
-107
-108
-109
-110
-111
-112
-113
-114
-115
-116
-117
-118
-119
-120
-121
-122
-123
-124
-125
-126
-127
-128
-129
-130
-131
-132
-133
-134
-135
-136
-137
-138
-139
-140
-141
-142
-143
-144
-145
-146
-147
-148
-149
-150
-151
-152
-153
-154
-155
-156
-157
-158
-159
-160
-161
-162
-163
-164
-165
-166
-167
-168
-169
-170
-171
-172
-173
-174
-175
-176
-177
-178
-179
-180
-181
-182
-183
-184
-185
-186
-187
-188
-189
-190
-191
-192
-193
-194
-195
-196
-197
-198
-199
-200
-201
-202
-203
-204
-205
-206
-207
-208
-209
-210
-211
-212
-213
-214
-215
-216
-217
-218
-219
-220
-221
-222
-223
-224
-225
-226
-227
-228
-229
-230
-231
-232
-233
-234
-235
-236
-237
-238
-239
-240
-241
-242
-243
-244
-245
-246
-247
-248
-249</pre></div></td><td class="code"><div class="highlight"><pre><span></span>        <span class="nt">KIPDR0</span><span class="o">=</span><span class="nt">172300</span>
-        <span class="nt">KIPDR1</span><span class="o">=</span><span class="nt">172302</span>
-        <span class="nt">KIPDR2</span><span class="o">=</span><span class="nt">172304</span>
-        <span class="nt">KIPDR3</span><span class="o">=</span><span class="nt">172306</span>
-        <span class="nt">KIPDR4</span><span class="o">=</span><span class="nt">172310</span>
-        <span class="nt">KIPDR5</span><span class="o">=</span><span class="nt">172312</span>
-        <span class="nt">KIPDR6</span><span class="o">=</span><span class="nt">172314</span>
-        <span class="nt">KIPDR7</span><span class="o">=</span><span class="nt">172316</span>
-
-        <span class="nt">KIPAR0</span><span class="o">=</span><span class="nt">172340</span>
-        <span class="nt">KIPAR1</span><span class="o">=</span><span class="nt">172342</span>
-        <span class="nt">KIPAR2</span><span class="o">=</span><span class="nt">172344</span>
-        <span class="nt">KIPAR3</span><span class="o">=</span><span class="nt">172346</span>
-        <span class="nt">KIPAR4</span><span class="o">=</span><span class="nt">172350</span>
-        <span class="nt">KIPAR5</span><span class="o">=</span><span class="nt">172352</span>
-        <span class="nt">KIPAR6</span><span class="o">=</span><span class="nt">172354</span>
-        <span class="nt">KIPAR7</span><span class="o">=</span><span class="nt">172356</span>
-
-        <span class="nt">SR0</span><span class="o">=</span><span class="nt">177572</span>
-
-        <span class="nt">XCSR</span><span class="o">=</span><span class="nt">177564</span>
-        <span class="nt">XBUF</span><span class="o">=</span><span class="nt">177566</span>
-
-        <span class="p">.</span><span class="nc">ASECT</span>
-        <span class="o">.=</span><span class="nt">1000</span>
-<span class="nt">START</span><span class="o">:</span>
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">700</span><span class="o">,</span><span class="nt">SP</span>         <span class="o">;</span><span class="nt">INIT</span> <span class="nt">STACK</span> <span class="nt">POINTER</span>
-
-        <span class="o">;</span><span class="nt">-----</span> <span class="nt">INSTALL</span> <span class="nt">TRAP</span> <span class="nt">CATCHERS</span>
-
-<span class="nt">TRPS</span><span class="o">:</span>   <span class="nt">CLR</span>     <span class="nt">R0</span>              <span class="o">;</span><span class="nt">CURRENT</span> <span class="nt">VECTOR</span>
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">2</span><span class="o">,</span><span class="nt">R1</span>           <span class="o">;</span><span class="nt">VECTOR</span> <span class="nt">TARGET</span>
-        <span class="nt">CLR</span>     <span class="nt">R2</span>              <span class="o">;</span><span class="nt">HALT</span> <span class="nt">INSTR</span>
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">100</span><span class="o">,</span><span class="nt">R3</span>         <span class="o">;</span><span class="nt">END</span> <span class="nt">VECTOR</span>
-<span class="nt">1</span><span class="o">$:</span>     <span class="nt">MOV</span>     <span class="nt">R1</span><span class="o">,(</span><span class="nt">R0</span><span class="o">)+</span>        <span class="o">;</span><span class="nt">STORE</span> <span class="nt">TARGET</span> <span class="nt">AND</span> <span class="nt">ADVANCE</span>
-        <span class="nt">MOV</span>     <span class="nt">R2</span><span class="o">,(</span><span class="nt">R0</span><span class="o">)+</span>        <span class="o">;</span><span class="nt">STORE</span> <span class="nt">HALT</span> <span class="nt">AND</span> <span class="nt">ADVANCE</span>
-        <span class="nt">ADD</span>     <span class="p">#</span><span class="nn">4</span><span class="o">,</span><span class="nt">R1</span>           <span class="o">;</span><span class="nt">UPDATE</span> <span class="nt">TARGET</span>
-        <span class="nt">SOB</span>     <span class="nt">R3</span><span class="o">,</span><span class="nt">1</span><span class="o">$</span>           <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">OVER</span> <span class="nt">VECTORS</span>
-
-        <span class="o">;</span><span class="nt">-----</span> <span class="nt">INIT</span> <span class="nt">AND</span> <span class="nt">ENABLE</span> <span class="nt">MEMORY</span> <span class="nt">MAPPING</span>
-
-<span class="nt">INITM</span><span class="o">:</span>  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">IPDRS</span><span class="o">,</span><span class="nt">R0</span>       <span class="o">;</span><span class="nt">SRC</span> <span class="nt">PDR</span> <span class="nt">INIT</span> <span class="nt">TABLE</span>
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">KIPDR0</span><span class="o">,</span><span class="nt">R1</span>      <span class="o">;</span><span class="nt">DST</span> <span class="nt">KIPDR0</span>
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">10</span><span class="o">,</span><span class="nt">R2</span>          <span class="o">;</span><span class="nt">DO</span> <span class="nt">EIGHT</span> <span class="nt">PDRS</span>
-        <span class="nt">MOV</span>     <span class="o">(</span><span class="nt">R0</span><span class="o">)+,(</span><span class="nt">R1</span><span class="o">)+</span>     <span class="o">;</span><span class="nt">COPY</span> <span class="nt">AND</span> <span class="nt">ADVANCE</span>
-        <span class="nt">SOB</span>     <span class="nt">R2</span><span class="o">,</span><span class="p">.</span><span class="nc">-2</span>          <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">OVER</span> <span class="nt">PDRS</span>
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">IPARS</span><span class="o">,</span><span class="nt">R0</span>       <span class="o">;</span><span class="nt">SRC</span> <span class="nt">PAR</span> <span class="nt">INIT</span> <span class="nt">TABLE</span>
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">KIPAR0</span><span class="o">,</span><span class="nt">R1</span>      <span class="o">;</span><span class="nt">DST</span> <span class="nt">KIPAR0</span>
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">10</span><span class="o">,</span><span class="nt">R2</span>          <span class="o">;</span><span class="nt">DO</span> <span class="nt">EIGHT</span> <span class="nt">PARS</span>
-        <span class="nt">MOV</span>     <span class="o">(</span><span class="nt">R0</span><span class="o">)+,(</span><span class="nt">R1</span><span class="o">)+</span>     <span class="o">;</span><span class="nt">COPY</span> <span class="nt">AND</span> <span class="nt">ADVANCE</span>
-        <span class="nt">SOB</span>     <span class="nt">R2</span><span class="o">,</span><span class="p">.</span><span class="nc">-2</span>          <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">OVER</span> <span class="nt">PARS</span>
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">1</span><span class="o">,@</span><span class="p">#</span><span class="nn">SR0</span>        <span class="o">;</span><span class="nt">ENABLE</span> <span class="nt">MEMORY</span> <span class="nt">MGMT</span>
-
-        <span class="o">;</span><span class="nt">-----</span> <span class="nt">TEST</span> <span class="nt">32K</span> <span class="nt">MS11</span> <span class="nt">BANKS</span> <span class="nt">AT</span> <span class="nt">PA</span> <span class="nt">100000</span> <span class="nt">THRU</span> <span class="nt">700000</span><span class="o">,</span>
-        <span class="o">;</span>      <span class="nt">RELOCATE</span><span class="o">,</span> <span class="nt">THEN</span> <span class="nt">TEST</span> <span class="nt">BANK</span> <span class="nt">AT</span> <span class="nt">PA</span> <span class="nt">000000</span>
-
-<span class="nt">DOPASS</span><span class="o">:</span> <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">1000</span><span class="o">,</span><span class="nt">R0</span>        <span class="o">;</span><span class="nt">PAR</span> <span class="nt">FOR</span> <span class="nt">PA</span> <span class="nt">100000</span>
-        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">DOBANK</span>       <span class="o">;</span><span class="nt">TEST</span> <span class="nt">IT</span>
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">2000</span><span class="o">,</span><span class="nt">R0</span>        <span class="o">;</span><span class="nt">PAR</span> <span class="nt">FOR</span> <span class="nt">PA</span> <span class="nt">200000</span>
-        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">DOBANK</span>       <span class="o">;</span><span class="nt">TEST</span> <span class="nt">IT</span>
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">3000</span><span class="o">,</span><span class="nt">R0</span>        <span class="o">;</span><span class="nt">PAR</span> <span class="nt">FOR</span> <span class="nt">PA</span> <span class="nt">300000</span>
-        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">DOBANK</span>       <span class="o">;</span><span class="nt">TEST</span> <span class="nt">IT</span>
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">4000</span><span class="o">,</span><span class="nt">R0</span>        <span class="o">;</span><span class="nt">PAR</span> <span class="nt">FOR</span> <span class="nt">PA</span> <span class="nt">400000</span>
-        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">DOBANK</span>       <span class="o">;</span><span class="nt">TEST</span> <span class="nt">IT</span>
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">5000</span><span class="o">,</span><span class="nt">R0</span>        <span class="o">;</span><span class="nt">PAR</span> <span class="nt">FOR</span> <span class="nt">PA</span> <span class="nt">500000</span>
-        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">DOBANK</span>       <span class="o">;</span><span class="nt">TEST</span> <span class="nt">IT</span>
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">6000</span><span class="o">,</span><span class="nt">R0</span>        <span class="o">;</span><span class="nt">PAR</span> <span class="nt">FOR</span> <span class="nt">PA</span> <span class="nt">600000</span>
-        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">DOBANK</span>       <span class="o">;</span><span class="nt">TEST</span> <span class="nt">IT</span>
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">7000</span><span class="o">,</span><span class="nt">R0</span>        <span class="o">;</span><span class="nt">PAR</span> <span class="nt">FOR</span> <span class="nt">PA</span> <span class="nt">700000</span>
-        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">DOBANK</span>       <span class="o">;</span><span class="nt">TEST</span> <span class="nt">IT</span>
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">1000</span><span class="o">,</span><span class="nt">R5</span>        <span class="o">;</span><span class="nt">RELOC</span> <span class="nt">TARGET</span> <span class="nt">PA</span><span class="p">:</span><span class="nd">100000</span>
-        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">RELOC</span>        <span class="o">;</span><span class="nt">GO</span> <span class="nt">DO</span> <span class="nt">IT</span>
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">0000</span><span class="o">,</span><span class="nt">R0</span>        <span class="o">;</span><span class="nt">PAR</span> <span class="nt">FOR</span> <span class="nt">PA</span> <span class="nt">000000</span>
-        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">DOBANK</span>       <span class="o">;</span><span class="nt">TEST</span> <span class="nt">IT</span>
-
-        <span class="o">;</span><span class="nt">-----</span> <span class="nt">ALL</span> <span class="nt">DONE</span> <span class="nt">WITH</span> <span class="nt">PASS</span>
-
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">0000</span><span class="o">,</span><span class="nt">R5</span>        <span class="o">;</span><span class="nt">RELOC</span> <span class="nt">TARGET</span> <span class="nt">PA</span><span class="p">:</span><span class="nd">000000</span>
-        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">RELOC</span>        <span class="o">;</span><span class="nt">GO</span> <span class="nt">DO</span> <span class="nt">IT</span>
-        <span class="nt">CLR</span>     <span class="o">@</span><span class="p">#</span><span class="nn">SR0</span>           <span class="o">;</span><span class="nt">DISABLE</span> <span class="nt">MEMORY</span> <span class="nt">MGMT</span>
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">PCOMPL</span><span class="o">,</span><span class="nt">R5</span>      <span class="o">;</span><span class="nt">GET</span> <span class="nt">PASS</span> <span class="nt">COMPLETE</span> <span class="nt">MSG</span>
-        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRSTR</span>        <span class="o">;</span><span class="nt">PRINT</span> <span class="nt">IT</span>
-        <span class="nt">HALT</span>                    <span class="o">;</span><span class="nt">ALL</span> <span class="nt">DONE</span>
-
-        <span class="o">;</span><span class="nt">-----</span> <span class="nt">MAP</span> <span class="nt">A</span> <span class="nt">SINGLE</span> <span class="nt">32K</span> <span class="nt">BANK</span> <span class="nt">AT</span> <span class="nt">VA</span> <span class="nt">20000</span>
-
-<span class="nt">DOBANK</span><span class="o">:</span> <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">KIPAR1</span><span class="o">,</span><span class="nt">R1</span>      <span class="o">;</span><span class="nt">WILL</span> <span class="nt">MAP</span> <span class="nt">USING</span> <span class="nt">KIPAR1</span> <span class="nt">THRU</span> <span class="nt">KIPAR4</span>
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">4</span><span class="o">,</span><span class="nt">R3</span>           <span class="o">;</span><span class="nt">FOUR</span> <span class="nt">KIPARS</span> <span class="nt">TO</span> <span class="nt">SET</span>
-        <span class="nt">CMP</span>     <span class="nt">R0</span><span class="o">,</span><span class="p">#</span><span class="nn">7000</span>        <span class="o">;</span><span class="nt">UNLESS</span> <span class="nt">WE</span> <span class="nt">ARE</span> <span class="nt">IN</span> <span class="nt">PA</span> <span class="nt">700000</span> <span class="nt">BANK</span><span class="o">...</span>      
-        <span class="nt">BNE</span>     <span class="nt">1</span><span class="o">$</span>              <span class="o">;</span><span class="nt">IF</span> <span class="nt">NOT</span><span class="o">,</span> <span class="nt">SKIP</span> <span class="nt">AHEAD</span>
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">3</span><span class="o">,</span><span class="nt">R3</span>           <span class="o">;</span><span class="nt">OTHERWISE</span><span class="o">,</span> <span class="nt">SCALE</span> <span class="nt">BACK</span> <span class="nt">TO</span> <span class="nt">3</span> <span class="nt">KIPARS</span>
-<span class="nt">1</span><span class="o">$:</span>     <span class="nt">MOV</span>     <span class="nt">R0</span><span class="o">,(</span><span class="nt">R1</span><span class="o">)+</span>        <span class="o">;</span><span class="nt">SET</span> <span class="nt">A</span> <span class="nt">KIPAR</span> <span class="nt">AND</span> <span class="nt">ADVANCE</span>
-        <span class="nt">ADD</span>     <span class="p">#</span><span class="nn">200</span><span class="o">,</span><span class="nt">R0</span>         <span class="o">;</span><span class="nt">INCREMENT</span> <span class="nt">VALUE</span> <span class="nt">FOR</span> <span class="nt">NEXT</span> <span class="nt">KIPAR</span>
-        <span class="nt">SOB</span>     <span class="nt">R3</span><span class="o">,</span><span class="nt">1</span><span class="o">$</span>           <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">OVER</span> <span class="nt">KIPARS</span>
-
-        <span class="o">;</span><span class="nt">-----</span> <span class="nt">CALCULATE</span> <span class="nt">END</span> <span class="nt">VA</span>
-
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">120000</span><span class="o">,</span><span class="nt">R1</span>      <span class="o">;</span><span class="nt">MAPPED</span> <span class="nt">BANK</span> <span class="nt">END</span> <span class="nt">IS</span> <span class="nt">VA</span> <span class="nt">120000</span>
-        <span class="nt">CMP</span>     <span class="o">@</span><span class="p">#</span><span class="nn">KIPAR1</span><span class="o">,</span><span class="p">#</span><span class="nn">7000</span>  <span class="o">;</span><span class="nt">UNLESS</span> <span class="nt">WE</span> <span class="nt">ARE</span> <span class="nt">IN</span> <span class="nt">PA</span> <span class="nt">700000</span> <span class="nt">BANK</span><span class="o">...</span>
-        <span class="nt">BNE</span>     <span class="nt">ZEROS</span>           <span class="o">;</span><span class="nt">IF</span> <span class="nt">NOT</span><span class="o">,</span> <span class="nt">SKIP</span> <span class="nt">AHEAD</span>
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">100000</span><span class="o">,</span><span class="nt">R1</span>      <span class="o">;</span><span class="nt">OTHERWISE</span><span class="o">,</span> <span class="nt">END</span> <span class="nt">IS</span> <span class="nt">VA</span> <span class="nt">100000</span>
-
-        <span class="o">;</span><span class="nt">-----</span> <span class="nt">ZEROS</span> <span class="nt">TEST</span>
-
-<span class="nt">ZEROS</span><span class="o">:</span>  <span class="nt">CLR</span>     <span class="nt">R2</span>              <span class="o">;</span><span class="nt">EXPECTED</span> <span class="nt">VALUE</span> <span class="nt">IS</span> <span class="nt">000000</span>
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">20000</span><span class="o">,</span><span class="nt">R0</span>       <span class="o">;</span><span class="nt">START</span> <span class="nt">AT</span> <span class="nt">VA</span> <span class="nt">20000</span>
-<span class="nt">1</span><span class="o">$:</span>     <span class="nt">MOV</span>     <span class="nt">R2</span><span class="o">,(</span><span class="nt">R0</span><span class="o">)+</span>        <span class="o">;</span><span class="nt">CLEAR</span> <span class="nt">A</span> <span class="nt">WORD</span> <span class="nt">AND</span> <span class="nt">ADVANCE</span>
-        <span class="nt">CMP</span>     <span class="nt">R0</span><span class="o">,</span><span class="nt">R1</span>           <span class="o">;</span><span class="nt">AT</span> <span class="nt">END</span><span class="o">?</span>
-        <span class="nt">BNE</span>     <span class="nt">1</span><span class="o">$</span>              <span class="o">;</span><span class="nt">IF</span> <span class="nt">NOT</span><span class="o">,</span> <span class="nt">LOOP</span>
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">20000</span><span class="o">,</span><span class="nt">R0</span>       <span class="o">;</span><span class="nt">START</span> <span class="nt">AT</span> <span class="nt">VA</span> <span class="nt">20000</span>
-<span class="nt">2</span><span class="o">$:</span>     <span class="nt">TST</span>     <span class="o">(</span><span class="nt">R0</span><span class="o">)+</span>           <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">A</span> <span class="nt">WORD</span> <span class="nt">AND</span> <span class="nt">ADVANCE</span>
-        <span class="nt">BEQ</span>     <span class="nt">3</span><span class="o">$</span>              <span class="o">;</span><span class="nt">IF</span> <span class="nt">ZERO</span><span class="o">,</span> <span class="nt">SKIP</span> <span class="nt">AHEAD</span>
-        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRERR</span>        <span class="o">;</span><span class="nt">OTHERWISE</span><span class="o">,</span> <span class="nt">REPORT</span> <span class="nt">ERROR</span>
-<span class="nt">3</span><span class="o">$:</span>     <span class="nt">CMP</span>     <span class="nt">R0</span><span class="o">,</span><span class="nt">R1</span>           <span class="o">;</span><span class="nt">AT</span> <span class="nt">END</span><span class="o">?</span>
-        <span class="nt">BNE</span>     <span class="nt">2</span><span class="o">$</span>              <span class="o">;</span><span class="nt">IF</span> <span class="nt">NOT</span><span class="o">,</span> <span class="nt">LOOP</span>
-
-        <span class="o">;</span><span class="nt">-----</span> <span class="nt">ONES</span> <span class="nt">TEST</span>
-
-<span class="nt">ONES</span><span class="o">:</span>   <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">177777</span><span class="o">,</span><span class="nt">R2</span>      <span class="o">;</span><span class="nt">EXPECTED</span> <span class="nt">VALUE</span> <span class="nt">US</span> <span class="nt">177777</span>       
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">20000</span><span class="o">,</span><span class="nt">R0</span>       <span class="o">;</span><span class="nt">START</span> <span class="nt">AT</span> <span class="nt">VA</span> <span class="nt">20000</span>
-<span class="nt">1</span><span class="o">$:</span>     <span class="nt">MOV</span>     <span class="nt">R2</span><span class="o">,(</span><span class="nt">R0</span><span class="o">)+</span>        <span class="o">;</span><span class="nt">WRITE</span> <span class="nt">A</span> <span class="nt">WORD</span> <span class="nt">AND</span> <span class="nt">ADVANCE</span>
-        <span class="nt">CMP</span>     <span class="nt">R0</span><span class="o">,</span><span class="nt">R1</span>           <span class="o">;</span><span class="nt">AT</span> <span class="nt">END</span><span class="o">?</span>
-        <span class="nt">BNE</span>     <span class="nt">1</span><span class="o">$</span>              <span class="o">;</span><span class="nt">IF</span> <span class="nt">NOT</span><span class="o">,</span> <span class="nt">LOOP</span>
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">20000</span><span class="o">,</span><span class="nt">R0</span>       <span class="o">;</span><span class="nt">START</span> <span class="nt">AT</span> <span class="nt">VA</span> <span class="nt">20000</span>
-<span class="nt">2</span><span class="o">$:</span>     <span class="nt">CMP</span>     <span class="o">(</span><span class="nt">R0</span><span class="o">)+,</span><span class="nt">R2</span>        <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">A</span> <span class="nt">WORD</span> <span class="nt">AND</span> <span class="nt">ADVANCE</span>
-        <span class="nt">BEQ</span>     <span class="nt">3</span><span class="o">$</span>              <span class="o">;</span><span class="nt">IF</span> <span class="nt">EXPECTED</span> <span class="nt">VALUE</span><span class="o">,</span> <span class="nt">SKIP</span> <span class="nt">AHEAD</span>
-        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRERR</span>        <span class="o">;</span><span class="nt">OTHERWISE</span><span class="o">,</span> <span class="nt">REPORT</span> <span class="nt">ERROR</span>
-<span class="nt">3</span><span class="o">$:</span>     <span class="nt">CMP</span>     <span class="nt">R0</span><span class="o">,</span><span class="nt">R1</span>           <span class="o">;</span><span class="nt">AT</span> <span class="nt">END</span><span class="o">?</span>
-        <span class="nt">BNE</span>     <span class="nt">2</span><span class="o">$</span>              <span class="o">;</span><span class="nt">IF</span> <span class="nt">NOT</span><span class="o">,</span> <span class="nt">LOOP</span>
-
-        <span class="o">;</span><span class="nt">-----</span> <span class="nt">WRITE</span> <span class="nt">LOCATION</span> <span class="nt">WITH</span> <span class="nt">ITS</span> <span class="nt">VA</span> <span class="nt">TEST</span>
-
-<span class="nt">ADDRS</span><span class="o">:</span>  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">20000</span><span class="o">,</span><span class="nt">R0</span>       <span class="o">;</span><span class="nt">START</span> <span class="nt">AT</span> <span class="nt">VA</span> <span class="nt">20000</span>
-<span class="nt">1</span><span class="o">$:</span>     <span class="nt">MOV</span>     <span class="nt">R0</span><span class="o">,</span><span class="nt">R2</span>           <span class="o">;</span><span class="nt">USE</span> <span class="nt">VA</span> <span class="nt">AS</span> <span class="nt">TEST</span> <span class="nt">VALUE</span>
-        <span class="nt">MOV</span>     <span class="nt">R2</span><span class="o">,(</span><span class="nt">R0</span><span class="o">)+</span>        <span class="o">;</span><span class="nt">WRITE</span> <span class="nt">A</span> <span class="nt">WORD</span> <span class="nt">AND</span> <span class="nt">ADVANCE</span>
-        <span class="nt">CMP</span>     <span class="nt">R0</span><span class="o">,</span><span class="nt">R1</span>           <span class="o">;</span><span class="nt">AT</span> <span class="nt">END</span><span class="o">?</span>
-        <span class="nt">BNE</span>     <span class="nt">1</span><span class="o">$</span>              <span class="o">;</span><span class="nt">IF</span> <span class="nt">NOT</span><span class="o">,</span> <span class="nt">LOOP</span>
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">20000</span><span class="o">,</span><span class="nt">R0</span>       <span class="o">;</span><span class="nt">START</span> <span class="nt">AT</span> <span class="nt">VA</span> <span class="nt">20000</span>
-<span class="nt">2</span><span class="o">$:</span>     <span class="nt">MOV</span>     <span class="nt">R0</span><span class="o">,</span><span class="nt">R2</span>           <span class="o">;</span><span class="nt">USE</span> <span class="nt">VA</span> <span class="nt">AS</span> <span class="nt">TEST</span> <span class="nt">VALUE</span>
-        <span class="nt">CMP</span>     <span class="o">(</span><span class="nt">R0</span><span class="o">)+,</span><span class="nt">R2</span>        <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">A</span> <span class="nt">WORD</span> <span class="nt">AND</span> <span class="nt">ADVANCE</span>
-        <span class="nt">BEQ</span>     <span class="nt">3</span><span class="o">$</span>              <span class="o">;</span><span class="nt">IF</span> <span class="nt">EXPECTED</span> <span class="nt">VALUE</span><span class="o">,</span> <span class="nt">SKIP</span> <span class="nt">AHEAD</span>
-        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRERR</span>        <span class="o">;</span><span class="nt">REPORT</span> <span class="nt">ERROR</span>
-<span class="nt">3</span><span class="o">$:</span>     <span class="nt">CMP</span>     <span class="nt">R0</span><span class="o">,</span><span class="nt">R1</span>           <span class="o">;</span><span class="nt">AT</span> <span class="nt">END</span><span class="o">?</span>
-        <span class="nt">BNE</span>     <span class="nt">2</span><span class="o">$</span>
-
-        <span class="o">;</span><span class="nt">-----</span> <span class="s2">&quot;RANDOM&quot;</span> <span class="nt">DATA</span> <span class="nt">TEST</span> <span class="o">(</span><span class="nt">PROGRAM</span> <span class="nt">AS</span> <span class="nt">TEST</span> <span class="nt">DATA</span><span class="o">)</span>
-
-<span class="nt">RNDM</span><span class="o">:</span>   <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">START</span><span class="o">,</span><span class="nt">R2</span>       <span class="o">;</span><span class="nt">SRC</span><span class="o">:</span> <span class="nt">START</span> <span class="nt">OF</span> <span class="nt">PROGRAM</span>
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">20000</span><span class="o">,</span><span class="nt">R0</span>       <span class="o">;</span><span class="nt">DST</span><span class="o">:</span> <span class="nt">VA</span> <span class="nt">20000</span>
-<span class="nt">1</span><span class="o">$:</span>     <span class="nt">MOV</span>     <span class="o">(</span><span class="nt">R2</span><span class="o">)+,(</span><span class="nt">R0</span><span class="o">)+</span>     <span class="o">;</span><span class="nt">WRITE</span> <span class="nt">A</span> <span class="nt">WORD</span> <span class="nt">AND</span> <span class="nt">ADVANCE</span>
-        <span class="nt">CMP</span>     <span class="nt">R0</span><span class="o">,</span><span class="nt">R1</span>           <span class="o">;</span><span class="nt">AT</span> <span class="nt">END</span><span class="o">?</span>
-        <span class="nt">BEQ</span>     <span class="nt">2</span><span class="o">$</span>              <span class="o">;</span><span class="nt">IF</span> <span class="nt">SO</span><span class="o">,</span> <span class="nt">SKIP</span> <span class="nt">AHEAD</span>
-        <span class="nt">CMP</span>     <span class="nt">R2</span><span class="o">,</span><span class="p">#</span><span class="nn">END</span>         <span class="o">;</span><span class="nt">TIME</span> <span class="nt">TO</span> <span class="nt">RESET</span> <span class="nt">SRC</span><span class="o">?</span>
-        <span class="nt">BLO</span>     <span class="nt">1</span><span class="o">$</span>              <span class="o">;</span><span class="nt">IF</span> <span class="nt">NOT</span><span class="o">,</span> <span class="nt">GO</span> <span class="nt">DO</span> <span class="nt">ANOTHER</span>
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">START</span><span class="o">,</span><span class="nt">R2</span>       <span class="o">;</span><span class="nt">OTHERWISE</span> <span class="nt">RESET</span> <span class="nt">SRC</span>
-        <span class="nt">BR</span>      <span class="nt">1</span><span class="o">$</span>              <span class="o">;</span><span class="nt">AND</span> <span class="nt">GO</span> <span class="nt">DO</span> <span class="nt">ANOTHER</span>
-<span class="nt">2</span><span class="o">$:</span>     <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">START</span><span class="o">,</span><span class="nt">R2</span>       <span class="o">;</span><span class="nt">SRC1</span><span class="o">:</span> <span class="nt">START</span> <span class="nt">OF</span> <span class="nt">PROGRAM</span>
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">20000</span><span class="o">,</span><span class="nt">R0</span>       <span class="o">;</span><span class="nt">SRC2</span><span class="o">:</span> <span class="nt">VA</span> <span class="nt">20000</span>
-<span class="nt">3</span><span class="o">$:</span>     <span class="nt">CMP</span>     <span class="o">(</span><span class="nt">R2</span><span class="o">)+,(</span><span class="nt">R0</span><span class="o">)+</span>     <span class="o">;</span><span class="nt">COMPARE</span> <span class="nt">ONE</span> <span class="nt">WORD</span> <span class="nt">AND</span> <span class="nt">ADVANCE</span>
-        <span class="nt">BEQ</span>     <span class="nt">4</span><span class="o">$</span>              <span class="o">;</span><span class="nt">IF</span> <span class="nt">SAME</span><span class="o">,</span> <span class="nt">SKIP</span> <span class="nt">AHEAD</span>
-        <span class="nt">MOV</span>     <span class="nt">R2</span><span class="o">,</span><span class="nt">-</span><span class="o">(</span><span class="nt">SP</span><span class="o">)</span>        <span class="o">;</span><span class="nt">SAVE</span> <span class="nt">SRC1</span>
-        <span class="nt">MOV</span>     <span class="nt">-2</span><span class="o">(</span><span class="nt">R2</span><span class="o">),</span><span class="nt">R2</span>       <span class="o">;</span><span class="nt">FETCH</span> <span class="nt">EXPECTED</span> <span class="nt">VALUE</span>
-        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRERR</span>        <span class="o">;</span><span class="nt">REPORT</span> <span class="nt">ERROR</span>
-        <span class="nt">MOV</span>     <span class="o">(</span><span class="nt">SP</span><span class="o">)+,</span><span class="nt">R2</span>        <span class="o">;</span><span class="nt">RESTORE</span> <span class="nt">SRC1</span>
-<span class="nt">4</span><span class="o">$:</span>     <span class="nt">CMP</span>     <span class="nt">R0</span><span class="o">,</span><span class="nt">R1</span>           <span class="o">;</span><span class="nt">AT</span> <span class="nt">END</span><span class="o">?</span>
-        <span class="nt">BEQ</span>     <span class="nt">5</span><span class="o">$</span>              <span class="o">;</span><span class="nt">IF</span> <span class="nt">SO</span><span class="o">,</span> <span class="nt">SKIP</span> <span class="nt">AHEAD</span>
-        <span class="nt">CMP</span>     <span class="nt">R2</span><span class="o">,</span><span class="p">#</span><span class="nn">END</span>         <span class="o">;</span><span class="nt">TIME</span> <span class="nt">TO</span> <span class="nt">RESET</span> <span class="nt">SRC1</span><span class="o">?</span>
-        <span class="nt">BLO</span>     <span class="nt">3</span><span class="o">$</span>              <span class="o">;</span><span class="nt">IF</span> <span class="nt">NOT</span><span class="o">,</span> <span class="nt">GO</span> <span class="nt">DO</span> <span class="nt">ANOTHER</span>
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">START</span><span class="o">,</span><span class="nt">R2</span>       <span class="o">;</span><span class="nt">OTHERWISE</span> <span class="nt">RESET</span> <span class="nt">SRC1</span>
-        <span class="nt">BR</span>      <span class="nt">3</span><span class="o">$</span>              <span class="o">;</span><span class="nt">AND</span> <span class="nt">GO</span> <span class="nt">DO</span> <span class="nt">ANOTHER</span>
-
-<span class="nt">5</span><span class="o">$:</span>     <span class="nt">RTS</span>     <span class="nt">PC</span>              <span class="o">;</span><span class="nt">TESTS</span> <span class="nt">DONE</span><span class="o">,</span> <span class="nt">RETURN</span> <span class="nt">TO</span> <span class="nt">CALLER</span>
-
-        <span class="o">;</span><span class="nt">-----</span> <span class="nt">RELOCATE</span>
-
-<span class="nt">RELOC</span><span class="o">:</span>  <span class="nt">MOV</span>     <span class="nt">R5</span><span class="o">,@</span><span class="p">#</span><span class="nn">KIPAR1</span>     <span class="o">;</span><span class="nt">MAP</span> <span class="nt">VA</span><span class="p">:</span><span class="nd">020000</span> <span class="nt">-</span><span class="o">&gt;</span> <span class="nt">PA</span><span class="o">:(</span><span class="nt">R5</span><span class="o">&lt;&lt;</span><span class="nt">6</span><span class="o">)</span> 
-        <span class="nt">CLR</span>     <span class="nt">R0</span>              <span class="o">;</span><span class="nt">SRC</span> <span class="nt">VA</span><span class="p">:</span><span class="nd">000000</span> 
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">20000</span><span class="o">,</span><span class="nt">R1</span>       <span class="o">;</span><span class="nt">DST</span> <span class="nt">VA</span><span class="p">:</span><span class="nd">020000</span>
-        <span class="nt">MOV</span>     <span class="nt">R1</span><span class="o">,</span><span class="nt">R2</span>           <span class="o">;</span><span class="nt">FULL</span> <span class="nt">PAGE</span> <span class="o">(</span><span class="nt">4K</span> <span class="nt">WORDS</span><span class="o">)</span>
-        <span class="nt">MOV</span>     <span class="o">(</span><span class="nt">R0</span><span class="o">)+,(</span><span class="nt">R1</span><span class="o">)+</span>     <span class="o">;</span><span class="nt">COPY</span> <span class="nt">A</span> <span class="nt">WORD</span>
-        <span class="nt">SOB</span>     <span class="nt">R2</span><span class="o">,</span><span class="p">.</span><span class="nc">-2</span>          <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">UNTIL</span> <span class="nt">DONE</span>
-        <span class="nt">MOV</span>     <span class="nt">R5</span><span class="o">,@</span><span class="p">#</span><span class="nn">KIPAR0</span>     <span class="o">;</span><span class="nt">MAP</span> <span class="nt">VA</span><span class="p">:</span><span class="nd">000000</span> <span class="nt">-</span><span class="o">&gt;</span> <span class="nt">PA</span><span class="o">:(</span><span class="nt">R5</span><span class="o">&lt;&lt;</span><span class="nt">6</span><span class="o">)</span>
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">RELSTR</span><span class="o">,</span><span class="nt">R5</span>      <span class="o">;</span><span class="nt">GET</span> <span class="nt">RELOCATED</span> <span class="nt">STRING</span>
-        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRSTR</span>        <span class="o">;</span><span class="nt">PRINT</span> <span class="nt">IT</span>
-        <span class="nt">MOV</span>     <span class="o">@</span><span class="p">#</span><span class="nn">KIPAR1</span><span class="o">,</span><span class="nt">R5</span>     <span class="o">;</span><span class="nt">GET</span> <span class="nt">RELOCATION</span> <span class="nt">TARGET</span>
-        <span class="nt">ASHC</span>    <span class="p">#</span><span class="nn">6</span><span class="o">,</span><span class="nt">R4</span>           <span class="o">;</span><span class="nt">SHIFT</span> <span class="nt">OVER</span> <span class="nt">FOR</span> <span class="nt">PA</span> <span class="nt">IN</span> <span class="nt">R4</span><span class="p">:</span><span class="nd">R5</span>
-        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRW18</span>        <span class="o">;</span><span class="nt">PRINT</span> <span class="nt">IT</span>
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">CRLF</span><span class="o">,</span><span class="nt">R5</span>        <span class="o">;</span><span class="nt">GET</span> <span class="nt">CRLF</span>
-        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRSTR</span>        <span class="o">;</span><span class="nt">PRINT</span> <span class="nt">IT</span>
-        <span class="nt">RTS</span>     <span class="nt">PC</span>              <span class="o">;</span><span class="nt">RETURN</span> <span class="nt">TO</span> <span class="nt">CALLER</span>
-
-        <span class="o">;</span><span class="nt">-----</span> <span class="nt">REPORT</span> <span class="nt">AN</span> <span class="nt">ERROR</span>
-
-<span class="nt">PRERR</span><span class="o">:</span>  <span class="nt">MOV</span>     <span class="o">@</span><span class="p">#</span><span class="nn">KIPAR1</span><span class="o">,</span><span class="nt">R5</span>     <span class="o">;</span><span class="nt">GET</span> <span class="nt">KIPAR</span> <span class="nt">FOR</span> <span class="nt">MAPPED</span> <span class="nt">BASE</span>      
-        <span class="nt">ASHC</span>    <span class="p">#</span><span class="nn">6</span><span class="o">,</span><span class="nt">R4</span>           <span class="o">;</span><span class="nt">SHIFT</span> <span class="nt">OVER</span> <span class="nt">FOR</span> <span class="nt">PA</span> <span class="nt">IN</span> <span class="nt">R4</span><span class="p">:</span><span class="nd">R5</span>
-        <span class="nt">ADD</span>     <span class="nt">R0</span><span class="o">,</span><span class="nt">R5</span>           <span class="o">;</span><span class="nt">ADD</span> <span class="nt">IN</span> <span class="nt">ERROR</span> <span class="nt">VA</span>
-        <span class="nt">ADC</span>     <span class="nt">R4</span>              <span class="o">;</span><span class="nt">CARRY</span> <span class="nt">IF</span> <span class="nt">NECESSSARY</span>
-        <span class="nt">SUB</span>     <span class="p">#</span><span class="nn">20002</span><span class="o">,</span><span class="nt">R5</span>       <span class="o">;</span><span class="nt">SUB</span> <span class="nt">VA</span> <span class="nt">OFFSET</span> <span class="nt">AND</span> <span class="nt">BACK</span> <span class="nt">UP</span> <span class="nt">ONE</span>
-        <span class="nt">SBC</span>     <span class="nt">R4</span>              <span class="o">;</span><span class="nt">BORROW</span> <span class="nt">IF</span> <span class="nt">NECESSARY</span>
-        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRW18</span>        <span class="o">;</span><span class="nt">PRINT</span> <span class="nt">PHYSICAL</span> <span class="nt">ADDRESS</span>
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">DELIM1</span><span class="o">,</span><span class="nt">R5</span>      <span class="o">;</span><span class="nt">GET</span> <span class="nt">DELIMITER</span>
-        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRSTR</span>        <span class="o">;</span><span class="nt">PRINT</span> <span class="nt">IT</span>
-        <span class="nt">MOV</span>     <span class="nt">R2</span><span class="o">,</span><span class="nt">R5</span>           <span class="o">;</span><span class="nt">GET</span> <span class="nt">EXPECTED</span> <span class="nt">VALUE</span>
-        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRW16</span>        <span class="o">;</span><span class="nt">PRINT</span> <span class="nt">IT</span>
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">DELIM2</span><span class="o">,</span><span class="nt">R5</span>      <span class="o">;</span><span class="nt">GET</span> <span class="nt">DELIMETER</span>
-        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRSTR</span>        <span class="o">;</span><span class="nt">PRINT</span> <span class="nt">IT</span>
-        <span class="nt">MOV</span>     <span class="nt">R0</span><span class="o">,</span><span class="nt">R4</span>           <span class="o">;</span><span class="nt">GET</span> <span class="nt">ADDRESS</span> <span class="nt">AFTER</span> <span class="nt">ERROR</span>
-        <span class="nt">MOV</span>     <span class="nt">-</span><span class="o">(</span><span class="nt">R4</span><span class="o">),</span><span class="nt">R5</span>        <span class="o">;</span><span class="nt">BACK</span> <span class="nt">UP</span> <span class="nt">AND</span> <span class="nt">GET</span> <span class="nt">ERROR</span> <span class="nt">VALUE</span>
-        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRW16</span>        <span class="o">;</span><span class="nt">PRINT</span> <span class="nt">IT</span>
-        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">CRLF</span><span class="o">,</span><span class="nt">R5</span>        <span class="o">;</span><span class="nt">GET</span> <span class="nt">CRLF</span>
-        <span class="nt">JSR</span>     <span class="nt">PC</span><span class="o">,</span><span class="nt">PRSTR</span>        <span class="o">;</span><span class="nt">PRINT</span> <span class="nt">IT</span>
-        <span class="nt">RTS</span>     <span class="nt">PC</span>              <span class="o">;</span><span class="nt">RETURN</span> <span class="nt">TO</span> <span class="nt">CALLER</span>
-
-        <span class="o">;</span><span class="nt">-----</span> <span class="nt">PRINT</span> <span class="nt">SIX</span> <span class="nt">DIGIT</span> <span class="nt">OCTAL</span> <span class="nt">NUMBER</span>
-
-<span class="nt">PRW16</span><span class="o">:</span>  <span class="nt">CLR</span>     <span class="nt">R4</span>              <span class="o">;</span><span class="nt">CLEAR</span> <span class="nt">UPPER</span> <span class="nt">WORD</span>
-<span class="nt">PRW18</span><span class="o">:</span>  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">6</span><span class="o">,</span><span class="nt">R3</span>           <span class="o">;</span><span class="nt">SIX</span> <span class="nt">DIGITS</span> <span class="nt">TO</span> <span class="nt">PRINT</span>
-        <span class="nt">ASHC</span>    <span class="p">#</span><span class="nn">1</span><span class="o">,</span><span class="nt">R4</span>           <span class="o">;</span><span class="nt">SHIFT</span> <span class="nt">IN</span> <span class="nt">MSB</span> <span class="nt">OF</span> <span class="nt">LOW</span> <span class="nt">WORD</span>
-<span class="nt">1</span><span class="o">$:</span>     <span class="nt">ADD</span>     <span class="p">#</span><span class="nn">60</span><span class="o">,</span><span class="nt">R4</span>          <span class="o">;</span><span class="nt">MAKE</span> <span class="nt">INTO</span> <span class="nt">ASCII</span> <span class="nt">DIGIT</span>
-        <span class="nt">MOV</span>     <span class="nt">R4</span><span class="o">,@</span><span class="p">#</span><span class="nn">XBUF</span>       <span class="o">;</span><span class="nt">PRINT</span> <span class="nt">IT</span>
-        <span class="nt">TSTB</span>    <span class="o">@</span><span class="p">#</span><span class="nn">XCSR</span>          <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">IF</span> <span class="nt">XMIT</span> <span class="nt">DONE</span>
-        <span class="nt">BPL</span>     <span class="p">.</span><span class="nc">-4</span>             <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">UNTIL</span> <span class="nt">SO</span>
-        <span class="nt">CLR</span>     <span class="nt">R4</span>              <span class="o">;</span><span class="nt">RESET</span> <span class="nt">OUTPUT</span> <span class="nt">CHAR</span>
-        <span class="nt">ASHC</span>    <span class="p">#</span><span class="nn">3</span><span class="o">,</span><span class="nt">R4</span>           <span class="o">;</span><span class="nt">SHIFT</span> <span class="nt">IN</span> <span class="nt">NEXT</span> <span class="nt">THREE</span> <span class="nt">BITS</span>
-        <span class="nt">SOB</span>     <span class="nt">R3</span><span class="o">,</span><span class="nt">1</span><span class="o">$</span>           <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">DIGITS</span>
-        <span class="nt">RTS</span>     <span class="nt">PC</span>              <span class="o">;</span><span class="nt">RETURN</span> <span class="nt">TO</span> <span class="nt">CALLER</span>
-
-        <span class="o">;</span><span class="nt">-----</span> <span class="nt">PRINT</span> <span class="nt">NULL-TERMINATED</span> <span class="nt">STRING</span>
-
-<span class="nt">PRSTR</span><span class="o">:</span>  <span class="nt">MOVB</span>    <span class="o">(</span><span class="nt">R5</span><span class="o">)+,@</span><span class="p">#</span><span class="nn">XBUF</span>    <span class="o">;</span><span class="nt">PRINT</span> <span class="nt">ONE</span> <span class="nt">CHAR</span> <span class="nt">AND</span> <span class="nt">ADVANCE</span>
-        <span class="nt">TSTB</span>    <span class="o">@</span><span class="p">#</span><span class="nn">XCSR</span>          <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">IF</span> <span class="nt">XMIT</span> <span class="nt">DONE</span>
-        <span class="nt">BPL</span>     <span class="p">.</span><span class="nc">-4</span>             <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">UNTIL</span> <span class="nt">SO</span>
-        <span class="nt">TSTB</span>    <span class="p">@</span><span class="k">R5</span>             <span class="p">;</span><span class="nt">CHECK</span> <span class="nt">IF</span> <span class="nt">END</span> <span class="nt">OF</span> <span class="nt">STRING</span>
-        <span class="nt">BNE</span>     <span class="nt">PRSTR</span>           <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">IF</span> <span class="nt">NOT</span>
-        <span class="nt">RTS</span>     <span class="nt">PC</span>              <span class="o">;</span><span class="nt">ELSE</span> <span class="nt">RETURN</span> <span class="nt">TO</span> <span class="nt">CALLER</span>
-
-<span class="nt">IPDRS</span><span class="o">:</span>  <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">077406</span><span class="o">,</span><span class="nt">077406</span><span class="o">,</span><span class="nt">077406</span><span class="o">,</span><span class="nt">077406</span>
-        <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">077406</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">077406</span>
-
-<span class="nt">IPARS</span><span class="o">:</span>  <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">000000</span><span class="o">,</span><span class="nt">000200</span><span class="o">,</span><span class="nt">000400</span><span class="o">,</span><span class="nt">000600</span>
-        <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">001000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">007600</span>
-
-<span class="nt">DELIM1</span><span class="o">:</span> <span class="p">.</span><span class="nc">ASCIZ</span>  <span class="o">/:</span> <span class="o">/</span>            <span class="o">;</span><span class="nt">POST-ADDRESS</span> <span class="nt">DELIMETER</span>
-<span class="nt">DELIM2</span><span class="o">:</span> <span class="p">.</span><span class="nc">ASCIZ</span>  <span class="o">/</span> <span class="o">/</span>             <span class="o">;</span><span class="nt">POST-CRC</span> <span class="nt">DELIMETER</span>
-<span class="nt">CRLF</span><span class="o">:</span>   <span class="p">.</span><span class="nc">ASCIZ</span>  <span class="o">&lt;</span><span class="nt">15</span><span class="o">&gt;&lt;</span><span class="nt">12</span><span class="o">&gt;</span>        <span class="o">;</span><span class="nt">LINE</span> <span class="nt">DELIMETER</span>
-<span class="nt">RELSTR</span><span class="o">:</span> <span class="p">.</span><span class="nc">ASCIZ</span>  <span class="o">/</span><span class="nt">RELOCATED</span> <span class="nt">TO</span> <span class="nt">PA</span><span class="o">:/</span>
-<span class="nt">PCOMPL</span><span class="o">:</span> <span class="p">.</span><span class="nc">ASCIZ</span>  <span class="o">/</span><span class="nt">PASS</span> <span class="nt">COMPLETED</span><span class="o">/&lt;</span><span class="nt">15</span><span class="o">&gt;&lt;</span><span class="nt">12</span><span class="o">&gt;&lt;</span><span class="nt">15</span><span class="o">&gt;&lt;</span><span class="nt">12</span><span class="o">&gt;</span>
-
-<span class="nt">END</span><span class="o">:</span>    <span class="p">.</span><span class="nc">END</span>    <span class="nt">START</span>
-</pre></div>
-</td></tr></table>
-<p>The code above is the end result of quite a bit of successive refinement.  Things learned along the way:</p>
-<ul>
-<li>
-<p>At first the tests consisted only of writing and checking all-ones and all-zeros to each location.  This did
-  uncover one more bank with a stuck bit at only some addresses, that my previous spot-checking had missed.
-  Lesson: you really gotta check every byte.  Removed, socketed, and replaced the implicated DRAM, and my
-  tests passed.</p>
-</li>
-<li>
-<p>Maybe I fixed it, so after this I invested the download time to try the the DEC ZQMC diagnostic again.  It
-  ran better than I had seen before, proceeding through a few subtests, but soon started flagging a lot of
-  errors that my diagnostic missed. Hmmm.  Inspecting the DEC code, it seemed to be writing and checking
-  random data at the time, not just all ones an zeros.  Went ahead and implemented "random" data test in my
-  diagnostic, and it immediately started implicating the same chips.  Lesson: all-ones, all-zeros isn't good
-  enough...</p>
-</li>
-<li>
-<p>While I was at it, I implemented an additional "write/check each byte with its virtual address" test.
-  Interestingly, this found <em>most</em>, but not <em>all</em> of the same chips as the random data test.  Lesson:
-  all-ones, all-zeros, and address in each word isn't good enough, either; you really do gotta have that
-  "random" data test, too. At this point, went ahead and replaced three more implicated DRAMS, and my tests
-  once again passed clean...</p>
-</li>
-<li>
-<p>In the meantime, I did some more code reading on the DEC diagnostic, and found that various features could
-  be enabled/disabled via the front panel switches.  With some care, the diagnostic might also be restartable
-  without having to wait for an entire re-download, if stopped carefully and in the right place.  So I spent
-  the time to re-download, and found with experimentation that the DEC diagnostic would now pass all banks of
-  memory cleanly, as long as <em>parity checking was disabled</em>.  Hmm...</p>
-</li>
-<li>
-<p>Moving back to my diagnostic, I noticed that while it ran clean now on all banks, on a fresh power-up it
-  would usually light the parity-error LED on the MS11-L on its first pass.  Subsequent passes, after every
-  location had been written at least once, were fine.  Since the MS11-L doesn't have any fancy power-up init
-  logic, it would make sense to see this if the program read locations without writing them first, but I
-  didn't think my code did that.  Enabling parity traps let me catch it in the act, and it was happening on a
-  <code>CLR</code> instruction that I was using to init memory!  Lesson: on an 11/45, <code>CLR</code> is implemented like other
-  single- operand, modifying instructions, and actually does a DATIP bus cycle from the destination before
-  writing back a zero!  So use <code>MOV</code> instead of <code>CLR</code> to init memory if you are worried about tripping parity
-  errors... Cleaned this up in my code, and my diagnostic now runs clean on my machine in all circumstances
-  without ever tripping a parity error.</p>
-</li>
-</ul>
-<p>So, a lot of issues found and repaired on the MS11-L.  Maybe still some issues with parity error handling,
-which seems to be halting the machine instead of taking a trap.  Figured it might be worth a shot to try the
-operating systems again, so mounted the respective disks and tried both, and... exact same failures in both
-cases!  Womp, womp...</p>
-<p>Well, might as well continue to look into the parity error handling, since some things still seem fishy there.
-The DEC documentation is a bit murky here; various versions of the KB11-A maintenance manual and 11/45
-processor handbook say different and somewhat contradictory things; some info in earlier editions is also
-removed from later ones.  The available engineering drawings for the relevant parts of the KB11-A CPU look to
-have some significant differences from the actual boards I have on hand, and there are more than a few ECO's
-for these boards listed as relating specifically to parity handling, but for which no other information is
-available.  And Noel has uncovered evidence that even the Unibus signaling related to parity may have been
-changed by DEC around the times of the early 11/45. Could be interesting...</p></div>
     <hr />
 </div>
     

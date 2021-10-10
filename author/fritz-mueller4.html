@@ -74,6 +74,65 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="https://fritzm.github.io/rk11.html"><h1>PDP-11/45: RK11</h1></a>
+Sun 29 January 2017
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p>Finished up the cleanup and rebuild of the H720E for the RK11-C controller: reformed the big electrolytics
+over a couple of days, and swapped out the tantalum filters on the regulator board (one of which had started
+to leak) for some replacements.  Tantalums of the correct form and value are crazy expensive, and since these
+caps (C11-C17, C23) are banked resevoirs on the regulated rails their exact values are not critical.  Went
+with some aluminum electrolytics instead that worked out to a little more aggregate capacity on each bank.</p>
+<p>My H720E is missing its top cover plate, so there was about 40 years worth of accumulated dust in there -- a
+lot to clean up!  I'm not sure if the cover was customarily left off to facilitate cooling of the regulator
+board, or if it is just genuinely missing.  Will see if the forums/lists have any wisdom here.  Should not be
+hard to fab a replacement if it is really supposed to be there.</p>
+<p>Routed the inter-cabinet power control wiring, racked the RK11, and cabled everything up.  This included
+moving the M9301 bootstrap terminator over to slot 0, then rummaging through a box of BC11 bus cables for one
+that was both long enough and in decent enough shape to connect the CPU and the RK11.  Some of these bus
+cables had period-correct labeling (see picture below :-))  Got a good tip off the cctalk mailing list
+(thanks, Jerry!) to drape the BC11 with a service loop from the top-rear of the CPU rack, thus avoiding any
+entanglement with the rack slides while moving the CPU cabinet in and out.</p>
+<p>A 2000pF cap that was flown over the RK11 backplane (+5V to DR BUS DC LO L) had broken free of its pin
+connectors; jury-rigged this with some arduino jumpers I had lying around, until I can track down some
+appropriate replacement connectors.</p>
+<p>Good news is that after this the machine still booted the M9301 bootstrap, and was still able to run and
+pass diagnostics loaded via PDP11GUI.  So, Unibus still working with the BC11 cable in place and termination
+out at the RK11.</p>
+<p>Started in with diagnostic ZRKJE0.BIC, which is the controller-only static test.  This indicated:</p>
+<div class="highlight"><pre><span></span>REGISTER NOT CLEARED
+  PC   REGADD    RECVD
+002560  177416  040000
+</pre></div>
+
+<p>This is the RKDB register, implemented by two M203 R/S flip-flop modules in slots A21 and B21 (see sheet
+RK11-C-10 in the RK11-C engineering drawings).  Swapped these, and the stuck bit moved to the other half of
+of the register, so looks like failed gate.  Pulled, socketed, replaced, and diagnostic no longer reports
+any stuck bits.  Next diagnostic fail is:</p>
+<div class="highlight"><pre><span></span>UNEXPECTED TIME OUT AT PC=004300
+</pre></div>
+
+<p>This is test #21 of the diagnostic, testing controller reset.  Will need to do some reading up on the design
+of the controller and the diagnostic source to understand how to troubleshoot it further.  All for now!</p>
+<p><img src='/images/pdp11/720e-caps_thumbnail_tall.jpg' title='H720e regulator card with refreshed caps' onclick='pswipe("pdp11",42);'/>
+<img src='/images/pdp11/rk11-racked_thumbnail_tall.jpg' title='RK11-C controller installed in rack, with temporary jumper hack for flown cap' onclick='pswipe("pdp11",43);'/>
+<img src='/images/pdp11/bc11-good_thumbnail_tall.jpg' title='A BC11-A bus cable, with vintage label' onclick='pswipe("pdp11",44);'/>
+<img src='/images/pdp11/rk11-back_thumbnail_tall.jpg' title='RK11-C controller from the back, flipchips and cabling visible' onclick='pswipe("pdp11",45);'/>
+<img src='/images/pdp11/m203_thumbnail_tall.jpg' title='A failing M203, the cause of a stuck bit in RK11 register RKDB' onclick='pswipe("pdp11",46);'/></p></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
         <a href="https://fritzm.github.io/diagnostics-14.html"><h1>PDP-11/45: Diagnostics XIV - CPU, MMU, FPU Complete!</h1></a>
 Mon 16 January 2017
 
@@ -915,32 +974,6 @@ making use of additional peripherals, etc.  I'll need to study these a bit befor
 correctly.  I have also skipped the power fail diagnostics for now as I will need to restore some core memory in order
 for these to work correctly.</p>
 <p>Next up will be to work on the FPU...</p></div>
-    <hr />
-</div>
-    
-
-        
-
-<div class='article'>
-    <div class="content-title">
-        <a href="https://fritzm.github.io/diagnostics-6.html"><h1>PDP-11/45: Diagnostics VI - GRA ALU PROM repair</h1></a>
-Sun 07 August 2016
-
-by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
- 
-    </div>
-    
-    <div><p>Data I/O Series 22 PROM programmer from eBay showed up, as well as some unprogrammed Signetics 82S123. 
-Punched in the subsidiary ALU control ROM contents from the listing on GRAK in the 11/45 engineering drawings
-and burnt a new PROM. Put a socket and the new PROM in place of the failed part on my original GRA, slotted it
-into the CPU, and success! Diagnostic CKBOA0 now passes.  I will probably return to the other faulty GRA at a
-later point, as it is partially diagnosed and I like to have spares working and ready to go.</p>
-<p>Next time I'll be moving on to the CKT series of tests for the KT11 memory management cards...</p>
-<p><img src='/images/pdp11/prom-programmer_thumbnail_tall.jpg' title='Data I/O series 22 PROM programmer, arrived from eBay' onclick='pswipe("pdp11",36);'/>
-<img src='/images/pdp11/alu-prom-replaced_thumbnail_tall.jpg' title='GRA board with replaced ALU PROM' onclick='pswipe("pdp11",37);'/></p></div>
     <hr />
 </div>
     

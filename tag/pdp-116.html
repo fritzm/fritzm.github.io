@@ -74,6 +74,47 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="https://fritzm.github.io/cpu-debug-2.html"><h1>PDP-11/45: CPU debug II</h1></a>
+Sun 05 June 2016
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p>Received and installed the replacement lamps for the -15V regulators.  Pic below shows what the power supply
+looks like with all the lamps functioning.</p>
+<p>Verified backplane DC voltages and ripple currents again, and re-trimmed all the DC regulators.  Verified AC
+LO and DC LO deasserted and free of glitches.  Found some harness wiring mistakes to the DD11 expansion
+backplane; corrected these.</p>
+<p>Tried some CPU board-swaps looking for a quick win, but broken console behavior didn't change significantly
+with different boards.</p>
+<p>Investigated the timing generator board, and found that the crystal oscillator wasn't oscillating.  Tracked
+this down to inductor L1 which looked as if it had been partially sheared away from the board at some point
+during installation/removal/storage.  Repaired this.  Success!  Able to load addresses from the front console
+now. Switches are mirrored in the BR when halted in console.</p>
+<p>Address bit 0 seems stuck.  Swapped PDR from spare board back to the original.  Can now examine and modify the
+light/switch register, and examine the contents of the M792 ROM.</p>
+<p>Jumpered the DD11 expansion backplane back in, and slotted in the MS11-L memory.  Limited success: can modify
+and examine memory for example near address 001000, but cannot modify low memory addresses.  In some ranges,
+can only modify every other word.  Also, PC seems stuck at 022000.</p>
+<p>At this point, I could really use a KM11 maintenance board set.  These are pretty hard to get a hold of, but a
+few folks on the web have built their own reproductions.  I put in a PCB order to ExpressPCB with a KM11
+layout by Tom Uban (described <a href="http://www.ubanproductions.com/museum.html">here</a>), and also put parts on order
+to stuff it.</p>
+<p>Also, figuring I'll need to be going deeper into the CPU debug, I found and bought an <a href="http://www.ebay.com/itm/142004889393">HP1662A logic
+analyzer</a> on eBay, for about the same money as the KM11 PCB and parts!</p>
+<p><img src='/images/pdp11/power-lights_thumbnail_tall.jpg' title='Power supply with all regulator lamps repaired' onclick='pswipe("pdp11",28);'/></p></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
         <a href="https://fritzm.github.io/power-fixes.html"><h1>PDP-11/45: Power fixes and CPU debug</h1></a>
 Mon 30 May 2016
 
@@ -409,28 +450,6 @@ and replace the failing neon indicators.</p>
     <hr />
 </div>
     
-
-        
-
-<div class='article'>
-    <div class="content-title">
-        <a href="https://fritzm.github.io/power-controllers.html"><h1>PDP-11/45: H742 power control boards</h1></a>
-Sat 23 May 2015
-
-by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
- 
-    </div>
-    
-    <div><p>Found a little time to clean up and go through the power control boards for the H742 supplies.  They are
-looking pretty good.  Even the big electrolytics seem fine on first look.  These things were built with very
-high quality components, and they really seem to last and last.</p>
-<p><img src='/images/pdp11/pwr-ctrls_thumbnail_tall.jpg' title='H742 power controller boards' onclick='pswipe("pdp11",8);'/></p></div>
-    <hr />
-</div>
-    
 <div class="pagination">
 <ul>
     <li class="prev"><a href="https://fritzm.github.io/tag/pdp-115.html">&larr; Previous</a></li>
@@ -508,7 +527,7 @@ high quality components, and they really seem to last and last.</p>
     </div>     </div> 
 <footer>
 <br />
-<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2020</p>
+<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2021</p>
 </footer>
 
 </div> <!-- /container -->
