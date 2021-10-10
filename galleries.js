@@ -92,7 +92,7 @@ var galleries = {
                             {src:"/images/pdp11/1134-chassis-sticker.jpeg", w:3024, h:3024, title:"PDP-11/34: BA11-K chassis sticker dating the system to 1976"},
                             {src:"/images/pdp11/1134-ohio-nuclear.jpg", w:4032, h:3024, title:"PDP-11/34: partial sticker for 'Ohio Nuclear' -- manufacturers of CT systems"},
                             {src:"/images/pdp11/1134-brackets-2.jpg", w:2438, h:1828, title:"PDP-11/34: BA11-K front panel mounting bracket"},
-                            {src:"/images/pdp11/1134-brackets-3.jpeg", w:4032, h:3024, title:"PDP-11/34: BA11-K front panel mounting detail, with nylon spacers to make room for pre-filter"},
+                            {src:"/images/pdp11/1134-brackets-3.jpeg", w:3024, h:4032, title:"PDP-11/34: BA11-K front panel mounting detail, with nylon spacers to make room for pre-filter"},
                             {src:"/images/pdp11/1134-brackets-4.jpeg", w:3024, h:3024, title:"PDP-11/34: Front panel mounted with replacement air pre-filter in place behind brackets and replacement power knob"},
                             {src:"/images/pdp11/H765-power-controller.jpeg", w:3024, h:3024, title:"PDP-11/34: H765 power controller module cleaned with new line cord"},
                             {src:"/images/pdp11/H765-transformer.jpeg", w:3024, h:3024, title:"PDP-11/34: H765 power supply main transformer, with modern X2 safety caps (orange) installed"},
