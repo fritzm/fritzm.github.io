@@ -74,6 +74,224 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="https://fritzm.github.io/cpu-debug-5.html"><h1>PDP-11/45: CPU debug V -- chasing lights!</h1></a>
+Sun 19 June 2016
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p>Tracked down the source of the inverted result after register-to-register move problem on GRA: outputs of the
+subsidiary ALU control ROM E74 on pins 6 and 7 are floating.  Will need some closer inspection to determine if this
+is a board fault or a chip fault.  In the meantime, I have a spare GRA which I had been reluctant to try because it
+has a "bad" sticker on it...  Decided to give it a try anyway, and it seems to be working much better than the one I
+have been debugging.</p>
+<p>Now have enough of the CPU debugged to toggle in and run a simple light chaser program:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">000000</span>  <span class="nt">013700</span>  <span class="nt">177570</span>  <span class="nt">L0</span><span class="o">:</span>     <span class="nt">MOV</span>     <span class="o">@</span><span class="p">#</span><span class="nn">177570</span><span class="o">,</span> <span class="nt">R0</span>    <span class="o">;</span><span class="nt">LOAD</span> <span class="nt">COUNT</span> <span class="nt">FROM</span> <span class="nt">SWITCH</span> <span class="nt">REGISTER</span>
+<span class="nt">000004</span>  <span class="nt">005300</span>          <span class="nt">L1</span><span class="o">:</span>     <span class="nt">DEC</span>     <span class="nt">R0</span>              <span class="o">;</span><span class="nt">COUNT</span> <span class="nt">DOWN</span>
+<span class="nt">000006</span>  <span class="nt">001376</span>                  <span class="nt">BNE</span>     <span class="nt">L1</span>              <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">UNTIL</span> <span class="nt">ZERO</span>
+<span class="nt">000010</span>  <span class="nt">006301</span>                  <span class="nt">ASL</span>     <span class="nt">R1</span>              <span class="o">;</span><span class="nt">SHIFT</span> <span class="nt">DISPLAY</span> <span class="nt">VALUE</span>
+<span class="nt">000012</span>  <span class="nt">001002</span>                  <span class="nt">BNE</span>     <span class="nt">L2</span>              <span class="o">;</span><span class="nt">SKIP</span> <span class="nt">AHEAD</span> <span class="nt">IF</span> <span class="nt">NOT</span> <span class="nt">SHIFTED</span> <span class="nt">OUT</span>
+<span class="nt">000014</span>  <span class="nt">012701</span>  <span class="nt">000001</span>          <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">1</span><span class="o">,</span><span class="nt">R1</span>           <span class="o">;</span><span class="nt">ELSE</span> <span class="nt">RELOAD</span>
+<span class="nt">000020</span>  <span class="nt">010137</span>  <span class="nt">177570</span>  <span class="nt">L2</span><span class="o">:</span>     <span class="nt">MOV</span>     <span class="nt">R1</span><span class="o">,@</span><span class="p">#</span><span class="nn">177570</span>     <span class="o">;</span><span class="nt">STORE</span> <span class="nt">TO</span> <span class="nt">DISPLAY</span> <span class="nt">REGISTER</span>
+<span class="nt">000024</span>  <span class="nt">000765</span>                  <span class="nt">BR</span>      <span class="nt">L0</span>              <span class="o">;</span><span class="nt">REPEAT</span> <span class="nt">FROM</span> <span class="nt">THE</span> <span class="nt">TOP</span>
+</pre></div>
+</td></tr></table>
+<p><span class="videobox">
+                    <iframe width="640" height="390"
+                        src='https://www.youtube.com/embed/ZhuzC9v3q-k?rel=0'
+                        frameborder='0' webkitAllowFullScreen
+                        mozallowfullscreen allowFullScreen>
+                    </iframe>
+                </span></p>
+<p>Some notes on the program and video above since I've received some questions:</p>
+<ul>
+<li>
+<p>The listing here is shown assembled at location 000000, but the program is relocatable and can be toggled in at any
+convenient address (000000, on top of the trap vectors, probably isn't the best choice!)</p>
+</li>
+<li>
+<p>Data display should be on "DISPLAY REGISTER" to see the chase.</p>
+</li>
+<li>
+<p>The front panel toggles are loaded into a counter to control the speed of the chase.  Without some of the most
+significant bits set the chase may go too fast to see, especially on older 11's with incandescent indicators.  All
+toggles off is a special case: this will be the slowest chase, since as written the counter wraps around when
+decremented before being checked for zero.  The video has toggles 15 and 14 up.</p>
+</li>
+<li>
+<p>If you look at the address lights in the video, you can see that I ran this program from address 100000.  This was
+because at the time I had a fault in the first 16KW of memory on my MS11-L so I couldn't execute any code at lower
+addresses.</p>
+</li>
+</ul></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
+        <a href="https://fritzm.github.io/ms11-debug.html"><h1>PDP-11/45: MS11-L debug</h1></a>
+Sat 18 June 2016
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p>After addressing the -15V problem on the MS11, most of the bad behaviors seem to have cleared up except a stuck (on)
+bit 6 in the first 16K words of address space (000000-077776).  Hooked up the new logic analyzer, and it has been very
+useful in troubleshooting the board -- can easily capture and inspect the timing of complete memory cycles.  Definitely
+worth the investment!</p>
+<p>Using the analyzer, I was able to verify the refresh and chip select logic on the board, then track down the stuck bit
+to what seems to be a single failed DRAM chip (E96 on the MS11-L engineering drawings).  I'd like to test the entire
+card before ordering replacement parts, but need to set up address translation to get beyond the first two banks from
+the console.</p>
+<p>Here is the address translation register setup that I used for testing.  This was followed by a deposit of 000001 to
+KT11 SR0 (777572) to enable translation.  KT11 SR3 was left all zeros to keep D space disabled.  This setup allows
+console access to physical addresses in banks 1 through 7 by appropriate settings of virtual address bits 13 through
+15.  I wanted to reserve PAR7 to map I/O space, so I left out bank 0 since it was one of the two already tested.</p>
+<style>
+.memlist { display: inline; border-collapse: collapse; margin-right: 1em; }
+.memlist caption { font-weight: bold; }
+.memlist tr:nth-child(even) { background-color: #f2f2f2; }
+.memlist th, .memlist td { padding: 5px; }
+.memlist td { border: 1px solid lightgray; font-family: Menlo,Consolas,monospace; }
+</style>
+
+<table class="memlist">
+<caption>Kernel I PAR</caption>
+<tbody>
+<tr><td>772340</td><td>001000</td></tr>
+<tr><td>772342</td><td>002000</td></tr>
+<tr><td>772344</td><td>003000</td></tr>
+<tr><td>772346</td><td>004000</td></tr>
+<tr><td>772350</td><td>005000</td></tr>
+<tr><td>772352</td><td>006000</td></tr>
+<tr><td>772354</td><td>007000</td></tr>
+<tr><td>772356</td><td>007600</td></tr>
+</tbody>
+</table>
+
+<table class="memlist">
+<caption>Kernel I PDR</caption>
+<tbody>
+<tr><td>772300</td><td>077406</td></tr>
+<tr><td>772302</td><td>077406</td></tr>
+<tr><td>772304</td><td>077406</td></tr>
+<tr><td>772306</td><td>077406</td></tr>
+<tr><td>772310</td><td>077406</td></tr>
+<tr><td>772312</td><td>077406</td></tr>
+<tr><td>772314</td><td>077406</td></tr>
+<tr><td>772316</td><td>077406</td></tr>
+</tbody>
+</table>
+
+<p>This worked as expected according to panel PROG PHY and the logic analyzer, so the KT11 option which I had not
+previously tested is at least working for kernel I space.  Tested each bank on the MS11 from the front panel using this
+setup, and uncovered that bank 4 bit 10 also has a stuck on condition.  Since bank 1 is working now, I can use that
+as work space for the time being in order to continue the CPU debug while awaiting some replacement DRAM chips in the
+mail.</p>
+<p>Pics here of the logic analyzer setup, and captured traces of a write and subsequent read to one of the misbehaving
+chips:</p>
+<p><img src='/images/pdp11/ms11-debug_thumbnail_tall.jpg' title='MS11 memory card debug in progress, with board extender, logic analyzer, and KM11' onclick='pswipe("pdp11",31);'/>
+<a href="https://fritzm.github.io/images/pdp11/bad-dram-write.jpg"><img src='/images/pdp11/bad-dram-write_thumbnail_tall.jpg'/></a>
+<a href="https://fritzm.github.io/images/pdp11/bad-dram-read.jpg"><img src='/images/pdp11/bad-dram-read_thumbnail_tall.jpg'/></a></p></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
+        <a href="https://fritzm.github.io/cpu-debug-4.html"><h1>PDP-11/45: MS11-L and CPU debug IV</h1></a>
+Sun 12 June 2016
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p>Made some progress on the inverted result after register-to-register move problem: with the help of the KM11, extender
+card, and a logic probe I was able to track down that signal ALUM L coming onto the DAP is not asserted when it should
+be for a MOV instruction.  This means the ALU is performing in arithmetic instead of logic mode and thus the incorrect
+result.</p>
+<p>I next moved the extender card over to GRA, where this signal originates from a subsidiary ROM, but unfortunately at
+that point the MS11-L memory behavior got even worse, putting and end to these experiments.  So I'll have to tackle
+that first...</p>
+<p>Moved the M792 ROM over to the expansion backplane where the MS11-L resides, and it works fine there.  So it doesn't
+seem to be a bus wiring or jumper problem onto the expansion backplane.  Checked the power input pins on the backplane
+behind the MS11-L.  5V was a little low there; trimmed this up.  Probably need to clean or replace the Molex contacts
+on the power distribution board in the cabinet, as it seems a few mV are being shed there needlessly compared to the
+output of the same regulator on the main backplane, but things seem within stated tolerances for now.</p>
+<p>The -15V input to the MS11-L was missing entirely.  Removed the DD11 expansion backplane, and added jumpers between
+the battery backup supply inputs and the corresponding main supply inputs, per documentation.  Now have -15 to the
+MS11-L, but still no joy.</p>
+<p>Will need to go deeper into the MS11-L next time...</p></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
+        <a href="https://fritzm.github.io/cpu-debug-3.html"><h1>PDP-11/45: KM11 replica and CPU debug III</h1></a>
+Sat 11 June 2016
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p>Received the boards and components for the KM11 replica; stuffed and soldered, and it appears to work!  There
+are some photos below.  I can easily single-step microcode, clock states, and bus cycles now, which should
+really help with the CPU debug.</p>
+<p>Swapped DAP for a spare, and this has fixed the stuck PC issue.  Memory issues remain, but by choosing a
+working memory range, I can start to toggle in and attempt to execute very simple programs.</p>
+<p>The simplest possible program, unconditional branch to self, seems to execute correctly:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span></span>001000 000777         BR      .-0
+</pre></div>
+</td></tr></table>
+<p>A register to register data move test does not however:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span></span>001000 010203         MOV     R2,R3
+001002 000776         BR      .-2
+</pre></div>
+</td></tr></table>
+<p>Control flow is as expected, but the value that ends up in R3 seems to be negated.  Still, pretty good
+progress! Now that I can step machine states, the next step will be to put the DAP out on an extender card and
+start tracking down signals with a logic probe.</p>
+<p>The HP1662A logic analyzer from eBay has also arrived; should come in handy in investigating the memory issue.</p>
+<p><img src='/images/pdp11/km11_thumbnail_tall.jpg' title='Tom Uban KM11 replica, stuffed with parts and ready to go' onclick='pswipe("pdp11",29);'/>
+<img src='/images/pdp11/km11-action_thumbnail_tall.jpg' title='Tom Uban KM11 replica in action' onclick='pswipe("pdp11",30);'/></p></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
         <a href="https://fritzm.github.io/cpu-debug-2.html"><h1>PDP-11/45: CPU debug II</h1></a>
 Sun 05 June 2016
 
@@ -329,127 +547,6 @@ have to do something about that...</p></div>
     <hr />
 </div>
     
-
-        
-
-<div class='article'>
-    <div class="content-title">
-        <a href="https://fritzm.github.io/vt52.html"><h1>PDP-11/45: VT52</h1></a>
-Sun 03 January 2016
-
-by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
- 
-    </div>
-    
-    <div><p>Spent some time reviving a VT52 that I intend to use with the PDP-11.  This was a pretty nice eBay find. 
-There was some oxidation and flakiness with the connectors to the chargen ROM daughter card (I remember this
-being typical of VT52s even back in the day).  A little more difficult to track down were some flaky solder
-joints around the clock chip.  But, everything else seems to be in pretty good shape and its working well now!
-Here it is hooked up to a Linux VM on my macbook, compiling some LSST code to generate some output as a test
-drive:</p>
-<p><img src='/images/pdp11/vt52_thumbnail_tall.jpg' title='VT52 hooked up to a Linux VM for a test drive' onclick='pswipe("pdp11",17);'/></p>
-<p>Man, seeing that funky font again, with its non-descending-descenders, is really great!  Surprisingly, it
-doesn't seem to be available in digital format anywhere, unlike the later VT100 fonts, etc.  Try as I might, I
-couldn't seem to find the chargen ROM listing in any of the DEC documentation archives, either.</p>
-<p>Well, I do have a Digilent FPGA eval card and some level conversion chips laying around, so as a holiday hack
-project I put together a quick ROM scanner in Verilog, interfaced it to the VT52 chargen on a breadboard, and
-scanned out the contents.  Here's a picture of the scanner in action, and the produced output:</p>
-<p><img src='/images/pdp11/rom-scanner_thumbnail_tall.jpg' title='Homemade FPGA ROM scanner used to read out the VT52 character generator ROM' onclick='pswipe("pdp11",18);'/></p>
-<p>The yellowish board on the right is the VT52 chargen.  The Verilog source for the scanner, the scanned data,
-and some preliminary attempts to convert the data to a few modern font formats are available on my github over
-at <a href="https://github.com/fritzm/vt52">https://github.com/fritzm/vt52</a>.  I need to learn some more about font formats to make some better font
-files; if I do I will update that repo.  Any help from fontophiles gladly accepted!</p></div>
-    <hr />
-</div>
-    
-
-        
-
-<div class='article'>
-    <div class="content-title">
-        <a href="https://fritzm.github.io/backplane-and-logic.html"><h1>PDP-11/45: CPU Backplane and logic</h1></a>
-Fri 03 July 2015
-
-by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
- 
-    </div>
-    
-    <div><p>Mounted the CPU backplane, and slotted in the CPU and MMU logic cards.  The empty slots on the right are for
-the FPU -- I have those on hand but figure I'll wait to slot them until I've got the basic CPU up and running.</p>
-<p>One kind of interesting thing: the logic boards were stored vertically for several decades, and on some of the
-cards with plastic ribbon-cable connectors the plastic seems to have flaked and shed and fallen down the
-boards.  The flaky substance then grew some impressive crystals between some of the solder traces.  Scrubbed
-these out with some anhydrous IPA.</p>
-<p>A tip copied from a fellow restorer: Alconox detergent for removing grime from various plastic components. 
-Parts soaked overnight come out looking nearly new (here you can see the cleaned plastic card guides).</p>
-<p>Also pictured here are the characteristic bloody knuckles that are obtained whenever wrestling with PDP
-backplanes, logic cards, and terminators in close confines.  That really takes you back...</p>
-<p><img src='/images/pdp11/boards-in-chassis_thumbnail_tall.jpg' title='CPU and MMU logic installed.  Empty slots on the right are for the FPU.' onclick='pswipe("pdp11",13);'/>
-<img src='/images/pdp11/board-with-crystals_thumbnail_tall.jpg' title='Logic board with crystals after several decades of storage' onclick='pswipe("pdp11",14);'/>
-<img src='/images/pdp11/crystals_thumbnail_tall.jpg' title='Closeup of crystals on logic board' onclick='pswipe("pdp11",15);'/>
-<img src='/images/pdp11/knuckles_thumbnail_tall.jpg' title='The characteristic bloody knuckles that are obtained whenever wrestling with PDP backplanes, logic cards, and terminators in close confines' onclick='pswipe("pdp11",16);'/></p></div>
-    <hr />
-</div>
-    
-
-        
-
-<div class='article'>
-    <div class="content-title">
-        <a href="https://fritzm.github.io/panel-and-742s.html"><h1>PDP-11/45: H742s and front panel</h1></a>
-Sun 21 June 2015
-
-by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
- 
-    </div>
-    
-    <div><p>The H742 supplies are now back together, mounted in the cabinet, and wired through to the 861.  I've powered
-them up and run them for minutes at a time (without any DC regulator loads) and there have been no surprise
-detonations...</p>
-<p>The repainted cabinet side door has also been remounted.</p>
-<p>Spent some time on the front panel as well.  Removed the tubular lock and took a trip to the local locksmith
-to have a new key made up.  Replaced all the incandescent indicator lamps with the closest modern equivalent. 
-Panel is now remounted and it's starting to look like a real '11!</p>
-<p><img src='/images/pdp11/742s-mounted_thumbnail_tall.jpg' title='H742s and CPU cabinet remounted' onclick='pswipe("pdp11",11);'/>
-<img src='/images/pdp11/front-panel_thumbnail_tall.jpg' title='Front panel remounted -- starting to look like a real PDP-11!' onclick='pswipe("pdp11",12);'/></p></div>
-    <hr />
-</div>
-    
-
-        
-
-<div class='article'>
-    <div class="content-title">
-        <a href="https://fritzm.github.io/fans-and-h742s.html"><h1>PDP-11/45: AC power and cooling</h1></a>
-Sun 07 June 2015
-
-by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
- 
-    </div>
-    
-    <div><p>Spent a lot of time over a couple weekends cleaning and reconditioning all the muffin cooling fans for the CPU
-cabinet and power supplies.  As you can see in the photo below, there are a lot of these!  All reassembled
-now, and wired along with the back-of-cabinet power distribution board.  Also did a clean on the big box fan
-at the top of the rack, not seen here.</p>
-<p>I have also completely torn down the H742s to give them a thorough clean, touch up a few last corrosion spots,
-and replace the failing neon indicators.</p>
-<p><img src='/images/pdp11/chassis-with-fans_thumbnail_tall.jpg' title='CPU cabinet with restored cooling fans' onclick='pswipe("pdp11",9);'/>
-<img src='/images/pdp11/742-rebuild_thumbnail_tall.jpg' title='Deeper into the H742s for cleaning, sanding, and painting' onclick='pswipe("pdp11",10);'/></p></div>
-    <hr />
-</div>
-    
 <div class="pagination">
 <ul>
     <li class="prev"><a href="https://fritzm.github.io/tag/retro-computing5.html">&larr; Previous</a></li>
@@ -496,6 +593,7 @@ and replace the failing neon indicators.</p>
                 
                 <li><a href="https://fritzm.github.io/category/arcade-games.html">Arcade Games</a></li>
                 <li><a href="https://fritzm.github.io/category/math.html">Math</a></li>
+                <li><a href="https://fritzm.github.io/category/micros.html">Micros</a></li>
                 <li><a href="https://fritzm.github.io/category/pdp-11.html">PDP-11</a></li>
                 <li><a href="https://fritzm.github.io/category/programming.html">Programming</a></li>
                 <li><a href="https://fritzm.github.io/category/radios.html">Radios</a></li>
@@ -527,7 +625,7 @@ and replace the failing neon indicators.</p>
     </div>     </div> 
 <footer>
 <br />
-<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2021</p>
+<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2022</p>
 </footer>
 
 </div> <!-- /container -->

@@ -74,6 +74,455 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="https://fritzm.github.io/apple-power-lang.html"><h1>Apple II Plus: power supply and language card</h1></a>
+Mon 21 March 2022
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p>Okay, so the Apple II Plus I was using to test the VM4209 monitor worked fine for about a half hour, then
+smoked a RIFA cap in its power supply.  These are a very common known failure in various old microcomputer
+power supplies, and I really should have already caught this on inspection and shotgunned it.  Boy, do they
+generate a lot of smoke and stink when they go...</p>
+<p>Electrolytics in here are also all pushing 40 years at this point and Astec opted for only 85C parts for many
+of these, so I went ahead and ordered a <a href="https://console5.com/store/apple-2-power-supply-cap-kit-p-n-605-5703-astec-aa11040b-aa11040-b.html">whole replacement
+kit</a> from
+Console5.  I replaced the front end filters and anything on the back end that was 85C or looked even slightly
+bulgy, which ended up being most of them:</p>
+<p><img src='/images/micros/apple-ii-rifa_thumbnail_tall.jpeg' title='Blown RIFA capacitor from Apple II Plus power supply' onclick='pswipe("micros",5);'/>
+<img src='/images/micros/apple-ii-pwr-before_thumbnail_tall.jpeg' title='Apple II Plus power supply before cap replacements' onclick='pswipe("micros",6);'/>
+<img src='/images/micros/apple-ii-pwr-after_thumbnail_tall.jpeg' title='Apple II Plus power supply after cap replacements' onclick='pswipe("micros",7);'/></p>
+<p>Put it all back together and back in business, except noticed an additional problem: DOS 3.3 booted but
+neither recognized nor loaded the "language card" (soft ROM) present in the machine.  Since my machine has
+Applesoft BASIC in system ROM, this meant no Integer BASIC (and no ROM mini-assembler) for me until this was
+fixed.</p>
+<p>For those who might not be familiar with the Apple II language card, it provides several features.  An Apple
+II or II Plus can have at most 48K of RAM on the system board.  The overall memory map looks like this:</p>
+<style>
+.memmap {
+  font-family: monospace;
+  width: 30em;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+  border-collapse: true; 
+}
+.memmap td {
+  border: 1px solid black;
+  padding: .5em;
+  text-align: center;
+}
+</style>
+
+<table class="memmap">
+  <tr><td>$0000-$BFFF</td><td>RAM (48K)</td></tr>
+  <tr><td>$C000-$CFFF</td><td>IO space (4K)</td></tr>
+  <tr><td>$D000-$FFFF</td><td>ROM (12K)</td></tr>
+</table>
+
+<p>The first thing the language card provides is a 2K ROM which by default overlays whatever ROM is in the system
+board socket for addresses <code>$F800</code> to <code>$FFFF</code>. This ROM holds the 6502 reset vector and the boot monitor; the
+version provided on the language card has an "autostart" capability that will search for and boot off an
+attached Disk II floppy.  I am not sure why Apple provided this ROM on the language card since the same ROM
+could be upgraded directly on the fully-socketed system board, and indeed everything after the Apple II Plus
+came with this autostart ROM pre-installed. Possibly this was done for maximum backward compatibility with
+Apple's previously-offered "Firmware Card", which also contained this ROM?  Third-parties would later offer
+clones of the language card that did <em>not</em> contain the additional/redundant F8 ROM, and nobody seems to have
+particularly cared or noticed...</p>
+<p>The second thing the language card provides is an additional 16K of RAM.  This can be loaded, then
+write-protected and mapped over the entire ROM space of the machine from <code>$D000</code> to <code>$FFFF</code>, providing a "soft
+ROM" capability.  Since the available ROM address space is only 12K, the leftover 4K or RAM on the language
+card is bank switchable at address range <code>$D000</code> to <code>$DFFF</code>.</p>
+<p>Advanced software which doesn't depend on the system ROMs at all can also map the RAM over the system ROM
+address space and leave it in read/write mode, thus gaining access to a full 64K of RAM (with the caveat of
+the switched bank at <code>$D000</code>.)</p>
+<p>The language card programming interface presents as follows:</p>
+<p><br><img style="display:block; margin-left:auto; margin-right:auto" src="/images/micros/apple-ii-lang-controls.png" title="Apple II language card control codes"/><br></p>
+<p>My goal is to be able to run the initial (1980) release of Apple DOS 3.3. This version loads up the language
+card at boot in soft ROM mode with Integer BASIC and an older version of the F8 monitor ROM, which contains a
+few extra niceties like a built in mini-assembler and primitive step/trace capabilities.  A system so loaded
+can then be conveniently switched back and forth between BASIC and monitor versions with the DOS "INT" and
+"FP" commands.  But detection of my language card seemed to be failing, so it was never loaded up at boot.
+Attempts to manually load and activate it also came to naught.</p>
+<p>So, time to dig in and see what's going wrong... DOS 3.3 does initial checks and setup of the language card
+via a small machine language program, loaded into RAM at boot by the DOS master disk's <code>HELLO</code> BASIC program.
+Machine code is used for this part rather than BASIC so the probe/setup code can be placed and run from RAM
+outside the mapping range of the language card (the BASIC interpreter itself running from ROM addresses
+<em>within</em> this mapping range). Here is the machine language program, after being <code>POKE</code>d into RAM by <code>HELLO</code>,
+listed via the ROM monitor:</p>
+<div style="text-align: center"><img style="display:inline-block" src="/images/micros/dos33-hello-1.jpeg"
+title="DOS 3.3 language probe, part 1/2"/> <img style="display:inline-block"
+src="/images/micros/dos33-hello-2.jpeg" title="DOS 3.3 language probe, part 2/2"/></div>
+
+<p>I interpret the actions of this code as follows:</p>
+<ul>
+<li>
+<p>The code first retrieves and stashes the contents of location <code>$E000</code>, within the mappable address range. A
+  read of <code>$C081</code> then maps the ROMs on the system board (see programming interface above), and the contents
+  of <code>$E000</code> are checked again.  If the contents now differ, the code assumes the card, now in mapped ROM
+  mode, was previously in mapped RAM mode, and it jumps to address <code>$0332</code> to put things back the way it found
+  them and bail out.</p>
+</li>
+<li>
+<p>If not, the code reads from address <code>$C083</code> twice, which puts the card, if present, in writable mapped RAM
+  mode.  Two different values are written to and compared back from location <code>$D000</code>.  If a language card is
+  <em>not</em> present, this location will still be mapped to ROM on the system board, and at least one of these
+  compares will fail; if either one does, the code jumps to <code>$0332</code> to bail out.</p>
+</li>
+<li>
+<p>Otherwise, we've verified that a card is present and wasn't already in active play.  The program now reads
+  from address <code>$C081</code> twice to move back to mapped ROM mode, but leaving RAM writable to be loaded by the
+  remainder of the <code>HELLO</code> program after return (in this mode, reads will come from system ROMs, but writes
+  will go to the corresponding locations in language card RAM). A success return code is loaded, and the code
+  jumps forward to the exit code at <code>$0334</code> to return to the caller.</p>
+</li>
+<li>
+<p>The bail out routine at <code>$0332</code> just sets up a fail return code, then falls through to <code>$0334</code>.  Code here
+  stores the return code to the return code location and does one last compare between the stashed and current
+  values at <code>$E000</code> to determine if mapped RAM mode must be restored; if so this is done via a read from
+  location <code>$C080</code> (RAM is left write-protected).  Control is then returned to BASIC.</p>
+</li>
+</ul>
+<p>In any case, the above is what the code <em>does</em>, even if I may have misinterpreted some of its motivations.  On
+my system, the ROM on the language card seemed to be working correctly (monitor ran fine, but if ROM on
+language card was pulled the machine failed to boot, indicating the monitor was in fact running successfully
+out of ROM on the card). However, mapped RAM mode seemed never to engage.  The machine code snippet above
+returned "00" without crashing, and the DOS <code>HELLO</code> program assumed no card present.  Manually accessing the
+appropriate control registers also had no effect.</p>
+<p>The language card design does not seem to be documented in detail, but a schematic is available and it is not
+too hard to suss out.  The first thing to check would seem to be the register interface.  Here is an excerpt
+from the schematic, with a couple of annotations added:</p>
+<p><br><img style="display:block; margin-left:auto; margin-right:auto" src="/images/micros/apple-ii-lang-schem.png" title="Apple II language card schematic excerpt"/><br></p>
+<p>The register interface is principally implemented by a 74LS175 quad flip-flop at D4.  These flip-flops share a
+common reset at power-on, and a common clock based on the expansion slot DEV_L signal; DEV_L is a
+slot-specific signal strobed by the system on any bus cycles to IO address space allocated to that slot.
+Examination of the programming interface along with address line decodes feeding the D inputs here leads to
+the conclusion that the top-most flip-flop holds RAM/ROM mapping mode, the next one down is RAM bank select,
+the next is RAM write-enable, and the last is a one-bit count to support write-enable after only two
+successive reads.</p>
+<p>Put a chipclip on at D4, and observed behavior of the flip-flops on the logic analyzer while exercising the
+control registers via the monitor.  Problems were apparent right away: while the bank select and count
+flip-flops were responding as expected, the mapping mode and wite-enable flip-flops were not.  The shared
+reset and clock appeared correct, and all flip-flops themselves were responding logically correctly with
+respect to their inputs.  The issue was apparently with the incoming D lines to two of the flip-flops.
+Starting with the ROM/RAM enable flip-flop, then, that D line is fed via C3 and C4.  And a visual inspection
+in preparation for clipping these up for the analyzer revealed that, surprisingly, these two chips had
+actually been reversed on the board!</p>
+<p>The language card is fully socketed, so presumeably this reversal had occured during previous troubleshooting
+or service by the former owner?  In any case, it was easy to swap the chips back to their correct locations,
+and the logic analyzer showed that the entire register interface seemed to be behaving according to design
+after that.  DOS 3.3 now recognized the card at boot (yay!), but the system would crash after loading and
+mapping the RAM.  So, maybe a bad RAM chip as well?</p>
+<p>To troubleshoot the RAM, I followed a technique described in <a href="https://www.youtube.com/watch?v=wVUWaodwNNI&amp;t=1309s">this
+video</a> on the "Adrian's Digital Basement" YouTube
+channel.  Basically, a couple short machine language programs, entered and executed via the monitor, to copy
+ROM contents into the language card RAM, then copy back out to another location in system RAM.  This allows a
+comparison of source data in ROM and round-tripped data in system RAM; a mismatch indicates a RAM problem on
+the card.  Here are the two programs I used and, and dumps of the resulting data:</p>
+<div style="text-align: center">
+  <img style="display:inline-block" src="/images/micros/apple-ii-copy-in.jpeg" title="Copy ROM to language card RAM"/>
+  <img style="display:inline-block" src="/images/micros/apple-ii-copy-out.jpeg" title="Copy language card RAM to system RAM"/>
+  <img style="display:inline-block" src="/images/micros/apple-ii-data-comp.jpeg" title="ROM data vs round-trip language card data"/>
+</div>
+
+<p>And sure enough, it's quite visible here that bit 7 is having problems.  Swapped out the 4116 at A2, and
+that seems to have done it for this one.  Now I need to go find a copy of Choplifter...</p>
+<p><img src='/images/micros/apple-ii-lang-card_thumbnail_tall.jpeg' title='Apple II Plus language card repairs: yellow indicates two chips that were found swapped on the card; red indicates a failed 4116 RAM chip that was replaced.' onclick='pswipe("micros",8);'/>
+<img src='/images/micros/apple-ii-repaired_thumbnail_tall.jpeg' title='Apple II Plus: Successful DOS 3.3 boot after language card repairs' onclick='pswipe("micros",9);'/></p></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
+        <a href="https://fritzm.github.io/vm4209.html"><h1>Sanyo VM4209</h1></a>
+Sun 13 March 2022
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p>Some time back I purchased a Sanyo VM4209 B&amp;W video monitor on eBay.  Sold as working, it arrived with
+apparently working horizontal but no vertical deflection.  The price had been right, however, so it was just
+shelved into the repair queue.</p>
+<p><br><img style="display:block; margin-left:auto; margin-right:auto" src="/images/micros/vm4209.png" title="VM4209 video monitor"/><br></p>
+<p>I now have a few DEC VT series terminals to work on and would like to have a small video monitor available on
+the bench for this, so I pulled down the VM4209 to give it a look.  Given the lack of vertical deflection, the
+first thing to check would be the vertical deflection power transistors, Q105 and Q106 here:</p>
+<p><br><img style="display:block; margin-left:auto; margin-right:auto" src="/images/micros/vm4209-vert-schem.png" title="VM4209 vertical deflection"/><br></p>
+<p>It turns out these transistors are quite well buried in the guts of the monitor on a small aluminum heat sink.
+Took a while to work my way in to them, and required unsoldering a few leads and removing the CRT:</p>
+<p><img src='/images/micros/vm4209-crt_thumbnail_tall.jpeg' title='VM4209: CRT' onclick='pswipe("micros",0);'/>
+<img src='/images/micros/vm4209-chassis_thumbnail_tall.jpeg' title='VM4209: chassis with CRT removed' onclick='pswipe("micros",1);'/>
+<img src='/images/micros/vm4209-bottom_thumbnail_tall.jpeg' title='VM4209: underside of main board' onclick='pswipe("micros",2);'/>
+<img src='/images/micros/vm4209-vtrans_thumbnail_tall.jpeg' title='VM4209: vertical deflection heat sink, with Q106 replacement' onclick='pswipe("micros",3);'/></p>
+<p>Sure enough, the lead connecting Q106 collector to ground had been broken, and the part tested bad. Q105
+appeared healthy, and there were no other apparent signs of distress in the surrounding circuitry. Q106 is an
+out of production 2SB474 germanium PNP in the less common TO66 package; I opted to replace it with the
+"modern" equivalent NTE226.  Re-assembled, and was greeted immediately with a functioning raster.  Pulled out
+an Apple II Plus to test with:</p>
+<p><img src='/images/micros/vm4209-appleii_thumbnail_tall.jpeg' title='VM4209: repaired, with Apple II Plus' onclick='pswipe("micros",4);'/></p>
+<p>This was quite fun for a short while, until a RIFA cap in the Apple II power supply let go, filling the dining
+room with acrid smoke.  So, expect an additional article on that one in the near future :-)</p></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
+        <a href="https://fritzm.github.io/rt11-basic.html"><h1>BASIC-11 under RT11</h1></a>
+Sun 15 August 2021
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p>I figured it might be fun to play around a little bit with BASIC-11 under RT11 on the newly-restored
+PDP-11/34.  If I got that working, it could also be included on the RK05 RT11 disk image that I use regularly
+for demos on the larger PDP-11/45.</p>
+<p>The first thing to do was to find a compatible disk image and get it running under simh.  Bitsavers had
+<code>BASIC-11_V2.1_RX02.DSK.zip</code>, which would seem to fit the bill, but the contained image would not mount
+successfully on simh's RY device.  Looking through a dump of the image, there was an apparent "RT11A"
+signature, so that looked promising.  Tried <code>putr</code> under dosbox as well, but it would hang mounting the image.
+So, off to the cctalk mailing list for some advice...</p>
+<p>Glen Slick on the list first noticed a file size discrepancy:</p>
+<blockquote>
+<p>That BASIC.DSK image file has a size of 486,400 bytes. I don't know where that size would come from.</p>
+<p>A physical RX-02 floppy should have a sector size of 256 bytes, with 26 sectors per track, and 77 tracks,
+which would be a total of 512,512 bytes, or 505,856 bytes if the first physical track is ignored.</p>
+<p>Indeed, the other RX-02 floppy images available here do have a size of 505,856 bytes:
+http://www.bitsavers.org/bits/DEC/pdp11/floppyimages/rx02/</p>
+<p>Hmm, maybe that BASIC.DSK image file was created by something that only copied the initial allocated logical
+sectors and ignored unused logical sectors at the end of the floppy, and maybe PUTR doesn't handle disk
+image files that are not the expected full size?</p>
+<p>Example of padding the 486,400 byte BASIC.DSK image file to a size of 512,512 bytes on a Windows system:</p>
+<div class="highlight"><pre><span></span>FSUTIL FILE CREATENEW BLANK 26112
+COPY /B BASIC.DSK+BLANK TEST.DSK
+
+C:\PUTR&gt;DIR TEST.DSK
+Volume in drive C has no label.
+Volume Serial Number is 14CE-1A29
+Directory of C:\PUTR
+08/11/2021  12:55p             512,512 TEST.DSK
+
+C:\PUTR&gt;PUTR
+PUTR V2.01  Copyright (C) 1995-2001 by John Wilson &lt;wilson@dbit.com&gt;.
+All rights reserved.  See www.dbit.com for other DEC-related software.
+
+COPY mode is ASCII, SET COPY BINARY to change
+(C:\PUTR)&gt;MOUNT RX: TEST.DSK /RX02 /RT11 /RONLY
+(C:\PUTR)&gt;DIR RX:
+
+Volume in drive RX is RT11A
+Directory of RX:\*.*
+
+11-Aug-2021
+BSOT0D.EAE    12  04-Apr-1983
+BSOT0S.EAE    10  04-Apr-1983
+BSOT1D.EAE     9  04-Apr-1983
+BSOT1S.EAE     6  04-Apr-1983
+BSOT0D.EIS    12  04-Apr-1983
+...
+</pre></div>
+
+</blockquote>
+<p>...etc.  Nice.  Still no luck mounting under simh, though.  Glen further offers:</p>
+<blockquote>
+<p>As far as I can tell by default PUTR expects to work with logical sector order RX-02 disk images that are
+512,512 bytes in size. The BASIC-11 RX-02 disk image available here is in logical sector order, but is less
+than 512,512 bytes in size: http://www.bitsavers.org/bits/DEC/pdp11/floppyimages/rx02/ PUTR appears to be
+unhappy with the disk image unless it is padded to 512,512 bytes in size.</p>
+<p>On the other hand as far as I can tell by default SIMH expects to work with physical sector order RX-02 disk
+images. If I mount the logical sector order RX-02 disk image that works with PUTR in SIMH, then RT-11 gives
+a "?DIR-F-Invalid directory" error. If I translate the logical sector order RX-02 disk image back into a
+physical sector order disk image (dealing with track shifting, sector interleaving, and track to track
+sector skewing) then RT-11 on SIMH is happy with the disk image.</p>
+</blockquote>
+<p>and:</p>
+<blockquote>
+<p>One bit of information that I found helpful as a reference when I looked at this quite a while ago was the
+2.11BSD RX02 floppy disk device driver source code, which can be viewed online here:</p>
+<p>https://minnie.tuhs.org/cgi-bin/utree.pl?file=2.11BSD/sys/pdpuba/rx.c</p>
+<p>In particular, the routine rxfactr(), which as the comment says it calculates the physical sector and
+physical track on the disk for a given logical sector.</p>
+<p>I used that as a starting point to write a simple utility to read an RX-02 disk image file in logical sector
+order and output an RX-02 disk image file in physical sector order.</p>
+<div class="highlight"><pre><span></span><span class="cm">/*</span>
+<span class="cm">*  rxfactr -- calculates the physical sector and physical</span>
+<span class="cm">*  track on the disk for a given logical sector.</span>
+<span class="cm">*  call:</span>
+<span class="cm">*      rxfactr(logical_sector,&amp;p_sector,&amp;p_track);</span>
+<span class="cm">*  the logical sector number (0 - 2001) is converted</span>
+<span class="cm">*  to a physical sector number (1 - 26) and a physical</span>
+<span class="cm">*  track number (0 - 76).</span>
+<span class="cm">*  the logical sectors specify physical sectors that</span>
+<span class="cm">*  are interleaved with a factor of 2. thus the sectors</span>
+<span class="cm">*  are read in the following order for increasing</span>
+<span class="cm">*  logical sector numbers (1,3, ... 23,25,2,4, ... 24,26)</span>
+<span class="cm">*  There is also a 6 sector slew between tracks.</span>
+<span class="cm">*  Logical sectors start at track 1, sector 1; go to</span>
+<span class="cm">*  track 76 and then to track 0.  Thus, for example, unix block number</span>
+<span class="cm">*  498 starts at track 0, sector 25 and runs thru track 0, sector 2</span>
+<span class="cm">*  (or 6 depending on density).</span>
+<span class="cm">*/</span>
+<span class="k">static</span>
+<span class="nf">rxfactr</span><span class="p">(</span><span class="n">sectr</span><span class="p">,</span> <span class="n">psectr</span><span class="p">,</span> <span class="n">ptrck</span><span class="p">)</span>
+   <span class="k">register</span> <span class="kt">int</span> <span class="n">sectr</span><span class="p">;</span>
+   <span class="kt">int</span> <span class="o">*</span><span class="n">psectr</span><span class="p">,</span> <span class="o">*</span><span class="n">ptrck</span><span class="p">;</span>
+<span class="p">{</span>
+   <span class="k">register</span> <span class="kt">int</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">;</span>
+
+   <span class="n">p1</span> <span class="o">=</span> <span class="n">sectr</span> <span class="o">/</span> <span class="mi">26</span><span class="p">;</span>
+   <span class="n">p2</span> <span class="o">=</span> <span class="n">sectr</span> <span class="o">%</span> <span class="mi">26</span><span class="p">;</span>
+   <span class="cm">/* 2 to 1 interleave */</span>
+   <span class="n">p2</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">p2</span> <span class="o">+</span> <span class="p">(</span><span class="n">p2</span> <span class="o">&gt;=</span> <span class="mi">13</span> <span class="o">?</span>  <span class="mi">1</span> <span class="o">:</span> <span class="mi">0</span><span class="p">))</span> <span class="o">%</span> <span class="mi">26</span><span class="p">;</span>
+   <span class="cm">/* 6 sector per track slew */</span>
+   <span class="o">*</span><span class="n">psectr</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">p2</span> <span class="o">+</span> <span class="mi">6</span> <span class="o">*</span> <span class="n">p1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">26</span><span class="p">;</span>
+   <span class="k">if</span> <span class="p">(</span><span class="o">++</span><span class="n">p1</span> <span class="o">&gt;=</span> <span class="mi">77</span><span class="p">)</span>
+       <span class="n">p1</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+   <span class="o">*</span><span class="n">ptrck</span> <span class="o">=</span> <span class="n">p1</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+</blockquote>
+<p>An RX02 image shuffled into physical sector order generated by Glen and suitable for use with simh is
+attached <a href="https://fritzm.github.io/PHYS.zip">here</a>.</p>
+<p>Jerry Weiss further suggested that the original, logically ordered image may work as is under simh if attached
+as an MSCP device rather than RX02.  This turns out also to be the case:</p>
+<blockquote>
+<blockquote>
+<p>On Fri, Aug 13, 2021 at 9:46 AM Jerry Weiss wrote:<br>
+Could you attach logical sector (block?) image as MSCP disk in SIMH?   Other than some minor image
+manipulation for removing track 0 if present, is there any reason this would not be readable?</p>
+</blockquote>
+<p>Hmm, it didn't occur to me to try that. Mounting the logical sector order RX-02 disk image, without any
+modification necessary, as a raw MSCP disk does indeed appear to work!</p>
+<div class="highlight"><pre><span></span>sim&gt; ATTACH RQ1 BASIC.DSK
+RQ1: &#39;BASIC.DSK&#39; Contains RT11 partitions
+1 valid partition, Type: V05, Sectors On Disk: 950
+
+sim&gt; SHOW RQ1
+RQ1     486KB, attached to BASIC.DSK, write locked
+       RD54, UNIT=1, autosize
+       RAW format
+
+.DIR DU1:
+
+BSOT0D.EAE    12  04-Apr-83      BSOT0S.EAE    10  04-Apr-83
+BSOT1D.EAE     9  04-Apr-83      BSOT1S.EAE     6  04-Apr-83
+BSOT0D.EIS    12  04-Apr-83      BSOT0S.EIS     9  04-Apr-83
+BSOT1D.EIS     9  04-Apr-83      BSOT1S.EIS     6  04-Apr-83
+BSOT0S.FIS     7  04-Apr-83      BSOT1S.FIS     6  04-Apr-83
+...
+</pre></div>
+
+</blockquote>
+<p>...etc.  Armed with the above, I was able to get BASIC-11 into an RT11 image in the Unibone card, and running
+on the new PDP-11/34.  Here's output from the <a href="https://rosettacode.org/wiki/Mandelbrot_set#DEC_BASIC-PLUS">DEC BASIC mandelbrot
+program</a> at rosetta code:</p>
+<p><img src='/images/pdp11/basic-mandel-output_thumbnail_tall.jpeg' title='BASIC-11 Mandelbrot program on a PDP-11/34, program output' onclick='pswipe("pdp11",103);'/>
+<img src='/images/pdp11/basic-mandel-list_thumbnail_tall.jpeg' title='BASIC-11 Mandelbrot program on a PDP-11/34, program listing' onclick='pswipe("pdp11",104);'/></p></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
+        <a href="https://fritzm.github.io/unibone.html"><h1>Unibone</h1></a>
+Wed 24 March 2021
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p>I have been keeping an eye on Jörg Hoppe's interesting <a href="http://retrocmp.com/projects/unibone">Unibone project</a>
+for some time -- it is a general-purpose Unibus device emulator and diagnostic tool, built around a
+<a href="https://beagleboard.org/black">BeagleBone Black</a> compute module running embedded real-time Linux. The
+PDP-11/34 restoration project finally provided enough impetus for me to pull the trigger on getting one.</p>
+<p>Sent Jörg an email to order a kit, which arrived some weeks later complete with bundled BeagleBone. The kit is
+pretty well thought-out and was enjoyable to put together.  Had to throw in a few of my own pin headers and
+jumpers to complete the assembly.  The only other small confusions were a few of the resistor packs which did
+not match the schematic (Jörg informed me these are non-critical values.)</p>
+<p>The kit did not include card handles.  I decided to try having some 3D printed by Shapeways, using their
+"processed versatile plastic" process, which is a laser sintered nylon, color dyed and smoothed.  I used a
+card handle model by Vince Slyngstad found <a href="https://so-much-stuff.com/pdp8/cad/3d.php">here</a>.  The results
+were nice, sturdy, and dimensionally correct. The chosen "purple" color is a rather intense magenta in real
+life.  Not exactly cheap for just a couple parts, but I had been wanting to try their print service.</p>
+<p><img src='/images/pdp11/unibone-kit_thumbnail_tall.jpeg' title='Unibone: unassembled kit' onclick='pswipe("pdp11",100);'/>
+<img src='/images/pdp11/unibone-handles_thumbnail_tall.jpeg' title='Unibone: 3d printed handles' onclick='pswipe("pdp11",101);'/>
+<img src='/images/pdp11/unibone-assembled_thumbnail_tall.jpeg' title='Unibone assembled' onclick='pswipe("pdp11",102);'/></p>
+<p>The Unibone has all sorts of capabilities, and proved itself <em>very</em> useful during the '11/34 restoration:</p>
+<ul>
+<li>
+<p>Ability to bus master to probe the Unibus address space and run diagnostics on memory found there.  This was
+  very useful for debugging the memory card that came with the -11/34 and sussing out its undocumented
+  configuration switch settings.</p>
+</li>
+<li>
+<p>Ability to directly load and execute MAINDEC diagnostics, without needing a functioning console emulator or
+  storage subsystem.  This is a convenient and speedier alternative to PDP11GUI.</p>
+</li>
+<li>
+<p>Subsequently, the ability to emulate entire storage subsystems, very useful for loading and running full
+  operating systems on this -11/34 which otherwise has no storage of its own.</p>
+</li>
+</ul>
+<p>The Unibone goes in a quad SPC slot; I opted for slot 9 on the -11/34, and this entailed removing the NPG
+jumper on the backplane there to allow the Unibone to bus master.  The device worked well straight-away after
+assembly.</p>
+<p>There are, alas, a couple small frustrations with the current design:</p>
+<ul>
+<li>
+<p>It is desireable to configure the Unibone and backplane to allow the Unibone to bus master and interrupt.
+  However, this leaves grant chain(s) open at boot until the Unibone's own embedded software can boot and take
+  control of the card (which takes on the order of a minute or so).  During this time the host system is
+  non-functional or may hang, and it needs to be subsequently reset (this reset can be scripted from the
+  Unibone, but all of this does significantly increase end-to-end boot time of the machine). It would be nice
+  if the Unibone had something like some normally-closed relays on the grant chains, to preserve grant
+  continuity until control is actively assumed.</p>
+</li>
+<li>
+<p>It would be desireable to be able to power the embedded BeagleBone in isolation, in place in a
+  system, without having to having to have the entire host system powered at the same time (e.g. for
+  maintenance of the Unibone's embedded software stack, maintenance of locally stored storage system media
+  images, etc.)  There is a relay on the Unibone which switches in Unibus power when available, but
+  unfortunately, the design is such that if the BeagleBone is also externally powered the relay remains
+  engaged when the host system is shut down.  This could lead to the BeagleBone trying to power then entire
+  Unibus via its 5V supply/connector, which could obviously be problematic...  For now it seems best just to
+  pull the card in order to run it in isolation, which is a little less than convenient.</p>
+</li>
+</ul>
+<p>That said, the designs and software are open source, and the card comes with some generous prototyping areas
+built right in, so some mods to address these issues could be a fun project.  All in all, Jörg has put
+together a fantasically useful bit of kit, and I'm certainly glad to have it in my toolbox!</p></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
         <a href="https://fritzm.github.io/1134.html"><h1>PDP-11/34</h1></a>
 Tue 09 March 2021
 
@@ -1097,1975 +1546,6 @@ fanciful interpretation of <code>PI</code>...</p></div>
     <hr />
 </div>
     
-
-        
-
-<div class='article'>
-    <div class="content-title">
-        <a href="https://fritzm.github.io/unix-v6-trouble-2.html"><h1>PDP-11/45: V6 Unix Troubleshooting, Part II</h1></a>
-Sun 25 October 2020
-
-by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
- 
-    </div>
-    
-    <div><p><em>[A catch-up article, documenting discoveries of Feb 2019]</em></p>
-<p>In early 2019, I made a V6 Unix pack from the Ken Wellsch tape image, as mentioned in <a href="https://fritzm.github.io/unix-and-ms11.html">this blog
-entry</a>.  It booted on my machine, but dumped core on the first <code>ls</code> in single-user
-mode, or as soon as I did any heavy lifting in multi-user mode.</p>
-<p>The following is the conclusion of a chronology of the troubleshooting campaign that took place over the next
-month and a half, culminating in a hardware fix and successful operation of V6 Unix on the machine (part I is
-<a href="https://fritzm.github.io/unix-v6-trouble-1.html">here</a>.)  This was largely a collaborative effort between Noel Chiappa an
-myself via direct email correspondence, though some help was received from others via the cctalk mailing list
-as well.</p>
-<p>By this point, the nature of the <code>ls</code> problem had been fairly well characterized: part of the <code>ls</code> process
-address space ended up holding an incorrect portion of its program text; subsequently, when execution jumped
-to some of these unexpected bits, an out-of-bounds memory access would occur triggering a memory management
-trap.  Efforts now focus on understanding how and why the bad bits got there...</p>
-<h3>February 7</h3>
-<p>[Here and below, block-quoted content is excerpted from email correspondence.]</p>
-<p>Fritz:</p>
-<blockquote>
-<p>Noel, is it possible for you deduce where Unix <em>should</em> be placing these  "bad" bits (from file offset octal
-4220)? Maybe a comparison of addresses where the bits should be, with addresses where the "bad" copy ends
-up, could point us at some particular failure modes to check in the KT11, CPU, or RK11...</p>
-</blockquote>
-<p>Noel:</p>
-<blockquote>
-<p>Yes, it's quite simple: just add the virtual address in the code to the physical address of the bottom of
-the text segment (given in UISA0). The VA is actually 04200, though: the 04220 includes 020 to hold the
-a.out header at the start of the command file.</p>
-<p>So, with UISA0 containing 01614, that gives us PA:161400 + 04200 = PA:165600, I think. And it wound up at
-PA:171600 - off by 04000 (higher) - which is obviously an interesting number.</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>Here's where it gets 'interesting'.</p>
-<p>Executing a command with pure text on V6 is a very complicated process. The shells fork()s a copy of itself,
-and does an exec() system call to overlay the entire memory in the new process with a copy of the command
-(which sounds fairly simple, at a high level) - but the code path to do the exec() with a pure text is
-incredibly hairy, in detail. In particular, for a variety of reasons, the memory of the process can get
-swapped in and out several times during that. I apparently used to understand how this all worked, see this
-message:</p>
-<p><a href="https://minnie.tuhs.org/pipermail/tuhs/2018-February/014299.html">https://minnie.tuhs.org/pipermail/tuhs/2018-February/014299.html</a></p>
-<p>but it's so complicated it's going to take a while to really comprehend it again. (The little grey cells are
-aging too, sigh...)</p>
-<p>The interesting point is that when V6 first copies the text in from the file holding the command (using
-readi(), Lions 6221 for anyone who's masochistic enough to try and actually follow this :-), it reads it in
-starting from the bottom, one disk block at a time (since in V6, files are not stored contiguously).</p>
-<p>So, if it starts from the bottom, and copies the wrong thing from low in the file <em>up</em> to VA:010200, when it
-later gets to VA:010200 in the file contents, that <em>should</em> over-write the stuff that got put there in the
-wrong place <em>earlier</em>. Unless there's <em>another</em> problem which causes that later write to <em>also</em> go somewhere
-wrong...</p>
-<p>So, I'm not sure when this trashage is happening, but because of the above, my <em>guess</em> is that it's in one
-of the two swap operations on the text (out, and then back in). (Although it might be interesting to look at
-PA:165600 and see what's actually <em>there</em>.) Unix does swapping of pure texts in a single, multi-block
-transfer (although not always as an integral number of blocks, as we found out the hard way with the QSIC
-:-).</p>
-<p>So my suspicions have now switched back to the RK11... One way to proceed would be to stop the system after
-the pure text is first read in (say around Lions 4465), and look to see what the text looks like in main
-memory at <em>that</em> point. (This will require looking at KT11 registers to see where it's holding the text
-segment, first.)</p>
-<p>If that all looks good, we'll have to figure out how to stop the system after the pure text is read back in
-(which does not happen in exec(), it's done by the normal system operation to swap in the text and data of a
-process which is ready to run).</p>
-<p>We could also stop the system after the text is swapped out, and key in a short (~ a dozen words) program to
-read the text back in from the swap device, and examine it - although we'd have to grub around in the system
-a bit to figure out where it got written to. (It might be just easier to stop it at, say, Lions 5196 and
-look at the arguments on the kernel stack.)</p>
-</blockquote>
-<p>Fritz:</p>
-<blockquote>
-<blockquote>
-<p>...it might be interesting to look at PA:165600 and see what's actually <em>there</em></p>
-</blockquote>
-<p>A sea of zeros, as it turns out.</p>
-</blockquote>
-<hr>
-<blockquote>
-<blockquote>
-<p>The most valuable thing ... would be to look at the text segment, after it's read in and before it's
-swapped out. I can work out where to put a halt, if you want to try that.</p>
-</blockquote>
-<p>Yes, this sounds like a good plan to me!  Is this as simple as dropping a HALT at VA:0 in the text? </p>
-</blockquote>
-<p>Noel:</p>
-<blockquote>
-<p>No; actually, probably easier! :-) Probably easiest is to, just before you type 'ls', put a HALT in the OS
-just after 4467 in Lions. Halt the machine momentarily, patch the kernel, and CONT. (Basically the same as
-your patch to the trap vector, just a different address.) That'll be at 021320 (should contain 062706),
-physical or virtual. :-)</p>
-<p>When the system halts, you'll need to look at the text in memory. Two ways to find the location: look on the
-kernel stack, the address should be the second thing down:</p>
-<div class="highlight"><pre><span></span>mov 16(r3),-(sp)
-add $20,(sp)
-mov (r4),-(sp)
-jsr pc,*$_swap
-</pre></div>
-
-<p>(i.e. the thing that 020 got added to). Probably easier, though, is just to look in UISA0 (which at this
-point is pointing to the block of memory that's been allocated to read the text into, Lions 4459-60).</p>
-<p>That number in UISA0, T, will be the click address of the text. So PA:T00 should be the start of the text
-(170011 010600, etc). So then PA:(T00+010200) should be the trashed chunk of text: 110024 010400 000167
-000016 010500 etc (right) or 016162 004767 000224 000414 016700 (wrong).</p>
-</blockquote>
-<h3>February 8</h3>
-<p>Noel:</p>
-<blockquote>
-<p>In addition to the info I already sent about how to [set the breakpoint], if you could note down the top 3
-words on the kernel stack, and the contents of the RK registers, those would be really useful; the first
-will allow us to work out what <em>should</em> be in the RK registers after the swap I/O operation completes - I
-don't think the RK11 will be asked to do anything after that finishes and before the system hits that halt
-in xalloc().</p>
-<p>To find the kernel stack.... read out KISA6, S. This value will point to the 'user' area of that process,
-plus the kernel stack. The kernel SP should be something like 01417xx; subtract 140000 (the segment number),
-and add what's left to S00.  Alternatively, you can probably use the rotating switch on the front panel to
-just look up VA:1417xx (whatever's in R6) directly.</p>
-<p>Oh, if you need some bed-time reading to put you to sleep, check out the bottom section ("exec() and
-pure-text images") in:</p>
-<p><a href="http://gunkies.org/wiki/Unix_V6_internals">http://gunkies.org/wiki/Unix_V6_internals</a></p>
-<p>which will explain what's going on here with the swapping in and out, which is sorta complicated.</p>
-</blockquote>
-<h3>February 9</h3>
-<p>Noel:</p>
-<blockquote>
-<blockquote>
-<p>just halt the machine after the text is swapped in</p>
-</blockquote>
-<p>The code we need is at Lions 2034, where the pure text of a process is swapped in (and this should only be
-traversed once; I don't think the system will need to swap in the text of the shell); just put a HALT in (in
-the usual manner, just before trying 'ls') at 015406, which should contain a 062706 (again).</p>
-<p>At that point, since the text size is 010400, and the location of the text in physical memory is 0161400,
-the BAR <em>should</em> contain 0172000. If not, and it's 0232000 (note that the 0200000 bit will be in the CSR,
-the lower XM bit) instead, Bazinga!, it's nailed (unless the system somehow snuck another RK operation in
-there, but I don't see anything that could do that).</p>
-</blockquote>
-<p>I finally get some time back in front of the machine, after a few days in bed with a cold:</p>
-<blockquote>
-<blockquote>
-<p>...put a HALT in the OS just after 4467 in Lions. Halt the machine momentarily, patch the kernel, and CONT.
-(Basically the same as your patch to the trap vector, just a different address.) That'll be at 021320
-(should contain 062706)...</p>
-</blockquote>
-<p>But alas, it does not.  [PA:021320] = 010246.  Furthermore, [PA:015406] = 016504.</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>I just tried under SIMH, also, and got consistent results:</p>
-<div class="highlight"><pre><span></span>[PA:015406] = 016504
-[PA:021320] = 010246
-</pre></div>
-
-<p>...so, one would think, my rkunix and yours are different?</p>
-</blockquote>
-<p>Noel:</p>
-<blockquote>
-<p>That must be it. I thought we were both working from the V6 distribution? Oh, yours prints out that Western
-Electric copyright notice, I don't think mine has that...</p>
-</blockquote>
-<h3>February 10</h3>
-<p>The first part of the day is spent sorting out and comparing the "Wellsch" V6 distribution that I have been
-using, and the "Ritchie" version that Noel has been using.  Noel comes to the conclusion that the only
-differences in the kernel sources are in fact the four <code>printfs</code> for the copyright notice, but this is enough
-to perturb the locations of various symbols of interest between the two kernels.  He also finds the binaries
-<code>ls</code>, <code>cc</code>, <code>as</code>, <code>as2</code>, <code>ld</code> <code>c0</code>, <code>c1</code>, and <code>c2</code> all match; as do liba.a, libc.a and crt0.o.</p>
-<p>Getting back on the trail of the bug:</p>
-<blockquote>
-<p>So the first place I'd like to try HALTing is just after the call to swap, Lions 4467; at that point, the
-text should be in main memory, and also just written to disk. Should be at 021320 (old contents should be
-062706).</p>
-<p>Fun things to do here: look at the text in main memory (0161400 and up), see if it's correct at this point.
-Also: pull the arguments off the top of the stack, and write a small program to read it back in...</p>
-</blockquote>
-<p>This turns out to be one last typo ("rkunix" vs. "rrkunix" on Noel's part) resulting in incorrect symbol
-addresses for my kernel, but I'm hip to Noel's curveballs now so:</p>
-<blockquote>
-<p>Okay, using today's newly acquired 'db' skillz :-), in my rkunix, that spot is at PA:21420.  Firing up the
-machine again and trying that now...</p>
-</blockquote>
-<p>It works; I end up stopped at the breakpoint and start extracting data:</p>
-<blockquote>
-<p>Hmmm:</p>
-<div class="highlight"><pre><span></span><span class="n">PA</span><span class="o">:</span><span class="mi">161400</span><span class="o">:</span> <span class="mi">141644</span> <span class="mi">141660</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">000000</span>
-<span class="n">PA</span><span class="o">:</span><span class="mi">161420</span><span class="o">:</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">000000</span>
-</pre></div>
-
-</blockquote>
-<p>Noel:</p>
-<blockquote>
-<p>The text is probably at a different location in PA at this point. Read out UISA0 for its base.</p>
-</blockquote>
-<p>Fritz:</p>
-<blockquote>
-<div class="highlight"><pre><span></span><span class="n">UISA0</span><span class="o">:</span> <span class="mi">001654</span>
-
-<span class="n">PA</span><span class="o">:</span><span class="mi">165400</span><span class="o">:</span> <span class="mi">170011</span> <span class="mi">010600</span> <span class="mi">011046</span> <span class="mi">005720</span> <span class="mi">010066</span> <span class="mi">000002</span> <span class="mi">004767</span> <span class="mi">000010</span>
-
-<span class="n">KSP</span><span class="o">:</span> <span class="mi">141656</span> <span class="o">-&gt;</span> <span class="n">PA</span><span class="o">:</span><span class="mi">165256</span>
-
-<span class="n">PA</span><span class="o">:</span><span class="mi">165256</span><span class="o">:</span> <span class="mi">007656</span> <span class="mi">001654</span> <span class="mi">000104</span> <span class="mi">000000</span> <span class="mi">101602</span> <span class="mi">066312</span> <span class="mi">000000</span> <span class="mi">141726</span>
-<span class="n">PA</span><span class="o">:</span><span class="mi">175600</span><span class="o">:</span> <span class="mi">110024</span> <span class="mi">010400</span> <span class="mi">000167</span> <span class="mi">000016</span> <span class="mi">010500</span> <span class="mi">010605</span> <span class="mi">101446</span> <span class="mi">010346</span>
-</pre></div>
-
-<p>So far so good -- both beginning and eventually-bogus sections of text check out at this point!</p>
-</blockquote>
-<p>Noel:</p>
-<blockquote>
-<p>Woo-Hoo!!!! YEAH!!!!</p>
-<p>So that part of the text <em>is</em> right at this point.</p>
-<p>Needless to say, this is <em>very</em>, very important data.</p>
-<p>So chances are very strong, at this point, that it's the RK11.</p>
-<p>What did you want to do next? You could start with the RK11 registers. Also, use PDP11GUI to read the copy
-off the swap device, once I decipher the stack?</p>
-</blockquote>
-<hr>
-<blockquote>
-<div class="highlight"><pre><span></span><span class="n">PA</span><span class="o">:</span><span class="mi">165256</span><span class="o">:</span> <span class="mi">007656</span> <span class="mi">001654</span> <span class="mi">000104</span> <span class="mi">000000</span> <span class="mi">101602</span> <span class="mi">066312</span> <span class="mi">000000</span> <span class="mi">141726</span>
-</pre></div>
-
-<p>OK, so the 01654 is the start address in PA (in clicks) for the area to swap out, and that matches UISA0.
-0104 is the text length (also in clicks), and that also matches. The 0 is a flag which says it's a write
-(read is 01). And the 07656 is the block number (4014.).</p>
-</blockquote>
-<p>Fritz:</p>
-<blockquote>
-<p>I should have a valid swap on the disk from before I shut down... Going to fire up PDP11GUI and grab it now
-to have a look. We want blocks 4014-4022, then? (9 x 512-byte blocks = 0110 clicks if I got that right?)</p>
-</blockquote>
-<p>Noel:</p>
-<blockquote>
-<p>4014.-4023., I think...</p>
-<blockquote>
-<p>(9 x 512-byte blocks = 0110 clicks if I got that right?)</p>
-</blockquote>
-<p>I think 8-1/2 or so; text is 010400 bytes (a little less, actually, but that's what the system is using),
-01000 bytes/block, = 010.4 blocks.</p>
-</blockquote>
-<p>Fritz:</p>
-<p>Hmm, the beginning looks good, but it seems to cut off to soon:</p>
-<blockquote>
-<div class="highlight"><pre><span></span>0000000    000000  000000  000000  000000  000000  000000  000000  000000
-*
-7656000    170011  010600  011046  005720  010066  000002  004767  000010
-7656020    010016  004737  006374  104401  004567  010154  162706  000044
-7656040    012716  000001  004737  004652  010067  022314  010516  062716
-7656060    177762  004737  006346  016500  177762  062700  177413  010067
-   |
-7660320    000137  002346  016516  000004  012746  020452  004737  003562
-7660340    005726  000137  002542  005067  017552  012704  022336  005003
-7660360    012716  021050  004737  005042  110024  005203  022703  000020
-7660400    000000  000000  000000  000000  000000  000000  000000  000000
-*
-11410000
-</pre></div>
-
-</blockquote>
-<p>Noel:</p>
-<blockquote>
-<blockquote>
-<div class="highlight"><pre><span></span>7656000    170011  010600  011046  005720  010066  000002  004767  000010
-</pre></div>
-
-</blockquote>
-<p>Yup, good start; SETD, etc.</p>
-<blockquote>
-<div class="highlight"><pre><span></span>7660360    012716  021050  004737  005042  110024  005203  022703  000020
-7660400    000000  000000  000000  000000  000000  000000  000000  000000
-</pre></div>
-
-</blockquote>
-<p>Hunh; not good. (Might be worth looking at that location in main memory, see if it's zeros or not.)</p>
-<p>That's so odd that it's all zeros - I wonder where they came from? Maybe they were already on the disk, and
-the write stopped way early? (At 01000 bytes per block, it stopped after 2-1/2 blocks; 056000s, 057000s,
-stopped half-way through the 060000's.)</p>
-<p>Would be useful to have the RK register contents after the swap() call returns...</p>
-</blockquote>
-<p>Fritz:</p>
-<blockquote>
-<p>Okay, the write should be from PA:165400 - PA:175777, to sectors 07656 - 07667.  Block 7667 encodes to an
-RKDA value of 012363.</p>
-<p>After the halt, I find:</p>
-<div class="highlight"><pre><span></span><span class="n">RKDS</span><span class="o">:</span> <span class="mi">004707</span> <span class="o">(</span><span class="n">OK</span><span class="o">)</span>
-<span class="n">RKER</span><span class="o">:</span> <span class="mi">000000</span> <span class="o">(</span><span class="n">OK</span><span class="o">)</span>
-<span class="n">RKCS</span><span class="o">:</span> <span class="mi">000322</span> <span class="o">(</span><span class="n">BOGUS</span><span class="o">!</span> <span class="n">EX</span><span class="o">.</span><span class="na">MEM</span> <span class="o">=</span> <span class="mi">01</span><span class="o">)</span>
-<span class="n">RKWC</span><span class="o">:</span> <span class="mi">000000</span> <span class="o">(</span><span class="n">OK</span><span class="o">)</span>
-<span class="n">RKBA</span><span class="o">:</span> <span class="mi">176000</span> <span class="o">(</span><span class="n">OK</span><span class="o">)</span>
-<span class="n">RKDA</span><span class="o">:</span> <span class="mi">012363</span> <span class="o">(</span><span class="n">OK</span><span class="o">)</span>
-</pre></div>
-
-<p>So, EX.MEM are the smoking bits here!  I will review the associated designs and come up with things the
-try/check.</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>Okay, taking a look:</p>
-<p>RKBA is implemented in the M795 module in slots AB07, as detailed on sheet RK11-C-15.  The M795 is a generic
-WC/BA Unibus interfacing module.  The BA part only covers 16 bits, but generates an overflow out "D15
-RKBA=ALL 1 L".</p>
-<p>EX MEM 01 and EX MEM 02 are maintained on the M239 module in slot A17, as detailed on sheet RK11-C-03.  The
-M239 is a 3x 4-bit counter/register module, so this also implements counting up these bits, when triggered
-by "D15 RKBA = ALL 1 L".</p>
-<p>Based on where we see the data on disk fall off (offset 2400) and the start PA (165400), I'm guessing we get
-a false trigger on this "ALL 1" at RKBA 167777.  So that looks like a false "1" detect on RKBA bit 12.</p>
-<p>So I think the thing to do is to put the M795 out on an extender, load RKBA with 167777, and have a check at
-E28 pin 5, and E34 pin 8!</p>
-<p>And we leave the cliffhanger there, for now, at least until tomorrow evening.  Because due to the way the
-RK11-C is mounted, in order to do the above I'm going to have to spin the whole machine around (its a dual
-H960), extend the RK05's so there is room to physically climb in the back, rig a work light, and get on in
-there...</p>
-</blockquote>
-<h3>February 11</h3>
-<blockquote>
-<p>SUCCESS!!</p>
-<p>Put the M795 out on an extender, loaded 167777 in RKBAR, and had a look around with a logic probe.  Narrowed
-it down to E34 (a 7430 8-input NAND).  Pulled, socketed, replaced, and off she goes!</p>
-<p>I can now successfully boot and run both V6 Unix and RSTS/E V06C from disk.</p>
-<p><em>THAT</em> was a really fun and rewarding hunt :-)  First message in the thread was back on Dec 30, 2018.  Lots
-of debugging and DRAM repairs, then the final long assault to this single, failed gate...</p>
-<p>Thanks to all here for the help and resources, and particular shout-outs for Noel and Paul who gave
-generously of their time and attention working through the densest bits, both on and off the list.</p>
-<p>I predict a long happy weekend and a big power bill at the end of the month :-)</p>
-</blockquote>
-<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/M795.png" 
-title="M795 WC/BAModule"/></p>
-<p style="text-align: center;"><em>M795 module and the single failed gate</em></p></div>
-    <hr />
-</div>
-    
-
-        
-
-<div class='article'>
-    <div class="content-title">
-        <a href="https://fritzm.github.io/unix-v6-trouble-1.html"><h1>PDP-11/45: V6 Unix Troubleshooting</h1></a>
-Sat 24 October 2020
-
-by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
- 
-    </div>
-    
-    <div><p><em>[A catch-up article, documenting discoveries of Jan/Feb 2019]</em></p>
-<p>In early 2019, I made a V6 Unix pack from the Ken Wellsch tape image, as mentioned in <a href="https://fritzm.github.io/unix-and-ms11.html">this blog
-entry</a>.  It booted on my machine, but dumped core on the first <code>ls</code> in single-user
-mode, or as soon as I did any heavy lifting in multi-user mode.</p>
-<p>The following is the first part of a chronology of the troubleshooting campaign that took place over the next
-month and a half, culminating in a smoking gun hardware fix and successful operation of V6 Unix on the
-machine.  This was largely a collaborative effort between Noel Chiappa an myself via direct email
-correspondence, though help was received from others via the cctalk mailing list as well.</p>
-<h3>January 8-9</h3>
-<p>Initial experiments.  Described the <code>ls</code> crashes to Noel.  He theorizes that <code>ls</code> works in one case and
-crashes in another is because it lands in a different spot in memory in each case.</p>
-<p>Luckily, a subsequent <code>od</code> on the core file does not crash, and a core file is successfully extracted:</p>
-<div class="highlight"><pre><span></span>140004 000000 141710 141724 
-$DK
-@rkunix
-mem = 1035
-RESTRICTED RIGHTS
-
-Use, duplication or disclosure is subject to
-restrictions stated in Contract with Western
-Electric Company, Inc.
-# LS
-MEMORY FAULT -- CORE DUMPED
-# OD CORE
-0000000 141552 141562 000000 000000 000000 000000 000000 000000
-0000020 000000
-0000060 000000 000000 000000 000001 000000 000000 063260 140076
-0000100 001700 000000 000104 066112 067543 062562 000000 000000
-0000120 000000 000000 000000 060221 000567 067543 062562 000000
-0000140 000000 000000 000000 000000 066112 000000 000020 000000
-0000160 000000 000000 000000 000000 177701 000000 000020 000000
-0000200 000000 000000 000000 000000 177701 041402 016006 000000
-0000220 000000 000000 000000 000000 066016 041402 016006 000000
-0000240 000000 000000 000000 000000 066016 075120 075120 075120
-0000260 000000
-0000300 000000 000000 000000 000000 000013 010400 001050 002366
-0000320 000000 000104 000035 000024 000000 141732 141742 141664
-0000340 141674 000000 000000 000000 000000 000000 000000 000000
-0000360 000000
-0000400 000000 000000 000000 000000 000000 000000 000012 000000
-0000420 000000 000000 000000 141772 000000 000000 000000 000000
-0000440 000000
-0001500 000000 025334 003602 001236 025334 003602 002454 003602
-0001520 063260 177716 000000 141542 016070 001176 000000 003602
-0001540 063260 177716 000000 141562 016070 001176 066352 030300
-0001560 063260 025334 003602 077572 000013 107564 141626 000512
-0001600 000000 141604 141616 000300 074616 025334 003602 000217
-0001620 000203 107404 020276 000512 000000 141634 141640 003602
-0001640 000007 000135 107454 141662 014314 003602 066352 005674
-0001660 000000 141712 013640 074616 000000 001000 000000 000000
-0001700 001000 074616 063260 066352 000013 141726 023730 066352
-0001720 063260 000000 000013 141742 023502 003602 000000 177760
-0001740 000013 141756 022050 000013 000000 000000 000000 000034
-0001760 000444 000031 177760 000000 030351 177770 010210 170010
-0002000 000001 177777 177777 023436 023436 020264 000162 000262
-0002020 000262 000202 000262 000256 000210 000262 000250 000262
-0002040 000262 000216 000262 000262 000262 000262 000262 000224
-0002060 000170 000234 000242 000003 100000 000144 040000 000142
-0002100 020000 000143 000055 000001 000400 000162 000055 000001
-0002120 000200 000167 000055 000002 004000 000163 000100 000170
-0002140 000055 000001 000040 000162 000055 000001 000020 000167
-0002160 000055 000002 002000 000163 000010 000170 000055 000001
-0002200 000004 000162 000055 000001 000002 000167 000055 000001
-0002220 000001 000170 000055 000001 010000 000164 000040 020066
-0002240 020106 020116 020126 020142 020152 020162 020176 020206
-0002260 020216 020226 000056 062457 061564 070057 071541 073563
-0002300 000144 062457 061564 063457 067562 070165 005000 071445
-0002320 005072 072000 072157 066141 022440 005144 022400 062065
-0002340 000040 031045 020144 022400 033055 033056 000163 026445
-0002360 062066 022400 062063 022454 062063 022400 071467 020000
-0002400 026445 027067 071467 022440 032055 032056 020163 020000
-0002420 026445 031061 030456 071462 000040 032045 020144 022400
-0002440 005163 022400 030456 071464 000012 071445 072440 071156
-0002460 060545 060544 066142 005145 022400 020163 067556 020164
-0002500 067546 067165 005144 000000 003750 000144 004076 000157
-0002520 004070 000170 004172 000146 004210 000145 004026 000143
-0002540 004044 000163 003764 000154 004226 000162 000000 000000
-0002560 177774 177760 177775 177770 104404 022376 000000 104405
-0002600 000000 000000 104403 000000 001000 104405 000000 000000
-0002620 104421 000000 023436 104423 000000 000000 104422 000000
-0002640 000000 000037 000034 000037 000036 000037 000036 000037
-0002660 000037 000036 000037 000036 000037 043120 020712 020716
-0002700 000001 000005 000515 000072 000457 051505 000124 042105
-0002720 000124 060504 020171 067515 020156 030060 030040 035060
-0002740 030060 030072 020060 034461 030060 000012 072523 046556
-0002760 067157 072524 053545 062145 064124 043165 064562 060523
-0003000 000164 060512 043156 061145 060515 040562 071160 060515
-0003020 045171 067165 072512 040554 063565 062523 047560 072143
-0003040 067516 042166 061545 000000 000000 000000 000000 000000
-0003060 000000
-0010060 000000 000020 000001 177770 177774 177777 071554 000000
-0010100 
-#
-</pre></div>
-
-<p>Noel prepares to analyze the core file (block quotes here and further below taken from email correspondence):</p>
-<blockquote>
-<p>I just checked, and the binary for the 'ls' command is what's called 'pure code'; i.e. the instructions are
-in a separate (potentially shared) block of memory from the process' data (un-shared).</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>On another front, that error message ("Memory error") is produced when a process gets a 'memory management
-trap' (trap to 0250). This could be caused by any number of things (it's a pity we don't know the contents
-of SR0 when the trap happened, that would tell us exactly what the cause was).</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>[Memory management registers in the core dump] are 'prototypes', later modified for actual use by adding in
-the actual address in main memory. Still trying to understand how that works - the code (in sureg() in
-main.c) is kind of obscure.</p>
-</blockquote>
-<h3>January 10-24</h3>
-<p>Further communication with Noel and the cctalk list raises some suspicion about the memory in my machine.
-Though I had done spot checks and repairs on this in the past, which had been sufficient to pass most MAINDEC
-diagnostics and to boot and run RT11, in fact the memory had not yet been exhaustively tested.</p>
-<p>Over the course of some days, memory test codes are developed and run, and several additional failed DRAMs in
-the MS11 memory system are isolated and repaired.  These efforts have previously been reported in detail in
-<a href="https://fritzm.github.io/unix-and-ms11.html">this blog entry</a>.</p>
-<p>After these repairs, the MAINDEC MS11 memory diagnostics and KT11-C MMU diagnostics, both of which are beastly
-and exhaustive, are found to pass robustly with one caveat: memory parity tests.  A deep-dive into the design
-and implementation of memory parity on the PDP-11/45 follows.  At the end it is concluded that the machine, a
-very early serial no. in its line, is in fact functioning per-design. These efforts are documented in <a href="https://fritzm.github.io/parity-handling.html">this
-blog entry</a>.</p>
-<p>Even though the memory system looks solid after this, the V6 Unix crash behavior remains exactly the same...</p>
-<h3>January 27-29</h3>
-<p>With the KT11 and memory now verified, Noel takes up the core dump again:</p>
-<blockquote>
-<p>The problem is that Unix does not save enough info in the core dump for me to thoroughly diagnose the MM
-fault; e.g. 'ls' is a 'pure text' program/command, and the code's not included in the core dump (in normal
-operation, there's no need/use for it), so I don't have the code that was running at the time, just the data
-and swappable per-process kernel data - which is not all the per-process data, e.g. it doesn't include the
-location of the process's code and data segments in main memory.</p>
-<p>Also, I'll look at the V6 code that sets up the KT11 registers to make sure I understand what it's doing.
-(The dump contains the 'prototype' for those contents, but the values are modified, by adding the actual
-memory location, before being stored in the KT11.)</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>I did find out that the PC at the time of the segmentation fault was 010210, which I thought looked awfully
-big (so I was wondering if somehow it went crazy), but in fact the text size is 010400, so it's just inside
-the pure text.</p>
-</blockquote>
-<p>We agree to use
-<a href="https://en.wikipedia.org/wiki/Lions%27_Commentary_on_UNIX_6th_Edition,_with_Source_Code"><em>Lions</em></a> as a common
-reference point for detailed discussion of the loading and running of "ls" and what may be seen in the core
-dump.</p>
-<h3>January 30</h3>
-<p>Noel:</p>
-<blockquote>
-<p>So, a bit more from my examination of the swappable per-process kernel data (the 'user' structure - not sure
-how much of a Unix internals person you are).</p>
-<p>It gives the following for the text, data and stack sizes:</p>
-<div class="highlight"><pre><span></span>tsize 000104
-dsize 000035
-ssize 000024
-</pre></div>
-
-<p>which seems reasonable/correct, because looking at the header for 'ls' we see:</p>
-<div class="highlight"><pre><span></span>000410 010400 001050 002366 000000 000000 000000 000001
-</pre></div>
-
-<p>'0410' says it's pure text, non-split; the 010400 is the text size, which matches (those sizes above are in
-'clicks', i.e. the 0100 byte quantum used in the PDP-11 memory management).</p>
-<p>The data size also appears to be correct:</p>
-<div class="highlight"><pre><span></span>001050 (initialized)
-002366 (BSS)
-------
-003436
-</pre></div>
-
-<p>which again matches (round up and divide by 0100).</p>
-<p>I have yet to dig around through the system sources and see what the initial stack allocation is, to see if
-that's reasonable (of course, it may have been extended during execution).</p>
-<p>And here are the 'prototype' segmentation register contents:</p>
-<div class="highlight"><pre><span></span>UISA 000000 000020 000000 000000 000000 000000 000000 177701
-UDSA 000000 000020 000000 000000 000000 000000 000000 177701
-UISD 041402 016006 000000 000000 000000 000000 000000 066016
-UDSD 041402 016006 000000 000000 000000 000000 000000 066016
-</pre></div>
-
-<p>Since it's not split, the D-space ones are clones of the I-space (which is what the code does - I don't
-think it turns user D off and on, depending on what the process has: I'd have made context switching faster
-by not having to set up the D-space registers for non-split processes, but I guess the extra overhead is
-pretty minimal).</p>
-<p>I have yet to check all the contents to make sure they look good, but the U?SA registers look OK; the '020'
-is for the data, and that's kept contiguous with the 'user' area, so the '020' is to offset past that.</p>
-<p>The PC at fault time of 010210 seems to point to the following code (assuming what was in main memory was
-actually the same as the binary on the disk):</p>
-<div class="highlight"><pre><span></span>        mov r4,r0
-        jmp 10226
-210:    mov r5,r0 
-        mov sp,r5
-</pre></div>
-
-<p>We don't have SSR2, which points to the failing instruction, and I forget whether the saved PC on an MMU
-fault points to the failing instruction, or the next one; I'm going to assume the latter.</p>
-<p>But either way, this is very puzzling, because I don't see an instruction there that could have gotten an
-MMU fault! The jump is to a location within the text segment (albeit at the end), and everything else it
-just register-register moves!</p>
-<p>And how could the fault depend on the location in main memory?!?!</p>
-<p>If you want to poke around in the core dump yourself, to verify that I haven't made a mistake, see this
-page:</p>
-<p><a href="http://gunkies.org/wiki/Unix_V6_dump_analysis">http://gunkies.org/wiki/Unix_V6_dump_analysis</a></p>
-<p>which gives useful offsets. (The ones in the user table I verified by writing a short program which did
-things like 'printf("%o", &amp;0-&gt;u_uisa)', and the data at those locations looks like what should be there, so
-I'm pretty sure that table is good. For the other one, core(5) (in the V6 man pages) gives the register
-offsets (albeit in a different form), so you can check that I worked them out correctly.</p>
-<p>Two things you could try to get rid of potential pattern sensitivities: before doing the 'ls', say 'sleep
-360 &amp;' first; that running in the background <em>should</em> cause the 'ls' to be loaded and run from a different
-address in main memory. The other thing you could try is 'cp /bin/ls xls' and then 'xls', to load the
-command from a different disk location. (Both of these assume that you don't get another fault, of course!)</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>[Initial stack size] is 20. clicks, which is what it still is (024 clicks) in the process core dump, so
-the stack has <em>not</em> been extended. So any MM fault you see after starting 'ls' will <em>probably</em> be the one
-that's causing the process to blow out.</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>I tried to re-create that exact version of the 'ls' binary, because the one in the distro is stripped, and I
-wanted one with symbols to look at. I failed, because a library routine (for dates) has changed on my
-machine, see here:</p>
-<p><a href="http://www.chiappa.net/~jnc/tech/V6Unix.html#Issues">http://www.chiappa.net/~jnc/tech/V6Unix.html#Issues</a></p>
-<p>However, I did verify that the binary for ls.o is identical to what I can produce (using the -O flag). It's
-just that library routine which is different. I don't think it's worth backing out my library; I did manage
-to hand-produce a stub of the symbol table for where the error is happening in the old 'ls' binary:</p>
-<div class="highlight"><pre><span></span>010210T csv
-010226T cret
-010244T cerror
-010262T _ldiv
-010304T _lrem
-010324T _dpadd
-</pre></div>
-
-<p>The fault does indeed seem to be happening at either the last instruction in the previous routine (ct_year,
-in ctime.c), or the first of csv.</p>
-<p>(I should explain that PDP-11 C uses two small chunks of code, CSV and CRET, to construct and take down
-stack frames on procedure entry and exit. So on exit from <em>any</em> C procedure, the last instruction is always
-an PC-relative jump to CRET.)</p>
-<p>It looks like that's what's blowing up - but it apparently works with the command at a different location in
-main memory! So it pretty much has to be a pattern sensitivity.</p>
-<p>However, I think the KT11 does the bounds checking <em>before</em> it does the relocation - the bounds checking is
-done on virtual, un-relocated addresses. So <em>that</em> part of it <em>should</em> be the same for both locations! So
-here's my analysis:</p>
-<p>Is it actually an indexed jump that's blowing up? I've been looking at the command binary, but that might
-not be what's in main memory. Or the CPU might be looking somewhere else (because of a KT error). (If we
-don't find the problem soon, we might want to put in that breakpoint so we can look in main memory and see
-what inst is actually at the location where SSR2 says the failing inst was; that can rule out a whole bunch
-of potential causes in one go - e.g. RK11 errors.)</p>
-<p>If it is actually that jump that's failing - how? The PC hasn't been updated yet, so it can't be the fetch
-of the next instruction that's failing. Is the fetch of the index word producing the MM fault?</p>
-</blockquote>
-<p>Fritz:</p>
-<blockquote>
-<p>It occurs to me that we don't even <em>really</em> know if the fault occurs from the same address every time, since
-we have a core sample size of 1; I should duplicate the fail and extract another core file to compare.</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>Another thing I thought I might try tonight: deposit a trap catcher in the memory mgmt trap location from
-the front panel, just before issuing the 'ls' command.  I can then check the PSW, PC, SP, and KT11 regs
-right at the time of fault.</p>
-</blockquote>
-<p>Experiments begin from the front panel, and continue on into the early hours, producing:</p>
-<p>Core #2:</p>
-<div class="highlight"><pre><span></span>140004 000000 141710 141724
-$DK
-@rkunix
-mem = 1035
-RESTRICTED RIGHTS
-
-Use, duplication or disclosure is subject to
-restrictions stated in Contract with Western
-Electric Company, Inc.
-# RM CORE
-# LS
-MEMORY FAULT -- CORE DUMPED
-# OD CORE
-0000000 141552 141562 000000 000000 000000 000000 000000 000000
-0000020 000000
-0000060 000000 000000 000000 000001 000000 000000 063260 140076
-0000100 001700 000000 000104 066112 067543 062562 000000 000000
-0000120 000000 000000 000000 060221 000571 067543 062562 000000
-0000140 000000 000000 000000 000000 066112 000000 000020 000000
-0000160 000000 000000 000000 000000 177701 000000 000020 000000
-0000200 000000 000000 000000 000000 177701 041402 016006 000000
-0000220 000000 000000 000000 000000 066016 041402 016006 000000
-0000240 000000 000000 000000 000000 066016 075120 075120 075120
-0000260 000000
-0000300 000000 000000 000000 000000 000013 010400 001050 002366
-0000320 000000 000104 000035 000024 000000 141732 141742 141664
-0000340 141674 000000 000000 000000 000000 000000 000000 000000
-0000360 000000
-0000400 000000 000000 000000 000000 000000 000000 000011 000000
-0000420 000000 000000 000000 141772 000000 000000 000000 000000
-0000440 000000
-0001500 000000 000000 000000 000000 000000 000000 000000 003602
-0001520 063260 177716 000000 141542 016070 001176 000000 003602
-0001540 063260 177716 000000 141562 016070 001176 066352 030300
-0001560 063260 141576 000005 003602 066352 001612 074376 044516
-0001600 003602 025334 003602 000000 000443 107144 141646 000512
-0001620 000000 141624 141640 000300 020276 020356 030000 003602
-0001640 000007 000135 107454 141662 014314 003602 066352 004404
-0001660 000000 141712 013640 074616 000000 001000 000000 000000
-0001700 001000 074616 063260 066352 000013 141726 023730 066352
-0001720 063260 000000 000013 141742 023502 003602 000000 177760
-0001740 000013 141756 022050 000013 000000 000000 000000 000034
-0001760 000444 000031 177760 000000 030351 177770 010210 170010
-0002000 000001 177777 177777 023436 023436 020264 000162 000262
-0002020 000262 000202 000262 000256 000210 000262 000250 000262
-0002040 000262 000216 000262 000262 000262 000262 000262 000224
-0002060 000170 000234 000242 000003 100000 000144 040000 000142
-0002100 020000 000143 000055 000001 000400 000162 000055 000001
-0002120 000200 000167 000055 000002 004000 000163 000100 000170
-0002140 000055 000001 000040 000162 000055 000001 000020 000167
-0002160 000055 000002 002000 000163 000010 000170 000055 000001
-0002200 000004 000162 000055 000001 000002 000167 000055 000001
-0002220 000001 000170 000055 000001 010000 000164 000040 020066
-0002240 020106 020116 020126 020142 020152 020162 020176 020206
-0002260 020216 020226 000056 062457 061564 070057 071541 073563
-0002300 000144 062457 061564 063457 067562 070165 005000 071445
-0002320 005072 072000 072157 066141 022440 005144 022400 062065
-0002340 000040 031045 020144 022400 033055 033056 000163 026445
-0002360 062066 022400 062063 022454 062063 022400 071467 020000
-0002400 026445 027067 071467 022440 032055 032056 020163 020000
-0002420 026445 031061 030456 071462 000040 032045 020144 022400
-0002440 005163 022400 030456 071464 000012 071445 072440 071156
-0002460 060545 060544 066142 005145 022400 020163 067556 020164
-0002500 067546 067165 005144 000000 003750 000144 004076 000157
-0002520 004070 000170 004172 000146 004210 000145 004026 000143
-0002540 004044 000163 003764 000154 004226 000162 000000 000000
-0002560 177774 177760 177775 177770 104404 022376 000000 104405
-0002600 000000 000000 104403 000000 001000 104405 000000 000000
-0002620 104421 000000 023436 104423 000000 000000 104422 000000
-0002640 000000 000037 000034 000037 000036 000037 000036 000037
-0002660 000037 000036 000037 000036 000037 043120 020712 020716
-0002700 000001 000005 000515 000072 000457 051505 000124 042105
-0002720 000124 060504 020171 067515 020156 030060 030040 035060
-0002740 030060 030072 020060 034461 030060 000012 072523 046556
-0002760 067157 072524 053545 062145 064124 043165 064562 060523
-0003000 000164 060512 043156 061145 060515 040562 071160 060515
-0003020 045171 067165 072512 040554 063565 062523 047560 072143
-0003040 067516 042166 061545 000000 000000 000000 000000 000000
-0003060 000000
-0010060 000000 000020 000001 177770 177774 177777 071554 000000
-0010100
-#
-</pre></div>
-
-<p>and also:</p>
-<blockquote>
-<p>'db' works<br>
-'cp' works<br>
-'rm' works  </p>
-<p>'sleep 360 &amp;' followed by 'ls' works, and then when the 'sleep' ends no longer works!  So confirmation about
-memory location dependence.</p>
-<p>'cp /bin/ls xls' followed by 'xls' does not work (dumps core); works with 'sleep' as with 'ls' above.</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>Okay, last experiment, booting up, then depositing trap catcher from the front panel into vector 250:</p>
-<div class="highlight"><pre><span></span><span class="mi">000250</span><span class="o">:</span> <span class="mi">000252</span>
-<span class="mi">000252</span><span class="o">:</span> <span class="mi">000000</span>
-</pre></div>
-
-<p>...then issuing the 'ls' seems to catch it.  I can then examine registers and memory etc. from the front
-panel.  This is a quick and easy repro.  I went ahead and dumped a few of the KT11 registers (but its late,
-so I can't guarantee I didn't slip up -- should try this again when I'm fresh):</p>
-<div class="highlight"><pre><span></span><span class="n">SR0</span><span class="o">:</span> <span class="mi">040143</span> <span class="o">(</span><span class="n">ah</span><span class="o">!</span> <span class="n">page</span> <span class="n">length</span> <span class="n">fault</span><span class="o">,</span> <span class="n">user</span> <span class="n">I</span><span class="o">-</span><span class="n">space</span><span class="o">,</span> <span class="n">page</span> <span class="mi">1</span><span class="o">)</span>
-<span class="n">SR1</span><span class="o">:</span> <span class="mi">000000</span> <span class="o">(</span><span class="n">no</span> <span class="n">auto</span> <span class="n">inc</span><span class="o">/</span><span class="n">dec</span> <span class="n">to</span> <span class="n">clean</span> <span class="n">up</span><span class="o">)</span>
-<span class="n">SR2</span><span class="o">:</span> <span class="mi">010210</span> <span class="o">(</span><span class="n">virtual</span> <span class="n">PC</span><span class="o">,</span> <span class="n">agrees</span> <span class="k">with</span> <span class="n">your</span> <span class="n">deduction</span> <span class="n">from</span> <span class="n">core</span> <span class="n">dump</span><span class="o">)</span>
-<span class="n">SR3</span><span class="o">:</span> <span class="mi">000000</span> <span class="o">(</span><span class="n">that</span><span class="s1">&#39;s odd -- shouldn&#39;</span><span class="n">t</span> <span class="n">split</span> <span class="n">I</span><span class="o">/</span><span class="n">D</span> <span class="n">be</span> <span class="n">enabled</span><span class="o">?)</span>
-
-<span class="n">UIPDR</span><span class="o">:</span> <span class="mi">041402</span> <span class="mi">016006</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">066116</span>
-<span class="n">UIPAR</span><span class="o">:</span> <span class="mi">001614</span> <span class="mi">001760</span> <span class="mi">001614</span> <span class="mi">001614</span> <span class="mi">001614</span> <span class="mi">001614</span> <span class="mi">001614</span> <span class="mi">001614</span>
-
-<span class="n">UDPDR</span><span class="o">:</span> <span class="mi">010501</span> <span class="mi">057517</span> <span class="mi">077717</span> <span class="mi">077717</span> <span class="mi">037611</span> <span class="mi">067616</span> <span class="mi">076300</span> <span class="mi">064317</span>
-<span class="n">UDPAR</span><span class="o">:</span> <span class="mi">002417</span> <span class="mi">002564</span> <span class="mi">007777</span> <span class="mi">007766</span> <span class="mi">005635</span> <span class="mi">005656</span> <span class="mi">007777</span>  <span class="n">oops</span>
-</pre></div>
-
-<p>...where "oops" means I thought I was done scribbling all these down, and turned off the machine.  Did I
-mention it's late? :-)</p>
-</blockquote>
-<p>[Note: It <em>was</em> late, and there is an error with UIPAR7 in this transcription.  This will be the source of
-some uncertainty until corrected on February 2.]</p>
-<h3>January 31</h3>
-<p>Noel:</p>
-<blockquote>
-<blockquote>
-<p>'sleep 360 &amp;' followed by 'ls' works, and then when the 'sleep' ends no longer works! So confirmation about
-memory location dependence.</p>
-</blockquote>
-<p>Yeah, that's a really important data-point. The fact that it is physical location dependent really does tend
-to implicate the KT11; I think the KB11 mostly only knows/has virtual addresses? (So I probably shouldn't
-bang my head trying to think of failure modes in the KB11?) If you have the source for its diag, you might
-try looking through it, looking for things it doesn't try...</p>
-<p>Although I suppose it could be a location-dependent issue with the RK11. I should explain how to find, and
-examine the pure-text for the 'ls' command; if you halt the CPU on the trap again, look at UISA0, and that
-should give you the 'click' where the text starts; at that point I'd probably examine every 256th (block
-size) word and we can compare them to the original to make sure the in-core copy is OK.</p>
-</blockquote>
-<hr>
-<blockquote>
-<blockquote>
-<div class="highlight"><pre><span></span><span class="n">SR0</span><span class="o">:</span> <span class="mi">040143</span> <span class="o">(</span><span class="n">ah</span><span class="o">!</span> <span class="n">page</span> <span class="n">length</span> <span class="n">fault</span><span class="o">,</span> <span class="n">user</span> <span class="n">I</span><span class="o">-</span><span class="n">space</span><span class="o">,</span> <span class="n">page</span> <span class="mi">1</span><span class="o">)</span>
-<span class="n">SR2</span><span class="o">:</span> <span class="mi">010210</span> <span class="o">(</span><span class="n">virtual</span> <span class="n">PC</span><span class="o">,</span> <span class="n">agrees</span> <span class="k">with</span> <span class="n">your</span> <span class="n">deduction</span> <span class="n">from</span> <span class="n">core</span> <span class="n">dump</span>
-</pre></div>
-
-</blockquote>
-<p>If it's really 010210, I wonder how it could be a fault on page 1; each page (segment, really) of virtual
-address space is 020000 long, so that address is well inside page 0?</p>
-<p>Unless it has fetched some other instruction, due to some other error, one which does try and do something
-on page 1... Might want to try looking at a few instructions around 010210 when you try this again, see
-what's actually there. Let's see, code starts at 0161400 in real memory (per UIPAR0 below), so 010210 is at
-0171610... Maybe dump a few words from 171600 on?</p>
-<blockquote>
-<div class="highlight"><pre><span></span><span class="n">SR3</span><span class="o">:</span> <span class="mi">000000</span> <span class="o">(</span><span class="n">that</span><span class="s1">&#39;s odd -- shouldn&#39;</span><span class="n">t</span> <span class="n">split</span> <span class="n">I</span><span class="o">/</span><span class="n">D</span> <span class="n">be</span> <span class="n">enabled</span><span class="o">?)</span>
-</pre></div>
-
-</blockquote>
-<p>No; you're running binary for a /40 system, so no split I/D. So also, all the UDPARs and UDPDRs will contain
-junk.</p>
-<blockquote>
-<div class="highlight"><pre><span></span><span class="n">UIPAR</span><span class="o">:</span> <span class="mi">001614</span> <span class="mi">001760</span> <span class="mi">001614</span> <span class="mi">001614</span> <span class="mi">001614</span> <span class="mi">001614</span> <span class="mi">001614</span> <span class="mi">001614</span>
-</pre></div>
-
-</blockquote>
-<p>?? UIPAR7 looks wrong; if the data is really at 01760, I think the stack should be above that in real memory
-- but I might be wrong, I will check.</p>
-<p>If it is wrong, did something cause the wrong value to be stored there (e.g. an error in the execution of
-lines 1750/1751 in Lions); or was the prototype calculated wrong (around line 1704) - but I think the
-prototypes looked correct in the process' core dump, but I will check them; or did the hardware flake out,
-and e.g. copy a later store (the code fills them from the top down) up to UISA7?</p>
-<p>To check out the latter, maybe a bespoke tiny program, toggled in, to try storing the 'correct' data in the
-UISPARs, in the exact way that the Unix code does it, and then look and see what's in there?</p>
-<p>This might also correlate to the strange stuff I saw in the process' user-mode stack, in the dump - I will
-go back and look at that now.</p>
-<p>If you do this again, please add KISA6 and KISD6 to the registers to dump (you can skip UDS*), so we can see
-what it thinks is going on with the per-process swappable data, which should be just below the process'
-user-mode data, in terms of real memory.</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>Yes, the stack is directly above the user data, which is directly above the swappable per-process data (user
-struct, and kernel stack). But the address math for stack segments in the KT11 is weird (see below).</p>
-<p>I <em>think</em> the prototypes:</p>
-<div class="highlight"><pre><span></span>UISA 000000 000020 000000 000000 000000 000000 000000 177701
-UISD 041402 016006 000000 000000 000000 000000 000000 066016
-</pre></div>
-
-<p>are right, but the negative direction of the stack is making my head hurt (and the UISA7 you recorded from
-the hardware might be right after all - but then the UISA0 might be wrong - it's suspicious, but not
-impossible, that they are the same value).</p>
-<p>If the SPPD is at physical xxx, the user data will be at xxx+20 (in clicks, as above) through xxx+20+34
-(below), and then the stack above that. Per the SPPD:</p>
-<div class="highlight"><pre><span></span>tsize 000104
-dsize 000035
-ssize 000024
-</pre></div>
-
-<p>the stack should then run from xxx+20+35 to xxx+20+35+23. The way the MM hardware works for stack segment,
-the 'base' is where the first click would be if the segment were a full 0200 clicks. (Per the example in the
-/45 proc handbook; for a 3-click stack running from physical 0331500 to 0331776, the PAR would contain
-03120, i.e. segment base at 0312000.)</p>
-<p>So let me do the math (please check to see if I'm confused :-); base of user data is at 0176000 (per UISA1
-contents), runs to 0201476 (i.e. plus 03500); the stack would run from 0201500 to 0204076 (i.e. plus 02400).
-So the stack segment 'base' would be 020000 below the next word, or 0164100.</p>
-<p>(My head hurts too much to work out if the 177701 of the prototype is right; basically, the location of the
-SPPD in clicks would be 01740 (I <em>think</em> - 01760 - 020), and that plus 177701 should give us 01641.)</p>
-<p>But, anyway, I'm fairly sure that 01614 is <em>not</em> right for UISA7 (unless it really was 1641 and you inverted
-the digits because it looked so close).</p>
-<p>Having KISA6 would help since it would give us a cross-check on the value of UISA1.....</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>So, according to the process core dump, these are the register contents at the time of the fault:</p>
-<div class="highlight"><pre><span></span>R0 177770
-R1 0
-R2 0
-R3 0
-R4 34
-R5 444
-SP 177760
-PC 010210
-PS 170010
-</pre></div>
-
-<p>Now, PDP-11 uses R5 for a frame pointer, set up thus:</p>
-<div class="highlight"><pre><span></span>        jsr     r5,csv        (first instruction in every C routine)
-
-csv:
-        mov     r5,r0
-        mov     sp,r5
-        mov     r4,-(sp)
-        mov     r3,-(sp)
-        mov     r2,-(sp)
-        tst     -(sp)
-        jmp     (r0)
-</pre></div>
-
-<p>on subroutine entry (the 'jsr r5, csv' pushes the old R5 contents, and temporarily saves the return PC - to
-just after the call to CSV, not to the sunroutine which called this one, that's further down - in R5). So,
-except for the first two instructions of CSV, R5 <em>always</em> contains an old SP.</p>
-<p>Now look at the R5 from the crash. That's not an old SP. Something has already gone seriously wrong by this
-point - actually, likely the process has just started to run the newly-loaded command code (see below), and
-hasn't even set up its first stack frame yet.</p>
-<p>Now look at the top of the stack, as recorded in the process' core dump:</p>
-<div class="highlight"><pre><span></span><span class="mi">0010060</span><span class="o">:</span> <span class="mi">000000</span> <span class="mi">000020</span> <span class="mi">000001</span> <span class="mi">177770</span> <span class="mi">177774</span> <span class="mi">177777</span> <span class="mi">071554</span> <span class="mi">000000</span>
-</pre></div>
-
-<p>And that's <em>it</em>; the rest if all 0's! (The base address does seem to correspond; with:</p>
-<div class="highlight"><pre><span></span>dsize 000035
-ssize 000024
-</pre></div>
-
-<p>and the SPPD being 020 clicks, that puts the top of the stack at 0101 clicks, or 010100, and the last
-location there is 010076.</p>
-<p>The core dump routine, core() writes the user data out in two transfers (Lions 4113-4124), one for the SPPD,
-one for the user's data+stack. So we probably got the SPPD OK, but the rest - who knows?</p>
-<p>It does call estabur(), which sets up the prototype MM register contents, and then writes them into the
-actual registers, so the prototypes in the process' core dump that I was looking at before have already been
-overwritten. :-(But estabur() then called sureg (Lions 1724) so hopefully the MM regs wound up pointing to
-the actual memory being used for the stack - but who knows?</p>
-<p>Anyway, looking at the contents, the top of the stack does look vaguely like what it should be when the
-command <em>starts</em> executing, after the exec() call; the SP is even reasonable; it points to that 0 at offset
-010060.</p>
-<p>The 020 is the return point for the call to _main (see below; that 'jsr pc,_main' ends at 016); the '1' is
-probably 'nargs' (see Exec(II) in the V6 Manual), the '0177770' is argv, '177774' is argv[0], 177777 is
-argv[1] (end of list marker), and '071554' is 'ls' (the command name, by convention the first argument).</p>
-<p>R0 contains what looks like an old SP, although I suppose that could have been
-left over from the assembler startup:</p>
-<div class="highlight"><pre><span></span><span class="n">start</span><span class="o">:</span>
-          <span class="n">setd</span>
-          <span class="n">mov</span>     <span class="n">sp</span><span class="o">,</span><span class="n">r0</span>
-          <span class="n">mov</span>     <span class="o">(</span><span class="n">r0</span><span class="o">),-(</span><span class="n">sp</span><span class="o">)</span>
-          <span class="n">tst</span>     <span class="o">(</span><span class="n">r0</span><span class="o">)+</span>
-          <span class="n">mov</span>     <span class="n">r0</span><span class="o">,</span><span class="mi">2</span><span class="o">(</span><span class="n">sp</span><span class="o">)</span>
-          <span class="n">jsr</span>     <span class="n">pc</span><span class="o">,</span><span class="n">_main</span>
-</pre></div>
-
-<p>but clearly the attempt to execute the first instruction in CSV blew up. And where did the '444' in R5 come
-from? The call to CSV is at 030?</p>
-</blockquote>
-<h3>February 1</h3>
-<p>Noel, regarding the second core file:</p>
-<blockquote>
-<p>I took a quick look, and everything 'important' seems to be identical: the registers, PC, etc at the time of
-the trap (including that mysterious '444' in R5); the prototype MM registers; the user's stack (looking
-again like the command just started.</p>
-</blockquote>
-<hr>
-<blockquote>
-<blockquote>
-<p>I went ahead and dumped a few of the KT11 registers</p>
-<div class="highlight"><pre><span></span><span class="n">UIPDR</span><span class="o">:</span> <span class="mi">041402</span> <span class="mi">016006</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">066116</span>
-</pre></div>
-
-</blockquote>
-<p>Oh, BTW, I checked, and these match the prototype values in the user struct.</p>
-</blockquote>
-<h3>February 2-3</h3>
-<p>A tip from Noel:</p>
-<blockquote>
-<p>Something stirred this in my memory: the best quick overview of the internals of the Bell PDP-11 Unixes is
-K. Thompson, "UNIX Implementation", available here:</p>
-<p><a href="https://users.soe.ucsc.edu/~sbrandt/221/Papers/History/thompson-bstj78.pdf">https://users.soe.ucsc.edu/~sbrandt/221/Papers/History/thompson-bstj78.pdf</a></p>
-<p>if you want to know more about what the insides are like.</p>
-</blockquote>
-<p>Fritz:</p>
-<blockquote>
-<p>Okay, here's the latest, done with some care:</p>
-<div class="highlight"><pre><span></span><span class="n">UISD</span><span class="o">:</span> <span class="mi">041402</span> <span class="mi">016006</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">066116</span>
-<span class="n">UISA</span><span class="o">:</span> <span class="mi">001614</span> <span class="mi">001760</span> <span class="mi">001614</span> <span class="mi">001614</span> <span class="mi">001614</span> <span class="mi">001614</span> <span class="mi">001614</span> <span class="mi">001641</span>
-
-<span class="n">KISD</span><span class="o">:</span> <span class="mi">077406</span> <span class="mi">077406</span> <span class="mi">077406</span> <span class="mi">077506</span> <span class="mi">077506</span> <span class="mi">077406</span> <span class="mi">007506</span> <span class="mi">077506</span>
-<span class="n">KISA</span><span class="o">:</span> <span class="mi">000000</span> <span class="mi">000200</span> <span class="mi">000400</span> <span class="mi">000600</span> <span class="mi">001000</span> <span class="mi">001200</span> <span class="mi">001740</span> <span class="mi">007600</span>
-
-<span class="n">SRs</span><span class="o">:</span> <span class="mi">040143</span> <span class="mi">000000</span> <span class="mi">010210</span> <span class="mi">000000</span>
-
-<span class="mi">171600</span><span class="o">:</span> <span class="mi">016162</span> <span class="mi">004767</span> <span class="mi">000224</span> <span class="mi">000414</span> <span class="mi">006700</span> <span class="mi">006152</span> <span class="mi">006702</span> <span class="mi">006144</span>
-</pre></div>
-
-</blockquote>
-<p>[Note: this fixes the previous late-night transcription error with UISA7...]</p>
-<p>Noel:</p>
-<blockquote>
-<blockquote>
-<div class="highlight"><pre><span></span><span class="n">UISD</span><span class="o">:</span> <span class="mi">041402</span> <span class="mi">016006</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">066116</span>
-<span class="n">UISA</span><span class="o">:</span> <span class="mi">001614</span> <span class="mi">001760</span> <span class="mi">001614</span> <span class="mi">001614</span> <span class="mi">001614</span> <span class="mi">001614</span> <span class="mi">001614</span> <span class="mi">001641</span>
-</pre></div>
-
-</blockquote>
-<p>So, 'good news' is these are the same except for UISA7, for which as I suspected, it looks like the digits
-were transposed. But the new value is exactly the one I calculated.</p>
-<p>'Bad news' is that takes out what I was thinking might be a potential cause, which was UPAR's getting
-trashed by hardware failure. So more hard work ahead (see below).</p>
-<blockquote>
-<div class="highlight"><pre><span></span><span class="n">KISD</span><span class="o">:</span> <span class="mi">077406</span> <span class="mi">077406</span> <span class="mi">077406</span> <span class="mi">077506</span> <span class="mi">077506</span> <span class="mi">077406</span> <span class="mi">007506</span> <span class="mi">077506</span>
-<span class="n">KISA</span><span class="o">:</span> <span class="mi">000000</span> <span class="mi">000200</span> <span class="mi">000400</span> <span class="mi">000600</span> <span class="mi">001000</span> <span class="mi">001200</span> <span class="mi">001740</span> <span class="mi">007600</span>
-</pre></div>
-
-</blockquote>
-<p>Those all look OK: KISD6 show the segment length as 020 (017 being the last valid click), which is right,
-and KISA6 is 01740, so with the user area and kernel stack being 20 clicks, that makes the start of the user
-data 01760, which is what UISA1 contains.</p>
-<blockquote>
-<div class="highlight"><pre><span></span><span class="n">SRs</span><span class="o">:</span> <span class="mi">040143</span> <span class="mi">000000</span> <span class="mi">010210</span> <span class="mi">000000</span>
-</pre></div>
-
-</blockquote>
-<p>OK, same failing location as before (010210); SSR0 shows:</p>
-<div class="highlight"><pre><span></span>Abort - page length error
-User mode
-Page 1
-</pre></div>
-
-<p>which is the same as last time.</p>
-<div class="highlight"><pre><span></span><span class="mi">171600</span><span class="o">:</span> <span class="mi">016162</span> <span class="mi">004767</span> <span class="mi">000224</span> <span class="mi">000414</span> <span class="mi">006700</span> <span class="mi">006152</span> <span class="mi">006702</span> <span class="mi">006144</span>
-</pre></div>
-
-<p>Let me just re-check the math here: text base is 0161400, plus a PC of 010210, gives us 0171610, which is
-right in the middle there - thanks!</p>
-<p>That does not, alas, look anything <em>at all</em> like what's <em>supposed</em> to be there, which is:</p>
-<div class="highlight"><pre><span></span><span class="mi">010200</span><span class="o">:</span> <span class="mi">110024</span>
-        <span class="mi">010400</span>  <span class="n">mov</span> <span class="n">r4</span><span class="o">,</span><span class="n">r0</span>
-        <span class="mi">000167</span>  <span class="n">jmp</span> <span class="mi">10226</span> <span class="o">(</span><span class="n">cret</span><span class="o">)</span>
-        <span class="mi">000016</span>
-        <span class="mi">010500</span>  <span class="n">mov</span> <span class="n">r5</span><span class="o">,</span><span class="n">r0</span> <span class="o">(</span><span class="n">start</span> <span class="n">of</span> <span class="n">CSV</span><span class="o">)</span>
-        <span class="mi">010605</span>  <span class="n">mov</span> <span class="n">sp</span><span class="o">,</span><span class="n">r5</span>
-        <span class="mi">010446</span>  <span class="n">mov</span> <span class="n">r4</span><span class="o">,-(</span><span class="n">sp</span><span class="o">)</span>
-        <span class="mi">010346</span>  <span class="n">mov</span> <span class="n">r3</span><span class="o">,-(</span><span class="n">sp</span><span class="o">)</span>
-</pre></div>
-
-<p>So maybe the RK11 went berserk? But maybe not...</p>
-<p>The 4767 is a 'jsr pc, xxx' which is typical C compiler emission, but the rest looks like rubbish - 6700 is
-a SXT R0, for instance.</p>
-<p>What's actually there at 010210 (virtual) still doesn't explain the MM trap we got; 'SXT R0' should have
-executed OK, no matter what? Confoozled...</p>
-<p>What's also odd is how it got here; it's almost like the first few instructions:</p>
-<div class="highlight"><pre><span></span><span class="n">start</span><span class="o">:</span>
-          <span class="n">setd</span>
-          <span class="n">mov</span>     <span class="n">sp</span><span class="o">,</span><span class="n">r0</span>
-          <span class="n">mov</span>     <span class="o">(</span><span class="n">r0</span><span class="o">),-(</span><span class="n">sp</span><span class="o">)</span>
-          <span class="n">tst</span>     <span class="o">(</span><span class="n">r0</span><span class="o">)+</span>
-          <span class="n">mov</span>     <span class="n">r0</span><span class="o">,</span><span class="mi">2</span><span class="o">(</span><span class="n">sp</span><span class="o">)</span>
-          <span class="n">jsr</span>     <span class="n">pc</span><span class="o">,</span><span class="n">_main</span>
-
-<span class="n">_main</span><span class="o">:</span>
-          <span class="n">jsr</span>     <span class="n">r5</span><span class="o">,</span><span class="n">csv</span>
-</pre></div>
-
-<p>executed OK, and then it tried to go off to csv, only there's trash there? And what's with the 0444 in R5?
-That should be 034, the return from that last JSR.</p>
-<p>I'm going to go ponder all this. One more thing you could try is do this all again, and write down the first
-couple of instructions at the start of the text segment (UISA0 = 01614, so 0161400 on for a few words), so
-we can see if <em>that</em> looks OK.</p>
-<p>If so, it will look like the command got read in off the disk wrong - since it's not coming from swap (it's
-just starting), it's coming out of the file system wrong. Why will be a good question.</p>
-<p>And I still don't understand the 'segment 1' fault, and the R5 contents - so many things going wrong all at
-once, for reasons that make no sense... I wonder if there's a noise glitch hitting several things all at the
-same time?</p>
-</blockquote>
-<p>Fritz:</p>
-<blockquote>
-<p>I read a bit through the KT11 maintenance manual you sent yesterday, to refresh myself on it a bit (thanks
-for that!).  I realized I almost always use my console in "PROG PHY" or "CONS PHY" mode; but using "USER I"
-and "KERNEL I" I may be able to verify quickly that the KT11 is thinking VA:010210 -&gt; PA:171610.</p>
-<p>When I set this up to try later, I'll examine that start of the text segment at 161400 as well, per your
-recommend.</p>
-</blockquote>
-<h3>February 4</h3>
-<p>Noel sends up a flare on cctalk in the the early AM, summarizing the problem and experiments to date.
-Suggestions start to flow in.  Some have already been tried or can be ruled out.  Some others:</p>
-<ul>
-<li>
-<p>Bob Smith: "I keep wondering about the psu...".  This gets some agreement from the list, and a few
-  interesting/relevant anecdotes are relayed.  Paul Koning:</p>
-<blockquote>
-<p>In RSTS development we once ran into DMC-11s not working reliably.  The field service tech knew exactly
-what to look for, and started checking all the supply voltages.  The spec says allowed tolerances are
-+/- 5%.  He knew the reality for correct operation was -0%, +5%, so he tweaked all the supplies to read
-a hair above nominal.</p>
-</blockquote>
-<p>Warner Losh:</p>
-<blockquote>
-<p>I recall our PDP-11 tech tweaking +5V from 5.05V to 4.95V and back again to demonstrate that tiny
-differences matter a lot on one of the cranky 11/23+''s we had after I made a particularly unhelpful
-teenage smart ass remark... The 11/23+ wouldn't boot at the slightly lower than full voltage.</p>
-</blockquote>
-<p>It is worth noting that in both of these cases, a slight undervoltage proved problematic...</p>
-</li>
-<li>
-<p>Paul Koning suggests a potential KT11 failure mode:</p>
-<blockquote>
-<p>Another possibility occurs to me: bad bits in the MMU (UISAR0 register if I remember correctly).  Bad
-memory is likely to show up with a few bits wrong; if UISAR0 has a stuck bit so the "plain" case maps
-incorrectly you'd expect to come up with execution that looks nothing at all like what was intended.</p>
-</blockquote>
-<p>Noel provides a short diagnostic (apparently, straight from his mind to machine code; props! :-) to check
-read-after-write on UISA* so we can rule this out:</p>
-<div class="highlight"><pre><span></span><span class="mi">1000</span><span class="o">:</span>   <span class="mi">12706</span>       <span class="o">/</span> <span class="n">Put</span> <span class="n">stack</span> <span class="n">at</span> <span class="mi">0700</span>
-        <span class="mi">700</span>
-        <span class="mi">12701</span>       <span class="o">/</span> <span class="n">Load</span> <span class="n">UISA0</span> <span class="n">address</span> <span class="k">in</span> <span class="n">R1</span>
-        <span class="mi">177640</span>
-        <span class="mi">5000</span>        <span class="o">/</span> <span class="n">Start</span> <span class="n">testing</span> <span class="n">at</span> <span class="mi">0</span>
-        <span class="mi">10011</span>       <span class="o">/</span> <span class="n">Store</span> <span class="n">it</span>
-        <span class="mi">20011</span>       <span class="o">/</span> <span class="n">Check</span> <span class="n">it</span>
-        <span class="mi">1401</span>        <span class="o">/</span> <span class="n">Skip</span> <span class="k">if</span> <span class="n">match</span>
-        <span class="mi">0</span>           <span class="o">/</span> <span class="n">Halt</span> <span class="n">here</span> <span class="n">on</span> <span class="n">error</span>
-        <span class="mi">5200</span>        <span class="o">/</span> <span class="n">Next</span> <span class="n">value</span>
-        <span class="mi">20027</span>       <span class="o">/</span> <span class="mi">07777</span> <span class="n">or</span> <span class="n">less</span><span class="o">?</span>
-        <span class="mi">7777</span>
-        <span class="mi">101770</span>      <span class="o">/</span> <span class="n">Go</span> <span class="n">around</span>
-        <span class="mi">5721</span>        <span class="o">/</span> <span class="n">Next</span> <span class="n">register</span>
-        <span class="mi">20127</span>       <span class="o">/</span> <span class="n">Done</span> <span class="n">them</span> <span class="n">all</span><span class="o">?</span>
-        <span class="mi">177660</span>
-        <span class="mi">101401</span>      <span class="o">/</span> <span class="n">Skip</span> <span class="k">if</span> <span class="n">not</span>
-        <span class="mi">0</span>           <span class="o">/</span> <span class="n">Halt</span> <span class="n">here</span> <span class="n">when</span> <span class="n">done</span>
-        <span class="mi">137</span>         <span class="o">/</span> <span class="n">Go</span> <span class="n">back</span>
-        <span class="mi">1010</span>
-</pre></div>
-
-<p>This is toggled in and passes on the machine.</p>
-</li>
-<li>
-<p>Mattis Lind:</p>
-<blockquote>
-<p>Would it be any difference if you run the machine at full speed or lower speed or even single step past
-this instruction? ... The TIG module has a separate non crystal controlled oscillator which one could
-tune for marginal checking.</p>
-</blockquote>
-<p>Ah, yes, the margining clock!  Always worth a check, and very easy to use with if you have a KM11 handy.
-A variety of clock speeds are tried, but the behavior remains the same.</p>
-</li>
-<li>
-<p>Brent Hilpert:</p>
-<blockquote>
-<p>For consideration, what about the refresh circuitry of the memory board?</p>
-<p>Mem diagnostics, unless they explicitly account for it, may not show up problems with memory refresh if
-the loop times are short enough to effectively substitute as refresh cycles, while they could show up
-later in real-world use with arbitrary time between accesses.</p>
-<p>Refresh on some early boards/systems was asynchronously timed by monostables or onboard oscillators
-which can drift or fail on the margin/slope. (I don't know what DEC's design policy was for DRAM
-refresh). It might also explain why a number of 4116s were (apparently) failing earlier in the efforts
-(if I recall the discussion correctly), replacing them might have just replaced them with 'slightly
-better' chips, i.e. with a slightly longer refresh tolerance.</p>
-</blockquote>
-<p>This one also gets some follow-up.  The schematics are consulted, and the MS11-L refresh is seen, indeed,
-to be driven by a simple free-running 555.  Further from Brent:</p>
-<blockquote>
-<p>4116 datasheet specs 2mS, my calcs give a refresh period of 1.5mS, the 14.5uS from the manual would give
-1.86 mS, 7% shy of 2. The schematic specs 1% resistors, and the parts list does appear to spec a
-high-tolerance "1%200PPM" cap.</p>
-<p>Although there are the internal voltage divider Rs in the 555 which are also critical for the timing and
-everything is 40+ years old...</p>
-</blockquote>
-<p>The actual MS11 in use measures out on my 'scope at 15.2us.  From Brent:</p>
-<blockquote>
-<p>15.2uS gives a 1.95mS refresh, so it's awfully close to the 2mS spec, but still within.  The datasheet I
-was looking at doesn't seem to give any spec for tolerance on the refresh so one would guess there's a
-safety margin built into the 2mS spec.</p>
-</blockquote>
-</li>
-</ul>
-<p>Fritz:</p>
-<blockquote>
-<blockquote>
-<div class="highlight"><pre><span></span>R0 177770
-R1 0
-R2 0
-R3 0
-R4 34
-R5 444
-SP 177760
-PC 010210
-
-060: 000000 000020 000001 177770 177774 177777 071554 000000
-</pre></div>
-
-</blockquote>
-<p>Okay, I've had a bit of time in front of the machine to repro this and take a look.  What I actually see is:</p>
-<div class="highlight"><pre><span></span>R0 177770
-R1 0
-R2 0
-R3 0
-R4 0
-R5 34
-R6 141774
-PC 000254
-</pre></div>
-
-<p>(remember, for the last, this will have been after taking a trap to 250, where I have the usual "BR .+2;
-HALT" catcher installed)</p>
-<p>Also, memory at 060 (PA:164060) is all zeros as far as the eye can see...</p>
-</blockquote>
-<p>Then, a big discovery from Noel:</p>
-<blockquote>
-<p>Argh. (Very red face!)</p>
-<p>I worked out the trap stack layout by looking at m40.s and trap.c, and totally forgot about the return PC
-(that's the 0444) from the call to trap():</p>
-<div class="highlight"><pre><span></span>0001740 000013 141756 022050 000013 000000 000000 000000 000034
-0001760 000444 000031 177760 000000 030351 177770 010210 170010
-</pre></div>
-
-<p>I clearly should have looked at core(V) in the V6 manual!</p>
-<p>The R6 you have recorded is correct for just after the trap; that's the kernel mode SP, which points to the
-top of the kernel stack, in segment 6 (in the swappable per-process kernel area, which runs from
-140000-1776).</p>
-<p>So there is no R5 mystery, I was just confused. Back to the other two!</p>
-</blockquote>
-<p>But meanwhile, back in front of the actual machine:</p>
-<blockquote>
-<p>Seeing some quite strange stuff now, after the crash, flipping between "CONS PHY" and "PROG PHY"...</p>
-<p>Bits 6-12 are not acting as I would expect, almost as if the KT11 ALU is doing an incorrect operation
-(subtraction rather than add!)  </p>
-<p>I see these are 74S181 bit slice ALUs, and function code should be hardwired to "A+B"... So that brings us
-back around to really checking those supply voltages...</p>
-</blockquote>
-<p>It turns out the +5V supplies were, in fact, slightly low (about 4.9 or so).  Trimmed these up, and the the
-observed problems with bits 6-12 receded, though the "ls" crash remained exactly the same.  It would appear,
-though, consistent with remarks above, that the machine has very little undervoltage tolerance on +5V --
-certainly less than the documented -5%.</p>
-<p>How long had the machine been in this condition, and what else might have been affected?  It could not have
-been for very long, since the previously run KT11 diagnostics would certainly have failed.  But the situation
-was spooky, and instilled some uncertainty about other data that had recently been retrieved via the front
-panel...</p>
-<h3>February 5</h3>
-<p>Noel clears away one additional address calculation error:</p>
-<blockquote>
-<p>So I had to grub a bit to find this, but here's what I said:</p>
-<blockquote>
-<p>With KISA7 at 001641, 0164100 should be the first location after the stack, so 0164060 and up would be
-good. They <em>should</em> be:</p>
-<div class="highlight"><pre><span></span><span class="mi">060</span><span class="o">:</span> <span class="mi">000000</span> <span class="mi">000020</span> <span class="mi">000001</span> <span class="mi">177770</span> <span class="mi">177774</span> <span class="mi">177777</span> <span class="mi">071554</span> <span class="mi">000000</span>
-</pre></div>
-
-</blockquote>
-<p>and I have no idea how I screwed the address there up that that badly. The data I'm showing there is the top
-(address-wise; i.e. bottom, push-pop-wise) of the user stack, and I think it's correct. However, it's UISA7
-which contains 01641, and that's the 'bottom' of that segment. I had previously done the math correctly:</p>
-<blockquote>
-<p>base of user data is at 0176000 (per UISA1 contents), runs to 0201476 (i.e. plus 03500); the stack would
-run from 0201500 to 0204076 (i.e. plus 02400). So the stack segment 'base' would be 020000 below the next
-word, or 0164100.</p>
-</blockquote>
-<p>So physical 0164060 is just in the middle of nowhere; it's somewhere in the middle of the text (which starts
-at physical 0161400).</p>
-<p>If you could try this again, and check the top of the <em>actual</em> user stack (which will be at physical
-0204060-0204076), I'd really appreciate it. I do expect it to be correct: the process core dump has it
-correct (as shown by the analysis of argc, argv, etc).</p>
-</blockquote>
-<p>And I am able to get some consistent, correct, data after the power-supply tune-up:</p>
-<blockquote>
-<p>Okay, latest numbers for you!</p>
-<p>Stack, confirmed:</p>
-<div class="highlight"><pre><span></span><span class="n">PA</span><span class="o">:</span><span class="mi">204060</span><span class="o">:</span> <span class="mi">000000</span> <span class="mi">000020</span> <span class="mi">000001</span> <span class="mi">177770</span> <span class="mi">177774</span> <span class="mi">777777</span> <span class="mi">071554</span> <span class="mi">000000</span>
-</pre></div>
-
-<p>Text; as I had feared, a few dropped bits there!  Went ahead and grabbed you eight extra words while I was
-there:</p>
-<div class="highlight"><pre><span></span><span class="n">PA</span><span class="o">:</span><span class="mi">171600</span><span class="o">:</span> <span class="mi">016162</span> <span class="mi">004767</span> <span class="mi">000224</span> <span class="mi">000414</span> <span class="mi">016700</span> <span class="mi">016152</span> <span class="mi">016702</span> <span class="mi">016144</span>
-<span class="n">PA</span><span class="o">:</span><span class="mi">171620</span><span class="o">:</span> <span class="mi">004767</span> <span class="mi">000206</span> <span class="mi">000405</span> <span class="mi">012404</span> <span class="mi">012467</span> <span class="mi">016124</span> <span class="mi">000167</span> <span class="mi">177346</span>
-</pre></div>
-
-<p>In disassembly from 171602, this yields:</p>
-<div class="highlight"><pre><span></span><span class="mi">171602</span><span class="o">:</span>   <span class="n">JSR</span>     <span class="n">PC</span><span class="o">,</span><span class="mi">172032</span>
-<span class="mi">171606</span><span class="o">:</span>   <span class="n">BR</span>      <span class="mi">171640</span>
-<span class="mi">171610</span><span class="o">:</span>   <span class="n">MOV</span>     <span class="mi">7766</span><span class="o">,</span><span class="n">R0</span>
-<span class="mi">171614</span><span class="o">:</span>   <span class="n">MOV</span>     <span class="mi">7764</span><span class="o">,</span><span class="n">R2</span>
-<span class="mi">171620</span><span class="o">:</span>   <span class="n">JSR</span>     <span class="n">PC</span><span class="o">,</span><span class="mi">172032</span>
-<span class="mi">171624</span><span class="o">:</span>   <span class="n">BR</span>      <span class="mi">171640</span>
-<span class="mi">171626</span><span class="o">:</span>   <span class="n">MOV</span>     <span class="o">(</span><span class="n">R4</span><span class="o">)+,</span><span class="n">R4</span>
-<span class="mi">171630</span><span class="o">:</span>   <span class="n">MOV</span>     <span class="o">(</span><span class="n">R4</span><span class="o">)+,</span><span class="mi">7760</span>
-<span class="mi">171634</span><span class="o">:</span>   <span class="n">JMP</span>     <span class="mi">171206</span>
-</pre></div>
-
-<p>...which looks at least like feasible code, if not the code we are expecting?</p>
-</blockquote>
-<p>Last, a note on procedure for using the front panel to verify KT11 address mappings:</p>
-<blockquote>
-<p>The way this works is you select the mapping set you want (in our case, USER I) with the top knob on the
-console, then toggle in a <em>virtual</em> address, hit "LOAD ADRS", and then when you hit "EXAM" it maps your
-provided address through the selected set.  Under these circumstances, I'll also see the "KERNEL" light go
-out and the "USER" light light up on the front panel indicating the active mapping set.  You can then flip
-to "PROG PHY" to see the mapped-to physical address.  This is not explained very clearly in the handbooks;
-it took me a little experimentation to figure out how to do it.</p>
-<p>Anyway, in our case, I toggle in "10210", and can read out "171610".</p>
-</blockquote>
-<h3>February 6</h3>
-<p>Noel:</p>
-<blockquote>
-<blockquote>
-<p>In disassembly from 171602, this yields: ...which looks at least like feasible code</p>
-</blockquote>
-<p>The first 4 words, yes, but not the rest. (Oh, and your disassembly is wrong; you used PA addresses, not
-VA.)</p>
-<p>But excitingly, that <em>could</em> explain the MM trap, since 16700/16152 at VA: 010210 gives us:</p>
-<div class="highlight"><pre><span></span>MOV 26364, R0
-</pre></div>
-
-<p>and that address is in segment 1, which is only 03500 long...</p>
-</blockquote>
-<p>Fritz:</p>
-<blockquote>
-<p>Also, that exact sequence does occur in the ls binary!</p>
-<p>From last night:</p>
-<div class="highlight"><pre><span></span><span class="n">PA</span><span class="o">:</span><span class="mi">171600</span><span class="o">:</span> <span class="mi">016162</span> <span class="mi">004767</span> <span class="mi">000224</span> <span class="mi">000414</span> <span class="mi">016700</span> <span class="mi">016152</span> <span class="mi">016702</span> <span class="mi">016144</span>
-<span class="n">PA</span><span class="o">:</span><span class="mi">171620</span><span class="o">:</span> <span class="mi">004767</span> <span class="mi">000206</span> <span class="mi">000405</span> <span class="mi">012404</span> <span class="mi">012467</span> <span class="mi">016124</span> <span class="mi">000167</span> <span class="mi">177346</span>
-</pre></div>
-
-<p>And from an od on bin/ls:</p>
-<div class="highlight"><pre><span></span>0004220 016162 004767 000224 000414 016700 016152 016702 016144
-0004240 004767 000206 000405 012404 012467 016124 000167 177346
-</pre></div>
-
-</blockquote>
-<p>All together, this brings us to a significant juncture in the debug effort: the power supply issue has been
-addressed, and various red herring have been cleared away.  Pre-conditions which exactly match the observed
-fault are apparent.  We are left with a single, consistent, and reproducible issue: part of the process
-address space ends up holding the wrong part of the program text.  But how, and why?</p></div>
-    <hr />
-</div>
-    
-
-        
-
-<div class='article'>
-    <div class="content-title">
-        <a href="https://fritzm.github.io/ecos.html"><h1>PDP-11/45: ECOs</h1></a>
-Sun 07 June 2020
-
-by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
- 
-    </div>
-    
-    <div><p><em>[A catch-up article, documenting discoveries of Jan/Feb 2019 and some additional research while writing
-up.]</em></p>
-<p>Okay, per last article, specifics of parity-handling on my CPU indicate that it is missing several significant
-ECOs.  I spent some time seeing if I could dig up and/or puzzle out more details on ECOs issued for the CPU,
-MMU, FPU, chassis, power supplies, and peripherals.  What I could find I will summarize here.</p>
-<h3>ECO Designations</h3>
-<p>This material is excerpted from
-<a href="http://bitsavers.org/pdf/dec/pdp8/pdp8e/PDP-8E_ECO_LOG_Dec74.pdf">PDP-8E_ECO_LOG_Dec74.pdf</a> on bitsavers. Of
-particular note is the distinction between "ECOs", implemented at the factory, and "FCOs", designed to be
-implemented in the field.  The latter are distinguishable by the presence of an additional letter inserted in
-their identifier:</p>
-<blockquote>
-<p><strong>ECO IDENTIFIER</strong></p>
-<p>Every ECO that is issued for a product is entered in the DEC-O-LOG with an identification number that
-includes the equipment type or option number, followed by a unique sequential number. For example, the ECO
-identifier “LA30-00053" is assigned to the 53rd ECO issued for the LA30 DECwriter.</p>
-<p><strong>FIELD DISTRIBUTION</strong></p>
-<p>Depending upon the nature of the engineering change, ECOs are categorized in one of five groups, which are
-assigned letter codes <em>F, D, DF, P, and M.</em> The appropriate field distribution code for the ECO appears on
-the first line of the DEC-O-LOG entry. </p>
-<p><ul>
-<em>F Code:</em> When the ECO has been engineered for field retrofit, it is coded “F”. <em>A Field Change Order</em> (FCO)
-is prepared by Field Service. The FCO provides a complete description of the engineering change and includes
-instructions for making the change to existing equipment installations.</p>
-<p>When an F-coded ECO is issued, a letter code is inserted as the first character of the sequential ECO
-identifier number. The letter code indicates the level of urgency or importance of the ECO as follows:</p>
-<p><ul><pre style="border: none; background-color: inherit">
-A   Mandatory change - highest priority      D   Low Priority change
-B   Mandatory change                         E   Optional change for product improvement
-C   Mandatory change if specified
-    trouble symptoms are observed
-</pre></ul></p>
-<p><ul><ul><ul>
-<div style="text-align:center"><strong>NOTE</strong></div></p>
-<p><strong>All ECOs issued for a product are entered into the DEC-O-LOG. Usually, the publication process that
-produces updated DEC-O-LOG pages is triggered by an F-coded ECO. At that time, any D, DF, P, or M-coded ECOs
-that precede the latest FCO are also published to provide a complete history of all ECO activity for the
-product.</strong>
-</ul></ul></ul></p>
-<p><em>D Code:</em> An ECO that changes the design of an equipment in production is coded “D”. This category includes
-changes to: </p>
-<p><ul>
-Production models, as a normal step in the design phase of a new product.</p>
-<p>All future production units of a specific equipment type or option, and the ECO is not to be retrofitted. </p>
-<p>Production units that include special features ordered by a specific customer. 
-</ul></p>
-<p>ECOs that are coded “D” are not retrofitted into existing units installed in the field. They are entered in
-the DEC-O-LOG for information purposes, and customers can purchase them from DEC.</p>
-<p><em>DF Code:</em> The “DF" field distribution code is assigned to ECOs that change the design of products that have
-been released to the field in limited quantity, when the retrofit is essentially a part of the design
-process.</p>
-<p><em>P Code:</em> When an ECO is issued solely for the purpose of changing engineering drawings or other engineering
-documentation, it is coded P (for Prints).</p>
-<p><em>M Code:</em> When an ECO is issued to change mechanical parts, structural components, or other items that do
-not affect existing units in the field, it is coded "M". M-coded ECOs cannot be purchased for retrofit.
-</ul></p>
-<p><strong>ML, DD, and WL REVISIONS</strong></p>
-<p>A <em>Master Drawing List</em> (ML) or a <em>Drawing Directory</em> (DD) lists all engineering drawings included in the
-engineering drawing set for a specific product or option. If an ECO causes any drawing in that set to be
-revised, the ML or DD is revised to indicate the latest revisions of all drawings in the set. The revision
-code for the ML or DD that reflects the ECO is included in the first line of that ECO entry in the
-DEC-O-LOG.</p>
-<p>A <em>Wire List</em> (WL) is used to indicate all wired connections for an equipment or option System Unit. If an
-ECO calls for changes in this wiring, the WL is appropriately revised. The revision code for the WL that
-reflects the ECO is included in the first line of that ECO entry in the DEC-O-LOG.</p>
-</blockquote>
-<h3>DEC-O-LOGs on Bitsavers</h3>
-<p>Unfortunately, at time of writing the selection of DEC-O-LOGs archived at bitsavers
-(<a href="http://bitsavers.trailing-edge.com/pdf/dec/fieldService/dec-o-log/">here</a>) is pretty sparse with respect to
-the '11/45.  There is a 1974 log for the M8105 TMC CPU board, a 1973 log for the M8108 SSR MMU
-board, and that's pretty much it for the '11/45 :-(</p>
-<p>Here's an entry from the M8105 log that <em>is</em> found there, relating to the subject of the previous article:</p>
-<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/M8105-D0005.jpg" title="FCO
-M8105-D0005"/></p>
-<p>Unfortunately, no cut/jump list here (some log entries do contain these).  There is a bunch of useful info to
-be gleaned, though:</p>
-<ul>
-<li>
-<p>The complete trap parity to 114 mod involved all of the M8100 (DAP), M8103 (RAC), M8105 (TMC), M8106 (UBC)
-  boards, plus mods to the processor wire-wrap backplane.</p>
-</li>
-<li>
-<p>All of these FCOs are given prefix "D", meaning DEC viewed fixing these in the field as "low priority".</p>
-</li>
-<li>
-<p>A <em>reason</em> for the change is given: "Parity errors are time consuming to detect..."  I suppose what they
-  mean is that adding code to sniff for possible parity errors, in order to distinguish these from other
-  possible sources of trap 4, was getting in the way of handling the other trap 4 sources promptly.  I can't
-  see that there would be any difference in processor overhead per se in dispatching between vector 4 and
-  vector 114?</p>
-</li>
-<li>
-<p>Machines which would trap parity to 114 as-delivered were phased into production starting in March 1973.
-  This is consistent with the low serial number and component date codes in my machine, confirming its
-  manufacture somewhere in 1972.</p>
-</li>
-<li>
-<p>The note about the MS11-B/C (M8110 SMC) is also interesting, in conjunction with fact that the re-work
-  is called out for "all core-parity PDP-11/45's".</p>
-</li>
-</ul>
-<h3>PDP-11/45 11/50 MOS Memory Troubleshooting Guide</h3>
-<p>As it turns out, <a href="http://www.bitsavers.org/www.computer.museum.uq.edu.au/pdf/DEC-11-HMSTS-A-D%20PDP-11-45,%2011-50%20MOS%20Memory%20Troubleshooting%20Guide.pdf">this
-document</a>
-is a bit of a gold mine, containing a complete list of ECO's for the '11/45 CPU/MMU/FPU modules, console, and
-backplane, as of 1974. There are brief notes, dates, and revision codes for each.</p>
-<p>In the case of the M8105, we can compare this with the DEC-O-LOG we do have on bitsavers.  This shows that the
-"Notes" in the troubleshooting guide in some cases give information not included in the corresponding
-DEC-O-LOG entries.  For example, the DEC-O-LOG entry for M8105-00002 says only:</p>
-<ul><blockquote>
-Change disable gate in priority arbitration.
-</blockquote></ul>
-
-<p>...while the troubleshooting guide offers a bit more explanation:</p>
-<ul><blockquote>
-Corrects FP TRAPS to location 4 where BRs below 7 occur at the same time.
-</ul>
-</blockquote>
-<p>The troubleshooting guide also calls out several "clusters" of interdependent ECOs:</p>
-<ul>
-<li>
-<p><strong>Parity</strong>, as remarked above: M8100-00003, M8103-00005, M8105-00005, M8106-00007/00008/00012/00012A,
-  KB11-A-00015, and M8110-00018.</p>
-<p>Separately, M8106-00003, from August 1972, is annotated "Adds disable jumper for UNIBUS PARITY", as
-observed missing in my hardware in the previous article.</p>
-</li>
-<li>
-<p><strong>CMP.B, BIT.B</strong>: M8100-00002A, KB11-A-00006.  These are dated June, 1972.  Hmm, I should check these
-  instructions on my machine...</p>
-</li>
-<li>
-<p><strong>Speed-up</strong>: M8104-00002, M8106-00005A, KB11-A-00012A/00013.  Not sure what is "sped up" here, but perhaps
-  Unibus signaling; the M8106 change is annotated "Clear MSYN with T1".</p>
-</li>
-</ul>
-<p>Also of note are a few items that seem to relate directly to previously observed behaviors of my machine:</p>
-<ul>
-<li>
-<p><strong>KM11 uPB</strong>: M8109-00015 "CPU fails to halt on selected ROM state when micro program break mode is set on
-  maintenance card. Detected when running a test sequence not containing a pause, i.e., 150ns cycle time."  Ah
-  ha!  I had run across this (mis)behavior previously, noted <a href="https://fritzm.github.io/diagnostics-5.html">here</a>.</p>
-</li>
-<li>
-<p><strong>Slots 26-28</strong>: KB11-A-0008 "Signal missing in small peripheral controller slots in KB11-A (slots 26-28)."
-  Another ah ha...  This seems likely related to issues noted <a href="https://fritzm.github.io/serial-console.html">here</a>.</p>
-</li>
-<li>
-<p><strong>Burnt +5V Trace</strong>: KB11-00001: "Reworks backpanels with 24 AWG wire in parallel with +5 V etch."  This may
-  explain the burnt trace and "extra red wire" as noted <a href="https://fritzm.github.io/initial-power-on.html">here</a>. </p>
-</li>
-</ul>
-<h3>Jay Jaeger DEC-O-LOG Microfiche Transcriptions</h3>
-<p>After an ask on the cctalk mailing list, Jay Jaeger commented that he has some complete sets of DEC-O-LOGs on
-microfiche!  Though he has no equipment with which to scan fiche, he very kindly took the time to manually
-transcribe those that seemed like they might be of most interest to me (thanks, Jay!) Jay has made his
-transcriptions publicly available <a href="https://drive.google.com/open?id=0B2v4WRwISEQRWWFFdVpCZWFTZEU">here</a>, under
-pdf/dec/fieldService/dec-o-log.</p>
-<p>There is a lot there, and it's worth a read.  Here are some excerpts I found relevant to discussions and
-investigations here:</p>
-<ul>
-<li>
-<p>On the parity rework:</p>
-<blockquote>
-<p>M8100-C0003  CODE: F  CS C  Etch C  JAN-73 [FCO]</p>
-<p>Problem: Parity errors require the generation of trap vector 114<br>
-Correction: Modify trap vector logic<br>
-Required on all 11/45 systems with parity</p>
-</blockquote>
-<p>
-<blockquote>
-<p>M8103-C0005  CODE: F CS F  MAR-73  [FCO]</p>
-<p>Problem: Parity errors need special abort logic to assert ZAP signal<br>
-Correction:  Modify ZAP gate on RACA</p>
-</blockquote>
-<p>
-<blockquote>
-<p>M8105-D0005  CODE: F   CS F  MAR-73  [FCO]</p>
-<p>Parity errors are time consuming to detect through vector 4.  Core parity requires these changes:
-M8100-D0003, M8103-D0005, M8105-D0005, M8106-D0007, KB11A-D0015 and M8106-D0008</p>
-<p>FCO's may be installed separately - each FCO relies upon the others only to fully implement parity.</p>
-<p>NOTE: MS11-B/C semiconductor parity memories with etch revision B M8110s will NOT function properly
-with these FCOs. A new M8110 is being designed to function with these FCOs.</p>
-</blockquote>
-<p>
-<blockquote>
-<p>M8106-D0007  CODE: F   CS:  J  [FCO]</p>
-<p>Problem: Parity errors are time consuming to detect through vector 4<br>
-Correction Allow processor to trap to 114 for parity errors.</p>
-</blockquote>
-<p>
-<blockquote>
-<p>M8106-D0008  CODE: F  CS:  K  MAR-73  [FCO]</p>
-<p>Problem: UNIBUS parity errors cause machine to halt<br>
-Correction: Disable UBCB UNI PERF [ 1 ] L from generating UBCB PARITY ERR SET L.</p>
-</blockquote>
-<p>
-<blockquote>
-<p>M8106-C0012  CODE: F  CS:  M  JUN-73  [FCO]</p>
-<p>Problem: MOS Parity memory is too tight<br>
-Correction:  Strobe parity errors sooner<br>
-NOTE: See M8106-C0012A</p>
-<p>Rework in parity systems with M7259 or etch revision C M8110s, rework all systems with parity and all
-PDP11-45s at next PM.</p>
-<p>M8106-C0012A  CODE: F  JUN-73  [FCO]</p>
-<p>The rework procedure in M8106-C0012 in steps #25 and #26 incorrectly references an R22.  Should be R20.</p>
-</blockquote>
-<p>
-<blockquote>
-<p>KB11A-D0015 CODE: F  DD:M  WL:L  [FCO]  MAR-73</p>
-<p>Problem: Detection of parity errors through vector 4 is slow.<br>
-Correction:  Detect parity errors through vector 114.</p>
-<p>Wire Adds: D11D2 to A06P1, E12A1 to F11F1, C09K1 to E12A1</p>
-<p>NOTE: This FCO must be installed in conjunction with the following FCOs to implement core parity:
-M8100-D0003, M8103-D0005, M8106-D0007 and M8106-D0008. Each of these related FCOs may be installed
-separately.</p>
-<p>Note that MS11-B/C semiconductor parity memories with etch revision B M8110s will NOT function properly
-when above FCOs are installed. A new M8110 is being designed to function with these FCOs.</p>
-</blockquote>
-<p>Okay, much of this confirms deductions worked out in the previous article.  The big additional clue here
-is that we actually have the backplane wire adds this time!</p>
-<ul>
-<li>
-<p>D11D2 to A06P1: This forwards UBCB PARITY ERR L, already at the TMC card, on to DAPE E7.  This provides
-  parity condition input to the extended trap vector generation logic explored in the previous article.</p>
-</li>
-<li>
-<p>E12A1 to F11F1 and C09K1 to E12A1: These relate to enhanced abort processing -- they distribute UBCB PE
-  ABORT L to TMCC E87, TMCE E38, and RACA E52, which I have not previously inspected.</p>
-</li>
-</ul>
-<p>Looking at the RAC changes first, we have this:</p>
-<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/RACA-ZAP.jpeg"
-title="RACA ZAP"/></p>
-<p>...which, per expectation, is not implemented on the RAC board I am running; no connection from CK1 to
-E52, and no connection from E52 to E101.  The ZAP signal is used to force the microcode counter to 200 on
-a trap or on power up, kicking off the exception handling microcode flow on sheet FLOWS 12.  I'm not sure
-why parity required special plumbing here; by my read a parity error should end up setting TMCC ABORT H
-which should also result in a ZAP?.  My guess would be the special plumbing allows the trap to be taken at
-an earlier clock phase?</p>
-<p>On the TMC we have these:</p>
-<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/TMCC-E87.jpeg"
-title="TMCC E87"/>
-<p>
-<img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/TMCE-E38.jpeg"
-title="TMCE E38"/></p>
-<p>Also related to abort signaling, and also not implemented on my machine (no connection from FF1 to E87 or
-E38, pins 12 and 10 common on E38).  So perhaps the reason to move parity to its own trap vector wasn't to
-avoid extra discrimintation logic in the trap 4 handler, but rather to enable an accelerated abort path
-without affecting extablished behavior of the other machine exceptions on vector 4?  Curious...</p>
-</li>
-<li>
-<p>On CMP.B, BIT.B:</p>
-<blockquote>
-<p>M8100-A002A  CODE:  DF  JUN-72  [FCO]</p>
-<p>Problem:  Disposition code on M8100-A0002 is 02: phase-in<br>
-Correction:  Change to code 03: rework immediately.<br>
-Problem:  CMP.B and BIT.B instructions with SM0 and DM0 and DF7 will destroy the PC<br>
-Correction:  Inhibit PCB clock under those conditions</p>
-</blockquote>
-<p>The troubleshooting guide mentions that that this change also needs KB11-A-00006, but that is not included
-in Jay's transcript (bummer).</p>
-<p>In any case, the description here tells us a lot more about the exact nature of the bug.  <code>SM0</code>, <code>DM0</code>,
-<code>DF7</code> here are microcode conditions; collectively this description implicates a CMP or BIT instruction,
-either byte or word length, with two registers as arguments, and the second argument being the PC (R7).</p>
-<p>CMP or BIT should <em>not</em> modify their second argument, but inspection of the the microcode flows shows that
-under this particular set of conditions the flow (<code>FET.00</code>, <code>FET.10</code>, <code>IRD.00</code>, <code>EXC.90</code>) is shared with
-many other E/class instructions which <em>should</em> do. So an update inhibit derived from existing microcode
-outputs to distinguish this particular set of conditions is needed, and thus this FCO.</p>
-<p>Here again the schematics hold some clues.  The relevant bit is the net for CLKPCB H on drawing DAPJ:</p>
-<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/DAP-CLKPCB.jpeg"
-title="DAPJ CLKPCB H"/></p>
-<p>The AND terms of E42 serve as inhibits for the update signal, which otherwise sources from TIGC T1 H via
-E43.  The top three terms in the diagram inhibit on cases of <code>UPCB=2 * ~SF7</code>, <code>UPCB=0</code>, or <code>UPCB=3 *
-~DF7</code> (with some term elimination on the first case).  This would be the vanilla implementation of the
-UPCB microcode signals.</p>
-<p>The bottom-most AND term seems to be the one involved in the FCO.  This adds an additional inhibit,
-<code>UPCB=3 * ICLASS * UPWE</code>, which would be active in the situation described in the FCO description.  Some
-minor additional clues here are that the handwriting for the signal names here doesn't quite match the
-rest of the drawing and that the backplane pin assignment for bringing in UPWE00 is not contiguous with
-the others in this net; together these suggest revision.  From this we could also guess that the missing
-corresponding KB11-A-00006 probably involves bringing signal RACB UPWE00 H to pin E06V2.</p>
-<p>Inspection of my DAP modules shows the predicted changes implemented around E42 with green-wires, so it
-looks like my machine <em>did</em> get this FCO, either in the factory or the field:  </p>
-<p><img src='/images/pdp11/DAP-E42_thumbnail_tall.jpeg' title='Evidence of FCO M8100-A00002A around E42 on DAP board' onclick='pswipe("pdp11",84);'/></p>
-<p>Next time I have the machine fired up I'll experiment with some BIT instructions from the front panel and
-make sure.</p>
-</li>
-<li>
-<p>On the "speedup" fixes:</p>
-<blockquote>
-<p>M8106-A0005  CODE: F  CS:  F  DEC-72  [FCO]</p>
-<p>Problem: Present board not meeting cycle time specifications for UNIBUS.<br>
-Correction: Add logic changes.<br>
-NOTE: This FCO must be installed in conjunction with FCO KB11A-A0012</p>
-</blockquote>
-<p>
-<blockquote>
-<p>M8106-A005A  CODE: F  JAN-73  [FCO]</p>
-<p>Problem 1: Rework procedure in M8106-A0005 is incorrect.<br>
-Correction 1:<br>
-&nbsp;&nbsp;In step #2 changed E83-11 to E83-13<br>
-&nbsp;&nbsp;In step #4 change R23 to R22<br>
-Problem 2: The assembly hole drawing does not specify which side of the board etch cut #13 is on<br>
-Correction 2:  Side 2</p>
-</blockquote>
-<p>
-<blockquote>
-<p>KB11A-A0012  CODE: F  DD: J  WL: J  DEC-72 [FCO]</p>
-<p>Problem: 11/45 processor does not meet UNIBUS cycle time specification.<br>
-Correction: Correct KB11-A back panel attached ADD/DELETE sheet and install FCO M8106-A0005 to UBC
-module.</p>
-</blockquote>
-<p>
-<blockquote>
-<p>KB11A-A012A  CODE: F  DEC-72 [FCO]</p>
-<p>Problem: Not all the add/deletes listed on sheet 2 of KB11A-A0012 are necessary for this retrofit.<br>
-Correction: use the ADD/DELETE sheet included in this supplement for FCO KB11A-A0012.</p>
-</blockquote>
-<p>
-<blockquote>
-<p>KB11A-E0013 CODE: F  DD: K  WL: K  JAN-73 [FCO]</p>
-<p>Problem: Improve performance of PDP-11/45 processor as UNIBUS master.<br>
-Correction: Revise KB11-A Wire List as defined the ADD/DELETE sheet and install etch revision C M8104
-module</p>
-<p>NOTE: This FCO completes the total FCO package necessary for improving the speed performance of the
-PDP-11/45 with core memory.  Note prerequisite FCOs are KB11A-A0012, KB11A-A012A and M8106-A0005.</p>
-</blockquote>
-<p>Well, definitely Unibus timing related then.  There is not very much info to start from here, and logs for
-the M8104 module are also missing from Jay's transcripts (perhaps not issued since no F-coded ECOs for 
-this board?)</p>
-<p>We <em>do</em> see from above, though:</p>
-<ul>
-<li>Involvement of M8106 E83 (sheet UBCB, driving CLR DESKEW L). Handwriting and "white out" artifacts
-  around this gate on the engineering drawings also suggest rework.</li>
-<li>Involvement of M8106 R22 (also sheet UBCB, pull up on fastbus parity error handling)</li>
-<li>The troubleshooting guide annotates M8106 00005 "CLR MSYN with T1". Handwriting mismatch on the clock
-  input of the MSYN flip-flop (sheet UBCB, E79) may be related.</li>
-<li>At least 13 etch cuts existed in the FCO (!)</li>
-</ul>
-<p>Looking through the drawings a bit more here after this, I noticed for the first time (doh!) that there is
-an updated set of Unibus timing diagrams <em>explicitly</em> to be used with M8104 rev C and post- KB11-A-E00013.
-The differences seem to be around the bus long pause cycle.  This prompted another look through the 1972
-and 1976 KB11-A maintenance manual, and sure enough, in section 8.7.2 of the 1976 version we find:</p>
-<blockquote>
-<p>ECO KBl l-A No. 13 ("Speed-up ECO"), in conjunction with Revision C or higher of the PDR Module (M8104),
-has changed the data transfer operations. Explanations of both versions are presented in this paragraph.
-(In general, ECO KB11-A No. 13 eliminated the bus long pause cycle.)</p>
-</blockquote>
-<p>...followed by much description of the signalling differences between pre- and post- KB11-A-E00013
-machines. This can definitely be mined for further clues.</p>
-<p>I did verify that at least some of this rework is <em>not</em> implemented on my M8106 boards (specifically,
-configuration of E83 on my boards does not match either of the apparent revisions in the drawings).
-Definitely a lot more work to do puzzling this one out.  Even though I'll continue to investigate the
-details of this change, it probably ends up being too much to undertake without complete documentation.</p>
-</li>
-<li>
-<p>On KM11 uPB Break:</p>
-<blockquote>
-<p>M8019-C0015  CODE: F  CS: R  CS: M3  APR-74 [FCO]</p>
-<p>Problem:  CPU fails to halt on selected ROM state when Micro Program break mode is set on maintenance
-card.  The problem is detected when running a test sequence not containing a pause 150 nsec cycle time.
-Correction:  Delete U/L: CTRL latch flipflop and add latch at input gating.  Test by running a branch
-dot with ROM match at 343.</p>
-<p>FOR ETCH REVISION C:</p>
-<p>Cuts:<br>
-&nbsp;&nbsp;Side 2 at E12 pin 9<br>
-&nbsp;&nbsp;Side 2 E32 pin 9 to E31 pin 13<br>
-&nbsp;&nbsp;Side 2 E32 pin 9 to E32 pin 10<br>
-&nbsp;&nbsp;Side 2 at E42 pin 13<br>
-&nbsp;&nbsp;Remove jumper E22 pin 14 to E35 pin 7</p>
-<p>Jumpers:<br>
-&nbsp;&nbsp;E12 pin 9 to E22 pin 11<br>
-&nbsp;&nbsp;E42 pin 13 to E35 pin 7<br>
-&nbsp;&nbsp;E42 pin 8 to E32 pin 9<br>
-&nbsp;&nbsp;E32 pin 10 to E31 pin 13</p>
-<p><em>(etch revision F instructions ellided; in Jay's transcript linked above)</em></p>
-<p>NOTE: Etch revision F boards are reworked from CS revision P to R.  Etch revision C boards are reworked
-from CS revision M2 to M3.</p>
-</blockquote>
-<p>My M8109 timing generator is etch C.  There are a lot of ECOs on this board, culminating in CS level M2
-ahead of this FCO.  In principle, many/most of these are verifiable by inspection, based on information
-contained in Jay's transcripts.</p>
-<p>This one is a bit deep, and I haven't really covered much about the M8109 yet.  I'll probably take up
-analysis of this problem, the associated FCO fix, and inspection/determination of the revision level of
-my board as its own topic in a future article.  I'd like to implement this fix if it proves not
-overly complicated.</p>
-</li>
-<li>
-<p>On slots 26-28:</p>
-<blockquote>
-<p>KB11A-B0008  CODE: DF  DD: E  WL: E  SEP-72  [FCO]  </p>
-<p>Problem:  Small peripheral controller slots in KB11-A panel, slots 26 thru 28, are not wired to accept
-some quad module controllers: NPG, PA, PB, LTC, ACLO, DCLO and +15V are missing. Correction:  Revise
-wiring to include signals listed above.</p>
-</blockquote>
-<p>Wow, lots missing from these slots besides the +15V and NPG I had noticed.  In other correspondence, Jay
-mentions that the DL11 (with which I was having trouble in these slots) is explicitly mentioned elsewhere
-in this FCO.</p>
-</li>
-<li>
-<p>On the burnt-trace / extra wire situation:</p>
-<blockquote>
-<p>KB11-00001  CODE: D  May-72  [ECO]  </p>
-<p>Problem: Etch carrying +5V current from Mate-n-Lock pins to backpanel pins is not heavy enough to carry
-required current. Correction:  Run 24AWG wire in parallel with etch on panels which already have
-Mat-n-Lock assembly installed.  Increase thickness of conductor with solder bead if Mate-n-Lock assembly
-not installed. PDP-11/45 system serial number 101 and later.</p>
-</blockquote>
-<p>Sounds about right, though the excerpt does not mention the exact trace or connector.</p>
-</li>
-</ul>
-<p>There are a good handful of others described in the DEC-O-LOG transcriptions as well.  Probably worth making a
-chronological (rather than topical) pass through each of the logs and each of my boards.  For another time...</p>
-<h3>Things still sought</h3>
-<ul>
-<li>
-<p>Somebody to scan Jay's DEC-O-LOG fiche, so the complete contents can be made available on bitsavers.  Jay
-  kindly offered to lend these out to have them scanned.  If you have the equipment for this and would be
-  interested in helping out, please drop a line on the cctalk mailing list!</p>
-</li>
-<li>
-<p>Information from FCO "kits", including cut/jump lists, diagrams, and instructions.  I've not yet seen any
-  of these, so I'm unsure what form they take, or where we might find them?</p>
-</li>
-<li>
-<p>Alternate versions of the '11/45 engineering drawings.  These can be quite useful for puzzling out the
-  contents of ECOs by visually "diffing" them.  So far I have only seen the June 1974 and April 1976 versions,
-  which are currently available at bitsavers.</p>
-</li>
-<li>
-<p>PDP-11/45 backplane wirelists.  I have never seen one of these.  The wirelist section in the commonly
-  available PDP-11/45 engineering drawing sets actually describes the power harness, and not the backplane.</p>
-</li>
-</ul></div>
-    <hr />
-</div>
-    
-
-        
-
-<div class='article'>
-    <div class="content-title">
-        <a href="https://fritzm.github.io/parity-handling.html"><h1>PDP-11/45: Parity error handling</h1></a>
-Mon 25 May 2020
-
-by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
- 
-    </div>
-    
-    <div><p><em>[A catch-up article, documenting events of Jan/Feb 2019.]</em></p>
-<p>At the end of the previous article, a bunch of repairs had been made to my MS11-L memory board.  The
-associated MAINDEC diagnostic ZQMC was able to run cleanly <em>but only with parity tests disabled</em>.  When parity
-tests were enabled, the parity fault LED on the MS11 would light (expected) and the machine would halt with
-ADRS ERR lit (unexpected...)</p>
-<p>So the first step is to read and research how memory parity handling is implemented on the KB11-A CPU.
-Immediately here we run into some trouble:</p>
-<ul>
-<li>
-<p>The 1973 edition of the 11/45 Processor Handbook has a section 2.5.6, "Memory Parity", which states: "Parity
-  errors cause the Central Processor to either trap through location 4 or to halt."  There is also an Appendix
-  E, "Memory Parity", which details CSRs for parity memory:</p>
-<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/memory-csr-73.png" title="1973 Memory CSR"/></p>
-<p>It is stated there that there are 16 of these, at addresses 772110-772146, each corrsponding to an 8K word
-block of address space.</p>
-<p>By the 1976 version of the processor handbook, however, all of this information had been expunged. The new
-Appendix A, "UNIBUS Addresses", lists range 772110-772136 simply as "UNIBUS memory parity".  Here, trap 4
-is listed as "CPU errors", and trap 114 is listed as "Memory system errors".  All subsequent revisions of
-the handbook state unambiguously that parity errors generate a trap 114.</p>
-</li>
-<li>
-<p>What do the KB11-A processor maintenance manuals have to offer?  Paragraph 7.7.7 of the 1972 KB11-A
-  maintenance manual states:</p>
-<blockquote>
-<p>A Parity error on the Unibus A is indicated by BUSA PA L high and BUSA PB L low.  The parity error
-causes UNI PERF (Unibus parity error flag) to be set when MSYN is cleared.  UNI PERF (1) L asserts UBCB
-PARITY ERR SET L during the pause cycle, which sets the console (CONF) flag and halts the CPU.</p>
-<p>The semiconductor memory control EHA and EHB (enable halt) flip-flops may be set under program control
-to assert SMCB PE HALT if a parity error is detected.  This input also asserts UBCB PARITY ERR SET L,
-which sets the console flag and halts the CPU.  Thus, if either a Unibus A parity error or SMCB PE HALT
-L is asserted, the processor will be vectored to trap when the CONT switch is pressed.</p>
-</blockquote>
-<p>Note that this text addresses how the CPU handles detected parity errors in both Unibus (first paragraph)
-and fastbus (second paragraph) memory systems.  Unibus parity errors are stated to set the CONF flag and
-halt the CPU, just as I am seeing on my system...  Fastbus parity handling (halt first vs. direct trap)
-can further be mediated by EHA and EHB, called out here to drawing SMCB in the MS11-B/C fastbus
-semiconductor memory print set.</p>
-<p>But here, too, by the time we get to the later revision 1976 KB11-A,D maintenance manual, this information
-is revised. The updated description makes no further mention of CONF, halting, or halt control, and seems
-to imply that all reported parity conditions trap directly through 114.</p>
-</li>
-<li>
-<p>How about contemporaneous memory systems?  The MS11-B/C solid state memory systems released with the 11/45
-  (note: not what I'm running; I have the much later MS11-L) consisted of either MOS or bipolar memory
-  matrices with an associated controller card (the M8110).  These supported both Unibus and fastbus interfaces.
-  Here, in the 1972 schematics, we see the implementation of the EHA/EHB halt control bits, mentioned above,
-  in the upper left of sheet SMCB:</p>
-<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/ms11-eha-ehb.png" title="MS11 halt control bits"/><br></p>
-<p>We can see the bit assignments here match the CSR layout from the 1973 processor handbook, and the
-associated MS11 maintenance manual from 1973 also describes them in its table 3-12:</p>
-<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/ms11-table-3-12.png" title="MS11 CSR w/ halt control bits"/></p>
-<p>And once again, by the 1974 revision of the same maintenance manual, no surprise: descriptions of the halt
-control bits have been expunged from table 3-12.  Okay, we're starting to get a consistent picture here...</p>
-<p>I don't know much about the core memory systems that were configured with the early 11/45s?  It would be
-interesting to know if anything other than the MS11-B/C ever supported this older CSR layout.</p>
-</li>
-<li>
-<p>Let's have a look at the KB11-A engineering drawings themselves.  The set I've been using during my
-  restoration dates from 1974.  The first, most obvious, place to look is trap vector generation; this is
-  accomplished on the lower left of drawing DAPE:</p>
-<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/trap-vector-decode.png" title="KB11-A trap vector generation, circa 1974"/></p>
-<p>This small combinational net feeds trap vector bits to the K1MX constant multiplexer. One non-obvious
-wrinkle noted elsewhere on the drawing: vectors generated for reserved instruction (004), EMT (014), and
-TRAP (016) are further left-shifted, downstream, by microcode (state RSD.10, drawing FLOWS 12) to result
-in 010, 030, and 034 respectively.  That's not strictly relevant to the discussion at hand, but might be
-helpful if pondering the logic implemented in the diagram above.</p>
-<p>This drawing is definitely from the "post 114" era.  On a parity error, we'll have ~IOT and ~PIRQ and
-~SEGT, together driving TV02 high; that's our traditional vector 004. But here we also see UBCB PE TRAP
-(1) L, active low, entering from the left. When driven low, we'll get TV03 and TV06 high as well, all
-together generating vector 114.</p>
-<p>Here we can see some clues, too, of how the change to 114 might have been bodged in: as drawn, TV01, TV02,
-TV03, TV04 and TV05*07 proceed nicely in order from bottom to top.  But TV06, needed by the change as the
-most-significant "1" in "114", looks like it was just wedged in out of order on the drawing...
-Presumably, it makes use of a previously unused section of hex inverter E11.  The change to activate TV03
-here as well would have been a cut/jump at the inputs of E7.</p>
-<p>And sure enough, here we see differences with my actual hardware!  Here's part of the layout of module
-DAP from the '74 engineering drawings, and a snap the same corner of my DAP spare which is same as the
-one I'm currently running in the machine:</p>
-<p><br/><div style="margin-left:auto; margin-right:auto; width:75%">
-<img src='/images/pdp11/dap-layout_thumbnail_tall.png' title='Corner of DAP layout from 1974 drawings' onclick='pswipe("pdp11",80);'/> 
-<img src='/images/pdp11/dap-corner_thumbnail_tall.png' title='Corner of one of my DAP boards.  Note missing R17.' onclick='pswipe("pdp11",81);'/>
-</div><br/></p>
-<p>Note particulary that R17, a pullup for UBCB PE TRAP (1) L, is missing on my board.  A little further work
-with the beeper shows that on my boards E7 pin 1 is connected directly to E7 pin 13, and is not connected
-to edge connector AP1.  E11 pin 3 appears to be NC.  Furthermore, examination of the backplane shows that
-there is no wire wrapped in place at DAP AP1 to deliver signal UBCB PE TRAP (1) from the UBC board.  So, I
-think I can conclude we're not looking at a bug or component failure here; <strong>my 11/45 simply pre-dates the
-change from vector 4 to vector 114.</strong></p>
-</li>
-<li>
-<p>Okay for the vector, but what about the halt behavior?  Here, the text quoted earlier from the 1972 KB11-A
-  maintenance manual has our clue where to look.  The parity derived signal eventually resulting in the halt
-  on either Unibus or fastbus parity error is UBCB PARITY ERR SET L (note "SET" in the signal name here, don't
-  confuse with UBCB PARITY ERR L...)  The 1974 drawings imply that a fastbus parity err, but <em>not</em> a Unibus
-  parity error, will halt the machine, in conflict with this text. But looking here, we see another bodge
-  clue: the hookup at E68 pins 4 and 5 as drawn looks a little suspicious...</p>
-<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/ubcb-parity-halt.jpeg" title="UBC parity halt logic"/></p>
-<p>And indeed, on my hardware, E68 pins 4 and 5 are <em>not</em> connected together; rather, E68 pin 5 is connected
-to E79 (Unibus parity error flag) pin 5. <strong>So, Unibus parity errors will also halt this version of the
-11/45 hardware, by design.</strong></p>
-<p>Some other differences related to parity are also apparent looking at my version of the UBC board.  E57,
-seen above generating UBC PE ABORT L, is not populated.  This seems related to some further refinement of
-abort sequencing, but the cirumstances surrounding the need for this aren't clear to me at this point.
-Also, jumper W1 and associated logic to entirely disable Unibus parity error detection are not present:</p>
-<p><br/><div style="margin-left:auto; margin-right:auto; width:75%;">
-<img src='/images/pdp11/ubc-layout_thumbnail_tall.png' title='Corner of UBC layout from 1974 drawings' onclick='pswipe("pdp11",82);'/> 
-<img src='/images/pdp11/ubc-corner_thumbnail_tall.jpeg' title='Corner of one of my UBC boards.  Note missing W1, R161, and unpopulated E57.' onclick='pswipe("pdp11",83);'/>
-</div><br/></p>
-</li>
-</ul>
-<p>So, what does all this mean?  Well, for one thing, there apparently isn't anything actually in need of repair
-here -- as far as I can tell, this version of the hardware is functioning per design, such as it is.</p>
-<p>And as it turns out, with a now properly repaired MS11-L, actual parity errors are few and far between (I've
-yet to see any that weren't intentionally created by diagnostics.)  According to Noel, stock Unix V6 doesn't
-do anything whatsoever with parity. RSTS/E V06C boot code seems to be properly probing and identifying the CSR
-on my MS11-L.  And good old RT11 has seemed happy enough in the past.  So I just may not <em>need</em> a totally
-up-to-date parity implementation on my machine.</p>
-<p>There is still the issue of more broadly tracking down and implementing outstanding ECOs for this machine.  I
-have so far had limited success in locating these (more on this next time!)  I'm certainly equipped here to
-implement field cuts and jumps, but it might get tricky to track down newer versions of boards for any ECOs
-that involved total swaps to updated etches.  In any case, in the absence of complete information on the ECOs
-I'm hesitant to cherry pick changes such as those identified here unless I am really blocked without
-them; better by far not to leave the machine in an undocumented "in-between" state.</p>
-<hr>
-<p>Footnotes: a lot of the discovery documented here took place in the context of the enthusiast community on
-the cctalk mailing list, and also in private communications.  Noel Chiappa and Paul Koning were both
-particularly generous with their time (thanks, guys!)  Here are some interesting related bits that didn't 
-fit directly in the narrative above, for completeness and for future reference:</p>
-<ul>
-<li>
-<p>On RSTS parity CSR sniffing, from Paul:</p>
-<blockquote>
-<p>From: Paul Koning<br>
-To: cctalk<br>
-Subject: Re: PDP-11/45 RSTS/E boot problem  </p>
-<blockquote>
-<p>Fritz Mueller wrote:</p>
-<p>There is a lot of inconsistent and incomplete information in the documentation about memory CSRs. They
-appear to come in different flavors depending on memory hardware; some of the earlier ones support
-setting a bit to determine whether parity errors will halt or trap the CPU, while some of the later
-ones (like my MS11-L) simply have "enable" and don't distinguish between halt and trap. I'm curious
-how OS init code sniffs out what memory CSRs there are, determines their specific flavors and, in a
-heterogeneous system, determines how much address space is under the auspice of each CSR?  Maybe Paul
-and Noel can comment here wrt. RSTS and Unix respectively?</p>
-</blockquote>
-<p>I quickly skimmed some RSTS INIT code (for V10.1).  Two things observed:</p>
-<p>1. At boot, INIT determines the memory layout.  It does this by writing 0 then -2 into each location to
-see if it works.  If it gets an NXM trap (trap to 4) or a parity trap (trap to 114) it calls that 1kW
-block of memory non-existent.  For the case of a parity error, it tells you that it saw a parity error
-and is disabling that block for that reason.</p>
-<p>2. In the DEFAULT option (curiously enough) there is a routine that looks for up to 16 parity CSRs
-starting at 172100.  This happens on entry to the memory layout option.  You can display what it finds
-by using the PARITY command in response to the "Table suboption" prompt.</p>
-<p>It checks if the bits 007750 are active in the parity CSR, if so it takes that to be an address/ECC
-parity CSR.  It figures out the CSR to memory association by going through memory in 1 kW increments,
-writing 3, 5 to the first 2 words, then setting "write wrong parity" in each CSR (007044), then doing
-BIC #3,.. BIC #5,... to those two test words, then reading them both back.  This should set bad parity,
-and it scans all the CSRs to see which one reports an error (top bit in the CSR).  If no CSR has that
-set, it concludes the particular block is no-parity memory.</p>
-<p>I probably got some of the details wrong, the above is from a fast skim of the code, but hopefully it
-will get you started.</p>
-</blockquote>
-<p>My machine currently has one MS11-L, which has the newer CSR layout referred to by Paul above (different
-than the much older MS11-B/C CSR layout depicted at the top of this article; see MS11-L docs for further
-details). RSTS init defaults-&gt;memory-&gt;parity on my system reports (correctly):</p>
-<div class="highlight"><pre><span></span> 0K: 00000000 - 00757777 ( 124K) : 00
-</pre></div>
-
-<p>Presumeably, RSTS carries out this identification activity with the CSR report enable bits off, and the
-CSR error bits still function correctly in these circumstances; otherwise, per above, my machine would
-summarily halt during this process!</p>
-</li>
-<li>
-<p>Noel, in some of his research, found Deeper magic from before the dawn of time re. evolution of the Unibus
-  parity implementation <em>before</em> the era of the start of this article, bridging back to the KA11 (11/20) CPU.
-  Quite interesting!</p>
-<blockquote>
-<p>From: Noel Chiappa<br>
-Subject: Change in UNIBUS parity operation (Was: PDP-11/45 RSTS/E boot problem)<br>
-To: cctalk  </p>
-<blockquote>
-<p>Even better, it claims to be able to control whether the memory uses odd or even parity! (How, for
-UNIBUS memory, I don't know - there's no way to do this over the UNIBUS.</p>
-</blockquote>
-<p>So this really confused me, as the UNIBUS spec says parity is wholly within the slave device, and only
-an <em>error</em> signal is transferred over the bus. E.g. from the 'pdp11 peripherals handbook', 1975 edition
-(pg. 5-8): "PA and PB are generated by a slave ... [it] negates PA and asserts PB to indicate a parity
-error ... both negated indicates no parity error. [other combinations] are conditions reserved for
-future use."</p>
-<p>The answer is that originally the UNIBUS parity operation was <em>different</em>, and that sometime around the
-introduction of the PDP-11/45, they <em>changed</em> it, which is apparently why Appendix E, about parity in
-the /45, says what it does!</p>
-<p>I found the first clue in the MM11-F Core Memory Manual (DEC-11-HMFA-D - which is not online, in fact no
-MM11-F stuff is online, I'll have to scan it all and send it to Al); I was looking in that to see if the
-parity version had a CSR or not (to reply to Paul Koning), and on the subject of parity it said this:
-"The data bits on the bus are called BUS DPB0 and BUS DPB1." And there is nothing else on how the two
-parity bits are <em>used</em> - the clear implication is that the memory just <em>stores</em> them, and hands them to
-someone else (the master) over the bus, for actual use.</p>
-<p>Looking further, I found proof in the "unibus interface manual" - and moreover, the details differ
-between the first (DEC-11-HIAA-D) and second (DEC-11-HIAB-D) editions (both of which differ from the
-above)!</p>
-<p>In the first, Table 2-1 has these entries for PA and PB: "Parity Available - PA ... Indicates paritied
-data" and "Parity Bit - PB ... Transmits parity bit"; at the bottom of page 2-4 we find "PA indicates
-that the data being transferred is to use parity, and PB transmits the parity bit. Neither line is used
-by the KA11 processor."</p>
-<p>(Which explains why, when, after reading about parity in the MM11-F manual, I went looking for parity
-stuff in the KA11 which would use it, I couldn't find it!)</p>
-<p>In the second, Table 2-1 has these entries for PA and PB: "Parity Bit Low - PA ... Transmits parity bit,
-low byte" and "Parity Bit High - PB ... Transmits parity bit, high byte"; at the top of page 2-5 we find
-wholly different text from the above, including "These lines are used by the MP11 Parity Option in
-conjunction with parity memories such as the MM11-FP."</p>
-<p>I looked online for more about the MP11, but could find nothing. I wonder if any were made?</p>
-<p>This later version seems to agree with that Appendix E. I tried to find an early -11/45 system manual,
-to see if it originally shipped with MM11-F's, but couldn't locate one - does anyone have one? The ones
-online (e.g. EK-1145-OP-001) are much later.</p>
-<p>It's also interesting to speculate about reasons <em>why</em> these changes were made; I can think of several!
-:-)</p>
-</blockquote>
-</li>
-</ul>
-<p>All for now!</p></div>
-    <hr />
-</div>
-    
 <div class="pagination">
 <ul>
     <li class="prev disabled"><a href="#">&larr; Previous</a></li>
@@ -3077,6 +1557,7 @@ online (e.g. EK-1145-OP-001) are much later.</p>
     <li class=""><a href="https://fritzm.github.io/author/fritz-mueller5.html">5</a></li>
     <li class=""><a href="https://fritzm.github.io/author/fritz-mueller6.html">6</a></li>
     <li class=""><a href="https://fritzm.github.io/author/fritz-mueller7.html">7</a></li>
+    <li class=""><a href="https://fritzm.github.io/author/fritz-mueller8.html">8</a></li>
 
     <li class="next"><a href="https://fritzm.github.io/author/fritz-mueller2.html">Next &rarr;</a></li>
 
@@ -3112,6 +1593,7 @@ online (e.g. EK-1145-OP-001) are much later.</p>
                 
                 <li><a href="https://fritzm.github.io/category/arcade-games.html">Arcade Games</a></li>
                 <li><a href="https://fritzm.github.io/category/math.html">Math</a></li>
+                <li><a href="https://fritzm.github.io/category/micros.html">Micros</a></li>
                 <li><a href="https://fritzm.github.io/category/pdp-11.html">PDP-11</a></li>
                 <li><a href="https://fritzm.github.io/category/programming.html">Programming</a></li>
                 <li><a href="https://fritzm.github.io/category/radios.html">Radios</a></li>
@@ -3143,7 +1625,7 @@ online (e.g. EK-1145-OP-001) are much later.</p>
     </div>     </div> 
 <footer>
 <br />
-<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2021</p>
+<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2022</p>
 </footer>
 
 </div> <!-- /container -->

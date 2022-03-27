@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>fritzm.github.io - BASIC-11 under RT11</title>
+    <meta name="description" content="">
+    <meta name="author" content="Fritz Mueller">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+    <script src="https://fritzm.github.io/theme/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="https://fritzm.github.io/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/local.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/pygments.css" rel="stylesheet">
+
+    <!-- Photoswipe -->
+    <link rel="stylesheet" href="https://fritzm.github.io/theme/photoswipe.css">
+    <link rel="stylesheet" href="https://fritzm.github.io/theme/default-skin/default-skin.css">
+    <script src="https://fritzm.github.io/theme/photoswipe.min.js"></script>
+    <script src="https://fritzm.github.io/theme/photoswipe-ui-default.min.js"></script>
+    <script src="https://fritzm.github.io/galleries.js"></script>
+    <script type="text/javascript">
+        var pswipe = function(gname, index) {
+            var pswpElement = document.querySelectorAll('.pswp')[0];
+            var items = galleries[gname];
+            var options = { index: index };
+            var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, options);
+            gallery.init();
+        };
+    </script>
+
+    <!-- So Firefox can bookmark->"abo this site" -->
+        <link href="https://fritzm.github.io/feeds/all.rss.xml" rel="alternate" title="fritzm.github.io" type="application/rss+xml">
+
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="navbar-inner">
+    <div class="container">
+
+         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+         </a>
+
+        <a class="brand" href="https://fritzm.github.io">fritzm.github.io</a>
+
+        <div class="nav-collapse">
+        <ul class="nav">
+            
+        </ul>
+        </div>
+        
+    </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="content">
+    <div class="row">
+
+        <div class="span9">
+    <div class='article'>
+        <div class="content-title">
+            <h1>BASIC-11 under RT11</h1>
+Sun 15 August 2021
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+        </div>
+	
+        <div><p>I figured it might be fun to play around a little bit with BASIC-11 under RT11 on the newly-restored
+PDP-11/34.  If I got that working, it could also be included on the RK05 RT11 disk image that I use regularly
+for demos on the larger PDP-11/45.</p>
+<p>The first thing to do was to find a compatible disk image and get it running under simh.  Bitsavers had
+<code>BASIC-11_V2.1_RX02.DSK.zip</code>, which would seem to fit the bill, but the contained image would not mount
+successfully on simh's RY device.  Looking through a dump of the image, there was an apparent "RT11A"
+signature, so that looked promising.  Tried <code>putr</code> under dosbox as well, but it would hang mounting the image.
+So, off to the cctalk mailing list for some advice...</p>
+<p>Glen Slick on the list first noticed a file size discrepancy:</p>
+<blockquote>
+<p>That BASIC.DSK image file has a size of 486,400 bytes. I don't know where that size would come from.</p>
+<p>A physical RX-02 floppy should have a sector size of 256 bytes, with 26 sectors per track, and 77 tracks,
+which would be a total of 512,512 bytes, or 505,856 bytes if the first physical track is ignored.</p>
+<p>Indeed, the other RX-02 floppy images available here do have a size of 505,856 bytes:
+http://www.bitsavers.org/bits/DEC/pdp11/floppyimages/rx02/</p>
+<p>Hmm, maybe that BASIC.DSK image file was created by something that only copied the initial allocated logical
+sectors and ignored unused logical sectors at the end of the floppy, and maybe PUTR doesn't handle disk
+image files that are not the expected full size?</p>
+<p>Example of padding the 486,400 byte BASIC.DSK image file to a size of 512,512 bytes on a Windows system:</p>
+<div class="highlight"><pre><span></span>FSUTIL FILE CREATENEW BLANK 26112
+COPY /B BASIC.DSK+BLANK TEST.DSK
+
+C:\PUTR&gt;DIR TEST.DSK
+Volume in drive C has no label.
+Volume Serial Number is 14CE-1A29
+Directory of C:\PUTR
+08/11/2021  12:55p             512,512 TEST.DSK
+
+C:\PUTR&gt;PUTR
+PUTR V2.01  Copyright (C) 1995-2001 by John Wilson &lt;wilson@dbit.com&gt;.
+All rights reserved.  See www.dbit.com for other DEC-related software.
+
+COPY mode is ASCII, SET COPY BINARY to change
+(C:\PUTR)&gt;MOUNT RX: TEST.DSK /RX02 /RT11 /RONLY
+(C:\PUTR)&gt;DIR RX:
+
+Volume in drive RX is RT11A
+Directory of RX:\*.*
+
+11-Aug-2021
+BSOT0D.EAE    12  04-Apr-1983
+BSOT0S.EAE    10  04-Apr-1983
+BSOT1D.EAE     9  04-Apr-1983
+BSOT1S.EAE     6  04-Apr-1983
+BSOT0D.EIS    12  04-Apr-1983
+...
+</pre></div>
+
+</blockquote>
+<p>...etc.  Nice.  Still no luck mounting under simh, though.  Glen further offers:</p>
+<blockquote>
+<p>As far as I can tell by default PUTR expects to work with logical sector order RX-02 disk images that are
+512,512 bytes in size. The BASIC-11 RX-02 disk image available here is in logical sector order, but is less
+than 512,512 bytes in size: http://www.bitsavers.org/bits/DEC/pdp11/floppyimages/rx02/ PUTR appears to be
+unhappy with the disk image unless it is padded to 512,512 bytes in size.</p>
+<p>On the other hand as far as I can tell by default SIMH expects to work with physical sector order RX-02 disk
+images. If I mount the logical sector order RX-02 disk image that works with PUTR in SIMH, then RT-11 gives
+a "?DIR-F-Invalid directory" error. If I translate the logical sector order RX-02 disk image back into a
+physical sector order disk image (dealing with track shifting, sector interleaving, and track to track
+sector skewing) then RT-11 on SIMH is happy with the disk image.</p>
+</blockquote>
+<p>and:</p>
+<blockquote>
+<p>One bit of information that I found helpful as a reference when I looked at this quite a while ago was the
+2.11BSD RX02 floppy disk device driver source code, which can be viewed online here:</p>
+<p>https://minnie.tuhs.org/cgi-bin/utree.pl?file=2.11BSD/sys/pdpuba/rx.c</p>
+<p>In particular, the routine rxfactr(), which as the comment says it calculates the physical sector and
+physical track on the disk for a given logical sector.</p>
+<p>I used that as a starting point to write a simple utility to read an RX-02 disk image file in logical sector
+order and output an RX-02 disk image file in physical sector order.</p>
+<div class="highlight"><pre><span></span><span class="cm">/*</span>
+<span class="cm">*  rxfactr -- calculates the physical sector and physical</span>
+<span class="cm">*  track on the disk for a given logical sector.</span>
+<span class="cm">*  call:</span>
+<span class="cm">*      rxfactr(logical_sector,&amp;p_sector,&amp;p_track);</span>
+<span class="cm">*  the logical sector number (0 - 2001) is converted</span>
+<span class="cm">*  to a physical sector number (1 - 26) and a physical</span>
+<span class="cm">*  track number (0 - 76).</span>
+<span class="cm">*  the logical sectors specify physical sectors that</span>
+<span class="cm">*  are interleaved with a factor of 2. thus the sectors</span>
+<span class="cm">*  are read in the following order for increasing</span>
+<span class="cm">*  logical sector numbers (1,3, ... 23,25,2,4, ... 24,26)</span>
+<span class="cm">*  There is also a 6 sector slew between tracks.</span>
+<span class="cm">*  Logical sectors start at track 1, sector 1; go to</span>
+<span class="cm">*  track 76 and then to track 0.  Thus, for example, unix block number</span>
+<span class="cm">*  498 starts at track 0, sector 25 and runs thru track 0, sector 2</span>
+<span class="cm">*  (or 6 depending on density).</span>
+<span class="cm">*/</span>
+<span class="k">static</span>
+<span class="nf">rxfactr</span><span class="p">(</span><span class="n">sectr</span><span class="p">,</span> <span class="n">psectr</span><span class="p">,</span> <span class="n">ptrck</span><span class="p">)</span>
+   <span class="k">register</span> <span class="kt">int</span> <span class="n">sectr</span><span class="p">;</span>
+   <span class="kt">int</span> <span class="o">*</span><span class="n">psectr</span><span class="p">,</span> <span class="o">*</span><span class="n">ptrck</span><span class="p">;</span>
+<span class="p">{</span>
+   <span class="k">register</span> <span class="kt">int</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">;</span>
+
+   <span class="n">p1</span> <span class="o">=</span> <span class="n">sectr</span> <span class="o">/</span> <span class="mi">26</span><span class="p">;</span>
+   <span class="n">p2</span> <span class="o">=</span> <span class="n">sectr</span> <span class="o">%</span> <span class="mi">26</span><span class="p">;</span>
+   <span class="cm">/* 2 to 1 interleave */</span>
+   <span class="n">p2</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">p2</span> <span class="o">+</span> <span class="p">(</span><span class="n">p2</span> <span class="o">&gt;=</span> <span class="mi">13</span> <span class="o">?</span>  <span class="mi">1</span> <span class="o">:</span> <span class="mi">0</span><span class="p">))</span> <span class="o">%</span> <span class="mi">26</span><span class="p">;</span>
+   <span class="cm">/* 6 sector per track slew */</span>
+   <span class="o">*</span><span class="n">psectr</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">p2</span> <span class="o">+</span> <span class="mi">6</span> <span class="o">*</span> <span class="n">p1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">26</span><span class="p">;</span>
+   <span class="k">if</span> <span class="p">(</span><span class="o">++</span><span class="n">p1</span> <span class="o">&gt;=</span> <span class="mi">77</span><span class="p">)</span>
+       <span class="n">p1</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+   <span class="o">*</span><span class="n">ptrck</span> <span class="o">=</span> <span class="n">p1</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+</blockquote>
+<p>An RX02 image shuffled into physical sector order generated by Glen and suitable for use with simh is
+attached <a href="https://fritzm.github.io/PHYS.zip">here</a>.</p>
+<p>Jerry Weiss further suggested that the original, logically ordered image may work as is under simh if attached
+as an MSCP device rather than RX02.  This turns out also to be the case:</p>
+<blockquote>
+<blockquote>
+<p>On Fri, Aug 13, 2021 at 9:46 AM Jerry Weiss wrote:<br>
+Could you attach logical sector (block?) image as MSCP disk in SIMH?   Other than some minor image
+manipulation for removing track 0 if present, is there any reason this would not be readable?</p>
+</blockquote>
+<p>Hmm, it didn't occur to me to try that. Mounting the logical sector order RX-02 disk image, without any
+modification necessary, as a raw MSCP disk does indeed appear to work!</p>
+<div class="highlight"><pre><span></span>sim&gt; ATTACH RQ1 BASIC.DSK
+RQ1: &#39;BASIC.DSK&#39; Contains RT11 partitions
+1 valid partition, Type: V05, Sectors On Disk: 950
+
+sim&gt; SHOW RQ1
+RQ1     486KB, attached to BASIC.DSK, write locked
+       RD54, UNIT=1, autosize
+       RAW format
+
+.DIR DU1:
+
+BSOT0D.EAE    12  04-Apr-83      BSOT0S.EAE    10  04-Apr-83
+BSOT1D.EAE     9  04-Apr-83      BSOT1S.EAE     6  04-Apr-83
+BSOT0D.EIS    12  04-Apr-83      BSOT0S.EIS     9  04-Apr-83
+BSOT1D.EIS     9  04-Apr-83      BSOT1S.EIS     6  04-Apr-83
+BSOT0S.FIS     7  04-Apr-83      BSOT1S.FIS     6  04-Apr-83
+...
+</pre></div>
+
+</blockquote>
+<p>...etc.  Armed with the above, I was able to get BASIC-11 into an RT11 image in the Unibone card, and running
+on the new PDP-11/34.  Here's output from the <a href="https://rosettacode.org/wiki/Mandelbrot_set#DEC_BASIC-PLUS">DEC BASIC mandelbrot
+program</a> at rosetta code:</p>
+<p><img src='/images/pdp11/basic-mandel-output_thumbnail_tall.jpeg' title='BASIC-11 Mandelbrot program on a PDP-11/34, program output' onclick='pswipe("pdp11",103);'/>
+<img src='/images/pdp11/basic-mandel-list_thumbnail_tall.jpeg' title='BASIC-11 Mandelbrot program on a PDP-11/34, program listing' onclick='pswipe("pdp11",104);'/></p></div>
+	
+        <hr>
+
+    </div>
+        </div>
+        
+        <div class="span3">
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Site
+                </li>
+            
+                <li><a href="https://fritzm.github.io/archives.html">Archives</a>
+                <li><a href="https://fritzm.github.io/tags.html">Tags</a>
+
+
+
+                <li><a href="https://fritzm.github.io/feeds/all.rss.xml" rel="alternate">RSS feed</a></li>
+
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Categories
+                </li>
+                
+                <li><a href="https://fritzm.github.io/category/arcade-games.html">Arcade Games</a></li>
+                <li><a href="https://fritzm.github.io/category/math.html">Math</a></li>
+                <li><a href="https://fritzm.github.io/category/micros.html">Micros</a></li>
+                <li><a href="https://fritzm.github.io/category/pdp-11.html">PDP-11</a></li>
+                <li><a href="https://fritzm.github.io/category/programming.html">Programming</a></li>
+                <li><a href="https://fritzm.github.io/category/radios.html">Radios</a></li>
+                   
+            </ul>
+            </div>
+
+
+
+
+            <div class="social">
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Social
+                </li>
+           
+                <li><a href="http://facebook.com/fritzmueller">facebook</a></li>
+                <li><a href="http://twitter.com/infrafritz">twitter</a></li>
+                <li><a href="http://instagram.com/infrafritz">Instagram</a></li>
+                <li><a href="http://www.linkedin.com/pub/fritz-mueller/a/679/62/">LinkedIn</a></li>
+                <li><a href="http://jsfiddle.net/user/fritzm/fiddles/">JSFiddle</a></li>
+                <li><a href="https://github.com/fritzm">GitHub</a></li>
+            </ul>
+            </div>
+            </div>
+
+        </div>  
+    </div>     </div> 
+<footer>
+<br />
+<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2022</p>
+</footer>
+
+</div> <!-- /container -->
+
+<!-- Photoswipe -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="pswp__bg"></div>
+    <div class="pswp__scroll-wrap">
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="https://fritzm.github.io/theme/bootstrap-collapse.js"></script>
+ 
+</body>
+</html>

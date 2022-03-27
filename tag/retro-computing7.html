@@ -74,6 +74,127 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="https://fritzm.github.io/vt52.html"><h1>PDP-11/45: VT52</h1></a>
+Sun 03 January 2016
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p>Spent some time reviving a VT52 that I intend to use with the PDP-11.  This was a pretty nice eBay find. 
+There was some oxidation and flakiness with the connectors to the chargen ROM daughter card (I remember this
+being typical of VT52s even back in the day).  A little more difficult to track down were some flaky solder
+joints around the clock chip.  But, everything else seems to be in pretty good shape and its working well now!
+Here it is hooked up to a Linux VM on my macbook, compiling some LSST code to generate some output as a test
+drive:</p>
+<p><img src='/images/pdp11/vt52_thumbnail_tall.jpg' title='VT52 hooked up to a Linux VM for a test drive' onclick='pswipe("pdp11",17);'/></p>
+<p>Man, seeing that funky font again, with its non-descending-descenders, is really great!  Surprisingly, it
+doesn't seem to be available in digital format anywhere, unlike the later VT100 fonts, etc.  Try as I might, I
+couldn't seem to find the chargen ROM listing in any of the DEC documentation archives, either.</p>
+<p>Well, I do have a Digilent FPGA eval card and some level conversion chips laying around, so as a holiday hack
+project I put together a quick ROM scanner in Verilog, interfaced it to the VT52 chargen on a breadboard, and
+scanned out the contents.  Here's a picture of the scanner in action, and the produced output:</p>
+<p><img src='/images/pdp11/rom-scanner_thumbnail_tall.jpg' title='Homemade FPGA ROM scanner used to read out the VT52 character generator ROM' onclick='pswipe("pdp11",18);'/></p>
+<p>The yellowish board on the right is the VT52 chargen.  The Verilog source for the scanner, the scanned data,
+and some preliminary attempts to convert the data to a few modern font formats are available on my github over
+at <a href="https://github.com/fritzm/vt52">https://github.com/fritzm/vt52</a>.  I need to learn some more about font formats to make some better font
+files; if I do I will update that repo.  Any help from fontophiles gladly accepted!</p></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
+        <a href="https://fritzm.github.io/backplane-and-logic.html"><h1>PDP-11/45: CPU Backplane and logic</h1></a>
+Fri 03 July 2015
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p>Mounted the CPU backplane, and slotted in the CPU and MMU logic cards.  The empty slots on the right are for
+the FPU -- I have those on hand but figure I'll wait to slot them until I've got the basic CPU up and running.</p>
+<p>One kind of interesting thing: the logic boards were stored vertically for several decades, and on some of the
+cards with plastic ribbon-cable connectors the plastic seems to have flaked and shed and fallen down the
+boards.  The flaky substance then grew some impressive crystals between some of the solder traces.  Scrubbed
+these out with some anhydrous IPA.</p>
+<p>A tip copied from a fellow restorer: Alconox detergent for removing grime from various plastic components. 
+Parts soaked overnight come out looking nearly new (here you can see the cleaned plastic card guides).</p>
+<p>Also pictured here are the characteristic bloody knuckles that are obtained whenever wrestling with PDP
+backplanes, logic cards, and terminators in close confines.  That really takes you back...</p>
+<p><img src='/images/pdp11/boards-in-chassis_thumbnail_tall.jpg' title='CPU and MMU logic installed.  Empty slots on the right are for the FPU.' onclick='pswipe("pdp11",13);'/>
+<img src='/images/pdp11/board-with-crystals_thumbnail_tall.jpg' title='Logic board with crystals after several decades of storage' onclick='pswipe("pdp11",14);'/>
+<img src='/images/pdp11/crystals_thumbnail_tall.jpg' title='Closeup of crystals on logic board' onclick='pswipe("pdp11",15);'/>
+<img src='/images/pdp11/knuckles_thumbnail_tall.jpg' title='The characteristic bloody knuckles that are obtained whenever wrestling with PDP backplanes, logic cards, and terminators in close confines' onclick='pswipe("pdp11",16);'/></p></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
+        <a href="https://fritzm.github.io/panel-and-742s.html"><h1>PDP-11/45: H742s and front panel</h1></a>
+Sun 21 June 2015
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p>The H742 supplies are now back together, mounted in the cabinet, and wired through to the 861.  I've powered
+them up and run them for minutes at a time (without any DC regulator loads) and there have been no surprise
+detonations...</p>
+<p>The repainted cabinet side door has also been remounted.</p>
+<p>Spent some time on the front panel as well.  Removed the tubular lock and took a trip to the local locksmith
+to have a new key made up.  Replaced all the incandescent indicator lamps with the closest modern equivalent. 
+Panel is now remounted and it's starting to look like a real '11!</p>
+<p><img src='/images/pdp11/742s-mounted_thumbnail_tall.jpg' title='H742s and CPU cabinet remounted' onclick='pswipe("pdp11",11);'/>
+<img src='/images/pdp11/front-panel_thumbnail_tall.jpg' title='Front panel remounted -- starting to look like a real PDP-11!' onclick='pswipe("pdp11",12);'/></p></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
+        <a href="https://fritzm.github.io/fans-and-h742s.html"><h1>PDP-11/45: AC power and cooling</h1></a>
+Sun 07 June 2015
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p>Spent a lot of time over a couple weekends cleaning and reconditioning all the muffin cooling fans for the CPU
+cabinet and power supplies.  As you can see in the photo below, there are a lot of these!  All reassembled
+now, and wired along with the back-of-cabinet power distribution board.  Also did a clean on the big box fan
+at the top of the rack, not seen here.</p>
+<p>I have also completely torn down the H742s to give them a thorough clean, touch up a few last corrosion spots,
+and replace the failing neon indicators.</p>
+<p><img src='/images/pdp11/chassis-with-fans_thumbnail_tall.jpg' title='CPU cabinet with restored cooling fans' onclick='pswipe("pdp11",9);'/>
+<img src='/images/pdp11/742-rebuild_thumbnail_tall.jpg' title='Deeper into the H742s for cleaning, sanding, and painting' onclick='pswipe("pdp11",10);'/></p></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
         <a href="https://fritzm.github.io/power-controllers.html"><h1>PDP-11/45: H742 power control boards</h1></a>
 Sat 23 May 2015
 
@@ -233,6 +354,7 @@ the RK05 drives on their rails temporarily to keep them off the floor and out of
                 
                 <li><a href="https://fritzm.github.io/category/arcade-games.html">Arcade Games</a></li>
                 <li><a href="https://fritzm.github.io/category/math.html">Math</a></li>
+                <li><a href="https://fritzm.github.io/category/micros.html">Micros</a></li>
                 <li><a href="https://fritzm.github.io/category/pdp-11.html">PDP-11</a></li>
                 <li><a href="https://fritzm.github.io/category/programming.html">Programming</a></li>
                 <li><a href="https://fritzm.github.io/category/radios.html">Radios</a></li>
@@ -264,7 +386,7 @@ the RK05 drives on their rails temporarily to keep them off the floor and out of
     </div>     </div> 
 <footer>
 <br />
-<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2021</p>
+<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2022</p>
 </footer>
 
 </div> <!-- /container -->

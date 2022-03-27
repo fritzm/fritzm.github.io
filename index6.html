@@ -74,6 +74,221 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="https://fritzm.github.io/diagnostics.html"><h1>PDP-11/45: Diagnostics with PDP11GUI</h1></a>
+Sun 03 July 2016
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p>Okay, now that serial is straightened out, on to running diagnostic tests via PDP11GUI.  PDP11GUI itself, as well as
+a thorough and useful database of DEC diagnostic programs, are available at <a href="http://www.retrocmp.com/tools">http://www.retrocmp.com/tools</a>.</p>
+<p>Since my home computer is a MacBook, I had intended to run PDP11GUI under Wine.  I ran into a problem with this where
+PDP11GUI under Wine could not generate its pre-processed machine description temp file, seemingly because of some
+incompatible behavior wrt. multiple backslashes in pathnames.  Rather than fight with this too long, I just sprang for
+a Windows 10 license and installed a Windows 10 VM; it will come in handy for other Windows-only tools that have
+been tweaky to use under Wine as well.</p>
+<p>With PDP11GUI up and running under Windows, results of the initial set of 11/45 CPU diagnostics were very encouraging!
+In summary:</p>
+<style>
+.diaglist { display: inline; border-collapse: collapse; margin-right: 1em; }
+.diaglist caption { font-weight: bold; }
+.diaglist tr:nth-child(even) { background-color: #f2f2f2; }
+.diaglist th, .diaglist td { padding: 5px; }
+.diaglist td { border: 1px solid lightgray; font-family: Menlo,Consolas,monospace; }
+</style>
+
+<table class="diaglist">
+<thead>
+<tr><th>Diagnostic</th><th>BEL</th><th>Description</th><th>Status</th></tr>
+</thead>
+<tbody>
+<tr><td>CKBAB0.BIC</td><td>002562</td><td>SXT instruction</td><td>pass</td></tr>
+<tr><td>CKBBB0.BIC</td><td>003604</td><td>SOB instruction</td><td>pass</td></tr>
+<tr><td>CKBCB0.BIC</td><td>007410</td><td>XOR instruction</td><td>pass</td></tr>
+<tr><td>CKBDC0.BIC</td><td>007262</td><td>MARK instruction</td><td>pass</td></tr>
+<tr><td>CKBEC0.BIC</td><td>002212</td><td>RTI/RTT instructions</td><td>pass</td></tr>
+<tr><td>CKBFD0.BIC</td><td>002272</td><td>stack limit</td><td>pass</td></tr>
+<tr><td>CKBGB0.BIC</td><td>001446</td><td>SPL instruction</td><td>halt 001404</td></tr>
+<tr><td>CKBHB0.BIC</td><td>003762</td><td>11/45 registers</td><td>pass</td></tr>
+<tr><td>CKBIB0.BIC</td><td>013746</td><td>ASH instruction</td><td>pass</td></tr>
+<tr><td>CKBJA0.BIC</td><td>014722</td><td>ASHC instruction</td><td>pass</td></tr>
+<tr><td>CKBKA0.BIC</td><td>014430</td><td>MUL instruction</td><td>pass</td></tr>
+<tr><td>CKBLA0.BIC</td><td>011574</td><td>DIV instruction</td><td>pass</td></tr>
+<tr><td>CKBME0.BIC</td><td>016000</td><td>11/45 traps</td><td>halt 005320</td></tr>
+<tr><td>CKBNC0.BIC</td><td>004702</td><td>PIRQ instruction</td><td>pass</td></tr>
+<tr><td>CKBOA0.BIC</td><td>013640</td><td>11/45 states</td><td>halt 000610</td></tr>
+</tbody>
+</table>
+
+<p>Note that these tests are written to output an ASCII BEL to the console on each successful pass.  The terminal
+built in to PDP11GUI doesn't sound when given a BEL, however, so it is convenient to patch the BEL literal in the
+programs to a visible character (e.g. 000052, ASCII '*') before running them.  This may be done in the memory loader
+window in PDP11GUI after "Load" but before "Deposit all".  The patch address I identified for each diagnostic is
+listed in the table above as well for convenience.</p>
+<p>So, out of this initial set of tests, only three halts to investigate.  I'll be posting more information here as I look
+further into these.</p>
+<p>Regarding the backplane SPC issue discussed in the previous post: Marty from the vcfed.org forum did some investigation
+of his 11/45, and reports that he does have +15V (actually +12V on his system) distributed to pin CU1 on slots
+26-28.  It seems to be wired over from slot 15 on his system, but it is not clear whether this was a factory wire,
+an ECO, or a user mod.</p>
+<p>Marty's 11/45 also has no power distributed to CA1 on this slots, so it's really looking to me like the reference
+to that on page 5-10 of the 11/45 maintenance manual is a misprint.  Thanks to Marty for checking all this out!  I'd be
+curious to hear from any other 11/45 owners out there regarding wiring of CU1 and CA1 on slots 26-28 in their systems.</p>
+<p><img src='/images/pdp11/pdp11gui_thumbnail_tall.jpg' title='PDP11GUI hooked up and running; ready to start downloading and running diagnostics' onclick='pswipe("pdp11",34);'/></p></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
+        <a href="https://fritzm.github.io/serial-console.html"><h1>PDP-11/45: Serial console and backplane SPC slots</h1></a>
+Sun 26 June 2016
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p>Hit a snag on the way to getting PDP11GUI hooked up: while the M9301 console emulator was working fine with the VT52,
+I could not get serial communication to my laptop (MacBook Pro + Keyspan USA-19HS USB serial) to work as expected.  Some
+detective work showed that the voltages from the EIA output drivers on the DL11 were way out of whack (+3V for mark,
+which should have been a negative voltage).  Somehow the VT52 was able to still make sense out of this signaling,
+though the laptop was not.</p>
+<p>Some investigation of power to the DL11, which was sitting in one of the backplane SPC slots (26-28), showed that there
+was no distribution of +15V to pin CU1 of these slots where the DL11 was expecting it.  So that explained the bad
+driver output voltages.  Moved the DL11 over to the DD11 expansion backplane which does have +15V to that pin, and
+serial to/from the laptop started working fine.</p>
+<p>So this raises a bit of a question about the SPC slots on the 11/45 backplane.  Was EIA console serial from these slots
+ever supported?  The configurations listed in the 11/45 engineering prints call out only DL11-A, the 20mA current
+loop version, which doesn't have EIA drivers and thus doesn't need the +15V supply, so maybe not.  Was +15V distribution
+perhaps added to these slots in subsequent revisions or via an ECO?  I'd like to track down a wire list for this or
+later revision 11/45 backplanes, and/or a comprehensive list of KB11-A ECOs, but so far haven't seen traces of either
+anywhere out there.</p>
+<p>One other curiosity of these SPC slots that came up while investigating this: the power distribution table in
+the 11/45 maintenance manual, EK-11045-MM-007, page 5-10, implies that +15V should be distributed to the SPC slots on
+CA1.  This is suspicious to me (maybe a typo?) because all other SPC pinouts that I have seen use this pin and CB1
+as NPR in/out.  And in checking my backplane, there is no power distribution to those pins.  But slots 27 and 28
+(Unibus B) do have their CA1 pins bridged to one another, and their CB1 pins bridged to one another, with what look like
+factory installed wire wraps.  This also seems unusual for NPR/NPG.  So, some mysteries remain about these slots...</p>
+<p>In other news, the clock oscillator on the VT52 has given out, so that's down now until I can find a replacement.  They
+are out of production and aren't easy to track down, but I do have one lead to follow so far.</p>
+<p>Also, I pulled the suspected failed subsidiary ALU control ROM, tested it in isolation, and verified that it had indeed
+failed.  This card is just a spare for me, but I'd like to go ahead and repair it since the fault is isolated.  With
+some help from the classiccmp mailing list (thanks guys!) I have a recommendation for some vintage PROM programmers to
+stalk on eBay, and some compatible parts, that would allow me to blow a replacement and make the repair.</p></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
+        <a href="https://fritzm.github.io/m9301-running.html"><h1>PDP-11/45: Running the M9301 console emulator</h1></a>
+Thu 23 June 2016
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p>Replacement DRAMs showed up.  Pulled and replaced the two faulty ones on the MS11.  Pic below -- you can see the
+replacements are socketed, and are the TI parts instead of the original ITT.  Full address space is working now!  Now
+that bank 0 is repaired, trap vectors can conceivably work.</p>
+<p>Jumpered and configured a DL11-E serial card for use as console, slotted in an M9301-YB bootstrap terminator, connected
+up the VT52, powered up, and off it goes straight to the console emulator!  That means the basic instruction set tests
+in the boot ROM are passing as well, which is great news.</p>
+<p>Next step will be to hook up PDP11GUI and load some more in-depth diagnostics, in order to shake out any
+remaining bugs with the CPU and memory system.  Will slot in the FPU at that point for testing and debug as well.</p>
+<p><img src='/images/pdp11/ms11-repaired_thumbnail_tall.jpg' title='MS11 with two bad 4116 RAMs pulled, socketed, and replaced' onclick='pswipe("pdp11",32);'/>
+<img src='/images/pdp11/m9301-running_thumbnail_tall.jpg' title='VT52 attached, and running now in the M9301 bootstrap monitor!' onclick='pswipe("pdp11",33);'/></p></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
+        <a href="https://fritzm.github.io/cpu-debug-5.html"><h1>PDP-11/45: CPU debug V -- chasing lights!</h1></a>
+Sun 19 June 2016
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p>Tracked down the source of the inverted result after register-to-register move problem on GRA: outputs of the
+subsidiary ALU control ROM E74 on pins 6 and 7 are floating.  Will need some closer inspection to determine if this
+is a board fault or a chip fault.  In the meantime, I have a spare GRA which I had been reluctant to try because it
+has a "bad" sticker on it...  Decided to give it a try anyway, and it seems to be working much better than the one I
+have been debugging.</p>
+<p>Now have enough of the CPU debugged to toggle in and run a simple light chaser program:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">000000</span>  <span class="nt">013700</span>  <span class="nt">177570</span>  <span class="nt">L0</span><span class="o">:</span>     <span class="nt">MOV</span>     <span class="o">@</span><span class="p">#</span><span class="nn">177570</span><span class="o">,</span> <span class="nt">R0</span>    <span class="o">;</span><span class="nt">LOAD</span> <span class="nt">COUNT</span> <span class="nt">FROM</span> <span class="nt">SWITCH</span> <span class="nt">REGISTER</span>
+<span class="nt">000004</span>  <span class="nt">005300</span>          <span class="nt">L1</span><span class="o">:</span>     <span class="nt">DEC</span>     <span class="nt">R0</span>              <span class="o">;</span><span class="nt">COUNT</span> <span class="nt">DOWN</span>
+<span class="nt">000006</span>  <span class="nt">001376</span>                  <span class="nt">BNE</span>     <span class="nt">L1</span>              <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">UNTIL</span> <span class="nt">ZERO</span>
+<span class="nt">000010</span>  <span class="nt">006301</span>                  <span class="nt">ASL</span>     <span class="nt">R1</span>              <span class="o">;</span><span class="nt">SHIFT</span> <span class="nt">DISPLAY</span> <span class="nt">VALUE</span>
+<span class="nt">000012</span>  <span class="nt">001002</span>                  <span class="nt">BNE</span>     <span class="nt">L2</span>              <span class="o">;</span><span class="nt">SKIP</span> <span class="nt">AHEAD</span> <span class="nt">IF</span> <span class="nt">NOT</span> <span class="nt">SHIFTED</span> <span class="nt">OUT</span>
+<span class="nt">000014</span>  <span class="nt">012701</span>  <span class="nt">000001</span>          <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">1</span><span class="o">,</span><span class="nt">R1</span>           <span class="o">;</span><span class="nt">ELSE</span> <span class="nt">RELOAD</span>
+<span class="nt">000020</span>  <span class="nt">010137</span>  <span class="nt">177570</span>  <span class="nt">L2</span><span class="o">:</span>     <span class="nt">MOV</span>     <span class="nt">R1</span><span class="o">,@</span><span class="p">#</span><span class="nn">177570</span>     <span class="o">;</span><span class="nt">STORE</span> <span class="nt">TO</span> <span class="nt">DISPLAY</span> <span class="nt">REGISTER</span>
+<span class="nt">000024</span>  <span class="nt">000765</span>                  <span class="nt">BR</span>      <span class="nt">L0</span>              <span class="o">;</span><span class="nt">REPEAT</span> <span class="nt">FROM</span> <span class="nt">THE</span> <span class="nt">TOP</span>
+</pre></div>
+</td></tr></table>
+<p><span class="videobox">
+                    <iframe width="640" height="390"
+                        src='https://www.youtube.com/embed/ZhuzC9v3q-k?rel=0'
+                        frameborder='0' webkitAllowFullScreen
+                        mozallowfullscreen allowFullScreen>
+                    </iframe>
+                </span></p>
+<p>Some notes on the program and video above since I've received some questions:</p>
+<ul>
+<li>
+<p>The listing here is shown assembled at location 000000, but the program is relocatable and can be toggled in at any
+convenient address (000000, on top of the trap vectors, probably isn't the best choice!)</p>
+</li>
+<li>
+<p>Data display should be on "DISPLAY REGISTER" to see the chase.</p>
+</li>
+<li>
+<p>The front panel toggles are loaded into a counter to control the speed of the chase.  Without some of the most
+significant bits set the chase may go too fast to see, especially on older 11's with incandescent indicators.  All
+toggles off is a special case: this will be the slowest chase, since as written the counter wraps around when
+decremented before being checked for zero.  The video has toggles 15 and 14 up.</p>
+</li>
+<li>
+<p>If you look at the address lights in the video, you can see that I ran this program from address 100000.  This was
+because at the time I had a fault in the first 16KW of memory on my MS11-L so I couldn't execute any code at lower
+addresses.</p>
+</li>
+</ul></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
         <a href="https://fritzm.github.io/ms11-debug.html"><h1>PDP-11/45: MS11-L debug</h1></a>
 Sat 18 June 2016
 
@@ -324,196 +539,6 @@ power distribution on the backplane before mounting and populating it...</p>
     <hr />
 </div>
     
-
-        
-
-<div class='article'>
-    <div class="content-title">
-        <a href="https://fritzm.github.io/power-harness-2.html"><h1>PDP-11/45: Power Harness, continued</h1></a>
-Sat 23 April 2016
-
-by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
- 
-    </div>
-    
-    <div><p>Moved the power modules and partial harness back over to the racks today, got everything remounted, finished
-and dressed the backplane terminations, and completed the inter-H742 connections.</p>
-<p>I did not do the runs for the backplane memory to the lower H742, as I do not have any backplane memory.  I
-probably won't ever have any, either: these memory options are specialized to the '11/45, are quite rare, and
-only cover part of the available address space.  Additionally, they would require me to track down the details
-of a backplane ECO to do the corresponding parts of the harness correctly.  The core and MOS memory that I do
-actually have are all system-unit options anyway.</p>
-<p>Here are some pics of the in-rack wiring in progress, and a couple views of the finished harness.  If you add
-up the capacity of the DC modules, you'll see that an '11/45 like mine (with floating point) is provisioned
-with +5V at 100 [sic] amps, and -15V at 20 amps.  That's no joke of a power supply...</p>
-<p><img src='/images/pdp11/harness-progress_thumbnail_tall.jpg' title='Finishing up the replacement power harness in the rack' onclick='pswipe("pdp11",24);'/>
-<img src='/images/pdp11/harness-complete_thumbnail_tall.jpg' title='Completed power harness from above rear' onclick='pswipe("pdp11",25);'/>
-<img src='/images/pdp11/power-supplies_thumbnail_tall.jpg' title='Completed power harness from side' onclick='pswipe("pdp11",26);'/></p></div>
-    <hr />
-</div>
-    
-
-        
-
-<div class='article'>
-    <div class="content-title">
-        <a href="https://fritzm.github.io/power-harness.html"><h1>PDP-11/45: Power Harness</h1></a>
-Sun 17 April 2016
-
-by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
- 
-    </div>
-    
-    <div><p>The main bit I'm missing from the '11/45 is the power distribution harness; somewhere over the years this was
-misplaced, or maybe I accidentally gave it away along with some excess '11/40 parts.  In any case, I haven't
-had any luck tracking one of these down (made extra difficult by the fact that my '11/45 is an early model
-which requires a slightly different harness than more recent models), so I'll have to build one myself from
-scratch.</p>
-<p>Luckily the required harness is pretty well documented in the engineering print sets.  The crimp pins are
-standard Mate-n-Lok still in production.  Some of the connectors are out of production, but they haven't been
-too hard to track down.</p>
-<p>Here are some pictures of the amassed wire of appropriate gauges and colors, connectors, crimp pins, and the
-start of the harness build on the bench:</p>
-<p><img src='/images/pdp11/harness-parts_thumbnail_tall.jpg' title='Wire, connectors, and crimp tool to get started on replacement power harness' onclick='pswipe("pdp11",22);'/>
-<img src='/images/pdp11/harness-bench_thumbnail_tall.jpg' title='Partially completed replacement power harness' onclick='pswipe("pdp11",23);'/></p></div>
-    <hr />
-</div>
-    
-
-        
-
-<div class='article'>
-    <div class="content-title">
-        <a href="https://fritzm.github.io/ebay-parts.html"><h1>PDP-11/45: Some parts from eBay</h1></a>
-Sat 09 April 2016
-
-by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
- 
-    </div>
-    
-    <div><p>I've been keeping an eye on eBay and have collected a few more goodies: a DD11-D nine-slot expansion
-backplane, a fully populated (128K x 18-bit) MS11-L MOS memory board, and a couple of replacement BC08-R
-cables for connecting the console to the CPU cards.  The MS11-L is a bit of a luxury; I am figuring it will be
-easier to deal with during bring-up than the core memory systems I have on hand.  It will also be nice to run
-with a full address space.</p>
-<p>Below is an updated shot of the CPU chassis with the expansion backplane installed, populated with bus
-jumpers, terminators, grant continuity cards, the MS11-L memory, a DL11 serial interface, and an M792-YB
-bootstrap ROM.  I've gone ahead and slotted in the FPU in the first four slots, since the cleaned and
-refurbished CPU cabinet is probably the safest place to store them now.  Console cables are also installed:</p>
-<p><img src='/images/pdp11/boards-in-chassis-2_thumbnail_tall.jpg' title='Backplane and expansion populated with CPU, MMU, FPU, bootstrap ROM, console serial, 256K RAM, grant continuity cards and terminators' onclick='pswipe("pdp11",19);'/></p>
-<p>The M792 ROM is an interesting bit, and probably worth a comment.  This is a 32-word diode-matrix ROM card. 
-The bits are physically laid out on the card (see pictures below); where there is a diode, there is a logical
-1 bit and where there is the absence of a diode there is a logical 0 bit.  Typically the matrix would be
-loaded with a bootstrap program, to save the operator from having to toggle it in from the console on each
-boot.</p>
-<p>The program could be modified by physically adding or removing diodes in the matrix.  My card has had such a
-mod; there is a handwritten note attached from some engineer describing this.  The mod customizes the
-bootstrap to always load from an RK disk unit, to avoid having to toggle in the device address at boot.  I
-will probably revert this mod because I like having things in fairly stock/usual condition.</p>
-<p><img src='/images/pdp11/mr11-with-note_thumbnail_tall.jpg' title='A modified M792-YB bootstrap ROM, with a vintage note attached' onclick='pswipe("pdp11",20);'/>
-<img src='/images/pdp11/mr11-bare_thumbnail_tall.jpg' title='M792-YB bootstrap ROM with note removed' onclick='pswipe("pdp11",21);'/></p>
-<p>For fun, here's the source listing of the stock bootstrap.  You can match the octal digits of the machine code
-against the diodes in the ROM above (low word addresses at the top of the matrix, and least-significant-bits
-on the left).</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">173100</span> <span class="nt">013701</span>         <span class="nt">MOV</span>     <span class="o">@</span><span class="p">#</span><span class="nn">177570</span><span class="o">,</span><span class="nt">R1</span>     <span class="o">;</span><span class="nt">READ</span> <span class="nt">SWITCH</span> <span class="nt">REG</span> <span class="nt">FOR</span> <span class="o">....</span>
-       <span class="nt">177570</span>
-<span class="nt">173104</span> <span class="nt">000005</span> <span class="nt">BEGIN</span><span class="o">:</span>  <span class="nt">RESET</span>                   <span class="o">;</span><span class="nt">FORCE</span> <span class="nt">CLEAR</span> <span class="nt">IF</span> <span class="nt">RETRY</span>
-<span class="nt">173106</span> <span class="nt">010100</span>         <span class="nt">MOV</span>     <span class="nt">R1</span><span class="o">,</span><span class="nt">R0</span>           <span class="o">;...</span><span class="p">.</span><span class="nc">DEVICE</span> <span class="nt">WC</span> <span class="nt">ADDRESS</span>
-<span class="nt">173110</span> <span class="nt">012710</span>         <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">-256</span><span class="o">,</span><span class="p">@</span><span class="k">R0</span>       <span class="p">;</span><span class="nt">SET</span> <span class="nt">TO</span> <span class="nt">READ</span> <span class="nt">256</span> <span class="nt">WORDS</span>
-       <span class="nt">177400</span>
-<span class="nt">173114</span> <span class="nt">020027</span>         <span class="nt">CMP</span>     <span class="nt">R0</span><span class="o">,</span><span class="p">#</span><span class="nn">177344</span>      <span class="o">;</span><span class="nt">IS</span> <span class="nt">IT</span> <span class="nt">DECTAPE</span><span class="o">?</span>
-       <span class="nt">177344</span>
-<span class="nt">173120</span> <span class="nt">001007</span>         <span class="nt">BNE</span>     <span class="nt">START</span>           <span class="o">;</span><span class="nt">NO</span><span class="o">.</span> <span class="nt">GO</span> <span class="nt">TO</span> <span class="nt">START</span>
-<span class="nt">173122</span> <span class="nt">012740</span>         <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">4002</span><span class="o">,</span><span class="nt">-</span><span class="o">(</span><span class="nt">R0</span><span class="o">)</span>     <span class="o">;</span><span class="nt">YES</span><span class="o">.</span> <span class="nt">MOVE</span> <span class="nt">TAPE</span> <span class="nt">TO</span> <span class="nt">FRONT</span>
-       <span class="nt">004002</span>
-<span class="nt">173126</span> <span class="nt">005710</span>         <span class="nt">TST</span>     <span class="p">@</span><span class="k">R0</span>             <span class="p">;</span><span class="nt">WAIT</span> <span class="nt">FOR</span> <span class="nt">ERROR</span><span class="o">!</span>
-<span class="nt">173130</span> <span class="nt">100376</span>         <span class="nt">BPL</span>     <span class="p">.</span><span class="nc">-2</span>
-<span class="nt">173132</span> <span class="nt">005740</span>         <span class="nt">TST</span>     <span class="nt">-</span><span class="o">(</span><span class="nt">R0</span><span class="o">)</span>           <span class="o">;</span><span class="nt">IS</span> <span class="nt">IT</span> <span class="nt">ENDZONE</span><span class="o">?</span>
-<span class="nt">173134</span> <span class="nt">100363</span>         <span class="nt">BPL</span>     <span class="nt">BEGIN</span>           <span class="o">;</span><span class="nt">NO</span><span class="o">.</span> <span class="nt">TRY</span> <span class="nt">AGAIN</span>
-<span class="nt">173136</span> <span class="nt">022020</span>         <span class="nt">CMP</span>     <span class="o">(</span><span class="nt">R0</span><span class="o">)+,(</span><span class="nt">R0</span><span class="o">)+</span>     <span class="o">;</span><span class="nt">ADJUST</span> <span class="nt">POINTER</span>
-<span class="nt">173140</span> <span class="nt">012740</span> <span class="nt">START</span><span class="o">:</span>  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">5</span><span class="o">,</span><span class="nt">-</span><span class="o">(</span><span class="nt">R0</span><span class="o">)</span>        <span class="o">;</span><span class="nt">NOW</span> <span class="nt">START</span> <span class="nt">ACTUAL</span> <span class="nt">READ</span>
-       <span class="nt">000005</span>
-<span class="nt">173144</span> <span class="nt">105710</span>         <span class="nt">TSTB</span>    <span class="p">@</span><span class="k">R0</span>             <span class="p">;</span><span class="nt">WAIT</span> <span class="nt">FOR</span> <span class="nt">DONE</span>
-<span class="nt">173146</span> <span class="nt">100376</span>         <span class="nt">BPL</span>     <span class="p">.</span><span class="nc">-2</span>
-<span class="nt">173150</span> <span class="nt">005710</span>         <span class="nt">TST</span>     <span class="p">@</span><span class="k">R0</span>             <span class="p">;</span><span class="nt">ERROR</span> <span class="nt">ENCOUNTERED</span><span class="o">?</span>
-<span class="nt">173152</span> <span class="nt">100754</span>         <span class="nt">BMI</span>     <span class="nt">BEGIN</span>           <span class="o">;</span><span class="nt">IF</span> <span class="nt">SO</span> <span class="nt">START</span> <span class="nt">OVER</span>
-<span class="nt">173154</span> <span class="nt">105010</span>         <span class="nt">CLRB</span>    <span class="p">@</span><span class="k">R0</span>             <span class="p">;</span><span class="nt">FOR</span> <span class="nt">DECTAPE</span><span class="o">,</span><span class="nt">STOP</span> <span class="nt">TRANSPORT</span>
-<span class="nt">173156</span> <span class="nt">000137</span>         <span class="nt">JMP</span>     <span class="o">@</span><span class="p">#</span><span class="nn">0</span>             <span class="o">;</span><span class="nt">GO</span> <span class="nt">TO</span> <span class="nt">ROUTINE</span> <span class="nt">LOADED</span>
-</pre></div>
-</td></tr></table>
-<p>Hmmm, the Pygments syntax highlighting package used by my blog generator doesn't seem to grok MACRO-11; may
-have to do something about that...</p></div>
-    <hr />
-</div>
-    
-
-        
-
-<div class='article'>
-    <div class="content-title">
-        <a href="https://fritzm.github.io/vt52.html"><h1>PDP-11/45: VT52</h1></a>
-Sun 03 January 2016
-
-by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
- 
-    </div>
-    
-    <div><p>Spent some time reviving a VT52 that I intend to use with the PDP-11.  This was a pretty nice eBay find. 
-There was some oxidation and flakiness with the connectors to the chargen ROM daughter card (I remember this
-being typical of VT52s even back in the day).  A little more difficult to track down were some flaky solder
-joints around the clock chip.  But, everything else seems to be in pretty good shape and its working well now!
-Here it is hooked up to a Linux VM on my macbook, compiling some LSST code to generate some output as a test
-drive:</p>
-<p><img src='/images/pdp11/vt52_thumbnail_tall.jpg' title='VT52 hooked up to a Linux VM for a test drive' onclick='pswipe("pdp11",17);'/></p>
-<p>Man, seeing that funky font again, with its non-descending-descenders, is really great!  Surprisingly, it
-doesn't seem to be available in digital format anywhere, unlike the later VT100 fonts, etc.  Try as I might, I
-couldn't seem to find the chargen ROM listing in any of the DEC documentation archives, either.</p>
-<p>Well, I do have a Digilent FPGA eval card and some level conversion chips laying around, so as a holiday hack
-project I put together a quick ROM scanner in Verilog, interfaced it to the VT52 chargen on a breadboard, and
-scanned out the contents.  Here's a picture of the scanner in action, and the produced output:</p>
-<p><img src='/images/pdp11/rom-scanner_thumbnail_tall.jpg' title='Homemade FPGA ROM scanner used to read out the VT52 character generator ROM' onclick='pswipe("pdp11",18);'/></p>
-<p>The yellowish board on the right is the VT52 chargen.  The Verilog source for the scanner, the scanned data,
-and some preliminary attempts to convert the data to a few modern font formats are available on my github over
-at <a href="https://github.com/fritzm/vt52">https://github.com/fritzm/vt52</a>.  I need to learn some more about font formats to make some better font
-files; if I do I will update that repo.  Any help from fontophiles gladly accepted!</p></div>
-    <hr />
-</div>
-    
 <div class="pagination">
 <ul>
     <li class="prev"><a href="https://fritzm.github.io/index5.html">&larr; Previous</a></li>
@@ -525,6 +550,7 @@ files; if I do I will update that repo.  Any help from fontophiles gladly accept
     <li class=""><a href="https://fritzm.github.io/index5.html">5</a></li>
     <li class="active"><a href="https://fritzm.github.io/index6.html">6</a></li>
     <li class=""><a href="https://fritzm.github.io/index7.html">7</a></li>
+    <li class=""><a href="https://fritzm.github.io/index8.html">8</a></li>
 
     <li class="next"><a href="https://fritzm.github.io/index7.html">Next &rarr;</a></li>
 
@@ -560,6 +586,7 @@ files; if I do I will update that repo.  Any help from fontophiles gladly accept
                 
                 <li><a href="https://fritzm.github.io/category/arcade-games.html">Arcade Games</a></li>
                 <li><a href="https://fritzm.github.io/category/math.html">Math</a></li>
+                <li><a href="https://fritzm.github.io/category/micros.html">Micros</a></li>
                 <li><a href="https://fritzm.github.io/category/pdp-11.html">PDP-11</a></li>
                 <li><a href="https://fritzm.github.io/category/programming.html">Programming</a></li>
                 <li><a href="https://fritzm.github.io/category/radios.html">Radios</a></li>
@@ -591,7 +618,7 @@ files; if I do I will update that repo.  Any help from fontophiles gladly accept
     </div>     </div> 
 <footer>
 <br />
-<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2021</p>
+<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2022</p>
 </footer>
 
 </div> <!-- /container -->

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>fritzm.github.io - Unibone</title>
+    <meta name="description" content="">
+    <meta name="author" content="Fritz Mueller">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+    <script src="https://fritzm.github.io/theme/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="https://fritzm.github.io/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/local.css" rel="stylesheet">
+    <link href="https://fritzm.github.io/theme/pygments.css" rel="stylesheet">
+
+    <!-- Photoswipe -->
+    <link rel="stylesheet" href="https://fritzm.github.io/theme/photoswipe.css">
+    <link rel="stylesheet" href="https://fritzm.github.io/theme/default-skin/default-skin.css">
+    <script src="https://fritzm.github.io/theme/photoswipe.min.js"></script>
+    <script src="https://fritzm.github.io/theme/photoswipe-ui-default.min.js"></script>
+    <script src="https://fritzm.github.io/galleries.js"></script>
+    <script type="text/javascript">
+        var pswipe = function(gname, index) {
+            var pswpElement = document.querySelectorAll('.pswp')[0];
+            var items = galleries[gname];
+            var options = { index: index };
+            var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, options);
+            gallery.init();
+        };
+    </script>
+
+    <!-- So Firefox can bookmark->"abo this site" -->
+        <link href="https://fritzm.github.io/feeds/all.rss.xml" rel="alternate" title="fritzm.github.io" type="application/rss+xml">
+
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="navbar-inner">
+    <div class="container">
+
+         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+         </a>
+
+        <a class="brand" href="https://fritzm.github.io">fritzm.github.io</a>
+
+        <div class="nav-collapse">
+        <ul class="nav">
+            
+        </ul>
+        </div>
+        
+    </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="content">
+    <div class="row">
+
+        <div class="span9">
+    <div class='article'>
+        <div class="content-title">
+            <h1>Unibone</h1>
+Wed 24 March 2021
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+        </div>
+	
+        <div><p>I have been keeping an eye on Jörg Hoppe's interesting <a href="http://retrocmp.com/projects/unibone">Unibone project</a>
+for some time -- it is a general-purpose Unibus device emulator and diagnostic tool, built around a
+<a href="https://beagleboard.org/black">BeagleBone Black</a> compute module running embedded real-time Linux. The
+PDP-11/34 restoration project finally provided enough impetus for me to pull the trigger on getting one.</p>
+<p>Sent Jörg an email to order a kit, which arrived some weeks later complete with bundled BeagleBone. The kit is
+pretty well thought-out and was enjoyable to put together.  Had to throw in a few of my own pin headers and
+jumpers to complete the assembly.  The only other small confusions were a few of the resistor packs which did
+not match the schematic (Jörg informed me these are non-critical values.)</p>
+<p>The kit did not include card handles.  I decided to try having some 3D printed by Shapeways, using their
+"processed versatile plastic" process, which is a laser sintered nylon, color dyed and smoothed.  I used a
+card handle model by Vince Slyngstad found <a href="https://so-much-stuff.com/pdp8/cad/3d.php">here</a>.  The results
+were nice, sturdy, and dimensionally correct. The chosen "purple" color is a rather intense magenta in real
+life.  Not exactly cheap for just a couple parts, but I had been wanting to try their print service.</p>
+<p><img src='/images/pdp11/unibone-kit_thumbnail_tall.jpeg' title='Unibone: unassembled kit' onclick='pswipe("pdp11",100);'/>
+<img src='/images/pdp11/unibone-handles_thumbnail_tall.jpeg' title='Unibone: 3d printed handles' onclick='pswipe("pdp11",101);'/>
+<img src='/images/pdp11/unibone-assembled_thumbnail_tall.jpeg' title='Unibone assembled' onclick='pswipe("pdp11",102);'/></p>
+<p>The Unibone has all sorts of capabilities, and proved itself <em>very</em> useful during the '11/34 restoration:</p>
+<ul>
+<li>
+<p>Ability to bus master to probe the Unibus address space and run diagnostics on memory found there.  This was
+  very useful for debugging the memory card that came with the -11/34 and sussing out its undocumented
+  configuration switch settings.</p>
+</li>
+<li>
+<p>Ability to directly load and execute MAINDEC diagnostics, without needing a functioning console emulator or
+  storage subsystem.  This is a convenient and speedier alternative to PDP11GUI.</p>
+</li>
+<li>
+<p>Subsequently, the ability to emulate entire storage subsystems, very useful for loading and running full
+  operating systems on this -11/34 which otherwise has no storage of its own.</p>
+</li>
+</ul>
+<p>The Unibone goes in a quad SPC slot; I opted for slot 9 on the -11/34, and this entailed removing the NPG
+jumper on the backplane there to allow the Unibone to bus master.  The device worked well straight-away after
+assembly.</p>
+<p>There are, alas, a couple small frustrations with the current design:</p>
+<ul>
+<li>
+<p>It is desireable to configure the Unibone and backplane to allow the Unibone to bus master and interrupt.
+  However, this leaves grant chain(s) open at boot until the Unibone's own embedded software can boot and take
+  control of the card (which takes on the order of a minute or so).  During this time the host system is
+  non-functional or may hang, and it needs to be subsequently reset (this reset can be scripted from the
+  Unibone, but all of this does significantly increase end-to-end boot time of the machine). It would be nice
+  if the Unibone had something like some normally-closed relays on the grant chains, to preserve grant
+  continuity until control is actively assumed.</p>
+</li>
+<li>
+<p>It would be desireable to be able to power the embedded BeagleBone in isolation, in place in a
+  system, without having to having to have the entire host system powered at the same time (e.g. for
+  maintenance of the Unibone's embedded software stack, maintenance of locally stored storage system media
+  images, etc.)  There is a relay on the Unibone which switches in Unibus power when available, but
+  unfortunately, the design is such that if the BeagleBone is also externally powered the relay remains
+  engaged when the host system is shut down.  This could lead to the BeagleBone trying to power then entire
+  Unibus via its 5V supply/connector, which could obviously be problematic...  For now it seems best just to
+  pull the card in order to run it in isolation, which is a little less than convenient.</p>
+</li>
+</ul>
+<p>That said, the designs and software are open source, and the card comes with some generous prototyping areas
+built right in, so some mods to address these issues could be a fun project.  All in all, Jörg has put
+together a fantasically useful bit of kit, and I'm certainly glad to have it in my toolbox!</p></div>
+	
+        <hr>
+
+    </div>
+        </div>
+        
+        <div class="span3">
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Site
+                </li>
+            
+                <li><a href="https://fritzm.github.io/archives.html">Archives</a>
+                <li><a href="https://fritzm.github.io/tags.html">Tags</a>
+
+
+
+                <li><a href="https://fritzm.github.io/feeds/all.rss.xml" rel="alternate">RSS feed</a></li>
+
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Categories
+                </li>
+                
+                <li><a href="https://fritzm.github.io/category/arcade-games.html">Arcade Games</a></li>
+                <li><a href="https://fritzm.github.io/category/math.html">Math</a></li>
+                <li><a href="https://fritzm.github.io/category/micros.html">Micros</a></li>
+                <li><a href="https://fritzm.github.io/category/pdp-11.html">PDP-11</a></li>
+                <li><a href="https://fritzm.github.io/category/programming.html">Programming</a></li>
+                <li><a href="https://fritzm.github.io/category/radios.html">Radios</a></li>
+                   
+            </ul>
+            </div>
+
+
+
+
+            <div class="social">
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                Social
+                </li>
+           
+                <li><a href="http://facebook.com/fritzmueller">facebook</a></li>
+                <li><a href="http://twitter.com/infrafritz">twitter</a></li>
+                <li><a href="http://instagram.com/infrafritz">Instagram</a></li>
+                <li><a href="http://www.linkedin.com/pub/fritz-mueller/a/679/62/">LinkedIn</a></li>
+                <li><a href="http://jsfiddle.net/user/fritzm/fiddles/">JSFiddle</a></li>
+                <li><a href="https://github.com/fritzm">GitHub</a></li>
+            </ul>
+            </div>
+            </div>
+
+        </div>  
+    </div>     </div> 
+<footer>
+<br />
+<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2022</p>
+</footer>
+
+</div> <!-- /container -->
+
+<!-- Photoswipe -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="pswp__bg"></div>
+    <div class="pswp__scroll-wrap">
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="https://fritzm.github.io/theme/bootstrap-collapse.js"></script>
+ 
+</body>
+</html>
