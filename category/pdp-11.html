@@ -186,7 +186,7 @@ of these have different clocking circuits unaffected by the default postion of S
 <p>After having addressed this, I single stepped through a few of the console microcode flows and was able to
 match the microcode listings to what was displayed on the KM11 and the console lights with some success.  An
 action shot of the KM11:</p>
-<p><img src='/images/pdp11/GT40-KM11_thumbnail_tall.JPG' title='GT40 system unit with KM11 replica board and microcode control board out on debug extender below.  The next microcode address is displayed in the bottom two rows of LEDs, with the LSB at the bottom right. Dark LEDs are logic 1, and lit are logic 0.  The next address displayed here is octal 316. From the microcode listings, we can see we are about to branch to micro-state CCS-1 (console continue switch), and can deduce that we are currently in micro-state H-2, about to branch out of the halt microcode loop to the continue switch handler.' onclick='pswipe("pdp11",110);'/></p>
+<p><img src='/images/pdp11/GT40-KM11_thumbnail_tall.jpg' title='GT40 system unit with KM11 replica board and microcode control board out on debug extender below.  The next microcode address is displayed in the bottom two rows of LEDs, with the LSB at the bottom right. Dark LEDs are logic 1, and lit are logic 0.  The next address displayed here is octal 316. From the microcode listings, we can see we are about to branch to micro-state CCS-1 (console continue switch), and can deduce that we are currently in micro-state H-2, about to branch out of the halt microcode loop to the continue switch handler.' onclick='pswipe("pdp11",110);'/></p>
 <p>A few tips for anybody else who might be micro-stepping the KD11-B CPU, while we are here:</p>
 <ul>
 <li>
