@@ -74,6 +74,32 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="https://fritzm.github.io/diagnostics-8.html"><h1>PDP-11/45: Diagnostics VIII - FP11 FPU</h1></a>
+Sat 03 September 2016
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p>Slotted in FP11 spares that I hadn't tried previously, and this has produced some improved results -- returning to
+diagnostic CKBME0 (11/45 traps) this now passes with the floating point installed.  Additionally, diagnostic
+CFPAB0 passes.</p>
+<p>CFPBB0 and CFPCD0, however, are failing.  Unfortunately, the source code for these is not available in the PDP-11
+diagnostics database at retrocmp.  The names of the diagnostics tell which instructions they are testing, though.
+CFPBB0 is annotated as testing the STST instruction.  Rather than work through disassembling the rather lengthy
+diagnostics, I'll probably just write some simple test programs around the STST instruction for next time.  In the
+meantime, I'll do some reading on the FP11 in preparation for microcode-step debug.</p></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
         <a href="https://fritzm.github.io/diagnostics-7.html"><h1>PDP-11/45: Diagnostics VII - KT11 MMU</h1></a>
 Sat 13 August 2016
 
@@ -198,39 +224,40 @@ patch locations, as described previously, are summarized here for future referen
 
 <p>Of the "CKB" series of tests, CKBOA0 (11/45 states) is the only one I that is not yet passing.  Looking into
 this a little further, the first failing sub-test is T65:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">010540</span> <span class="nt">010701</span>                  <span class="nt">T65</span><span class="o">:</span>    <span class="nt">SCOPE</span>                    <span class="o">;</span>
-<span class="nt">010542</span> <span class="nt">012737</span>  <span class="nt">030000</span>  <span class="nt">177776</span>          <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">PUM</span><span class="o">,@</span><span class="p">#</span><span class="nn">PSW</span>       <span class="o">;</span><span class="nt">KERNEL</span> <span class="nt">MODE</span><span class="o">,</span> <span class="nt">PREV</span> <span class="nt">USER</span> <span class="nt">MODE</span>
-<span class="nt">010550</span> <span class="nt">012706</span>  <span class="nt">000500</span>                  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">KPTR</span><span class="o">,</span><span class="nt">KSP</span>        <span class="o">;</span><span class="nt">SET</span> <span class="nt">KERNEL</span> <span class="nt">STACK</span> <span class="nt">POINTER</span>
-<span class="nt">010554</span> <span class="nt">012716</span>  <span class="nt">000700</span>                  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">UPTR</span><span class="o">,(</span><span class="nt">KSP</span><span class="o">)</span>
-<span class="nt">010560</span> <span class="nt">106606</span>                          <span class="nt">MTPD</span>    <span class="nt">USP</span>              <span class="o">;</span><span class="nt">SET</span> <span class="nt">USER</span> <span class="nt">STATCK</span> <span class="nt">POINTER</span>
-<span class="nt">010562</span> <span class="nt">005067</span>  <span class="nt">170110</span>                  <span class="nt">CLR</span>     <span class="nt">UPTR-2</span>
-<span class="nt">010566</span> <span class="nt">052737</span>  <span class="nt">140000</span>  <span class="nt">177776</span>          <span class="nt">BIS</span>     <span class="p">#</span><span class="nn">UM</span><span class="o">,@</span><span class="p">#</span><span class="nn">PSW</span>        <span class="o">;</span><span class="nt">USER</span> <span class="nt">MODE</span><span class="o">,</span> <span class="nt">PREV</span> <span class="nt">USER</span> <span class="nt">MODE</span>
-<span class="nt">010574</span> <span class="nt">106506</span>                          <span class="nt">MFPD</span>    <span class="nt">USP</span>              <span class="o">;</span><span class="nt">PUSH</span> <span class="nt">USER</span> <span class="nt">STACK</span> <span class="nt">POINTER</span> <span class="nt">ONTO</span> <span class="nt">USER</span> <span class="nt">STACK</span>
-<span class="nt">010576</span> <span class="nt">042737</span>  <span class="nt">140000</span>  <span class="nt">177776</span>          <span class="nt">BIC</span>     <span class="p">#</span><span class="nn">UM</span><span class="o">,@</span><span class="p">#</span><span class="nn">PSW</span>        <span class="o">;</span><span class="nt">KERNEL</span> <span class="nt">MODE</span><span class="o">,</span> <span class="nt">PREV</span> <span class="nt">USER</span> <span class="nt">MODE</span>
-<span class="nt">010604</span> <span class="nt">106506</span>                          <span class="nt">MFPD</span>    <span class="nt">USP</span>              <span class="o">;</span><span class="nt">PUSH</span> <span class="nt">USER</span> <span class="nt">STACK</span> <span class="nt">POINTER</span> <span class="nt">ONTO</span> <span class="nt">KERNEL</span> <span class="nt">STACK</span>
-<span class="nt">010606</span> <span class="nt">022716</span>  <span class="nt">000676</span>                  <span class="nt">CMP</span>     <span class="p">#</span><span class="nn">UPTR-2</span><span class="o">,(</span><span class="nt">KSP</span><span class="o">)</span>    <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">THAT</span> <span class="nt">USER</span> <span class="nt">STACK</span> <span class="nt">POINTER</span> <span class="nt">WAS</span>
-<span class="nt">010612</span> <span class="nt">001401</span>                          <span class="nt">BEQ</span>     <span class="o">.+</span><span class="nt">4</span>              <span class="o">;</span><span class="nt">PUSHED</span> <span class="nt">PROPERLY</span> <span class="o">(</span><span class="nt">ONCE</span><span class="o">)</span>
-<span class="nt">010614</span> <span class="nt">000000</span>                          <span class="nt">HLT</span>                      <span class="o">;</span><span class="nt">ERROR</span><span class="o">!</span>
-<span class="nt">010616</span> <span class="nt">022767</span>  <span class="nt">000700</span>  <span class="nt">170052</span>          <span class="nt">CMP</span>     <span class="p">#</span><span class="nn">UPTR</span><span class="o">,</span><span class="nt">UPTR-2</span>     <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">THAT</span> <span class="nt">USER</span> <span class="nt">STACK</span> <span class="nt">POINTER</span> <span class="nt">IS</span> <span class="nt">ON</span> <span class="nt">THE</span>
-<span class="nt">010624</span> <span class="nt">001401</span>                          <span class="nt">BEQ</span>     <span class="o">.+</span><span class="nt">4</span>              <span class="o">;</span><span class="nt">USERS</span> <span class="nt">STACK</span>
-<span class="nt">010626</span> <span class="nt">000000</span>                          <span class="nt">HLT</span>                      <span class="o">;</span><span class="nt">ERROR</span><span class="o">!</span>
-</pre></div>
-</td></tr></table>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span></pre></div></td><td class="code"><div><pre><span></span><span class="mf">010540</span><span class="w"> </span><span class="mf">010701</span><span class="w">                  </span><span class="n">T65</span><span class="p">:</span><span class="w">    </span><span class="n">SCOPE</span><span class="w">                    </span><span class="p">;</span>
+<span class="mf">010542</span><span class="w"> </span><span class="mf">012737</span><span class="w">  </span><span class="mf">030000</span><span class="w">  </span><span class="mf">177776</span><span class="w">          </span><span class="n">MOV</span><span class="w">     </span><span class="err">#</span><span class="n">PUM</span><span class="p">,</span><span class="err">@#</span><span class="n">PSW</span><span class="w">       </span><span class="p">;</span><span class="n">KERNEL</span><span class="w"> </span><span class="n">MODE</span><span class="p">,</span><span class="w"> </span><span class="n">PREV</span><span class="w"> </span><span class="n">USER</span><span class="w"> </span><span class="n">MODE</span>
+<span class="mf">010550</span><span class="w"> </span><span class="mf">012706</span><span class="w">  </span><span class="mf">000500</span><span class="w">                  </span><span class="n">MOV</span><span class="w">     </span><span class="err">#</span><span class="n">KPTR</span><span class="p">,</span><span class="n">KSP</span><span class="w">        </span><span class="p">;</span><span class="n">SET</span><span class="w"> </span><span class="n">KERNEL</span><span class="w"> </span><span class="n">STACK</span><span class="w"> </span><span class="n">POINTER</span>
+<span class="mf">010554</span><span class="w"> </span><span class="mf">012716</span><span class="w">  </span><span class="mf">000700</span><span class="w">                  </span><span class="n">MOV</span><span class="w">     </span><span class="err">#</span><span class="n">UPTR</span><span class="p">,(</span><span class="n">KSP</span><span class="p">)</span>
+<span class="mf">010560</span><span class="w"> </span><span class="mf">106606</span><span class="w">                          </span><span class="n">MTPD</span><span class="w">    </span><span class="n">USP</span><span class="w">              </span><span class="p">;</span><span class="n">SET</span><span class="w"> </span><span class="n">USER</span><span class="w"> </span><span class="n">STATCK</span><span class="w"> </span><span class="n">POINTER</span>
+<span class="mf">010562</span><span class="w"> </span><span class="mf">005067</span><span class="w">  </span><span class="mf">170110</span><span class="w">                  </span><span class="kr">CLR</span><span class="w">     </span><span class="n">UPTR</span><span class="o">-</span><span class="mf">2</span>
+<span class="mf">010566</span><span class="w"> </span><span class="mf">052737</span><span class="w">  </span><span class="mf">140000</span><span class="w">  </span><span class="mf">177776</span><span class="w">          </span><span class="n">BIS</span><span class="w">     </span><span class="err">#</span><span class="n">UM</span><span class="p">,</span><span class="err">@#</span><span class="n">PSW</span><span class="w">        </span><span class="p">;</span><span class="n">USER</span><span class="w"> </span><span class="n">MODE</span><span class="p">,</span><span class="w"> </span><span class="n">PREV</span><span class="w"> </span><span class="n">USER</span><span class="w"> </span><span class="n">MODE</span>
+<span class="mf">010574</span><span class="w"> </span><span class="mf">106506</span><span class="w">                          </span><span class="n">MFPD</span><span class="w">    </span><span class="n">USP</span><span class="w">              </span><span class="p">;</span><span class="n">PUSH</span><span class="w"> </span><span class="n">USER</span><span class="w"> </span><span class="n">STACK</span><span class="w"> </span><span class="n">POINTER</span><span class="w"> </span><span class="kr">ONTO</span><span class="w"> </span><span class="n">USER</span><span class="w"> </span><span class="n">STACK</span>
+<span class="mf">010576</span><span class="w"> </span><span class="mf">042737</span><span class="w">  </span><span class="mf">140000</span><span class="w">  </span><span class="mf">177776</span><span class="w">          </span><span class="n">BIC</span><span class="w">     </span><span class="err">#</span><span class="n">UM</span><span class="p">,</span><span class="err">@#</span><span class="n">PSW</span><span class="w">        </span><span class="p">;</span><span class="n">KERNEL</span><span class="w"> </span><span class="n">MODE</span><span class="p">,</span><span class="w"> </span><span class="n">PREV</span><span class="w"> </span><span class="n">USER</span><span class="w"> </span><span class="n">MODE</span>
+<span class="mf">010604</span><span class="w"> </span><span class="mf">106506</span><span class="w">                          </span><span class="n">MFPD</span><span class="w">    </span><span class="n">USP</span><span class="w">              </span><span class="p">;</span><span class="n">PUSH</span><span class="w"> </span><span class="n">USER</span><span class="w"> </span><span class="n">STACK</span><span class="w"> </span><span class="n">POINTER</span><span class="w"> </span><span class="kr">ONTO</span><span class="w"> </span><span class="n">KERNEL</span><span class="w"> </span><span class="n">STACK</span>
+<span class="mf">010606</span><span class="w"> </span><span class="mf">022716</span><span class="w">  </span><span class="mf">000676</span><span class="w">                  </span><span class="n">CMP</span><span class="w">     </span><span class="err">#</span><span class="n">UPTR</span><span class="o">-</span><span class="mf">2</span><span class="p">,(</span><span class="n">KSP</span><span class="p">)</span><span class="w">    </span><span class="p">;</span><span class="n">CHECK</span><span class="w"> </span><span class="n">THAT</span><span class="w"> </span><span class="n">USER</span><span class="w"> </span><span class="n">STACK</span><span class="w"> </span><span class="n">POINTER</span><span class="w"> </span><span class="n">WAS</span>
+<span class="mf">010612</span><span class="w"> </span><span class="mf">001401</span><span class="w">                          </span><span class="n">BEQ</span><span class="w">     </span><span class="mf">.</span><span class="o">+</span><span class="mf">4</span><span class="w">              </span><span class="p">;</span><span class="n">PUSHED</span><span class="w"> </span><span class="n">PROPERLY</span><span class="w"> </span><span class="p">(</span><span class="kr">ON</span><span class="n">CE</span><span class="p">)</span>
+<span class="mf">010614</span><span class="w"> </span><span class="mf">000000</span><span class="w">                          </span><span class="n">HLT</span><span class="w">                      </span><span class="p">;</span><span class="n">ERROR</span><span class="err">!</span>
+<span class="mf">010616</span><span class="w"> </span><span class="mf">022767</span><span class="w">  </span><span class="mf">000700</span><span class="w">  </span><span class="mf">170052</span><span class="w">          </span><span class="n">CMP</span><span class="w">     </span><span class="err">#</span><span class="n">UPTR</span><span class="p">,</span><span class="n">UPTR</span><span class="o">-</span><span class="mf">2</span><span class="w">     </span><span class="p">;</span><span class="n">CHECK</span><span class="w"> </span><span class="n">THAT</span><span class="w"> </span><span class="n">USER</span><span class="w"> </span><span class="n">STACK</span><span class="w"> </span><span class="n">POINTER</span><span class="w"> </span><span class="n">IS</span><span class="w"> </span><span class="kr">ON</span><span class="w"> </span><span class="n">THE</span>
+<span class="mf">010624</span><span class="w"> </span><span class="mf">001401</span><span class="w">                          </span><span class="n">BEQ</span><span class="w">     </span><span class="mf">.</span><span class="o">+</span><span class="mf">4</span><span class="w">              </span><span class="p">;</span><span class="n">USERS</span><span class="w"> </span><span class="n">STACK</span>
+<span class="mf">010626</span><span class="w"> </span><span class="mf">000000</span><span class="w">                          </span><span class="n">HLT</span><span class="w">                      </span><span class="p">;</span><span class="n">ERROR</span><span class="err">!</span>
+</pre></div></td></tr></table></div>
+
+
 <p>This runs amok on the MFPD instruction at 010574, which should push the user stack pointer onto the user stack.
 Instead, the user stack pointer is pushed to memory at an incorrect address; 010676 instead of 000676.  This actually
 overwrites subsequent test code. Since the value pushed is 000700, a hard-coded loop is created that prevents the
@@ -305,13 +332,14 @@ character written to the output buffer will be latched to the transmit shift reg
 go ready again almost immediately.</p>
 <p>I inserted the following code before the BIS/WAIT sequence in the original diagnostic (listed previously), which
 establishes consistent preconditions (shift register full, buffer empty) before the BIS.  Success rate went to 100%:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3</pre></div></td><td class="code"><div class="highlight"><pre><span></span>        <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">40</span><span class="o">,@</span><span class="p">#</span><span class="nn">177566</span>    <span class="o">;</span><span class="nt">ENSURE</span> <span class="nt">XMIT</span> <span class="nt">SHIFT</span> <span class="nt">REGISTER</span> <span class="nt">HAS</span> <span class="nt">SOMETHING</span> <span class="nt">TO</span> <span class="nt">CHEW</span> <span class="nt">ON</span>
-<span class="nt">L0</span><span class="o">:</span>     <span class="nt">TSTB</span>    <span class="o">@</span><span class="p">#</span><span class="nn">TTCSR</span>         <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">XMIT</span> <span class="nt">BUFFER</span>
-        <span class="nt">BPL</span>     <span class="nt">L0</span>              <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">UNTIL</span> <span class="nt">READY</span><span class="o">,</span> <span class="nt">ENSURES</span> <span class="nt">INT</span> <span class="nt">IMMEDIATELY</span> <span class="nt">AFTER</span> <span class="nt">BIS</span>
-</pre></div>
-</td></tr></table>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><span class="w">        </span><span class="nt">MOV</span><span class="w">     </span><span class="p">#</span><span class="nn">40</span><span class="o">,@</span><span class="p">#</span><span class="nn">177566</span><span class="w">    </span><span class="o">;</span><span class="nt">ENSURE</span><span class="w"> </span><span class="nt">XMIT</span><span class="w"> </span><span class="nt">SHIFT</span><span class="w"> </span><span class="nt">REGISTER</span><span class="w"> </span><span class="nt">HAS</span><span class="w"> </span><span class="nt">SOMETHING</span><span class="w"> </span><span class="nt">TO</span><span class="w"> </span><span class="nt">CHEW</span><span class="w"> </span><span class="nt">ON</span>
+<span class="nt">L0</span><span class="o">:</span><span class="w">     </span><span class="nt">TSTB</span><span class="w">    </span><span class="o">@</span><span class="p">#</span><span class="nn">TTCSR</span><span class="w">         </span><span class="o">;</span><span class="nt">CHECK</span><span class="w"> </span><span class="nt">XMIT</span><span class="w"> </span><span class="nt">BUFFER</span>
+<span class="w">        </span><span class="nt">BPL</span><span class="w">     </span><span class="nt">L0</span><span class="w">              </span><span class="o">;</span><span class="nt">LOOP</span><span class="w"> </span><span class="nt">UNTIL</span><span class="w"> </span><span class="nt">READY</span><span class="o">,</span><span class="w"> </span><span class="nt">ENSURES</span><span class="w"> </span><span class="nt">INT</span><span class="w"> </span><span class="nt">IMMEDIATELY</span><span class="w"> </span><span class="nt">AFTER</span><span class="w"> </span><span class="nt">BIS</span>
+</pre></div></td></tr></table></div>
+
+
 <p>I then further verified that the unmodified original diagnostic suite passes 100% if I turn the M7800 down to 4800
 Baud.  Worth noting when trying to run these older diagnostics!</p></div>
     <hr />
@@ -360,67 +388,68 @@ by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">F
     <div><p>Okay, digging into the CKBME0 traps diagnostic now in more detail.  Here I've transcribed the source of the failing
 test from the older available diagnostic listing, then re-assembled it at the address matching the more modern
 binary.  This makes it a little easier to follow along while debugging the newer binary:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">013604</span> <span class="nt">000230</span>                          <span class="nt">SPL</span>     <span class="nt">0</span>               <span class="o">;</span><span class="nt">SET</span> <span class="nt">PRIORITY</span> <span class="nt">LEVEL</span> <span class="nt">0</span>
-<span class="nt">013606</span> <span class="nt">012706</span>  <span class="nt">000500</span>                  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">STKPTR</span><span class="o">,%</span><span class="nt">6</span>      <span class="o">;</span><span class="nt">SET</span> <span class="nt">STACK</span> <span class="nt">PTR</span>
-<span class="nt">013612</span> <span class="nt">012737</span>  <span class="nt">013650</span>  <span class="nt">000064</span>          <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">TTY7A</span><span class="o">,@</span><span class="p">#</span><span class="nn">TPVEC</span>  <span class="o">;</span><span class="nt">LOAD</span> <span class="nt">TTY</span> <span class="nt">INTERRUPT</span> <span class="nt">VECTOR</span>
-<span class="nt">013620</span> <span class="nt">012737</span>  <span class="nt">013644</span>  <span class="nt">000014</span>          <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">TTY7B</span><span class="o">,@</span><span class="p">#</span><span class="nn">BPTVEC</span> <span class="o">;</span><span class="nt">LOAD</span> <span class="s1">&#39;T&#39;</span> <span class="nt">BIT</span> <span class="nt">TRAP</span> <span class="nt">VECTOR</span>
-<span class="nt">013626</span> <span class="nt">005002</span>                          <span class="nt">CLR</span>     <span class="o">%</span><span class="nt">2</span>              <span class="o">;</span><span class="nt">CLEAR</span> <span class="nt">INDICATOR</span>
-<span class="nt">013630</span> <span class="nt">052737</span>  <span class="nt">000100</span>  <span class="nt">177564</span>          <span class="nt">BIS</span>     <span class="p">#</span><span class="nn">100</span><span class="o">,@</span><span class="p">#</span><span class="nn">TTCSR</span>    <span class="o">;</span><span class="nt">ALLOW</span> <span class="nt">INTERRUPT</span> <span class="nt">INTERRUPT</span> <span class="nt">OCCURS</span> <span class="nt">AFTER</span>
-                                                               <span class="o">;</span><span class="nt">THIS</span> <span class="nt">INSTRUCTION</span> <span class="o">&amp;</span> <span class="nt">BEFORE</span> <span class="nt">NEXT</span>
-<span class="nt">013636</span> <span class="nt">000001</span>                  <span class="nt">WAIT1</span><span class="o">:</span>  <span class="nt">WAIT</span>                    <span class="o">;</span><span class="nt">WAIT</span> <span class="nt">FOR</span> <span class="nt">AN</span> <span class="nt">INTERRUPT</span>
-<span class="nt">013640</span> <span class="nt">005202</span>                          <span class="nt">INC</span>     <span class="o">%</span><span class="nt">2</span>              <span class="o">;</span><span class="nt">INCREMENT</span> <span class="nt">INDICATOR</span>
-<span class="nt">013642</span> <span class="nt">000000</span>                          <span class="nt">HLT</span>                     <span class="o">;</span><span class="nt">ERROR</span><span class="o">!</span> <span class="nt">NO</span> <span class="s1">&#39;T&#39;</span> <span class="nt">TRAP</span> <span class="nt">AFTER</span> <span class="nt">INTERRUPT</span>
-<span class="nt">013644</span> <span class="nt">000000</span>                  <span class="nt">TTY7B</span><span class="o">:</span>  <span class="nt">HLT</span>                     <span class="o">;</span><span class="nt">ERROR</span><span class="o">!</span> <span class="s1">&#39;T&#39;</span> <span class="nt">BIT</span> <span class="nt">TRAPPED</span> <span class="nt">OUT</span> <span class="nt">OF</span> <span class="nt">WAIT</span>
-<span class="nt">013646</span> <span class="nt">000424</span>                          <span class="nt">BR</span>      <span class="nt">TTY7EX</span>          <span class="o">;</span><span class="nt">EXIT</span> <span class="nt">TEST</span>
-<span class="nt">013650</span> <span class="nt">012737</span>  <span class="nt">000040</span>  <span class="nt">177566</span>  <span class="nt">TTY7A</span><span class="o">:</span>  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">40</span><span class="o">,@</span><span class="p">#</span><span class="nn">177566</span>    <span class="o">;</span><span class="nt">TYPE</span> <span class="nt">SPACE</span> <span class="nt">CHAR</span>
-<span class="nt">013656</span> <span class="nt">012737</span>  <span class="nt">013674</span>  <span class="nt">000064</span>          <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">TTY7C</span><span class="o">,@</span><span class="p">#</span><span class="nn">TPVEC</span>  <span class="o">;</span><span class="nt">REPOSITION</span> <span class="nt">TTY</span> <span class="nt">INT</span> <span class="nt">VECTOR</span>
-<span class="nt">013664</span> <span class="nt">012766</span>  <span class="nt">000020</span>  <span class="nt">000002</span>          <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">20</span><span class="o">,</span><span class="nt">2</span><span class="o">(</span><span class="nt">6</span><span class="o">)</span>        <span class="o">;</span><span class="nt">PUT</span> <span class="s1">&#39;T&#39;</span> <span class="nt">BIT</span> <span class="nt">IN</span> <span class="nt">RETURN</span> <span class="nt">STATUS</span>
-<span class="nt">013672</span> <span class="nt">000006</span>                          <span class="nt">RTT</span>                     <span class="o">;</span><span class="nt">RETURN</span> <span class="nt">TO</span> <span class="nt">WAIT</span> <span class="nt">WITH</span> <span class="s1">&#39;T&#39;</span> <span class="nt">BIT</span> <span class="nt">SET</span>
-                                                               <span class="o">;</span><span class="nt">AND</span> <span class="nt">WAIT</span> <span class="nt">FOR</span> <span class="nt">TTY</span> <span class="nt">INTERRUPT</span> <span class="nt">WHEN</span> <span class="nt">NULL</span>
-                                                               <span class="o">;</span><span class="nt">CHARACTER</span> <span class="nt">IS</span> <span class="nt">TYPED</span>
-<span class="nt">013674</span> <span class="nt">012737</span>  <span class="nt">013716</span>  <span class="nt">000014</span>  <span class="nt">TTY7C</span><span class="o">:</span>  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">TTY7D</span><span class="o">,@</span><span class="p">#</span><span class="nn">BPTVEC</span> <span class="o">;</span><span class="nt">REPOINT</span> <span class="s1">&#39;T&#39;</span> <span class="nt">BIT</span> <span class="nt">TRAP</span> <span class="nt">VECTOR</span> <span class="nt">AFTER</span>
-                                                               <span class="o">;</span><span class="nt">TTY</span> <span class="nt">HAS</span> <span class="nt">INTERRUPTED</span>
-<span class="nt">013702</span> <span class="nt">005037</span>  <span class="nt">177564</span>                  <span class="nt">CLR</span>     <span class="o">@</span><span class="p">#</span><span class="nn">TTCSR</span>         <span class="o">;</span><span class="nt">DISABLE</span> <span class="nt">INTERRUPT</span> <span class="nt">ENABLE</span>
-<span class="nt">013706</span> <span class="nt">012737</span>  <span class="nt">000015</span>  <span class="nt">177566</span>          <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">15</span><span class="o">,@</span><span class="p">#</span><span class="nn">177566</span>
-<span class="nt">013714</span> <span class="nt">000006</span>                          <span class="nt">RTT</span>                     <span class="o">;</span><span class="nt">RETURN</span> <span class="nt">TO</span> <span class="nt">INST</span> <span class="nt">FOLLOWING</span> <span class="nt">WAIT</span> <span class="nt">WITH</span> <span class="s1">&#39;T&#39;</span>
-                                                               <span class="o">;</span><span class="nt">BIT</span> <span class="nt">SET</span>
-<span class="nt">013716</span> <span class="nt">000240</span>                  <span class="nt">TTY7D</span><span class="o">:</span>  <span class="nt">NOP</span>
-<span class="nt">013720</span> <span class="nt">012737</span>  <span class="nt">000016</span>  <span class="nt">000014</span>  <span class="nt">TTY7EX</span><span class="o">:</span> <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">BPTVEC</span><span class="o">+</span><span class="nt">2</span><span class="o">,@</span><span class="p">#</span><span class="nn">BPTVEC</span><span class="o">;</span><span class="nt">RESTORE</span> <span class="nt">VECTORS</span> <span class="nt">TO</span> <span class="nt">HALT</span> <span class="nt">AT</span>
-<span class="nt">013726</span> <span class="nt">012737</span>  <span class="nt">000066</span>  <span class="nt">000064</span>          <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">66</span><span class="o">,@</span><span class="p">#</span><span class="nn">TPVEC</span>     <span class="o">;</span><span class="nt">VECTOR</span> <span class="o">+</span><span class="nt">2</span>
-<span class="nt">013734</span> <span class="nt">005302</span>                          <span class="nt">DEC</span>     <span class="o">%</span><span class="nt">2</span>              <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">INDICATOR</span>
-<span class="nt">013736</span> <span class="nt">001401</span>                          <span class="nt">BEQ</span>     <span class="o">.+</span><span class="nt">4</span>
-<span class="nt">013740</span> <span class="nt">000000</span>                          <span class="nt">HLT</span>                     <span class="o">;</span><span class="nt">ERROR</span><span class="o">!</span> <span class="nt">DID</span> <span class="nt">NOT</span> <span class="nt">DO</span> <span class="nt">INC</span> <span class="nt">INST</span> <span class="nt">AFTER</span> <span class="nt">INTERRUPT</span>
-</pre></div>
-</td></tr></table>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span></pre></div></td><td class="code"><div><pre><span></span><span class="mf">013604</span><span class="w"> </span><span class="mf">000230</span><span class="w">                          </span><span class="n">SPL</span><span class="w">     </span><span class="mf">0</span><span class="w">               </span><span class="p">;</span><span class="n">SET</span><span class="w"> </span><span class="n">PRIORITY</span><span class="w"> </span><span class="n">LEVEL</span><span class="w"> </span><span class="mf">0</span>
+<span class="mf">013606</span><span class="w"> </span><span class="mf">012706</span><span class="w">  </span><span class="mf">000500</span><span class="w">                  </span><span class="n">MOV</span><span class="w">     </span><span class="err">#</span><span class="n">STKPTR</span><span class="p">,</span><span class="err">%</span><span class="mf">6</span><span class="w">      </span><span class="p">;</span><span class="n">SET</span><span class="w"> </span><span class="n">STACK</span><span class="w"> </span><span class="n">PTR</span>
+<span class="mf">013612</span><span class="w"> </span><span class="mf">012737</span><span class="w">  </span><span class="mf">013650</span><span class="w">  </span><span class="mf">000064</span><span class="w">          </span><span class="n">MOV</span><span class="w">     </span><span class="err">#</span><span class="n">TTY7A</span><span class="p">,</span><span class="err">@#</span><span class="n">TPVEC</span><span class="w">  </span><span class="p">;</span><span class="kr">LOAD</span><span class="w"> </span><span class="n">TTY</span><span class="w"> </span><span class="nb">INT</span><span class="n">ERRUPT</span><span class="w"> </span><span class="n">VECTOR</span>
+<span class="mf">013620</span><span class="w"> </span><span class="mf">012737</span><span class="w">  </span><span class="mf">013644</span><span class="w">  </span><span class="mf">000014</span><span class="w">          </span><span class="n">MOV</span><span class="w">     </span><span class="err">#</span><span class="n">TTY7B</span><span class="p">,</span><span class="err">@#</span><span class="n">BPTVEC</span><span class="w"> </span><span class="p">;</span><span class="kr">LOAD</span><span class="w"> </span><span class="err">&#39;</span><span class="n">T</span><span class="err">&#39;</span><span class="w"> </span><span class="n">BIT</span><span class="w"> </span><span class="n">TRAP</span><span class="w"> </span><span class="n">VECTOR</span>
+<span class="mf">013626</span><span class="w"> </span><span class="mf">005002</span><span class="w">                          </span><span class="kr">CLR</span><span class="w">     </span><span class="err">%</span><span class="mf">2</span><span class="w">              </span><span class="p">;</span><span class="n">CLEAR</span><span class="w"> </span><span class="n">INDICATOR</span>
+<span class="mf">013630</span><span class="w"> </span><span class="mf">052737</span><span class="w">  </span><span class="mf">000100</span><span class="w">  </span><span class="mf">177564</span><span class="w">          </span><span class="n">BIS</span><span class="w">     </span><span class="err">#</span><span class="mf">100</span><span class="p">,</span><span class="err">@#</span><span class="n">TTCSR</span><span class="w">    </span><span class="p">;</span><span class="n">ALLOW</span><span class="w"> </span><span class="nb">INT</span><span class="n">ERRUPT</span><span class="w"> </span><span class="nb">INT</span><span class="n">ERRUPT</span><span class="w"> </span><span class="n">OCCURS</span><span class="w"> </span><span class="n">AFTER</span>
+<span class="w">                                                               </span><span class="p">;</span><span class="n">THIS</span><span class="w"> </span><span class="n">INSTRUCTION</span><span class="w"> </span><span class="err">&amp;</span><span class="w"> </span><span class="n">BEFORE</span><span class="w"> </span><span class="kr">NEXT</span>
+<span class="mf">013636</span><span class="w"> </span><span class="mf">000001</span><span class="w">                  </span><span class="kr">WAIT</span><span class="mf">1</span><span class="p">:</span><span class="w">  </span><span class="kr">WAIT</span><span class="w">                    </span><span class="p">;</span><span class="kr">WAIT</span><span class="w"> </span><span class="kr">FOR</span><span class="w"> </span><span class="n">AN</span><span class="w"> </span><span class="nb">INT</span><span class="n">ERRUPT</span>
+<span class="mf">013640</span><span class="w"> </span><span class="mf">005202</span><span class="w">                          </span><span class="n">INC</span><span class="w">     </span><span class="err">%</span><span class="mf">2</span><span class="w">              </span><span class="p">;</span><span class="n">INCREMENT</span><span class="w"> </span><span class="n">INDICATOR</span>
+<span class="mf">013642</span><span class="w"> </span><span class="mf">000000</span><span class="w">                          </span><span class="n">HLT</span><span class="w">                     </span><span class="p">;</span><span class="n">ERROR</span><span class="err">!</span><span class="w"> </span><span class="n">NO</span><span class="w"> </span><span class="err">&#39;</span><span class="n">T</span><span class="err">&#39;</span><span class="w"> </span><span class="n">TRAP</span><span class="w"> </span><span class="n">AFTER</span><span class="w"> </span><span class="nb">INT</span><span class="n">ERRUPT</span>
+<span class="mf">013644</span><span class="w"> </span><span class="mf">000000</span><span class="w">                  </span><span class="n">TTY7B</span><span class="p">:</span><span class="w">  </span><span class="n">HLT</span><span class="w">                     </span><span class="p">;</span><span class="n">ERROR</span><span class="err">!</span><span class="w"> </span><span class="err">&#39;</span><span class="n">T</span><span class="err">&#39;</span><span class="w"> </span><span class="n">BIT</span><span class="w"> </span><span class="n">TRAPPED</span><span class="w"> </span><span class="n">OUT</span><span class="w"> </span><span class="n">OF</span><span class="w"> </span><span class="kr">WAIT</span>
+<span class="mf">013646</span><span class="w"> </span><span class="mf">000424</span><span class="w">                          </span><span class="n">BR</span><span class="w">      </span><span class="n">TTY7EX</span><span class="w">          </span><span class="p">;</span><span class="n">EXIT</span><span class="w"> </span><span class="n">TEST</span>
+<span class="mf">013650</span><span class="w"> </span><span class="mf">012737</span><span class="w">  </span><span class="mf">000040</span><span class="w">  </span><span class="mf">177566</span><span class="w">  </span><span class="n">TTY7A</span><span class="p">:</span><span class="w">  </span><span class="n">MOV</span><span class="w">     </span><span class="err">#</span><span class="mf">40</span><span class="p">,</span><span class="err">@#</span><span class="mf">177566</span><span class="w">    </span><span class="p">;</span><span class="n">TYPE</span><span class="w"> </span><span class="n">SPACE</span><span class="w"> </span><span class="n">CHAR</span>
+<span class="mf">013656</span><span class="w"> </span><span class="mf">012737</span><span class="w">  </span><span class="mf">013674</span><span class="w">  </span><span class="mf">000064</span><span class="w">          </span><span class="n">MOV</span><span class="w">     </span><span class="err">#</span><span class="n">TTY7C</span><span class="p">,</span><span class="err">@#</span><span class="n">TPVEC</span><span class="w">  </span><span class="p">;</span><span class="n">REPOSITION</span><span class="w"> </span><span class="n">TTY</span><span class="w"> </span><span class="nb">INT</span><span class="w"> </span><span class="n">VECTOR</span>
+<span class="mf">013664</span><span class="w"> </span><span class="mf">012766</span><span class="w">  </span><span class="mf">000020</span><span class="w">  </span><span class="mf">000002</span><span class="w">          </span><span class="n">MOV</span><span class="w">     </span><span class="err">#</span><span class="mf">20</span><span class="p">,</span><span class="mf">2</span><span class="p">(</span><span class="mf">6</span><span class="p">)</span><span class="w">        </span><span class="p">;</span><span class="n">PUT</span><span class="w"> </span><span class="err">&#39;</span><span class="n">T</span><span class="err">&#39;</span><span class="w"> </span><span class="n">BIT</span><span class="w"> </span><span class="n">IN</span><span class="w"> </span><span class="kr">RETURN</span><span class="w"> </span><span class="n">STATUS</span>
+<span class="mf">013672</span><span class="w"> </span><span class="mf">000006</span><span class="w">                          </span><span class="n">RTT</span><span class="w">                     </span><span class="p">;</span><span class="kr">RETURN</span><span class="w"> </span><span class="kr">TO</span><span class="w"> </span><span class="kr">WAIT</span><span class="w"> </span><span class="n">WITH</span><span class="w"> </span><span class="err">&#39;</span><span class="n">T</span><span class="err">&#39;</span><span class="w"> </span><span class="n">BIT</span><span class="w"> </span><span class="n">SET</span>
+<span class="w">                                                               </span><span class="p">;</span><span class="ow">AND</span><span class="w"> </span><span class="kr">WAIT</span><span class="w"> </span><span class="kr">FOR</span><span class="w"> </span><span class="n">TTY</span><span class="w"> </span><span class="nb">INT</span><span class="n">ERRUPT</span><span class="w"> </span><span class="n">WHEN</span><span class="w"> </span><span class="n">NULL</span>
+<span class="w">                                                               </span><span class="p">;</span><span class="n">CHARACTER</span><span class="w"> </span><span class="n">IS</span><span class="w"> </span><span class="n">TYPED</span>
+<span class="mf">013674</span><span class="w"> </span><span class="mf">012737</span><span class="w">  </span><span class="mf">013716</span><span class="w">  </span><span class="mf">000014</span><span class="w">  </span><span class="n">TTY7C</span><span class="p">:</span><span class="w">  </span><span class="n">MOV</span><span class="w">     </span><span class="err">#</span><span class="n">TTY7D</span><span class="p">,</span><span class="err">@#</span><span class="n">BPTVEC</span><span class="w"> </span><span class="p">;</span><span class="n">REPOINT</span><span class="w"> </span><span class="err">&#39;</span><span class="n">T</span><span class="err">&#39;</span><span class="w"> </span><span class="n">BIT</span><span class="w"> </span><span class="n">TRAP</span><span class="w"> </span><span class="n">VECTOR</span><span class="w"> </span><span class="n">AFTER</span>
+<span class="w">                                                               </span><span class="p">;</span><span class="n">TTY</span><span class="w"> </span><span class="n">HAS</span><span class="w"> </span><span class="nb">INT</span><span class="n">ERRUPTED</span>
+<span class="mf">013702</span><span class="w"> </span><span class="mf">005037</span><span class="w">  </span><span class="mf">177564</span><span class="w">                  </span><span class="kr">CLR</span><span class="w">     </span><span class="err">@#</span><span class="n">TTCSR</span><span class="w">         </span><span class="p">;</span><span class="n">DISABLE</span><span class="w"> </span><span class="nb">INT</span><span class="n">ERRUPT</span><span class="w"> </span><span class="n">ENABLE</span>
+<span class="mf">013706</span><span class="w"> </span><span class="mf">012737</span><span class="w">  </span><span class="mf">000015</span><span class="w">  </span><span class="mf">177566</span><span class="w">          </span><span class="n">MOV</span><span class="w">     </span><span class="err">#</span><span class="mf">15</span><span class="p">,</span><span class="err">@#</span><span class="mf">177566</span>
+<span class="mf">013714</span><span class="w"> </span><span class="mf">000006</span><span class="w">                          </span><span class="n">RTT</span><span class="w">                     </span><span class="p">;</span><span class="kr">RETURN</span><span class="w"> </span><span class="kr">TO</span><span class="w"> </span><span class="n">INST</span><span class="w"> </span><span class="n">FOLLOWING</span><span class="w"> </span><span class="kr">WAIT</span><span class="w"> </span><span class="n">WITH</span><span class="w"> </span><span class="err">&#39;</span><span class="n">T</span><span class="err">&#39;</span>
+<span class="w">                                                               </span><span class="p">;</span><span class="n">BIT</span><span class="w"> </span><span class="n">SET</span>
+<span class="mf">013716</span><span class="w"> </span><span class="mf">000240</span><span class="w">                  </span><span class="n">TTY7D</span><span class="p">:</span><span class="w">  </span><span class="n">NOP</span>
+<span class="mf">013720</span><span class="w"> </span><span class="mf">012737</span><span class="w">  </span><span class="mf">000016</span><span class="w">  </span><span class="mf">000014</span><span class="w">  </span><span class="n">TTY7EX</span><span class="p">:</span><span class="w"> </span><span class="n">MOV</span><span class="w">     </span><span class="err">#</span><span class="n">BPTVEC</span><span class="o">+</span><span class="mf">2</span><span class="p">,</span><span class="err">@#</span><span class="n">BPTVEC</span><span class="p">;</span><span class="kd">RESTORE</span><span class="w"> </span><span class="n">VECTORS</span><span class="w"> </span><span class="kr">TO</span><span class="w"> </span><span class="n">HALT</span><span class="w"> </span><span class="n">AT</span>
+<span class="mf">013726</span><span class="w"> </span><span class="mf">012737</span><span class="w">  </span><span class="mf">000066</span><span class="w">  </span><span class="mf">000064</span><span class="w">          </span><span class="n">MOV</span><span class="w">     </span><span class="err">#</span><span class="mf">66</span><span class="p">,</span><span class="err">@#</span><span class="n">TPVEC</span><span class="w">     </span><span class="p">;</span><span class="n">VECTOR</span><span class="w"> </span><span class="o">+</span><span class="mf">2</span>
+<span class="mf">013734</span><span class="w"> </span><span class="mf">005302</span><span class="w">                          </span><span class="n">DEC</span><span class="w">     </span><span class="err">%</span><span class="mf">2</span><span class="w">              </span><span class="p">;</span><span class="n">CHECK</span><span class="w"> </span><span class="n">INDICATOR</span>
+<span class="mf">013736</span><span class="w"> </span><span class="mf">001401</span><span class="w">                          </span><span class="n">BEQ</span><span class="w">     </span><span class="mf">.</span><span class="o">+</span><span class="mf">4</span>
+<span class="mf">013740</span><span class="w"> </span><span class="mf">000000</span><span class="w">                          </span><span class="n">HLT</span><span class="w">                     </span><span class="p">;</span><span class="n">ERROR</span><span class="err">!</span><span class="w"> </span><span class="n">DID</span><span class="w"> </span><span class="ow">NOT</span><span class="w"> </span><span class="n">DO</span><span class="w"> </span><span class="n">INC</span><span class="w"> </span><span class="n">INST</span><span class="w"> </span><span class="n">AFTER</span><span class="w"> </span><span class="nb">INT</span><span class="n">ERRUPT</span>
+</pre></div></td></tr></table></div>
+
+
 <p>This test seems to be designed to return from an interrupt handler to a WAIT instruction, with the T bit set in
 the PSW and a serial xmit interrupt pending.  It verifies that the WAIT still "waits" in this circumstance.  It also
 verifies that a trace trap <em>does</em> occur after the immediately following INC instruction when the xmit interrupt
@@ -599,34 +628,6 @@ stalk on eBay, and some compatible parts, that would allow me to blow a replacem
     <hr />
 </div>
     
-
-        
-
-<div class='article'>
-    <div class="content-title">
-        <a href="https://fritzm.github.io/m9301-running.html"><h1>PDP-11/45: Running the M9301 console emulator</h1></a>
-Thu 23 June 2016
-
-by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
- 
-    </div>
-    
-    <div><p>Replacement DRAMs showed up.  Pulled and replaced the two faulty ones on the MS11.  Pic below -- you can see the
-replacements are socketed, and are the TI parts instead of the original ITT.  Full address space is working now!  Now
-that bank 0 is repaired, trap vectors can conceivably work.</p>
-<p>Jumpered and configured a DL11-E serial card for use as console, slotted in an M9301-YB bootstrap terminator, connected
-up the VT52, powered up, and off it goes straight to the console emulator!  That means the basic instruction set tests
-in the boot ROM are passing as well, which is great news.</p>
-<p>Next step will be to hook up PDP11GUI and load some more in-depth diagnostics, in order to shake out any
-remaining bugs with the CPU and memory system.  Will slot in the FPU at that point for testing and debug as well.</p>
-<p><img src='/images/pdp11/ms11-repaired_thumbnail_tall.jpg' title='MS11 with two bad 4116 RAMs pulled, socketed, and replaced' onclick='pswipe("pdp11",32);'/>
-<img src='/images/pdp11/m9301-running_thumbnail_tall.jpg' title='VT52 attached, and running now in the M9301 bootstrap monitor!' onclick='pswipe("pdp11",33);'/></p></div>
-    <hr />
-</div>
-    
 <div class="pagination">
 <ul>
     <li class="prev"><a href="https://fritzm.github.io/tag/retro-computing4.html">&larr; Previous</a></li>
@@ -705,7 +706,7 @@ remaining bugs with the CPU and memory system.  Will slot in the FPU at that poi
     </div>     </div> 
 <footer>
 <br />
-<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2022</p>
+<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2023</p>
 </footer>
 
 </div> <!-- /container -->

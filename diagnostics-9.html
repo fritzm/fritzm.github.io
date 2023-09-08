@@ -96,25 +96,26 @@ RC clock.</p>
 </li>
 </ul>
 <p>Okay, so here's my first simple test program for STST:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6
-7
-8
-9</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">000000</span>                          <span class="nt">AC0</span><span class="o">=%</span><span class="nt">0</span>
-<span class="nt">000000</span>                          <span class="p">.</span><span class="nc">ASECT</span>
-<span class="nt">001000</span>                          <span class="o">.=</span><span class="nt">1000</span>
-<span class="nt">001000</span>  <span class="nt">170127</span>  <span class="nt">044000</span>  <span class="nt">START</span><span class="o">:</span>  <span class="nt">LDFPS</span>   <span class="p">#</span><span class="nn">044000</span>         <span class="o">;</span><span class="nt">FID</span><span class="o">+</span><span class="nt">FIUV</span>
-<span class="nt">001004</span>  <span class="nt">172467</span>  <span class="nt">000004</span>          <span class="nt">LDF</span>     <span class="nt">NEGZ</span><span class="o">,</span><span class="nt">AC0</span>        <span class="o">;</span><span class="nt">LOAD</span> <span class="nt">A</span> <span class="nt">MINUS-ZERO</span>
-<span class="nt">001010</span>  <span class="nt">170300</span>                  <span class="nt">STST</span>    <span class="nt">R0</span>              <span class="o">;</span><span class="nt">STORE</span> <span class="nt">FEC</span> <span class="nt">TO</span> <span class="nt">R0</span>
-<span class="nt">001012</span>  <span class="nt">000000</span>                  <span class="nt">HALT</span>
-<span class="nt">001014</span>  <span class="nt">100000</span>  <span class="nt">000000</span>  <span class="nt">NEGZ</span><span class="o">:</span>   <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">100000</span><span class="o">,</span><span class="nt">000000</span>   <span class="o">;</span><span class="nt">MINUS-ZERO</span>
-<span class="nt">001000</span>                          <span class="p">.</span><span class="nc">END</span>    <span class="nt">START</span>
-</pre></div>
-</td></tr></table>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span>
+<span class="normal">9</span></pre></div></td><td class="code"><div><pre><span></span><span class="mf">000000</span><span class="w">                          </span><span class="n">AC0</span><span class="o">=</span><span class="err">%</span><span class="mf">0</span>
+<span class="mf">000000</span><span class="w">                          </span><span class="mf">.</span><span class="n">ASECT</span>
+<span class="mf">001000</span><span class="w">                          </span><span class="mf">.</span><span class="o">=</span><span class="mf">1000</span>
+<span class="mf">001000</span><span class="w">  </span><span class="mf">170127</span><span class="w">  </span><span class="mf">044000</span><span class="w">  </span><span class="n">START</span><span class="p">:</span><span class="w">  </span><span class="n">LDFPS</span><span class="w">   </span><span class="err">#</span><span class="mf">044000</span><span class="w">         </span><span class="p">;</span><span class="n">FID</span><span class="o">+</span><span class="n">FIUV</span>
+<span class="mf">001004</span><span class="w">  </span><span class="mf">172467</span><span class="w">  </span><span class="mf">000004</span><span class="w">          </span><span class="n">LDF</span><span class="w">     </span><span class="n">NEGZ</span><span class="p">,</span><span class="n">AC0</span><span class="w">        </span><span class="p">;</span><span class="kr">LOAD</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="n">MINUS</span><span class="o">-</span><span class="n">ZERO</span>
+<span class="mf">001010</span><span class="w">  </span><span class="mf">170300</span><span class="w">                  </span><span class="n">STST</span><span class="w">    </span><span class="n">R0</span><span class="w">              </span><span class="p">;</span><span class="n">STORE</span><span class="w"> </span><span class="n">FEC</span><span class="w"> </span><span class="kr">TO</span><span class="w"> </span><span class="n">R0</span>
+<span class="mf">001012</span><span class="w">  </span><span class="mf">000000</span><span class="w">                  </span><span class="n">HALT</span>
+<span class="mf">001014</span><span class="w">  </span><span class="mf">100000</span><span class="w">  </span><span class="mf">000000</span><span class="w">  </span><span class="n">NEGZ</span><span class="p">:</span><span class="w">   </span><span class="mf">.</span><span class="n">WORD</span><span class="w">   </span><span class="mf">100000</span><span class="p">,</span><span class="mf">000000</span><span class="w">   </span><span class="p">;</span><span class="n">MINUS</span><span class="o">-</span><span class="n">ZERO</span>
+<span class="mf">001000</span><span class="w">                          </span><span class="mf">.</span><span class="kr">END</span><span class="w">    </span><span class="n">START</span>
+</pre></div></td></tr></table></div>
+
+
 <p>This would be expected to produce the 000014 "Floating Undefined Variable" (minus-zero) exception code in R0, but I see
 an incorrect value of 177417.  Using the KM11 on the FPU shows the -0 trap and STST microstate flow is per expectation.</p>
 <p>Put the FRL out on the extender and started stepping the microcode, examining the state of the pins at the AC register
@@ -187,7 +188,7 @@ not.  Out of time this weekend; Will have to chase signals back through those pa
     </div>     </div> 
 <footer>
 <br />
-<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2022</p>
+<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2023</p>
 </footer>
 
 </div> <!-- /container -->

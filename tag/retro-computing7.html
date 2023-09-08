@@ -74,6 +74,100 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="https://fritzm.github.io/ebay-parts.html"><h1>PDP-11/45: Some parts from eBay</h1></a>
+Sat 09 April 2016
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p>I've been keeping an eye on eBay and have collected a few more goodies: a DD11-D nine-slot expansion
+backplane, a fully populated (128K x 18-bit) MS11-L MOS memory board, and a couple of replacement BC08-R
+cables for connecting the console to the CPU cards.  The MS11-L is a bit of a luxury; I am figuring it will be
+easier to deal with during bring-up than the core memory systems I have on hand.  It will also be nice to run
+with a full address space.</p>
+<p>Below is an updated shot of the CPU chassis with the expansion backplane installed, populated with bus
+jumpers, terminators, grant continuity cards, the MS11-L memory, a DL11 serial interface, and an M792-YB
+bootstrap ROM.  I've gone ahead and slotted in the FPU in the first four slots, since the cleaned and
+refurbished CPU cabinet is probably the safest place to store them now.  Console cables are also installed:</p>
+<p><img src='/images/pdp11/boards-in-chassis-2_thumbnail_tall.jpg' title='Backplane and expansion populated with CPU, MMU, FPU, bootstrap ROM, console serial, 256K RAM, grant continuity cards and terminators' onclick='pswipe("pdp11",19);'/></p>
+<p>The M792 ROM is an interesting bit, and probably worth a comment.  This is a 32-word diode-matrix ROM card. 
+The bits are physically laid out on the card (see pictures below); where there is a diode, there is a logical
+1 bit and where there is the absence of a diode there is a logical 0 bit.  Typically the matrix would be
+loaded with a bootstrap program, to save the operator from having to toggle it in from the console on each
+boot.</p>
+<p>The program could be modified by physically adding or removing diodes in the matrix.  My card has had such a
+mod; there is a handwritten note attached from some engineer describing this.  The mod customizes the
+bootstrap to always load from an RK disk unit, to avoid having to toggle in the device address at boot.  I
+will probably revert this mod because I like having things in fairly stock/usual condition.</p>
+<p><img src='/images/pdp11/mr11-with-note_thumbnail_tall.jpg' title='A modified M792-YB bootstrap ROM, with a vintage note attached' onclick='pswipe("pdp11",20);'/>
+<img src='/images/pdp11/mr11-bare_thumbnail_tall.jpg' title='M792-YB bootstrap ROM with note removed' onclick='pswipe("pdp11",21);'/></p>
+<p>For fun, here's the source listing of the stock bootstrap.  You can match the octal digits of the machine code
+against the diodes in the ROM above (low word addresses at the top of the matrix, and least-significant-bits
+on the left).</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span></pre></div></td><td class="code"><div><pre><span></span><span class="mf">173100</span><span class="w"> </span><span class="mf">013701</span><span class="w">         </span><span class="n">MOV</span><span class="w">     </span><span class="err">@#</span><span class="mf">177570</span><span class="p">,</span><span class="n">R1</span><span class="w">     </span><span class="p">;</span><span class="kr">READ</span><span class="w"> </span><span class="n">SWITCH</span><span class="w"> </span><span class="n">REG</span><span class="w"> </span><span class="kr">FOR</span><span class="w"> </span><span class="mf">....</span>
+<span class="w">       </span><span class="mf">177570</span>
+<span class="mf">173104</span><span class="w"> </span><span class="mf">000005</span><span class="w"> </span><span class="n">BEGIN</span><span class="p">:</span><span class="w">  </span><span class="n">RESET</span><span class="w">                   </span><span class="p">;</span><span class="kr">FOR</span><span class="n">CE</span><span class="w"> </span><span class="n">CLEAR</span><span class="w"> </span><span class="kr">IF</span><span class="w"> </span><span class="n">RETRY</span>
+<span class="mf">173106</span><span class="w"> </span><span class="mf">010100</span><span class="w">         </span><span class="n">MOV</span><span class="w">     </span><span class="n">R1</span><span class="p">,</span><span class="n">R0</span><span class="w">           </span><span class="p">;</span><span class="mf">....</span><span class="n">DEVICE</span><span class="w"> </span><span class="n">WC</span><span class="w"> </span><span class="n">ADDRESS</span>
+<span class="mf">173110</span><span class="w"> </span><span class="mf">012710</span><span class="w">         </span><span class="n">MOV</span><span class="w">     </span><span class="err">#</span><span class="o">-</span><span class="mf">256</span><span class="p">,</span><span class="err">@</span><span class="n">R0</span><span class="w">       </span><span class="p">;</span><span class="n">SET</span><span class="w"> </span><span class="kr">TO</span><span class="w"> </span><span class="kr">READ</span><span class="w"> </span><span class="mf">256</span><span class="w"> </span><span class="n">WORDS</span>
+<span class="w">       </span><span class="mf">177400</span>
+<span class="mf">173114</span><span class="w"> </span><span class="mf">020027</span><span class="w">         </span><span class="n">CMP</span><span class="w">     </span><span class="n">R0</span><span class="p">,</span><span class="err">#</span><span class="mf">177344</span><span class="w">      </span><span class="p">;</span><span class="n">IS</span><span class="w"> </span><span class="n">IT</span><span class="w"> </span><span class="n">DECTAPE</span><span class="err">?</span>
+<span class="w">       </span><span class="mf">177344</span>
+<span class="mf">173120</span><span class="w"> </span><span class="mf">001007</span><span class="w">         </span><span class="n">BNE</span><span class="w">     </span><span class="n">START</span><span class="w">           </span><span class="p">;</span><span class="n">NO</span><span class="mf">.</span><span class="w"> </span><span class="kr">GO</span><span class="w"> </span><span class="kr">TO</span><span class="w"> </span><span class="n">START</span>
+<span class="mf">173122</span><span class="w"> </span><span class="mf">012740</span><span class="w">         </span><span class="n">MOV</span><span class="w">     </span><span class="err">#</span><span class="mf">4002</span><span class="p">,</span><span class="o">-</span><span class="p">(</span><span class="n">R0</span><span class="p">)</span><span class="w">     </span><span class="p">;</span><span class="n">YES</span><span class="mf">.</span><span class="w"> </span><span class="n">MOVE</span><span class="w"> </span><span class="n">TAPE</span><span class="w"> </span><span class="kr">TO</span><span class="w"> </span><span class="n">FRONT</span>
+<span class="w">       </span><span class="mf">004002</span>
+<span class="mf">173126</span><span class="w"> </span><span class="mf">005710</span><span class="w">         </span><span class="n">TST</span><span class="w">     </span><span class="err">@</span><span class="n">R0</span><span class="w">             </span><span class="p">;</span><span class="kr">WAIT</span><span class="w"> </span><span class="kr">FOR</span><span class="w"> </span><span class="n">ERROR</span><span class="err">!</span>
+<span class="mf">173130</span><span class="w"> </span><span class="mf">100376</span><span class="w">         </span><span class="n">BPL</span><span class="w">     </span><span class="mf">.</span><span class="o">-</span><span class="mf">2</span>
+<span class="mf">173132</span><span class="w"> </span><span class="mf">005740</span><span class="w">         </span><span class="n">TST</span><span class="w">     </span><span class="o">-</span><span class="p">(</span><span class="n">R0</span><span class="p">)</span><span class="w">           </span><span class="p">;</span><span class="n">IS</span><span class="w"> </span><span class="n">IT</span><span class="w"> </span><span class="kr">END</span><span class="n">ZONE</span><span class="err">?</span>
+<span class="mf">173134</span><span class="w"> </span><span class="mf">100363</span><span class="w">         </span><span class="n">BPL</span><span class="w">     </span><span class="n">BEGIN</span><span class="w">           </span><span class="p">;</span><span class="n">NO</span><span class="mf">.</span><span class="w"> </span><span class="n">TRY</span><span class="w"> </span><span class="n">AGAIN</span>
+<span class="mf">173136</span><span class="w"> </span><span class="mf">022020</span><span class="w">         </span><span class="n">CMP</span><span class="w">     </span><span class="p">(</span><span class="n">R0</span><span class="p">)</span><span class="o">+</span><span class="p">,(</span><span class="n">R0</span><span class="p">)</span><span class="o">+</span><span class="w">     </span><span class="p">;</span><span class="n">ADJUST</span><span class="w"> </span><span class="n">POINTER</span>
+<span class="mf">173140</span><span class="w"> </span><span class="mf">012740</span><span class="w"> </span><span class="n">START</span><span class="p">:</span><span class="w">  </span><span class="n">MOV</span><span class="w">     </span><span class="err">#</span><span class="mf">5</span><span class="p">,</span><span class="o">-</span><span class="p">(</span><span class="n">R0</span><span class="p">)</span><span class="w">        </span><span class="p">;</span><span class="n">NOW</span><span class="w"> </span><span class="n">START</span><span class="w"> </span><span class="n">ACTUAL</span><span class="w"> </span><span class="kr">READ</span>
+<span class="w">       </span><span class="mf">000005</span>
+<span class="mf">173144</span><span class="w"> </span><span class="mf">105710</span><span class="w">         </span><span class="n">TSTB</span><span class="w">    </span><span class="err">@</span><span class="n">R0</span><span class="w">             </span><span class="p">;</span><span class="kr">WAIT</span><span class="w"> </span><span class="kr">FOR</span><span class="w"> </span><span class="n">DONE</span>
+<span class="mf">173146</span><span class="w"> </span><span class="mf">100376</span><span class="w">         </span><span class="n">BPL</span><span class="w">     </span><span class="mf">.</span><span class="o">-</span><span class="mf">2</span>
+<span class="mf">173150</span><span class="w"> </span><span class="mf">005710</span><span class="w">         </span><span class="n">TST</span><span class="w">     </span><span class="err">@</span><span class="n">R0</span><span class="w">             </span><span class="p">;</span><span class="n">ERROR</span><span class="w"> </span><span class="n">ENCOUNTERED</span><span class="err">?</span>
+<span class="mf">173152</span><span class="w"> </span><span class="mf">100754</span><span class="w">         </span><span class="n">BMI</span><span class="w">     </span><span class="n">BEGIN</span><span class="w">           </span><span class="p">;</span><span class="kr">IF</span><span class="w"> </span><span class="n">SO</span><span class="w"> </span><span class="n">START</span><span class="w"> </span><span class="n">OVER</span>
+<span class="mf">173154</span><span class="w"> </span><span class="mf">105010</span><span class="w">         </span><span class="kr">CLR</span><span class="n">B</span><span class="w">    </span><span class="err">@</span><span class="n">R0</span><span class="w">             </span><span class="p">;</span><span class="kr">FOR</span><span class="w"> </span><span class="n">DECTAPE</span><span class="p">,</span><span class="kr">STOP</span><span class="w"> </span><span class="n">TRANSPORT</span>
+<span class="mf">173156</span><span class="w"> </span><span class="mf">000137</span><span class="w">         </span><span class="n">JMP</span><span class="w">     </span><span class="err">@#</span><span class="mf">0</span><span class="w">             </span><span class="p">;</span><span class="kr">GO</span><span class="w"> </span><span class="kr">TO</span><span class="w"> </span><span class="n">ROUTINE</span><span class="w"> </span><span class="kr">LOAD</span><span class="n">ED</span>
+</pre></div></td></tr></table></div>
+
+
+<p>Hmmm, the Pygments syntax highlighting package used by my blog generator doesn't seem to grok MACRO-11; may
+have to do something about that...</p></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
         <a href="https://fritzm.github.io/vt52.html"><h1>PDP-11/45: VT52</h1></a>
 Sun 03 January 2016
 
@@ -386,7 +480,7 @@ the RK05 drives on their rails temporarily to keep them off the floor and out of
     </div>     </div> 
 <footer>
 <br />
-<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2022</p>
+<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2023</p>
 </footer>
 
 </div> <!-- /container -->

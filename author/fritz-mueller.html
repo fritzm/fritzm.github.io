@@ -74,6 +74,238 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="https://fritzm.github.io/gt40.html"><h1>GT40 Terminal</h1></a>
+Mon 21 August 2023
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p>A while ago my friend Scott approached me with an idea to collaborate on restoration of a DEC GT40 graphic
+display terminal of unknown status, belonging to a third collector friend of ours; the idea was to restore the
+machine to working order for exhibition at the various summer/fall vintage computer shows. The GT40 ran an
+early (pre-Atari) graphical version of the lunar lander game which was released in 1973. The 50th anniversary
+of this code seemed a nice theme for the exhibit.</p>
+<p>The GT40 was an integrated product consisting of a PDP-11/05 (KD11-B) CPU, a VT11 vector display processor,
+a VR14 X-Y monitor, a light pen, keyboard, and a DL11 serial interface:</p>
+<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/GT40.png" title="The DEC GT40"/></p>
+<p>Scott retrieved the terminal, which had a fairly bad case of screen rot. We agreed that Scott would work on
+restoration of the monitor while I dug in on the system unit. Scott got to work while I dealt with
+distractions of ongoing home renovations, a ton of work-related travel, and my first bout of COVID (blaargh!)</p>
+<p>The screen rot is caused by a deterioriation of a polyvinyl acetate (PVA) layer sandwiched between the front
+surface of the CRT glass and an outer protective implosion shield. All of this is held together by a retaining
+ring affixed to the CRT with silicone adhesive. The only fix for this is to disassemble the monitor, separate
+the sandwich, and clean out and replace the deteriorated PVA layer.</p>
+<p>After chatting with some folks who had successfully conducted a similar VR14 restoration at the <a href="https://www.ricomputermuseum.org/">Rhode Island
+Computer Museum</a>, Scott obtained some <a href="https://prosoco.com/product/dicone-nc9/">silicone
+digester</a> to aid in separation of the retaining ring.  The terminal
+was disassembled and then digester was repeatedly injected under the ring with a syringe, allowed to sit, and
+the resulting softened silicone scraped away over the course of a week.</p>
+<p>Scott then worked to conform a lexan sheet to the interior of the implosion shield as a replacement for the
+PVA layer, as RICM had done.  This process, conducted in a home oven, proved to be quite fiddly.  But
+persistence paid off, and the end result looks very nice!</p>
+<p>After a precautionary reform of the larger power supply electrolytics, careful reassembly, and a gradual
+bringup on a variac, the monitor showed proof of life on the bench, hooked up to a signal generator source.</p>
+<p><img src='/images/pdp11/VR14-screen-rot_thumbnail_tall.JPG' title='GT40 display (VR14) with screen rot' onclick='pswipe("pdp11",105);'/>
+<img src='/images/pdp11/VR14-digesting_thumbnail_tall.JPG' title='Silicone digester repeatedly injected beneath the retaining ring, and softened silicone sraped away a layer at a time.' onclick='pswipe("pdp11",106);'/>
+<img src='/images/pdp11/VR14-apart_thumbnail_tall.JPG' title='After a week of work the retaining ring was freed and the layers were able to be separated and cleaned.' onclick='pswipe("pdp11",107);'/>
+<img src='/images/pdp11/VR14-plexi_thumbnail_tall.JPG' title='Conforming plexiglass in the oven to fill the gap between the display tube and the implosion shield where the PVA used to be.' onclick='pswipe("pdp11",108);'/>
+<img src='/images/pdp11/VR14-working_thumbnail_tall.png' title='Display re-assembled and working, driven by a test oscillator, and looking nice!' onclick='pswipe("pdp11",109);'/></p>
+<p>In the meantime, starting to feel better, I began to look at the CPU unit.  Power supply electrolytics
+appeared to be in good shape, and the supply came up on the bench without much difficulty.</p>
+<p>The module utilization for this backplane is as follows:</p>
+<style>
+.module-utilization {
+  font-size: smaller;
+  width: 50em;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+  border-collapse: true;
+}
+.module-utilization th {
+  padding: .5em;
+  font-weight: normal;
+}
+.module-utilization tr:first-child th {
+  width: 16.67%;
+}
+.module-utilization td {
+  border: 1px solid black;
+  padding: .5em;
+  text-align: center;
+}
+.module-utilization td:empty {
+  background-color: LightGray;
+}
+.module-utilization tr:first-child td:first-child {
+  border: none;
+  visibility: hidden;
+}
+</style>
+
+<table class="module-utilization">
+  <tr><td></td><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th></tr>
+  <tr><th>1</td><td colspan=6>A320 VT40 Display Generator</td></tr>
+  <tr><th>2</td><td colspan=6>M7013 VT40 Display Control</td></tr>
+  <tr><th>3</td><td colspan=6>M7014 VT40 Bus Control</td></tr>
+  <tr><th>4</td><td colspan=2></td><td colspan=4>M7800 DL11 Serial</td></tr>
+  <tr><th>5</td><td colspan=2>M930 Term. / UNIBUS out</td><td colspan=4>H214 Core Stack (8K x 16)</td></tr>
+  <tr><th>6</td><td colspan=6>G231 Core Memory Driver</td></tr>
+  <tr><th>7</td><td colspan=6>G110 Core Memory Control</td></tr>
+  <tr><th>8</td><td colspan=6>M7261 KD11-B Control</td></tr>
+  <tr><th>9</td><td colspan=6>M7260 KD11-B Data Paths</td></tr>
+</table>
+
+<p>On the assumption (later proved wrong) that this was effectively the same as a PDP-11/05 setup, I began debug
+with just the two CPU cards, an M9301 boot/terminator in position 5A-B, and a grant continuity "knuckle
+buster" in position 4D.  Some problems were immediately apparent from the front console: deposit and examine
+operations to various memory-mapped CPU registers seemed to work as expected, but when examining contents the
+M9301 ROM locations bit 13 was always displaying zero.  The CPU would not enter run mode, nor could it be
+single stepped.</p>
+<p>Docs suggested that the GT40 would accomodate a KM11 debug module in postion 1B, so in this went.  The machine
+behaved even more strangely when the KM11 was in, hanging up entirely unless the KM11 was put in manual clock
+mode, and even then stepping microstates at unexpected times.  It took a little probing of the CPU clock
+circuits to discover why:</p>
+<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/GT40-CPU-clock.png" title="GT40 CPU clock circuit"/></p>
+<p>Here we see the RC clock at E019.  CONJ MAN CLK L is wired to KM11 switch S2, and inhibits the RC clock when
+pulled low.  With the RC clock thus disabled, NOR gate E027 admits manual clocking via CONJ S CLK ON L,
+connected to KM11 (momentary) switch S4.  The output at E027 pin 11 continues downstream from here as the
+basis of the main processor clock signal.</p>
+<p>As it happened, momentary switch S4 was wired on my KM11 replica with opposite sense from that expected. Thus
+in its resting postion CONJ S CLK ON L was <em>asserted</em> (low), which meant the clock output at E027 pin 11 was
+forced constantly high, regardless of the state of the RC clock.  This was verified by leaving S2 "off" and
+pulling S4 over to its momentary position, whence the CPU clock immediately picked up again.</p>
+<p>I had never noticed this switch reversal when using the KM11 with the 11/45, the RK11-C, or the 11/34 -- all
+of these have different clocking circuits unaffected by the default postion of S4.  Desoldered and rotated S4
+180 degrees, and the problem was fixed.</p>
+<p>After having addressed this, I single stepped through a few of the console microcode flows and was able to
+match the microcode listings to what was displayed on the KM11 and the console lights with some success.  An
+action shot of the KM11:</p>
+<p><img src='/images/pdp11/GT40-KM11_thumbnail_tall.JPG' title='GT40 system unit with KM11 replica board and microcode control board out on debug extender below.  The next microcode address is displayed in the bottom two rows of LEDs, with the LSB at the bottom right. Dark LEDs are logic 1, and lit are logic 0.  The next address displayed here is octal 316. From the microcode listings, we can see we are about to branch to micro-state CCS-1 (console continue switch), and can deduce that we are currently in micro-state H-2, about to branch out of the halt microcode loop to the continue switch handler.' onclick='pswipe("pdp11",110);'/></p>
+<p>A few tips for anybody else who might be micro-stepping the KD11-B CPU, while we are here:</p>
+<ul>
+<li>
+<p>The MPC address displayed on the KM11 is <em>negated</em> -- dark LEDs are ones, and lit LEDs are zeros. This
+  definitely takes a little getting used to...</p>
+</li>
+<li>
+<p>The MPC address displayed on the KM11 is the address of the <em>next</em> micro-instruction, not the current
+  one.  This is also pretty tricky until you get the hang of it.  One nice thing about it, though, is that
+  the displayed next address does include the wired-or outputs of micro-branches.</p>
+</li>
+<li>
+<p>Each manual clock toggle is one <em>bus clock</em>, and typically, a micro-instruction will take two bus clocks to
+  execute.  An exception is the inner part (single shifts) of the micro-flows for shift and rotate
+  instructions, which only take a single bus clock.  Generally, it is useful to go ahead and advance two bus
+  clocks at a time, as it is easy to get confused probing for signals that by design aren't clocked until the
+  second bus clock within the micro-instruction.</p>
+</li>
+<li>
+<p>The console lights are hard-wired to always display the ALU B-leg input.  Useful intermediate information is
+  often displayed there intentionally by the microcode flows.</p>
+</li>
+</ul>
+<p>Now it was possible to put the data paths board out on extenders and step the microcode for a console
+examine of a ROM location with bit 13 set, and see why bit 13 never showed up on the console lights.  To
+understand this properly, we need to see an excerpt of the KD11-B data paths:</p>
+<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/KD11-B-datapath.png" title="KD11-B data path (excerpt)" width="70%"/></p>
+<p>Here you see the ALU in the middle, fed by its B-leg and A-leg inputs. B-leg is fed from the B-register, with
+provisions for shifting, sign-extension, or forcing the constant +1. B-leg is also continuously displayed on
+the console lights. A-leg contains, significantly, the 16-location scratch-pad memory (SPM). The first eight
+locations of this hold processor registers R0 through R7; the remaining eight locations serve as temporary
+registers for use by the microcode. A-leg can also provide misceallaneous constants from a small ROM.</p>
+<p>The A-mux, below the ALU, determines whether the main processor data path is fed from the ALU output, or from
+the UNIBUS data lines.</p>
+<p>With this in mind, the relevant microcode source sequence (taken from the listings in the engineering
+drawings) is as follows:</p>
+<div class="highlight"><pre><span></span>LOC  NXT  * CONSOLE EXAMINE SWITCH- FIRST TIME IN SEQUENCE (DON&#39;T INC R[17])
+          / GET TO CE1-1 FROM H-2 VIA BUT SWITCH
+          / GET TO CE1-1 FROM CE2-2 VIA GOTO
+317  307  CE1-1 BA,B←R[17]; BUT SWITCH
+          / DISPLAY ADDRESS BY PUTTING INTO THE B REGISTER WHILE EXAMINE IS DOWN
+          / LOOP ON CE1-1 UNTIL SWITCH IS RELEASED
+307  326  CE1-2 DATI; CKOFF
+326  302  CE1-3 B←UNIBUS DATA; GOTO H-2
+</pre></div>
+
+
+<p>At micro-location 317 (state CE-1, "console examine 1"), the bus address register and B-register are loaded
+from SPM location 17, which holds the current console load/examine address.  BUT SWITCH ("branch micro-test
+switch") causes the microcode to loop here as long as the examine switch is depressed.  During this time, the
+fetch address is displayed on the console lights since it has been loaded into the B-register.  This was all
+observed to be functioning normally.</p>
+<p>When the examine switch is released, we branch to micro-location 307.  Here, a UNIBUS read (DATI) bus cycle is
+initiated, and the processor clock and microcode execution are suspended until the bus target asyncrohonously
+asserts SSYN (indicating valid data on the bus) or alternatively times out.  The bus cycle was observed to
+occur normally, leaving SSYN and the correct data (including a correct bit 13) asserted on the UNIBUS.</p>
+<p>Proceeding to micro-location 326, we see that the A-mux should be set up there to admit the data from the
+UNIBUS to the main processor data path and then the B-register should be latched for display. Here a problem
+was apparent. Sheet DPD of the GT40 engineering drawings covers bits 15:12 of the data paths; package E015
+there is an 8266 2x4 mux which implements that slice of the A-mux.  E015 was seen via logic probe to be set up
+with correct select codes and correct input from the UNIBUS. UNIBUS bit 13 was not being correctly passed on
+to its corresponding output, however -- a failed part.</p>
+<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/GT40-bad-amux.png" title="KD11-B AMUX 15:12"/></p>
+<p>The 8266 is out of production and somewhat rare; for the time being a functioning 8266 was "borrowed" from a
+spare GT40 data paths board that we obtained from our fellow collector.  Removed the bad part, socketed, and
+replaced with the borrowed part, and the bit 13 display problem was fixed!</p>
+<p>Moving next to the run/step problem, the machine was seen to be hanging up in micro-state F-3, after
+initiating the DATI bus cycle to fetch an instruction. This lead to investigation of some of the the bus
+control logic, as detailed on sheet CONC of the engineering drawings:</p>
+<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/KD11-B-DATI-bus-control.png" title="GT40 DATI bus control logic (excerpt)"/></p>
+<p>The CPU must negotiate for control of the UNIBUS and assert BBSY if successful.  Here I could see the DATI
+request being successfully latched, but BBSY assertion was blocked at E014 by CONC NPR GRANT H, a
+non-processor request (DMA) bus grant.  Sure enough, some more probing indicated the the processor had issued
+a NPR grant because it was reading an NPR request over the UNIBUS.  Where was that coming from with nothing
+else in the system?</p>
+<p>Well, it turns out in the GT40 the near-side bus termination is integrated onto the M7014 GT40 bus control
+board that must but in slot 3, so you can't really debug without this card in place!  (It <em>could</em> be that an
+additional M930 terminator in 3-A,B would work, as in a stock 11/05, but I haven't checked the backplane wire
+list in detail to be certain of this.)  In any case, slotted in the M7014, and the machine began to behave
+much more rationally with a properply configured bus...</p>
+<p>Went for broke and slotted in the rest of the display interface boards and (why not?) the core memory and DL11
+as well.  The machine was showing very promising signs of life.  The terminal emulator in the bootstrap ROM
+ran and was able to render recevied characters on the display!  Characters typed on the keyboard were also
+successfully forwarded out the DL11.  A line feed character typed to the terminal emulator seemed to crash it,
+so that still needed to be looked into.  Took the time to toggle in a small test program from the user guide,
+and this executed correctly rendering a square on the display, indicating most of the logic in the display
+interface boards was also functioning correctly:</p>
+<p><img src='/images/pdp11/GT40-good-sign_thumbnail_tall.jpeg' title='First sign of end-to-end life on the GT40: terminal emulator boostrap running, and rendering received characters.' onclick='pswipe("pdp11",111);'/>
+<img src='/images/pdp11/GT40-square_thumbnail_tall.jpeg' title='GT40 display list processor running, rendering a square.' onclick='pswipe("pdp11",112);'/></p>
+<p>Tried to get some program uploads going over the built-in binary loader in the bootstrap terminal emulator,
+but this didn't seem to be quite working, either.  Took a short break for dinner, returned to examine this
+further, ran for a few minutes, then disaster...  Something in the CPU let go, and the machine was once
+again unable to execute code.</p>
+<p>Digging in on this new failure a little, when attempting to single step ROM code from the front panel, the
+PC was seen to increment by +1 instead of the expected +2; this resulted in an immediate bus error that
+halted the machine.  Back in goes the KM11, then, and the same microcode stepping technique was used to
+begin investigating.</p>
+<p>So how does the KD11-B (ostensibly) increment the PC by 2?  It turns out this is done by selecting the PC (SPM
+location 7) onto the ALU A-leg, constant +1 on the ALU B-leg, and introducing the additional +1 at the carry
+input of the least significant bit slice of the ALU on sheet DPA of the engineering diagrams:</p>
+<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/KD11-B-plus-2.png" title="KD11-B ALU least-significant slice"/></p>
+<p>Signal CONF CIN H comes from microcode, wire-or'd with output of operation decode ROMs in the ALU aux control
+circuitry.  In this case, the logic probe revealed that this signal was erroneously low; further investigation
+revealed that microcode PROM CONF E094 had failed:</p>
+<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/KD11-B-CONF-E094.png" title="KD11-B faile microcode PROM CONF E094" width="75%"/></p>
+<p>Alright, this is an IM5603 (equiv. 82S126N) bipolar PROM, and I don't happen to have that in stock.  So now
+we're stuck until we can source one.  At this point, the day job once again intervened, and I needed to
+prepare to head off to the Rubin Observatory in Chile for a couple of weeks.  Scott came by to pick up the
+work in progress; had time to share a short demonstration of microcode debug techniques, then off to pack and
+prepare for my trip...</p>
+<p>[ to be continued... ]</p></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
         <a href="https://fritzm.github.io/apple-power-lang.html"><h1>Apple II Plus: power supply and language card</h1></a>
 Mon 21 March 2022
 
@@ -311,34 +543,35 @@ http://www.bitsavers.org/bits/DEC/pdp11/floppyimages/rx02/</p>
 sectors and ignored unused logical sectors at the end of the floppy, and maybe PUTR doesn't handle disk
 image files that are not the expected full size?</p>
 <p>Example of padding the 486,400 byte BASIC.DSK image file to a size of 512,512 bytes on a Windows system:</p>
-<div class="highlight"><pre><span></span>FSUTIL FILE CREATENEW BLANK 26112
-COPY /B BASIC.DSK+BLANK TEST.DSK
+<div class="highlight"><pre><span></span><span class="n">FSUTIL</span><span class="w"> </span><span class="k">FILE</span><span class="w"> </span><span class="n">CREATENEW</span><span class="w"> </span><span class="n">BLANK</span><span class="w"> </span><span class="mi">26112</span>
+<span class="n">COPY</span><span class="w"> </span><span class="o">/</span><span class="n">B</span><span class="w"> </span><span class="n">BASIC</span><span class="p">.</span><span class="n">DSK</span><span class="o">+</span><span class="n">BLANK</span><span class="w"> </span><span class="n">TEST</span><span class="p">.</span><span class="n">DSK</span>
 
-C:\PUTR&gt;DIR TEST.DSK
-Volume in drive C has no label.
-Volume Serial Number is 14CE-1A29
-Directory of C:\PUTR
-08/11/2021  12:55p             512,512 TEST.DSK
+<span class="nl">C</span><span class="p">:</span><span class="err">\</span><span class="n">PUTR</span><span class="o">&gt;</span><span class="n">DIR</span><span class="w"> </span><span class="n">TEST</span><span class="p">.</span><span class="n">DSK</span>
+<span class="n">Volume</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">drive</span><span class="w"> </span><span class="n">C</span><span class="w"> </span><span class="n">has</span><span class="w"> </span><span class="k">no</span><span class="w"> </span><span class="n">label</span><span class="p">.</span>
+<span class="n">Volume</span><span class="w"> </span><span class="n">Serial</span><span class="w"> </span><span class="n">Number</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="mi">14</span><span class="n">CE</span><span class="o">-</span><span class="mi">1</span><span class="n">A29</span>
+<span class="n">Directory</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nl">C</span><span class="p">:</span><span class="err">\</span><span class="n">PUTR</span>
+<span class="mi">08</span><span class="o">/</span><span class="mi">11</span><span class="o">/</span><span class="mi">2021</span><span class="w">  </span><span class="mi">12</span><span class="err">:</span><span class="mi">55</span><span class="n">p</span><span class="w">             </span><span class="mi">512</span><span class="p">,</span><span class="mi">512</span><span class="w"> </span><span class="n">TEST</span><span class="p">.</span><span class="n">DSK</span>
 
-C:\PUTR&gt;PUTR
-PUTR V2.01  Copyright (C) 1995-2001 by John Wilson &lt;wilson@dbit.com&gt;.
-All rights reserved.  See www.dbit.com for other DEC-related software.
+<span class="nl">C</span><span class="p">:</span><span class="err">\</span><span class="n">PUTR</span><span class="o">&gt;</span><span class="n">PUTR</span>
+<span class="n">PUTR</span><span class="w"> </span><span class="n">V2</span><span class="mf">.01</span><span class="w">  </span><span class="n">Copyright</span><span class="w"> </span><span class="p">(</span><span class="n">C</span><span class="p">)</span><span class="w"> </span><span class="mi">1995</span><span class="o">-</span><span class="mi">2001</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="n">John</span><span class="w"> </span><span class="n">Wilson</span><span class="w"> </span><span class="o">&lt;</span><span class="n">wilson</span><span class="nv">@dbit</span><span class="p">.</span><span class="n">com</span><span class="o">&gt;</span><span class="p">.</span>
+<span class="ow">All</span><span class="w"> </span><span class="n">rights</span><span class="w"> </span><span class="n">reserved</span><span class="p">.</span><span class="w">  </span><span class="n">See</span><span class="w"> </span><span class="n">www</span><span class="p">.</span><span class="n">dbit</span><span class="p">.</span><span class="n">com</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">other</span><span class="w"> </span><span class="k">DEC</span><span class="o">-</span><span class="n">related</span><span class="w"> </span><span class="n">software</span><span class="p">.</span>
 
-COPY mode is ASCII, SET COPY BINARY to change
-(C:\PUTR)&gt;MOUNT RX: TEST.DSK /RX02 /RT11 /RONLY
-(C:\PUTR)&gt;DIR RX:
+<span class="n">COPY</span><span class="w"> </span><span class="n">mode</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="nf">ASCII</span><span class="p">,</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">COPY</span><span class="w"> </span><span class="nc">BINARY</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">change</span>
+<span class="p">(</span><span class="nl">C</span><span class="p">:</span><span class="err">\</span><span class="n">PUTR</span><span class="p">)</span><span class="o">&gt;</span><span class="n">MOUNT</span><span class="w"> </span><span class="nl">RX</span><span class="p">:</span><span class="w"> </span><span class="n">TEST</span><span class="p">.</span><span class="n">DSK</span><span class="w"> </span><span class="o">/</span><span class="n">RX02</span><span class="w"> </span><span class="o">/</span><span class="n">RT11</span><span class="w"> </span><span class="o">/</span><span class="n">RONLY</span>
+<span class="p">(</span><span class="nl">C</span><span class="p">:</span><span class="err">\</span><span class="n">PUTR</span><span class="p">)</span><span class="o">&gt;</span><span class="n">DIR</span><span class="w"> </span><span class="nl">RX</span><span class="p">:</span>
 
-Volume in drive RX is RT11A
-Directory of RX:\*.*
+<span class="n">Volume</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">drive</span><span class="w"> </span><span class="n">RX</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">RT11A</span>
+<span class="n">Directory</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nl">RX</span><span class="p">:</span><span class="err">\</span><span class="o">*</span><span class="p">.</span><span class="o">*</span>
 
-11-Aug-2021
-BSOT0D.EAE    12  04-Apr-1983
-BSOT0S.EAE    10  04-Apr-1983
-BSOT1D.EAE     9  04-Apr-1983
-BSOT1S.EAE     6  04-Apr-1983
-BSOT0D.EIS    12  04-Apr-1983
-...
+<span class="mi">11</span><span class="o">-</span><span class="n">Aug</span><span class="o">-</span><span class="mi">2021</span>
+<span class="n">BSOT0D</span><span class="p">.</span><span class="n">EAE</span><span class="w">    </span><span class="mi">12</span><span class="w">  </span><span class="mi">04</span><span class="o">-</span><span class="n">Apr</span><span class="o">-</span><span class="mi">1983</span>
+<span class="n">BSOT0S</span><span class="p">.</span><span class="n">EAE</span><span class="w">    </span><span class="mi">10</span><span class="w">  </span><span class="mi">04</span><span class="o">-</span><span class="n">Apr</span><span class="o">-</span><span class="mi">1983</span>
+<span class="n">BSOT1D</span><span class="p">.</span><span class="n">EAE</span><span class="w">     </span><span class="mi">9</span><span class="w">  </span><span class="mi">04</span><span class="o">-</span><span class="n">Apr</span><span class="o">-</span><span class="mi">1983</span>
+<span class="n">BSOT1S</span><span class="p">.</span><span class="n">EAE</span><span class="w">     </span><span class="mi">6</span><span class="w">  </span><span class="mi">04</span><span class="o">-</span><span class="n">Apr</span><span class="o">-</span><span class="mi">1983</span>
+<span class="n">BSOT0D</span><span class="p">.</span><span class="n">EIS</span><span class="w">    </span><span class="mi">12</span><span class="w">  </span><span class="mi">04</span><span class="o">-</span><span class="n">Apr</span><span class="o">-</span><span class="mi">1983</span>
+<span class="p">...</span>
 </pre></div>
+
 
 </blockquote>
 <p>...etc.  Nice.  Still no luck mounting under simh, though.  Glen further offers:</p>
@@ -381,23 +614,24 @@ order and output an RX-02 disk image file in physical sector order.</p>
 <span class="cm">*  (or 6 depending on density).</span>
 <span class="cm">*/</span>
 <span class="k">static</span>
-<span class="nf">rxfactr</span><span class="p">(</span><span class="n">sectr</span><span class="p">,</span> <span class="n">psectr</span><span class="p">,</span> <span class="n">ptrck</span><span class="p">)</span>
-   <span class="k">register</span> <span class="kt">int</span> <span class="n">sectr</span><span class="p">;</span>
-   <span class="kt">int</span> <span class="o">*</span><span class="n">psectr</span><span class="p">,</span> <span class="o">*</span><span class="n">ptrck</span><span class="p">;</span>
+<span class="n">rxfactr</span><span class="p">(</span><span class="n">sectr</span><span class="p">,</span><span class="w"> </span><span class="n">psectr</span><span class="p">,</span><span class="w"> </span><span class="n">ptrck</span><span class="p">)</span>
+<span class="w">   </span><span class="k">register</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">sectr</span><span class="p">;</span>
+<span class="w">   </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="n">psectr</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="n">ptrck</span><span class="p">;</span>
 <span class="p">{</span>
-   <span class="k">register</span> <span class="kt">int</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">;</span>
+<span class="w">   </span><span class="k">register</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">p1</span><span class="p">,</span><span class="w"> </span><span class="n">p2</span><span class="p">;</span>
 
-   <span class="n">p1</span> <span class="o">=</span> <span class="n">sectr</span> <span class="o">/</span> <span class="mi">26</span><span class="p">;</span>
-   <span class="n">p2</span> <span class="o">=</span> <span class="n">sectr</span> <span class="o">%</span> <span class="mi">26</span><span class="p">;</span>
-   <span class="cm">/* 2 to 1 interleave */</span>
-   <span class="n">p2</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">p2</span> <span class="o">+</span> <span class="p">(</span><span class="n">p2</span> <span class="o">&gt;=</span> <span class="mi">13</span> <span class="o">?</span>  <span class="mi">1</span> <span class="o">:</span> <span class="mi">0</span><span class="p">))</span> <span class="o">%</span> <span class="mi">26</span><span class="p">;</span>
-   <span class="cm">/* 6 sector per track slew */</span>
-   <span class="o">*</span><span class="n">psectr</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">p2</span> <span class="o">+</span> <span class="mi">6</span> <span class="o">*</span> <span class="n">p1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">26</span><span class="p">;</span>
-   <span class="k">if</span> <span class="p">(</span><span class="o">++</span><span class="n">p1</span> <span class="o">&gt;=</span> <span class="mi">77</span><span class="p">)</span>
-       <span class="n">p1</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-   <span class="o">*</span><span class="n">ptrck</span> <span class="o">=</span> <span class="n">p1</span><span class="p">;</span>
+<span class="w">   </span><span class="n">p1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sectr</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">26</span><span class="p">;</span>
+<span class="w">   </span><span class="n">p2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sectr</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">26</span><span class="p">;</span>
+<span class="w">   </span><span class="cm">/* 2 to 1 interleave */</span>
+<span class="w">   </span><span class="n">p2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">p2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">p2</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">13</span><span class="w"> </span><span class="o">?</span><span class="w">  </span><span class="mi">1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mi">0</span><span class="p">))</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">26</span><span class="p">;</span>
+<span class="w">   </span><span class="cm">/* 6 sector per track slew */</span>
+<span class="w">   </span><span class="o">*</span><span class="n">psectr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">p2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">6</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">p1</span><span class="p">)</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">26</span><span class="p">;</span>
+<span class="w">   </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">++</span><span class="n">p1</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">77</span><span class="p">)</span>
+<span class="w">       </span><span class="n">p1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">   </span><span class="o">*</span><span class="n">ptrck</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p1</span><span class="p">;</span>
 <span class="p">}</span>
 </pre></div>
+
 
 </blockquote>
 <p>An RX02 image shuffled into physical sector order generated by Glen and suitable for use with simh is
@@ -412,24 +646,25 @@ manipulation for removing track 0 if present, is there any reason this would not
 </blockquote>
 <p>Hmm, it didn't occur to me to try that. Mounting the logical sector order RX-02 disk image, without any
 modification necessary, as a raw MSCP disk does indeed appear to work!</p>
-<div class="highlight"><pre><span></span>sim&gt; ATTACH RQ1 BASIC.DSK
-RQ1: &#39;BASIC.DSK&#39; Contains RT11 partitions
-1 valid partition, Type: V05, Sectors On Disk: 950
+<div class="highlight"><pre><span></span><span class="nf">sim</span><span class="err">&gt;</span><span class="w"> </span><span class="no">ATTACH</span><span class="w"> </span><span class="no">RQ1</span><span class="w"> </span><span class="no">BASIC.DSK</span>
+<span class="nl">RQ1:</span><span class="w"> </span><span class="err">&#39;</span><span class="nf">BASIC.DSK</span><span class="err">&#39;</span><span class="w"> </span><span class="no">Contains</span><span class="w"> </span><span class="no">RT11</span><span class="w"> </span><span class="no">partitions</span>
+<span class="err">1</span><span class="w"> </span><span class="nf">valid</span><span class="w"> </span><span class="no">partition</span><span class="p">,</span><span class="w"> </span><span class="no">Type</span><span class="p">:</span><span class="w"> </span><span class="no">V05</span><span class="p">,</span><span class="w"> </span><span class="no">Sectors</span><span class="w"> </span><span class="no">On</span><span class="w"> </span><span class="no">Disk</span><span class="p">:</span><span class="w"> </span><span class="mi">950</span>
 
-sim&gt; SHOW RQ1
-RQ1     486KB, attached to BASIC.DSK, write locked
-       RD54, UNIT=1, autosize
-       RAW format
+<span class="nf">sim</span><span class="err">&gt;</span><span class="w"> </span><span class="no">SHOW</span><span class="w"> </span><span class="no">RQ1</span>
+<span class="nf">RQ1</span><span class="w">     </span><span class="mi">486</span><span class="no">KB</span><span class="p">,</span><span class="w"> </span><span class="no">attached</span><span class="w"> </span><span class="no">to</span><span class="w"> </span><span class="no">BASIC.DSK</span><span class="p">,</span><span class="w"> </span><span class="no">write</span><span class="w"> </span><span class="no">locked</span>
+<span class="w">       </span><span class="nf">RD54</span><span class="p">,</span><span class="w"> </span><span class="no">UNIT</span><span class="err">=</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="no">autosize</span>
+<span class="w">       </span><span class="nf">RAW</span><span class="w"> </span><span class="no">format</span>
 
-.DIR DU1:
+<span class="na">.DIR</span><span class="w"> </span><span class="no">DU1</span><span class="p">:</span>
 
-BSOT0D.EAE    12  04-Apr-83      BSOT0S.EAE    10  04-Apr-83
-BSOT1D.EAE     9  04-Apr-83      BSOT1S.EAE     6  04-Apr-83
-BSOT0D.EIS    12  04-Apr-83      BSOT0S.EIS     9  04-Apr-83
-BSOT1D.EIS     9  04-Apr-83      BSOT1S.EIS     6  04-Apr-83
-BSOT0S.FIS     7  04-Apr-83      BSOT1S.FIS     6  04-Apr-83
-...
+<span class="nf">BSOT0D.EAE</span><span class="w">    </span><span class="mi">12</span><span class="w">  </span><span class="mi">04</span><span class="p">-</span><span class="no">Apr-83</span><span class="w">      </span><span class="no">BSOT0S.EAE</span><span class="w">    </span><span class="mi">10</span><span class="w">  </span><span class="mi">04</span><span class="p">-</span><span class="no">Apr-83</span>
+<span class="nf">BSOT1D.EAE</span><span class="w">     </span><span class="mi">9</span><span class="w">  </span><span class="mi">04</span><span class="p">-</span><span class="no">Apr-83</span><span class="w">      </span><span class="no">BSOT1S.EAE</span><span class="w">     </span><span class="mi">6</span><span class="w">  </span><span class="mi">04</span><span class="p">-</span><span class="no">Apr-83</span>
+<span class="nf">BSOT0D.EIS</span><span class="w">    </span><span class="mi">12</span><span class="w">  </span><span class="mi">04</span><span class="p">-</span><span class="no">Apr-83</span><span class="w">      </span><span class="no">BSOT0S.EIS</span><span class="w">     </span><span class="mi">9</span><span class="w">  </span><span class="mi">04</span><span class="p">-</span><span class="no">Apr-83</span>
+<span class="nf">BSOT1D.EIS</span><span class="w">     </span><span class="mi">9</span><span class="w">  </span><span class="mi">04</span><span class="p">-</span><span class="no">Apr-83</span><span class="w">      </span><span class="no">BSOT1S.EIS</span><span class="w">     </span><span class="mi">6</span><span class="w">  </span><span class="mi">04</span><span class="p">-</span><span class="no">Apr-83</span>
+<span class="nf">BSOT0S.FIS</span><span class="w">     </span><span class="mi">7</span><span class="w">  </span><span class="mi">04</span><span class="p">-</span><span class="no">Apr-83</span><span class="w">      </span><span class="no">BSOT1S.FIS</span><span class="w">     </span><span class="mi">6</span><span class="w">  </span><span class="mi">04</span><span class="p">-</span><span class="no">Apr-83</span>
+<span class="na">...</span>
 </pre></div>
+
 
 </blockquote>
 <p>...etc.  Armed with the above, I was able to get BASIC-11 into an RT11 image in the Unibone card, and running
@@ -547,7 +782,7 @@ which was an <a href="https://en.wikipedia.org/wiki/Technicare">early manufactur
 <p>Foam problems here were limited to a decayed air pre-filter at the front of the chassis and some padding on
 the cable retaining bar at the rear.  A heat gun and a paint scraper are your friend for removing the leftover
 cellophane adhesive strips that were used to secure the foam.  For the replacement pre-filter, I opted for 3M
-Filtrete carbon pre-filter sheet (part ‎FAPF-UCTF2PAMZ) which comes in sheets large enough to cover the front
+Filtrete carbon pre-filter sheet (part FAPF-UCTF2PAMZ) which comes in sheets large enough to cover the front
 of the chassis and is easily cut to size with scissors.</p>
 <p>The front panel brackets ended up being a bit of a puzzle to reassemble -- I unfortunately failed to pay close
 attention to how exactly the lower fasteners were configured during disassembly.  Most of the wisdom out in
@@ -1402,150 +1637,6 @@ a single switch.</p></div>
     <hr />
 </div>
     
-
-        
-
-<div class='article'>
-    <div class="content-title">
-        <a href="https://fritzm.github.io/fp11-again.html"><h1>PDP-11/45: Some more floating point trouble</h1></a>
-Sat 21 November 2020
-
-by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
- 
-    </div>
-    
-    <div><p><em>[A catch-up article, documenting events of April/May 2020]</em></p>
-<p>In late April, I offered to give a video demonstration of the '11/45 to some interested work colleagues. Since
-I hadn't had it on in a while, I fired it up to make sure everything was still in working order. The machine
-behaved well from the front panel and was able to boot both V6 Unix and RSTS V06C. Great! Typed a very simple
-demo program in to RSTS (print a multiplication table) and that ran, but produced some very strange results.
-Uh oh... </p>
-<p>Asked RSTS to <code>PRINT PI</code>, and it spat out a value somewhere around 3.7... :-)</p>
-<p>So, time to try the floating point MAINDECS...  Sure enough, failures all over the place, starting with the
-very first diagnostic in the floating point suite, CFPAB0. This diagnostic covers utility operations like
-LDFPS/STFPS, SETI/SETL, SETF/SETD, etc.</p>
-<p>I do not have listings for the diagnostics in this suite, but it is usually simple enough to reproduce
-failures with short toggle-in programs given the names and descriptions of the failing diagnostics. In this
-case, the following simple code to exercise an LDFPS/STFPS sequence from the front panel switches and lights
-showed that bits 10 and 11 of the floating point status/control word would come back erroneously toggled:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">001000</span>  <span class="nt">170137</span>  <span class="nt">START</span><span class="o">:</span>  <span class="nt">LDFPS</span>   <span class="o">@</span><span class="p">#</span><span class="nn">177570</span>        <span class="o">;</span><span class="nt">LOAD</span> <span class="nt">FPS</span> <span class="nt">FROM</span> <span class="nt">SWITCH</span> <span class="nt">REGISTER</span>
-        <span class="nt">177570</span>
-<span class="nt">001004</span>  <span class="nt">170237</span>          <span class="nt">STFPS</span>   <span class="o">@</span><span class="p">#</span><span class="nn">177570</span>        <span class="o">;</span><span class="nt">AND</span> <span class="nt">STORE</span> <span class="nt">BACK</span> <span class="nt">TO</span> <span class="nt">DISPLAY</span> <span class="nt">REGISTER</span>
-        <span class="nt">177570</span>
-<span class="nt">001010</span>  <span class="nt">000773</span>          <span class="nt">BR</span>      <span class="nt">START</span>           <span class="o">;</span><span class="nt">REPEAT</span>
-</pre></div>
-</td></tr></table>
-<p>First things first, check power to the FPU and its clock; these look fine.  Next, plug the KM11 into the
-floating point slot and check the FPU microcode sequences while executing LDFPS and STFPS instructions.
-These also look fine:</p>
-<ul>
-<li>
-<p>For <code>LDFPS @#177570</code> I see <code>RDY.00</code>, <code>RDY.10</code>, <code>RDY.20</code>, <code>RDY.30</code>, <code>RDY.70</code>, <code>LD.50</code></p>
-</li>
-<li>
-<p>For <code>STFPS @#177570</code> I see <code>RDY.00</code>, <code>RDY.10</code>, <code>RDY.20</code>, <code>RDY.30</code>, <code>RDY.80</code>, <code>STR.30</code>, <code>STR.08</code></p>
-</li>
-</ul>
-<p>Most of the data paths of interest regarding the FPS register are on the fraction low (FRL) board, so this
-goes out on extenders so the microcode can be stepped and gate-level logic inspected with a logic probe.</p>
-<p>Here is the block diagram of data paths in the FPU, for reference in discussion below:</p>
-<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/fp11-data-paths.png" 
-title="FP11-B data paths"/></p>
-<p style="text-align: center;"><em>FP11-B data paths</em></p>
-
-<p>So, one thing to note with regard to the FPS register is that it is gated through the ACMX multiplexer and
-written into scratch pad register AC7[0] during microcode state <code>RDY.00</code> which is the first state in the
-common prolog of every FPU instruction:</p>
-<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/fp11-ucode-prolog.png" 
-title="FP11-B microcode prolog" width="200px"/></p>
-<p style="text-align: center;"><em>FP11-B microcode prolog</em></p>
-
-<p>Stopping in state <code>RDY.00</code> and examining the ACMX inputs, selects, and outputs for bits 10 and 11 immediately
-reveals a problem.  These bits of ACMX are implemented by a 74153 dual 4-input mux, E71 on sheet FRLB of the
-FP11-B engineering drawings:</p>
-<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/fp11-acmx-e71.png" 
-title="FP11-B ACMX &gt;11:10&lt;" width="400px"/></p>
-<p style="text-align: center;"><em>FP11-B ACMX &lt;11:10&gt;</em></p>
-
-<p>Inputs from the FPS register on pins 6 and 10 appear correct, as do the selector signals on pins 14 and 2.
-But outputs on pins 7 and 9 appear to be inverted.  So E71 appears bad.  Pulled this, socketed, and replaced.
-After this fix, LDFPS/STFPS function correctly in the toggle-in test program, and MAINDEC CFPAB0 passes.</p>
-<p>Not out of the woods yet, though...  Progressing down the sequence of MAINDECS, diagnostic CFPDC0
-(add/subtract) now fails :-(  For this, we bring back the simple "add two floats" diagnostic used during
-previous FP11 debug:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17</pre></div></td><td class="code"><div class="highlight"><pre><span></span>        <span class="nt">000000</span>                          <span class="nt">AC0</span><span class="o">=%</span><span class="nt">0</span>
-        <span class="nt">000001</span>                          <span class="nt">AC1</span><span class="o">=%</span><span class="nt">1</span>
-<span class="nt">000000</span>                                  <span class="p">.</span><span class="nc">ASECT</span>
-        <span class="nt">001000</span>                          <span class="o">.=</span><span class="nt">1000</span>
-<span class="nt">001000</span>  <span class="nt">170011</span>                  <span class="nt">START</span><span class="o">:</span>  <span class="nt">SETD</span>                <span class="o">;</span><span class="nt">SET</span> <span class="nt">DOUBLE</span> <span class="nt">PRECISION</span> <span class="nt">MODE</span>
-<span class="nt">001002</span>  <span class="nt">172467</span>  <span class="nt">000014</span>                  <span class="nt">LDD</span>     <span class="nt">D1</span><span class="o">,</span><span class="nt">AC0</span>      <span class="o">;</span><span class="nt">FETCH</span> <span class="nt">FIRST</span> <span class="nt">ADDEND</span> <span class="nt">FROM</span> <span class="nt">D1</span>
-<span class="nt">001006</span>  <span class="nt">172567</span>  <span class="nt">000020</span>                  <span class="nt">LDD</span>     <span class="nt">D2</span><span class="o">,</span><span class="nt">AC1</span>      <span class="o">;</span><span class="nt">FETCH</span> <span class="nt">SECOND</span> <span class="nt">ADDEND</span> <span class="nt">FROM</span> <span class="nt">D2</span>
-<span class="nt">001012</span>  <span class="nt">172100</span>                          <span class="nt">ADDD</span>    <span class="nt">AC0</span><span class="o">,</span><span class="nt">AC1</span>     <span class="o">;</span><span class="nt">ADD</span> <span class="nt">THEM</span> <span class="o">(</span><span class="nt">RESULT</span> <span class="nt">IN</span> <span class="nt">AC1</span><span class="o">)</span>
-<span class="nt">001014</span>  <span class="nt">174167</span>  <span class="nt">000022</span>                  <span class="nt">STD</span>     <span class="nt">AC1</span><span class="o">,</span><span class="nt">D3</span>      <span class="o">;</span><span class="nt">STORE</span> <span class="nt">RESULT</span> <span class="nt">TO</span> <span class="nt">D3</span>
-<span class="nt">001020</span>  <span class="nt">000000</span>                          <span class="nt">HALT</span>
-<span class="nt">001022</span>  <span class="nt">040200</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D1</span><span class="o">:</span>     <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">040000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span> <span class="o">;</span><span class="nt">0</span><span class="p">.</span><span class="nc">5</span>
-<span class="nt">001030</span>  <span class="nt">000000</span>
-<span class="nt">001032</span>  <span class="nt">040200</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D2</span><span class="o">:</span>     <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">040000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span> <span class="o">;</span><span class="nt">0</span><span class="p">.</span><span class="nc">5</span>
-<span class="nt">001040</span>  <span class="nt">000000</span>
-<span class="nt">001042</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D3</span><span class="o">:</span>     <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span>
-<span class="nt">001050</span>  <span class="nt">000000</span>
-        <span class="nt">001000</span>                          <span class="p">.</span><span class="nc">END</span>    <span class="nt">START</span>
-</pre></div>
-</td></tr></table>
-<p>Sure enough, this is producing incorrect results.  The microcode flows for add/subtract/compare are a bit more
-involved than the simple load/store sequences above.  The sequence starts with common prolog <code>RDY.00</code>,
-<code>RDY.10</code>, <code>RDY.20</code>, <code>RDY.30</code>, same as above.  The first fork after <code>RDY.30</code> goes to <code>RDY.60</code>, since
-add/subtract/compare are "no memory class" instructions (FP accumulator register operands only).  The second
-fork after <code>RDY.60</code> takes us to <code>ADD.00</code> on sheet FP11 FLOWS 8.</p>
-<p>The left side if FLOWS 8 is a decision tree for zero operands and/or whether or not we are executing a compare
-instruction.  Traversal of these states sets up fraction and exponent operands and, if necessary, a comparison
-of operand exponents in the EALU.  In our case (addition of two double-precision non-zero operands), the
-sequence is: <code>ADD.00</code>, <code>ADD.04</code>, <code>ADD.06</code>, <code>ADD.02</code>, <code>ADD.08</code>, <code>ADD.12</code>.</p>
-<p>We then end up at state <code>ADD.22</code> at the top of the right side of FLOWS 8.  The previously set up exponent
-difference is used to index into a 256x4 "range ROM"; output bits from this ROM inform the subsequent
-microcode fork which determines which operand shift, if any, to apply before the upcoming fraction ALU
-operation.</p>
-<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/fp11-exp-compare.png" 
-title="FP11-B Exponent Comparison Flow"/></p>
-<p>Here a problem is evident.  We should fork to <code>ADD.24</code>, for equal exponents, but instead we end up add
-<code>ADD.30</code>, for destination exponent less than source exponent.  Putting the FXP board out on the extender and
-pausing in this state, the operands and operation codes on the EALU bit-slices appear to be correct, but
-signal FRMH ALU CIN L is erroneously asserted at E34 pin 7 (sheet FXPA).  This extra carry (borrow, really,
-since the operation is a subtract) into the least significant bit-slice causes the EALU output to be -1
-instead of 0.</p>
-<p>Moving back to the source of this signal on the FRM board, it turns out that FRM E20, a 74H40 dual quad-input
-NAND, is outputting an invalid logic level at pin 8.  Pulled this, socketed, replaced, and the problem appears
-to be fixed.</p>
-<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/FRM-E20.png" 
-title="FP11-B FRMH ALU CIN L"/></p>
-<p>After this second repair, the full suite of FP11-B diagnostics is passing again.  And RSTS/E has a much less
-fanciful interpretation of <code>PI</code>...</p></div>
-    <hr />
-</div>
-    
 <div class="pagination">
 <ul>
     <li class="prev disabled"><a href="#">&larr; Previous</a></li>
@@ -1625,7 +1716,7 @@ fanciful interpretation of <code>PI</code>...</p></div>
     </div>     </div> 
 <footer>
 <br />
-<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2022</p>
+<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2023</p>
 </footer>
 
 </div> <!-- /container -->

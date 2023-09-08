@@ -74,6 +74,67 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="https://fritzm.github.io/rk11.html"><h1>PDP-11/45: RK11</h1></a>
+Sun 29 January 2017
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p>Finished up the cleanup and rebuild of the H720E for the RK11-C controller: reformed the big electrolytics
+over a couple of days, and swapped out the tantalum filters on the regulator board (one of which had started
+to leak) for some replacements.  Tantalums of the correct form and value are crazy expensive, and since these
+caps (C11-C17, C23) are banked resevoirs on the regulated rails their exact values are not critical.  Went
+with some aluminum electrolytics instead that worked out to a little more aggregate capacity on each bank.</p>
+<p>My H720E is missing its top cover plate, so there was about 40 years worth of accumulated dust in there -- a
+lot to clean up!  I'm not sure if the cover was customarily left off to facilitate cooling of the regulator
+board, or if it is just genuinely missing.  Will see if the forums/lists have any wisdom here.  Should not be
+hard to fab a replacement if it is really supposed to be there.</p>
+<p>Routed the inter-cabinet power control wiring, racked the RK11, and cabled everything up.  This included
+moving the M9301 bootstrap terminator over to slot 0, then rummaging through a box of BC11 bus cables for one
+that was both long enough and in decent enough shape to connect the CPU and the RK11.  Some of these bus
+cables had period-correct labeling (see picture below :-))  Got a good tip off the cctalk mailing list
+(thanks, Jerry!) to drape the BC11 with a service loop from the top-rear of the CPU rack, thus avoiding any
+entanglement with the rack slides while moving the CPU cabinet in and out.</p>
+<p>A 2000pF cap that was flown over the RK11 backplane (+5V to DR BUS DC LO L) had broken free of its pin
+connectors; jury-rigged this with some arduino jumpers I had lying around, until I can track down some
+appropriate replacement connectors.</p>
+<p>Good news is that after this the machine still booted the M9301 bootstrap, and was still able to run and
+pass diagnostics loaded via PDP11GUI.  So, Unibus still working with the BC11 cable in place and termination
+out at the RK11.</p>
+<p>Started in with diagnostic ZRKJE0.BIC, which is the controller-only static test.  This indicated:</p>
+<div class="highlight"><pre><span></span>REGISTER NOT CLEARED
+  PC   REGADD    RECVD
+002560  177416  040000
+</pre></div>
+
+
+<p>This is the RKDB register, implemented by two M203 R/S flip-flop modules in slots A21 and B21 (see sheet
+RK11-C-10 in the RK11-C engineering drawings).  Swapped these, and the stuck bit moved to the other half of
+of the register, so looks like failed gate.  Pulled, socketed, replaced, and diagnostic no longer reports
+any stuck bits.  Next diagnostic fail is:</p>
+<div class="highlight"><pre><span></span>UNEXPECTED TIME OUT AT PC=004300
+</pre></div>
+
+
+<p>This is test #21 of the diagnostic, testing controller reset.  Will need to do some reading up on the design
+of the controller and the diagnostic source to understand how to troubleshoot it further.  All for now!</p>
+<p><img src='/images/pdp11/720e-caps_thumbnail_tall.jpg' title='H720e regulator card with refreshed caps' onclick='pswipe("pdp11",42);'/>
+<img src='/images/pdp11/rk11-racked_thumbnail_tall.jpg' title='RK11-C controller installed in rack, with temporary jumper hack for flown cap' onclick='pswipe("pdp11",43);'/>
+<img src='/images/pdp11/bc11-good_thumbnail_tall.jpg' title='A BC11-A bus cable, with vintage label' onclick='pswipe("pdp11",44);'/>
+<img src='/images/pdp11/rk11-back_thumbnail_tall.jpg' title='RK11-C controller from the back, flipchips and cabling visible' onclick='pswipe("pdp11",45);'/>
+<img src='/images/pdp11/m203_thumbnail_tall.jpg' title='A failing M203, the cause of a stuck bit in RK11 register RKDB' onclick='pswipe("pdp11",46);'/></p></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
         <a href="https://fritzm.github.io/diagnostics-14.html"><h1>PDP-11/45: Diagnostics XIV - CPU, MMU, FPU Complete!</h1></a>
 Mon 16 January 2017
 
@@ -217,177 +278,178 @@ subroutines and also give some useful visibility into the intermediate states.</
 my FP11 order to focus my hardware troubleshooting.  The following program came in handy.  This is based off
 some example code in the FP11 maintenance manual, though I elaborated it slightly with a binary printout
 routine:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55
-56
-57
-58
-59
-60
-61
-62
-63
-64
-65
-66
-67
-68
-69
-70
-71
-72
-73
-74
-75
-76
-77
-78
-79
-80
-81
-82
-83
-84
-85</pre></div></td><td class="code"><div class="highlight"><pre><span></span>        <span class="nt">000000</span>                          <span class="nt">AC0</span><span class="o">=%</span><span class="nt">0</span>
-        <span class="nt">000001</span>                          <span class="nt">AC1</span><span class="o">=%</span><span class="nt">1</span>
-        <span class="nt">000002</span>                          <span class="nt">AC2</span><span class="o">=%</span><span class="nt">2</span>
-        <span class="nt">177560</span>                          <span class="nt">SERIAL</span><span class="o">=</span><span class="nt">177560</span>
-        <span class="nt">170006</span>                          <span class="nt">MRS</span><span class="o">=</span><span class="nt">170006</span>
-<span class="nt">000000</span>                                  <span class="p">.</span><span class="nc">ASECT</span>
-        <span class="nt">001000</span>                          <span class="o">.=</span><span class="nt">1000</span>
-<span class="nt">001000</span>  <span class="nt">170127</span>  <span class="nt">040220</span>          <span class="nt">START</span><span class="o">:</span>  <span class="nt">LDFPS</span>   <span class="p">#</span><span class="nn">40220</span>          <span class="o">;</span><span class="nt">DISABLE</span> <span class="nt">INTS</span><span class="o">,</span> <span class="nt">SET</span> <span class="nt">DBL</span> <span class="nt">AND</span> <span class="nt">MAINT</span> <span class="nt">MODE</span>
-<span class="nt">001004</span>  <span class="nt">172667</span>  <span class="nt">000316</span>                  <span class="nt">LDD</span>     <span class="nt">MLYR</span><span class="o">,</span><span class="nt">AC2</span>        <span class="o">;</span><span class="nt">LOAD</span> <span class="nt">MULTIPLIER</span> <span class="nt">IN</span> <span class="nt">AC2</span>
-<span class="nt">001010</span>  <span class="nt">012703</span>  <span class="nt">000230</span>                  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">230</span><span class="o">,</span><span class="nt">R3</span>         <span class="o">;</span><span class="nt">R3</span> <span class="nt">GETS</span> <span class="nt">OCTAL</span> <span class="nt">230</span> <span class="o">(</span><span class="nt">FRAC</span> <span class="nt">MUL</span> <span class="nt">MICROSTATE</span><span class="o">)</span>
-<span class="nt">001014</span>  <span class="nt">170003</span>                          <span class="nt">LDUB</span>                    <span class="o">;</span><span class="nt">LOAD</span> <span class="nt">R3</span> <span class="nt">TO</span> <span class="nt">MBR</span>
-<span class="nt">001016</span>  <span class="nt">012702</span>  <span class="nt">177564</span>                  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">SERIAL</span><span class="o">+</span><span class="nt">4</span><span class="o">,</span><span class="nt">R2</span>    <span class="o">;</span><span class="nt">SERIAL</span> <span class="nt">XMIT</span> <span class="nt">BASE</span> <span class="nt">TO</span> <span class="nt">R2</span>
-<span class="nt">001022</span>  <span class="nt">012762</span>  <span class="nt">000015</span>  <span class="nt">000002</span>          <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">15</span><span class="o">,</span><span class="nt">2</span><span class="o">(</span><span class="nt">R2</span><span class="o">)</span>       <span class="o">;</span><span class="nt">OUTPUT</span> <span class="s1">&#39;\R&#39;</span>
-<span class="nt">001030</span>  <span class="nt">105712</span>                          <span class="nt">TSTB</span>    <span class="o">(</span><span class="nt">R2</span><span class="o">)</span>            <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">XMIT</span> <span class="nt">CLEAR</span>
-<span class="nt">001032</span>  <span class="nt">100376</span>                          <span class="nt">BPL</span>     <span class="p">.</span><span class="nc">-2</span>             <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">UNTIL</span> <span class="nt">SO</span>
-<span class="nt">001034</span>  <span class="nt">012762</span>  <span class="nt">000012</span>  <span class="nt">000002</span>          <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">12</span><span class="o">,</span><span class="nt">2</span><span class="o">(</span><span class="nt">R2</span><span class="o">)</span>       <span class="o">;</span><span class="nt">OUTPUT</span> <span class="s1">&#39;\N&#39;</span>
-<span class="nt">001042</span>  <span class="nt">105712</span>                          <span class="nt">TSTB</span>    <span class="o">(</span><span class="nt">R2</span><span class="o">)</span>            <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">XMIT</span> <span class="nt">CLEAR</span>
-<span class="nt">001044</span>  <span class="nt">100376</span>                          <span class="nt">BPL</span>     <span class="p">.</span><span class="nc">-2</span>             <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">UNTIL</span> <span class="nt">SO</span>
-<span class="nt">001046</span>  <span class="nt">005004</span>                          <span class="nt">CLR</span>     <span class="nt">R4</span>              <span class="o">;</span><span class="nt">R4</span> <span class="nt">HOLDS</span> <span class="nt">SC</span> <span class="nt">VALUE</span>
-<span class="nt">001050</span>  <span class="nt">005204</span>                  <span class="nt">NXTMUL</span><span class="o">:</span> <span class="nt">INC</span>     <span class="nt">R4</span>              <span class="o">;</span><span class="nt">INCREMENT</span> <span class="nt">SC</span>
-<span class="nt">001052</span>  <span class="nt">170004</span>                          <span class="nt">LDSC</span>                    <span class="o">;</span><span class="nt">LOAD</span> <span class="nt">1S</span> <span class="nt">COMPLEMENT</span> <span class="nt">OF</span> <span class="nt">R4</span> <span class="nt">INTO</span> <span class="nt">SC</span>
-<span class="nt">001054</span>  <span class="nt">012705</span>  <span class="nt">001356</span>          <span class="nt">LSTMUL</span><span class="o">:</span> <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">QR</span><span class="o">+</span><span class="nt">10</span><span class="o">,</span><span class="nt">R5</span>       <span class="o">;</span><span class="nt">SET</span> <span class="nt">R5</span> <span class="nt">PAST</span> <span class="nt">END</span> <span class="nt">OF</span> <span class="nt">STORAGE</span> <span class="nt">TABLE</span>
-<span class="nt">001060</span>  <span class="nt">172567</span>  <span class="nt">000232</span>                  <span class="nt">LDD</span>     <span class="nt">MCND</span><span class="o">,</span><span class="nt">AC1</span>        <span class="o">;</span><span class="nt">LOAD</span> <span class="nt">MULTIPLICAND</span> <span class="nt">INTO</span> <span class="nt">AC1</span>
-<span class="nt">001064</span>  <span class="nt">171102</span>                          <span class="nt">MULD</span>    <span class="nt">AC2</span><span class="o">,</span><span class="nt">AC1</span>         <span class="o">;</span><span class="nt">DO</span> <span class="nt">PARTIAL</span> <span class="nt">MULTIPLY</span>
-<span class="nt">001066</span>  <span class="nt">170007</span>                          <span class="nt">STQ0</span>                    <span class="o">;</span><span class="nt">TRANSFER</span> <span class="nt">QR</span> <span class="nt">TO</span> <span class="nt">AC0</span>
-<span class="nt">001070</span>  <span class="nt">174045</span>                          <span class="nt">STD</span>     <span class="nt">AC0</span><span class="o">,</span><span class="nt">-</span><span class="o">(</span><span class="nt">R5</span><span class="o">)</span>       <span class="o">;</span><span class="nt">STORE</span> <span class="nt">QR</span> <span class="nt">IN</span> <span class="nt">TABLE</span>
-<span class="nt">001072</span>  <span class="nt">042715</span>  <span class="nt">177600</span>                  <span class="nt">BIC</span>     <span class="p">#</span><span class="nn">177600</span><span class="o">,(</span><span class="nt">R5</span><span class="o">)</span>    <span class="o">;</span><span class="nt">CLEAR</span> <span class="nt">OFF</span> <span class="nt">SIGN</span> <span class="nt">AND</span> <span class="nt">EXPONENT</span>
-<span class="nt">001076</span>  <span class="nt">170005</span>                          <span class="nt">STA0</span>                    <span class="o">;</span><span class="nt">TRANSFER</span> <span class="nt">AR</span> <span class="nt">TO</span> <span class="nt">AC0</span>
-<span class="nt">001100</span>  <span class="nt">174045</span>                          <span class="nt">STD</span>     <span class="nt">AC0</span><span class="o">,</span><span class="nt">-</span><span class="o">(</span><span class="nt">R5</span><span class="o">)</span>       <span class="o">;</span><span class="nt">STORE</span> <span class="nt">AR</span> <span class="nt">IN</span> <span class="nt">TABLE</span>
-<span class="nt">001102</span>  <span class="nt">042715</span>  <span class="nt">177600</span>                  <span class="nt">BIC</span>     <span class="p">#</span><span class="nn">177600</span><span class="o">,(</span><span class="nt">R5</span><span class="o">)</span>    <span class="o">;</span><span class="nt">CLEAR</span> <span class="nt">OFF</span> <span class="nt">SIGN</span> <span class="nt">AND</span> <span class="nt">EXPONENT</span>
-<span class="nt">001106</span>  <span class="nt">170006</span>                          <span class="nt">MRS</span>                     <span class="o">;</span><span class="nt">SHIFT</span> <span class="nt">AR</span> <span class="nt">AND</span> <span class="nt">QR</span> <span class="nt">RIGHT</span> <span class="nt">ONE</span> <span class="nt">PLACE</span>
-<span class="nt">001110</span>  <span class="nt">170006</span>                          <span class="nt">MRS</span>                     <span class="o">;</span><span class="nt">SHIFT</span> <span class="nt">AR</span> <span class="nt">AND</span> <span class="nt">QR</span> <span class="nt">RIGHT</span> <span class="nt">ONE</span> <span class="nt">PLACE</span>
-<span class="nt">001112</span>  <span class="nt">170007</span>                          <span class="nt">STQ0</span>                    <span class="o">;</span><span class="nt">TRANSFER</span> <span class="nt">QR</span> <span class="nt">TO</span> <span class="nt">AC0</span>
-<span class="nt">001114</span>  <span class="nt">174067</span>  <span class="nt">000236</span>                  <span class="nt">STD</span>     <span class="nt">AC0</span><span class="o">,</span><span class="nt">TEMP</span>        <span class="o">;</span><span class="nt">STORE</span> <span class="nt">QR</span> <span class="nt">IN</span> <span class="nt">TEMP</span>
-<span class="nt">001120</span>  <span class="nt">016703</span>  <span class="nt">000232</span>                  <span class="nt">MOV</span>     <span class="nt">TEMP</span><span class="o">,</span><span class="nt">R3</span>         <span class="o">;</span><span class="nt">FETCH</span> <span class="nt">MSW</span> <span class="nt">OF</span> <span class="nt">QR</span> <span class="nt">TO</span> <span class="nt">R3</span>
-<span class="nt">001124</span>  <span class="nt">042703</span>  <span class="nt">177600</span>                  <span class="nt">BIC</span>     <span class="p">#</span><span class="nn">177600</span><span class="o">,</span><span class="nt">R3</span>      <span class="o">;</span><span class="nt">CLEAR</span> <span class="nt">OFF</span> <span class="nt">SIGN</span> <span class="nt">AND</span> <span class="nt">EXPONENT</span>
-<span class="nt">001130</span>  <span class="nt">006303</span>                          <span class="nt">ASL</span>     <span class="nt">R3</span>              <span class="o">;</span><span class="nt">SHIFT</span> <span class="nt">MSBS</span> <span class="nt">OF</span> <span class="nt">QR</span> <span class="nt">ONE</span> <span class="nt">PLACE</span> <span class="nt">LEFT</span>
-<span class="nt">001132</span>  <span class="nt">006303</span>                          <span class="nt">ASL</span>     <span class="nt">R3</span>              <span class="o">;</span><span class="nt">SHIFT</span> <span class="nt">MSBS</span> <span class="nt">OF</span> <span class="nt">QR</span> <span class="nt">ONE</span> <span class="nt">PLACE</span> <span class="nt">LEFT</span>
-<span class="nt">001134</span>  <span class="nt">050365</span>  <span class="nt">000010</span>                  <span class="nt">BIS</span>     <span class="nt">R3</span><span class="o">,</span><span class="nt">10</span><span class="o">(</span><span class="nt">R5</span><span class="o">)</span>       <span class="o">;</span><span class="nt">SET</span> <span class="nt">QR59</span> <span class="nt">AND</span> <span class="nt">QR58</span> <span class="nt">IN</span> <span class="nt">TABLE</span>
-<span class="nt">001140</span>  <span class="nt">170005</span>                          <span class="nt">STA0</span>                    <span class="o">;</span><span class="nt">TRANSFER</span> <span class="nt">AR</span> <span class="nt">TO</span> <span class="nt">AC0</span>
-<span class="nt">001142</span>  <span class="nt">174067</span>  <span class="nt">000210</span>                  <span class="nt">STD</span>     <span class="nt">AC0</span><span class="o">,</span><span class="nt">TEMP</span>        <span class="o">;</span><span class="nt">STORE</span> <span class="nt">AR</span> <span class="nt">IN</span> <span class="nt">TEMP</span>
-<span class="nt">001146</span>  <span class="nt">016703</span>  <span class="nt">000204</span>                  <span class="nt">MOV</span>     <span class="nt">TEMP</span><span class="o">,</span><span class="nt">R3</span>         <span class="o">;</span><span class="nt">FETCH</span> <span class="nt">MSW</span> <span class="nt">OF</span> <span class="nt">AR</span> <span class="nt">TO</span> <span class="nt">R3</span>
-<span class="nt">001152</span>  <span class="nt">042703</span>  <span class="nt">177600</span>                  <span class="nt">BIC</span>     <span class="p">#</span><span class="nn">177600</span><span class="o">,</span><span class="nt">R3</span>      <span class="o">;</span><span class="nt">CLEAR</span> <span class="nt">OFF</span> <span class="nt">SIGN</span> <span class="nt">AND</span> <span class="nt">EXPONENT</span>
-<span class="nt">001156</span>  <span class="nt">006303</span>                          <span class="nt">ASL</span>     <span class="nt">R3</span>              <span class="o">;</span><span class="nt">SHIFT</span> <span class="nt">MSBS</span> <span class="nt">OF</span> <span class="nt">AR</span> <span class="nt">ONE</span> <span class="nt">PLACE</span> <span class="nt">LEFT</span>
-<span class="nt">001160</span>  <span class="nt">006303</span>                          <span class="nt">ASL</span>     <span class="nt">R3</span>              <span class="o">;</span><span class="nt">SHIFT</span> <span class="nt">MSBS</span> <span class="nt">OF</span> <span class="nt">AR</span> <span class="nt">ONE</span> <span class="nt">PLACE</span> <span class="nt">LEFT</span>
-<span class="nt">001162</span>  <span class="nt">050315</span>                          <span class="nt">BIS</span>     <span class="nt">R3</span><span class="o">,(</span><span class="nt">R5</span><span class="o">)</span>         <span class="o">;</span><span class="nt">SET</span> <span class="nt">AR59</span> <span class="nt">AND</span> <span class="nt">AR58</span> <span class="nt">IN</span> <span class="nt">TABLE</span>
-<span class="nt">001164</span>  <span class="nt">012705</span>  <span class="nt">001336</span>                  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">AR</span><span class="o">,</span><span class="nt">R5</span>          <span class="o">;</span><span class="nt">GET</span> <span class="nt">ADDRESS</span> <span class="nt">OF</span> <span class="nt">FIRST</span> <span class="nt">QUAD</span> <span class="nt">FOR</span> <span class="nt">PRINTING</span>
-<span class="nt">001170</span>  <span class="nt">012700</span>  <span class="nt">000010</span>                  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">10</span><span class="o">,</span><span class="nt">R0</span>          <span class="o">;</span><span class="nt">R0</span> <span class="nt">COUNTS</span> <span class="nt">8</span> <span class="nt">WORDS</span> <span class="nt">IN</span> <span class="nt">TWO</span> <span class="nt">QUADS</span>
-<span class="nt">001174</span>  <span class="nt">012503</span>                  <span class="nt">LWORD</span><span class="o">:</span>  <span class="nt">MOV</span>     <span class="o">(</span><span class="nt">R5</span><span class="o">)+,</span><span class="nt">R3</span>        <span class="o">;</span><span class="nt">FETCH</span> <span class="nt">NEXT</span> <span class="nt">WORD</span> <span class="nt">OF</span> <span class="nt">QUAD</span>
-<span class="nt">001176</span>  <span class="nt">012701</span>  <span class="nt">000020</span>                  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">20</span><span class="o">,</span><span class="nt">R1</span>          <span class="o">;</span><span class="nt">R1</span> <span class="nt">COUNTS</span> <span class="nt">16</span> <span class="nt">BITS</span> <span class="nt">IN</span> <span class="nt">WORD</span>
-<span class="nt">001202</span>  <span class="nt">006103</span>                  <span class="nt">LBIT</span><span class="o">:</span>   <span class="nt">ROL</span>     <span class="nt">R3</span>              <span class="o">;</span><span class="nt">ROTATE</span><span class="o">,</span> <span class="nt">HIGH</span> <span class="nt">BIT</span> <span class="nt">GOES</span> <span class="nt">TO</span> <span class="nt">CARRY</span>
-<span class="nt">001204</span>  <span class="nt">103405</span>                          <span class="nt">BCS</span>     <span class="nt">LBIT1</span>           <span class="o">;</span><span class="nt">SKIP</span> <span class="nt">AHEAD</span> <span class="nt">IF</span> <span class="nt">CARRY</span> <span class="nt">SET</span>
-<span class="nt">001206</span>  <span class="nt">012762</span>  <span class="nt">000056</span>  <span class="nt">000002</span>          <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">56</span><span class="o">,</span><span class="nt">2</span><span class="o">(</span><span class="nt">R2</span><span class="o">)</span>       <span class="o">;</span><span class="nt">OTHERWISE</span> <span class="nt">OUTPUT</span> <span class="s1">&#39;.&#39;</span>
-<span class="nt">001214</span>  <span class="nt">000167</span>  <span class="nt">000006</span>                  <span class="nt">JMP</span>     <span class="nt">LBIT2</span>           <span class="o">;</span><span class="nt">AND</span> <span class="nt">SKIP</span> <span class="nt">AHEAD</span>
-<span class="nt">001220</span>  <span class="nt">012762</span>  <span class="nt">000061</span>  <span class="nt">000002</span>  <span class="nt">LBIT1</span><span class="o">:</span>  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">61</span><span class="o">,</span><span class="nt">2</span><span class="o">(</span><span class="nt">R2</span><span class="o">)</span>       <span class="o">;</span><span class="nt">OUTPUT</span> <span class="s1">&#39;1&#39;</span>
-<span class="nt">001226</span>  <span class="nt">105712</span>                  <span class="nt">LBIT2</span><span class="o">:</span>  <span class="nt">TSTB</span>    <span class="o">(</span><span class="nt">R2</span><span class="o">)</span>            <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">XMIT</span> <span class="nt">CLEAR</span>
-<span class="nt">001230</span>  <span class="nt">100376</span>                          <span class="nt">BPL</span>     <span class="p">.</span><span class="nc">-2</span>             <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">UNTIL</span> <span class="nt">SO</span>
-<span class="nt">001232</span>  <span class="nt">077115</span>                          <span class="nt">SOB</span>     <span class="nt">R1</span><span class="o">,</span><span class="nt">LBIT</span>         <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">OVER</span> <span class="nt">BITS</span> <span class="nt">IN</span> <span class="nt">WORD</span>
-<span class="nt">001234</span>  <span class="nt">012762</span>  <span class="nt">000040</span>  <span class="nt">000002</span>          <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">40</span><span class="o">,</span><span class="nt">2</span><span class="o">(</span><span class="nt">R2</span><span class="o">)</span>       <span class="o">;</span><span class="nt">OUTPUT</span> <span class="s1">&#39; &#39;</span> <span class="nt">TO</span> <span class="nt">SEPARATE</span> <span class="nt">WORDS</span>
-<span class="nt">001242</span>  <span class="nt">105712</span>                          <span class="nt">TSTB</span>    <span class="o">(</span><span class="nt">R2</span><span class="o">)</span>            <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">XMIT</span> <span class="nt">CLEAR</span>
-<span class="nt">001244</span>  <span class="nt">100376</span>                          <span class="nt">BPL</span>     <span class="p">.</span><span class="nc">-2</span>             <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">UNTIL</span> <span class="nt">SO</span>
-<span class="nt">001246</span>  <span class="nt">077026</span>                          <span class="nt">SOB</span>     <span class="nt">R0</span><span class="o">,</span><span class="nt">LWORD</span>        <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">OVER</span> <span class="nt">WORDS</span> <span class="nt">IN</span> <span class="nt">QUAD</span>
-<span class="nt">001250</span>  <span class="nt">012762</span>  <span class="nt">000015</span>  <span class="nt">000002</span>          <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">15</span><span class="o">,</span><span class="nt">2</span><span class="o">(</span><span class="nt">R2</span><span class="o">)</span>       <span class="o">;</span><span class="nt">OUTPUT</span> <span class="s1">&#39;\R&#39;</span>
-<span class="nt">001256</span>  <span class="nt">105712</span>                          <span class="nt">TSTB</span>    <span class="o">(</span><span class="nt">R2</span><span class="o">)</span>            <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">XMIT</span> <span class="nt">CLEAR</span>
-<span class="nt">001260</span>  <span class="nt">100376</span>                          <span class="nt">BPL</span>     <span class="p">.</span><span class="nc">-2</span>             <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">UNTIL</span> <span class="nt">SO</span>
-<span class="nt">001262</span>  <span class="nt">012762</span>  <span class="nt">000012</span>  <span class="nt">000002</span>          <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">12</span><span class="o">,</span><span class="nt">2</span><span class="o">(</span><span class="nt">R2</span><span class="o">)</span>       <span class="o">;</span><span class="nt">OUTPUT</span> <span class="s1">&#39;\N&#39;</span>
-<span class="nt">001270</span>  <span class="nt">105712</span>                          <span class="nt">TSTB</span>    <span class="o">(</span><span class="nt">R2</span><span class="o">)</span>            <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">XMIT</span> <span class="nt">CLEAR</span>
-<span class="nt">001272</span>  <span class="nt">100376</span>                          <span class="nt">BPL</span>     <span class="p">.</span><span class="nc">-2</span>             <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">UNTIL</span> <span class="nt">SO</span>
-<span class="nt">001274</span>  <span class="nt">020427</span>  <span class="nt">000071</span>                  <span class="nt">CMP</span>     <span class="nt">R4</span><span class="o">,</span><span class="p">#</span><span class="nn">71</span>          <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">PASSES</span> <span class="nt">AGAINST</span> <span class="nt">57</span>
-<span class="nt">001300</span>  <span class="nt">100663</span>                          <span class="nt">BMI</span>     <span class="nt">NXTMUL</span>          <span class="o">;</span><span class="nt">LESS</span><span class="o">:</span> <span class="nt">DO</span> <span class="nt">NEXT</span> <span class="nt">PASS</span>
-<span class="nt">001302</span>  <span class="nt">001402</span>                          <span class="nt">BEQ</span>     <span class="nt">LSTPAS</span>          <span class="o">;</span><span class="nt">EQUAL</span><span class="o">:</span> <span class="nt">DO</span> <span class="nt">LAST</span> <span class="nt">PASS</span>
-<span class="nt">001304</span>  <span class="nt">000167</span>  <span class="nt">171470</span>                  <span class="nt">JMP</span>     <span class="nt">173000</span>          <span class="o">;</span><span class="nt">GREATER</span><span class="o">:</span> <span class="nt">RETURN</span> <span class="nt">TO</span> <span class="nt">M9301</span> <span class="nt">MONITOR</span>
-<span class="nt">001310</span>  <span class="nt">005204</span>                  <span class="nt">LSTPAS</span><span class="o">:</span> <span class="nt">INC</span>     <span class="nt">R4</span>              <span class="o">;</span><span class="nt">INDICATE</span> <span class="nt">58TH</span> <span class="nt">PASS</span>
-<span class="nt">001312</span>  <span class="nt">000167</span>  <span class="nt">177536</span>                  <span class="nt">JMP</span>     <span class="nt">LSTMUL</span>          <span class="o">;</span><span class="nt">DO</span> <span class="nt">LAST</span> <span class="nt">PASS</span> <span class="nt">WITHOUT</span> <span class="nt">LOADING</span> <span class="nt">SC</span>
-<span class="nt">001316</span>  <span class="nt">040200</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">MCND</span><span class="o">:</span>   <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">040200</span><span class="o">,</span> <span class="nt">000000</span><span class="o">,</span> <span class="nt">000000</span><span class="o">,</span> <span class="nt">000000</span>
-<span class="nt">001324</span>  <span class="nt">000000</span>
-<span class="nt">001326</span>  <span class="nt">040300</span>  <span class="nt">000300</span>  <span class="nt">000300</span>  <span class="nt">MLYR</span><span class="o">:</span>   <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">040300</span><span class="o">,</span> <span class="nt">000300</span><span class="o">,</span> <span class="nt">000300</span><span class="o">,</span> <span class="nt">000300</span>
-<span class="nt">001334</span>  <span class="nt">000300</span>
-<span class="nt">001336</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">AR</span><span class="o">:</span>     <span class="p">.</span><span class="nc">FLT4</span>   <span class="nt">0</span>
-<span class="nt">001344</span>  <span class="nt">000000</span>
-<span class="nt">001346</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">QR</span><span class="o">:</span>     <span class="p">.</span><span class="nc">FLT4</span>   <span class="nt">0</span>
-<span class="nt">001354</span>  <span class="nt">000000</span>
-<span class="nt">001356</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">TEMP</span><span class="o">:</span>   <span class="p">.</span><span class="nc">FLT4</span>   <span class="nt">0</span>
-<span class="nt">001364</span>  <span class="nt">000000</span>
-        <span class="nt">001000</span>                          <span class="p">.</span><span class="nc">END</span>    <span class="nt">START</span>
-</pre></div>
-</td></tr></table>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span></pre></div></td><td class="code"><div><pre><span></span><span class="w">        </span><span class="nt">000000</span><span class="w">                          </span><span class="nt">AC0</span><span class="o">=%</span><span class="nt">0</span>
+<span class="w">        </span><span class="nt">000001</span><span class="w">                          </span><span class="nt">AC1</span><span class="o">=%</span><span class="nt">1</span>
+<span class="w">        </span><span class="nt">000002</span><span class="w">                          </span><span class="nt">AC2</span><span class="o">=%</span><span class="nt">2</span>
+<span class="w">        </span><span class="nt">177560</span><span class="w">                          </span><span class="nt">SERIAL</span><span class="o">=</span><span class="nt">177560</span>
+<span class="w">        </span><span class="nt">170006</span><span class="w">                          </span><span class="nt">MRS</span><span class="o">=</span><span class="nt">170006</span>
+<span class="nt">000000</span><span class="w">                                  </span><span class="p">.</span><span class="nc">ASECT</span>
+<span class="w">        </span><span class="nt">001000</span><span class="w">                          </span><span class="o">.=</span><span class="nt">1000</span>
+<span class="nt">001000</span><span class="w">  </span><span class="nt">170127</span><span class="w">  </span><span class="nt">040220</span><span class="w">          </span><span class="nt">START</span><span class="o">:</span><span class="w">  </span><span class="nt">LDFPS</span><span class="w">   </span><span class="p">#</span><span class="nn">40220</span><span class="w">          </span><span class="o">;</span><span class="nt">DISABLE</span><span class="w"> </span><span class="nt">INTS</span><span class="o">,</span><span class="w"> </span><span class="nt">SET</span><span class="w"> </span><span class="nt">DBL</span><span class="w"> </span><span class="nt">AND</span><span class="w"> </span><span class="nt">MAINT</span><span class="w"> </span><span class="nt">MODE</span>
+<span class="nt">001004</span><span class="w">  </span><span class="nt">172667</span><span class="w">  </span><span class="nt">000316</span><span class="w">                  </span><span class="nt">LDD</span><span class="w">     </span><span class="nt">MLYR</span><span class="o">,</span><span class="nt">AC2</span><span class="w">        </span><span class="o">;</span><span class="nt">LOAD</span><span class="w"> </span><span class="nt">MULTIPLIER</span><span class="w"> </span><span class="nt">IN</span><span class="w"> </span><span class="nt">AC2</span>
+<span class="nt">001010</span><span class="w">  </span><span class="nt">012703</span><span class="w">  </span><span class="nt">000230</span><span class="w">                  </span><span class="nt">MOV</span><span class="w">     </span><span class="p">#</span><span class="nn">230</span><span class="o">,</span><span class="nt">R3</span><span class="w">         </span><span class="o">;</span><span class="nt">R3</span><span class="w"> </span><span class="nt">GETS</span><span class="w"> </span><span class="nt">OCTAL</span><span class="w"> </span><span class="nt">230</span><span class="w"> </span><span class="o">(</span><span class="nt">FRAC</span><span class="w"> </span><span class="nt">MUL</span><span class="w"> </span><span class="nt">MICROSTATE</span><span class="o">)</span>
+<span class="nt">001014</span><span class="w">  </span><span class="nt">170003</span><span class="w">                          </span><span class="nt">LDUB</span><span class="w">                    </span><span class="o">;</span><span class="nt">LOAD</span><span class="w"> </span><span class="nt">R3</span><span class="w"> </span><span class="nt">TO</span><span class="w"> </span><span class="nt">MBR</span>
+<span class="nt">001016</span><span class="w">  </span><span class="nt">012702</span><span class="w">  </span><span class="nt">177564</span><span class="w">                  </span><span class="nt">MOV</span><span class="w">     </span><span class="p">#</span><span class="nn">SERIAL</span><span class="o">+</span><span class="nt">4</span><span class="o">,</span><span class="nt">R2</span><span class="w">    </span><span class="o">;</span><span class="nt">SERIAL</span><span class="w"> </span><span class="nt">XMIT</span><span class="w"> </span><span class="nt">BASE</span><span class="w"> </span><span class="nt">TO</span><span class="w"> </span><span class="nt">R2</span>
+<span class="nt">001022</span><span class="w">  </span><span class="nt">012762</span><span class="w">  </span><span class="nt">000015</span><span class="w">  </span><span class="nt">000002</span><span class="w">          </span><span class="nt">MOV</span><span class="w">     </span><span class="p">#</span><span class="nn">15</span><span class="o">,</span><span class="nt">2</span><span class="o">(</span><span class="nt">R2</span><span class="o">)</span><span class="w">       </span><span class="o">;</span><span class="nt">OUTPUT</span><span class="w"> </span><span class="s1">&#39;\R&#39;</span>
+<span class="nt">001030</span><span class="w">  </span><span class="nt">105712</span><span class="w">                          </span><span class="nt">TSTB</span><span class="w">    </span><span class="o">(</span><span class="nt">R2</span><span class="o">)</span><span class="w">            </span><span class="o">;</span><span class="nt">CHECK</span><span class="w"> </span><span class="nt">XMIT</span><span class="w"> </span><span class="nt">CLEAR</span>
+<span class="nt">001032</span><span class="w">  </span><span class="nt">100376</span><span class="w">                          </span><span class="nt">BPL</span><span class="w">     </span><span class="p">.</span><span class="nc">-2</span><span class="w">             </span><span class="o">;</span><span class="nt">LOOP</span><span class="w"> </span><span class="nt">UNTIL</span><span class="w"> </span><span class="nt">SO</span>
+<span class="nt">001034</span><span class="w">  </span><span class="nt">012762</span><span class="w">  </span><span class="nt">000012</span><span class="w">  </span><span class="nt">000002</span><span class="w">          </span><span class="nt">MOV</span><span class="w">     </span><span class="p">#</span><span class="nn">12</span><span class="o">,</span><span class="nt">2</span><span class="o">(</span><span class="nt">R2</span><span class="o">)</span><span class="w">       </span><span class="o">;</span><span class="nt">OUTPUT</span><span class="w"> </span><span class="s1">&#39;\N&#39;</span>
+<span class="nt">001042</span><span class="w">  </span><span class="nt">105712</span><span class="w">                          </span><span class="nt">TSTB</span><span class="w">    </span><span class="o">(</span><span class="nt">R2</span><span class="o">)</span><span class="w">            </span><span class="o">;</span><span class="nt">CHECK</span><span class="w"> </span><span class="nt">XMIT</span><span class="w"> </span><span class="nt">CLEAR</span>
+<span class="nt">001044</span><span class="w">  </span><span class="nt">100376</span><span class="w">                          </span><span class="nt">BPL</span><span class="w">     </span><span class="p">.</span><span class="nc">-2</span><span class="w">             </span><span class="o">;</span><span class="nt">LOOP</span><span class="w"> </span><span class="nt">UNTIL</span><span class="w"> </span><span class="nt">SO</span>
+<span class="nt">001046</span><span class="w">  </span><span class="nt">005004</span><span class="w">                          </span><span class="nt">CLR</span><span class="w">     </span><span class="nt">R4</span><span class="w">              </span><span class="o">;</span><span class="nt">R4</span><span class="w"> </span><span class="nt">HOLDS</span><span class="w"> </span><span class="nt">SC</span><span class="w"> </span><span class="nt">VALUE</span>
+<span class="nt">001050</span><span class="w">  </span><span class="nt">005204</span><span class="w">                  </span><span class="nt">NXTMUL</span><span class="o">:</span><span class="w"> </span><span class="nt">INC</span><span class="w">     </span><span class="nt">R4</span><span class="w">              </span><span class="o">;</span><span class="nt">INCREMENT</span><span class="w"> </span><span class="nt">SC</span>
+<span class="nt">001052</span><span class="w">  </span><span class="nt">170004</span><span class="w">                          </span><span class="nt">LDSC</span><span class="w">                    </span><span class="o">;</span><span class="nt">LOAD</span><span class="w"> </span><span class="nt">1S</span><span class="w"> </span><span class="nt">COMPLEMENT</span><span class="w"> </span><span class="nt">OF</span><span class="w"> </span><span class="nt">R4</span><span class="w"> </span><span class="nt">INTO</span><span class="w"> </span><span class="nt">SC</span>
+<span class="nt">001054</span><span class="w">  </span><span class="nt">012705</span><span class="w">  </span><span class="nt">001356</span><span class="w">          </span><span class="nt">LSTMUL</span><span class="o">:</span><span class="w"> </span><span class="nt">MOV</span><span class="w">     </span><span class="p">#</span><span class="nn">QR</span><span class="o">+</span><span class="nt">10</span><span class="o">,</span><span class="nt">R5</span><span class="w">       </span><span class="o">;</span><span class="nt">SET</span><span class="w"> </span><span class="nt">R5</span><span class="w"> </span><span class="nt">PAST</span><span class="w"> </span><span class="nt">END</span><span class="w"> </span><span class="nt">OF</span><span class="w"> </span><span class="nt">STORAGE</span><span class="w"> </span><span class="nt">TABLE</span>
+<span class="nt">001060</span><span class="w">  </span><span class="nt">172567</span><span class="w">  </span><span class="nt">000232</span><span class="w">                  </span><span class="nt">LDD</span><span class="w">     </span><span class="nt">MCND</span><span class="o">,</span><span class="nt">AC1</span><span class="w">        </span><span class="o">;</span><span class="nt">LOAD</span><span class="w"> </span><span class="nt">MULTIPLICAND</span><span class="w"> </span><span class="nt">INTO</span><span class="w"> </span><span class="nt">AC1</span>
+<span class="nt">001064</span><span class="w">  </span><span class="nt">171102</span><span class="w">                          </span><span class="nt">MULD</span><span class="w">    </span><span class="nt">AC2</span><span class="o">,</span><span class="nt">AC1</span><span class="w">         </span><span class="o">;</span><span class="nt">DO</span><span class="w"> </span><span class="nt">PARTIAL</span><span class="w"> </span><span class="nt">MULTIPLY</span>
+<span class="nt">001066</span><span class="w">  </span><span class="nt">170007</span><span class="w">                          </span><span class="nt">STQ0</span><span class="w">                    </span><span class="o">;</span><span class="nt">TRANSFER</span><span class="w"> </span><span class="nt">QR</span><span class="w"> </span><span class="nt">TO</span><span class="w"> </span><span class="nt">AC0</span>
+<span class="nt">001070</span><span class="w">  </span><span class="nt">174045</span><span class="w">                          </span><span class="nt">STD</span><span class="w">     </span><span class="nt">AC0</span><span class="o">,</span><span class="nt">-</span><span class="o">(</span><span class="nt">R5</span><span class="o">)</span><span class="w">       </span><span class="o">;</span><span class="nt">STORE</span><span class="w"> </span><span class="nt">QR</span><span class="w"> </span><span class="nt">IN</span><span class="w"> </span><span class="nt">TABLE</span>
+<span class="nt">001072</span><span class="w">  </span><span class="nt">042715</span><span class="w">  </span><span class="nt">177600</span><span class="w">                  </span><span class="nt">BIC</span><span class="w">     </span><span class="p">#</span><span class="nn">177600</span><span class="o">,(</span><span class="nt">R5</span><span class="o">)</span><span class="w">    </span><span class="o">;</span><span class="nt">CLEAR</span><span class="w"> </span><span class="nt">OFF</span><span class="w"> </span><span class="nt">SIGN</span><span class="w"> </span><span class="nt">AND</span><span class="w"> </span><span class="nt">EXPONENT</span>
+<span class="nt">001076</span><span class="w">  </span><span class="nt">170005</span><span class="w">                          </span><span class="nt">STA0</span><span class="w">                    </span><span class="o">;</span><span class="nt">TRANSFER</span><span class="w"> </span><span class="nt">AR</span><span class="w"> </span><span class="nt">TO</span><span class="w"> </span><span class="nt">AC0</span>
+<span class="nt">001100</span><span class="w">  </span><span class="nt">174045</span><span class="w">                          </span><span class="nt">STD</span><span class="w">     </span><span class="nt">AC0</span><span class="o">,</span><span class="nt">-</span><span class="o">(</span><span class="nt">R5</span><span class="o">)</span><span class="w">       </span><span class="o">;</span><span class="nt">STORE</span><span class="w"> </span><span class="nt">AR</span><span class="w"> </span><span class="nt">IN</span><span class="w"> </span><span class="nt">TABLE</span>
+<span class="nt">001102</span><span class="w">  </span><span class="nt">042715</span><span class="w">  </span><span class="nt">177600</span><span class="w">                  </span><span class="nt">BIC</span><span class="w">     </span><span class="p">#</span><span class="nn">177600</span><span class="o">,(</span><span class="nt">R5</span><span class="o">)</span><span class="w">    </span><span class="o">;</span><span class="nt">CLEAR</span><span class="w"> </span><span class="nt">OFF</span><span class="w"> </span><span class="nt">SIGN</span><span class="w"> </span><span class="nt">AND</span><span class="w"> </span><span class="nt">EXPONENT</span>
+<span class="nt">001106</span><span class="w">  </span><span class="nt">170006</span><span class="w">                          </span><span class="nt">MRS</span><span class="w">                     </span><span class="o">;</span><span class="nt">SHIFT</span><span class="w"> </span><span class="nt">AR</span><span class="w"> </span><span class="nt">AND</span><span class="w"> </span><span class="nt">QR</span><span class="w"> </span><span class="nt">RIGHT</span><span class="w"> </span><span class="nt">ONE</span><span class="w"> </span><span class="nt">PLACE</span>
+<span class="nt">001110</span><span class="w">  </span><span class="nt">170006</span><span class="w">                          </span><span class="nt">MRS</span><span class="w">                     </span><span class="o">;</span><span class="nt">SHIFT</span><span class="w"> </span><span class="nt">AR</span><span class="w"> </span><span class="nt">AND</span><span class="w"> </span><span class="nt">QR</span><span class="w"> </span><span class="nt">RIGHT</span><span class="w"> </span><span class="nt">ONE</span><span class="w"> </span><span class="nt">PLACE</span>
+<span class="nt">001112</span><span class="w">  </span><span class="nt">170007</span><span class="w">                          </span><span class="nt">STQ0</span><span class="w">                    </span><span class="o">;</span><span class="nt">TRANSFER</span><span class="w"> </span><span class="nt">QR</span><span class="w"> </span><span class="nt">TO</span><span class="w"> </span><span class="nt">AC0</span>
+<span class="nt">001114</span><span class="w">  </span><span class="nt">174067</span><span class="w">  </span><span class="nt">000236</span><span class="w">                  </span><span class="nt">STD</span><span class="w">     </span><span class="nt">AC0</span><span class="o">,</span><span class="nt">TEMP</span><span class="w">        </span><span class="o">;</span><span class="nt">STORE</span><span class="w"> </span><span class="nt">QR</span><span class="w"> </span><span class="nt">IN</span><span class="w"> </span><span class="nt">TEMP</span>
+<span class="nt">001120</span><span class="w">  </span><span class="nt">016703</span><span class="w">  </span><span class="nt">000232</span><span class="w">                  </span><span class="nt">MOV</span><span class="w">     </span><span class="nt">TEMP</span><span class="o">,</span><span class="nt">R3</span><span class="w">         </span><span class="o">;</span><span class="nt">FETCH</span><span class="w"> </span><span class="nt">MSW</span><span class="w"> </span><span class="nt">OF</span><span class="w"> </span><span class="nt">QR</span><span class="w"> </span><span class="nt">TO</span><span class="w"> </span><span class="nt">R3</span>
+<span class="nt">001124</span><span class="w">  </span><span class="nt">042703</span><span class="w">  </span><span class="nt">177600</span><span class="w">                  </span><span class="nt">BIC</span><span class="w">     </span><span class="p">#</span><span class="nn">177600</span><span class="o">,</span><span class="nt">R3</span><span class="w">      </span><span class="o">;</span><span class="nt">CLEAR</span><span class="w"> </span><span class="nt">OFF</span><span class="w"> </span><span class="nt">SIGN</span><span class="w"> </span><span class="nt">AND</span><span class="w"> </span><span class="nt">EXPONENT</span>
+<span class="nt">001130</span><span class="w">  </span><span class="nt">006303</span><span class="w">                          </span><span class="nt">ASL</span><span class="w">     </span><span class="nt">R3</span><span class="w">              </span><span class="o">;</span><span class="nt">SHIFT</span><span class="w"> </span><span class="nt">MSBS</span><span class="w"> </span><span class="nt">OF</span><span class="w"> </span><span class="nt">QR</span><span class="w"> </span><span class="nt">ONE</span><span class="w"> </span><span class="nt">PLACE</span><span class="w"> </span><span class="nt">LEFT</span>
+<span class="nt">001132</span><span class="w">  </span><span class="nt">006303</span><span class="w">                          </span><span class="nt">ASL</span><span class="w">     </span><span class="nt">R3</span><span class="w">              </span><span class="o">;</span><span class="nt">SHIFT</span><span class="w"> </span><span class="nt">MSBS</span><span class="w"> </span><span class="nt">OF</span><span class="w"> </span><span class="nt">QR</span><span class="w"> </span><span class="nt">ONE</span><span class="w"> </span><span class="nt">PLACE</span><span class="w"> </span><span class="nt">LEFT</span>
+<span class="nt">001134</span><span class="w">  </span><span class="nt">050365</span><span class="w">  </span><span class="nt">000010</span><span class="w">                  </span><span class="nt">BIS</span><span class="w">     </span><span class="nt">R3</span><span class="o">,</span><span class="nt">10</span><span class="o">(</span><span class="nt">R5</span><span class="o">)</span><span class="w">       </span><span class="o">;</span><span class="nt">SET</span><span class="w"> </span><span class="nt">QR59</span><span class="w"> </span><span class="nt">AND</span><span class="w"> </span><span class="nt">QR58</span><span class="w"> </span><span class="nt">IN</span><span class="w"> </span><span class="nt">TABLE</span>
+<span class="nt">001140</span><span class="w">  </span><span class="nt">170005</span><span class="w">                          </span><span class="nt">STA0</span><span class="w">                    </span><span class="o">;</span><span class="nt">TRANSFER</span><span class="w"> </span><span class="nt">AR</span><span class="w"> </span><span class="nt">TO</span><span class="w"> </span><span class="nt">AC0</span>
+<span class="nt">001142</span><span class="w">  </span><span class="nt">174067</span><span class="w">  </span><span class="nt">000210</span><span class="w">                  </span><span class="nt">STD</span><span class="w">     </span><span class="nt">AC0</span><span class="o">,</span><span class="nt">TEMP</span><span class="w">        </span><span class="o">;</span><span class="nt">STORE</span><span class="w"> </span><span class="nt">AR</span><span class="w"> </span><span class="nt">IN</span><span class="w"> </span><span class="nt">TEMP</span>
+<span class="nt">001146</span><span class="w">  </span><span class="nt">016703</span><span class="w">  </span><span class="nt">000204</span><span class="w">                  </span><span class="nt">MOV</span><span class="w">     </span><span class="nt">TEMP</span><span class="o">,</span><span class="nt">R3</span><span class="w">         </span><span class="o">;</span><span class="nt">FETCH</span><span class="w"> </span><span class="nt">MSW</span><span class="w"> </span><span class="nt">OF</span><span class="w"> </span><span class="nt">AR</span><span class="w"> </span><span class="nt">TO</span><span class="w"> </span><span class="nt">R3</span>
+<span class="nt">001152</span><span class="w">  </span><span class="nt">042703</span><span class="w">  </span><span class="nt">177600</span><span class="w">                  </span><span class="nt">BIC</span><span class="w">     </span><span class="p">#</span><span class="nn">177600</span><span class="o">,</span><span class="nt">R3</span><span class="w">      </span><span class="o">;</span><span class="nt">CLEAR</span><span class="w"> </span><span class="nt">OFF</span><span class="w"> </span><span class="nt">SIGN</span><span class="w"> </span><span class="nt">AND</span><span class="w"> </span><span class="nt">EXPONENT</span>
+<span class="nt">001156</span><span class="w">  </span><span class="nt">006303</span><span class="w">                          </span><span class="nt">ASL</span><span class="w">     </span><span class="nt">R3</span><span class="w">              </span><span class="o">;</span><span class="nt">SHIFT</span><span class="w"> </span><span class="nt">MSBS</span><span class="w"> </span><span class="nt">OF</span><span class="w"> </span><span class="nt">AR</span><span class="w"> </span><span class="nt">ONE</span><span class="w"> </span><span class="nt">PLACE</span><span class="w"> </span><span class="nt">LEFT</span>
+<span class="nt">001160</span><span class="w">  </span><span class="nt">006303</span><span class="w">                          </span><span class="nt">ASL</span><span class="w">     </span><span class="nt">R3</span><span class="w">              </span><span class="o">;</span><span class="nt">SHIFT</span><span class="w"> </span><span class="nt">MSBS</span><span class="w"> </span><span class="nt">OF</span><span class="w"> </span><span class="nt">AR</span><span class="w"> </span><span class="nt">ONE</span><span class="w"> </span><span class="nt">PLACE</span><span class="w"> </span><span class="nt">LEFT</span>
+<span class="nt">001162</span><span class="w">  </span><span class="nt">050315</span><span class="w">                          </span><span class="nt">BIS</span><span class="w">     </span><span class="nt">R3</span><span class="o">,(</span><span class="nt">R5</span><span class="o">)</span><span class="w">         </span><span class="o">;</span><span class="nt">SET</span><span class="w"> </span><span class="nt">AR59</span><span class="w"> </span><span class="nt">AND</span><span class="w"> </span><span class="nt">AR58</span><span class="w"> </span><span class="nt">IN</span><span class="w"> </span><span class="nt">TABLE</span>
+<span class="nt">001164</span><span class="w">  </span><span class="nt">012705</span><span class="w">  </span><span class="nt">001336</span><span class="w">                  </span><span class="nt">MOV</span><span class="w">     </span><span class="p">#</span><span class="nn">AR</span><span class="o">,</span><span class="nt">R5</span><span class="w">          </span><span class="o">;</span><span class="nt">GET</span><span class="w"> </span><span class="nt">ADDRESS</span><span class="w"> </span><span class="nt">OF</span><span class="w"> </span><span class="nt">FIRST</span><span class="w"> </span><span class="nt">QUAD</span><span class="w"> </span><span class="nt">FOR</span><span class="w"> </span><span class="nt">PRINTING</span>
+<span class="nt">001170</span><span class="w">  </span><span class="nt">012700</span><span class="w">  </span><span class="nt">000010</span><span class="w">                  </span><span class="nt">MOV</span><span class="w">     </span><span class="p">#</span><span class="nn">10</span><span class="o">,</span><span class="nt">R0</span><span class="w">          </span><span class="o">;</span><span class="nt">R0</span><span class="w"> </span><span class="nt">COUNTS</span><span class="w"> </span><span class="nt">8</span><span class="w"> </span><span class="nt">WORDS</span><span class="w"> </span><span class="nt">IN</span><span class="w"> </span><span class="nt">TWO</span><span class="w"> </span><span class="nt">QUADS</span>
+<span class="nt">001174</span><span class="w">  </span><span class="nt">012503</span><span class="w">                  </span><span class="nt">LWORD</span><span class="o">:</span><span class="w">  </span><span class="nt">MOV</span><span class="w">     </span><span class="o">(</span><span class="nt">R5</span><span class="o">)+,</span><span class="nt">R3</span><span class="w">        </span><span class="o">;</span><span class="nt">FETCH</span><span class="w"> </span><span class="nt">NEXT</span><span class="w"> </span><span class="nt">WORD</span><span class="w"> </span><span class="nt">OF</span><span class="w"> </span><span class="nt">QUAD</span>
+<span class="nt">001176</span><span class="w">  </span><span class="nt">012701</span><span class="w">  </span><span class="nt">000020</span><span class="w">                  </span><span class="nt">MOV</span><span class="w">     </span><span class="p">#</span><span class="nn">20</span><span class="o">,</span><span class="nt">R1</span><span class="w">          </span><span class="o">;</span><span class="nt">R1</span><span class="w"> </span><span class="nt">COUNTS</span><span class="w"> </span><span class="nt">16</span><span class="w"> </span><span class="nt">BITS</span><span class="w"> </span><span class="nt">IN</span><span class="w"> </span><span class="nt">WORD</span>
+<span class="nt">001202</span><span class="w">  </span><span class="nt">006103</span><span class="w">                  </span><span class="nt">LBIT</span><span class="o">:</span><span class="w">   </span><span class="nt">ROL</span><span class="w">     </span><span class="nt">R3</span><span class="w">              </span><span class="o">;</span><span class="nt">ROTATE</span><span class="o">,</span><span class="w"> </span><span class="nt">HIGH</span><span class="w"> </span><span class="nt">BIT</span><span class="w"> </span><span class="nt">GOES</span><span class="w"> </span><span class="nt">TO</span><span class="w"> </span><span class="nt">CARRY</span>
+<span class="nt">001204</span><span class="w">  </span><span class="nt">103405</span><span class="w">                          </span><span class="nt">BCS</span><span class="w">     </span><span class="nt">LBIT1</span><span class="w">           </span><span class="o">;</span><span class="nt">SKIP</span><span class="w"> </span><span class="nt">AHEAD</span><span class="w"> </span><span class="nt">IF</span><span class="w"> </span><span class="nt">CARRY</span><span class="w"> </span><span class="nt">SET</span>
+<span class="nt">001206</span><span class="w">  </span><span class="nt">012762</span><span class="w">  </span><span class="nt">000056</span><span class="w">  </span><span class="nt">000002</span><span class="w">          </span><span class="nt">MOV</span><span class="w">     </span><span class="p">#</span><span class="nn">56</span><span class="o">,</span><span class="nt">2</span><span class="o">(</span><span class="nt">R2</span><span class="o">)</span><span class="w">       </span><span class="o">;</span><span class="nt">OTHERWISE</span><span class="w"> </span><span class="nt">OUTPUT</span><span class="w"> </span><span class="s1">&#39;.&#39;</span>
+<span class="nt">001214</span><span class="w">  </span><span class="nt">000167</span><span class="w">  </span><span class="nt">000006</span><span class="w">                  </span><span class="nt">JMP</span><span class="w">     </span><span class="nt">LBIT2</span><span class="w">           </span><span class="o">;</span><span class="nt">AND</span><span class="w"> </span><span class="nt">SKIP</span><span class="w"> </span><span class="nt">AHEAD</span>
+<span class="nt">001220</span><span class="w">  </span><span class="nt">012762</span><span class="w">  </span><span class="nt">000061</span><span class="w">  </span><span class="nt">000002</span><span class="w">  </span><span class="nt">LBIT1</span><span class="o">:</span><span class="w">  </span><span class="nt">MOV</span><span class="w">     </span><span class="p">#</span><span class="nn">61</span><span class="o">,</span><span class="nt">2</span><span class="o">(</span><span class="nt">R2</span><span class="o">)</span><span class="w">       </span><span class="o">;</span><span class="nt">OUTPUT</span><span class="w"> </span><span class="s1">&#39;1&#39;</span>
+<span class="nt">001226</span><span class="w">  </span><span class="nt">105712</span><span class="w">                  </span><span class="nt">LBIT2</span><span class="o">:</span><span class="w">  </span><span class="nt">TSTB</span><span class="w">    </span><span class="o">(</span><span class="nt">R2</span><span class="o">)</span><span class="w">            </span><span class="o">;</span><span class="nt">CHECK</span><span class="w"> </span><span class="nt">XMIT</span><span class="w"> </span><span class="nt">CLEAR</span>
+<span class="nt">001230</span><span class="w">  </span><span class="nt">100376</span><span class="w">                          </span><span class="nt">BPL</span><span class="w">     </span><span class="p">.</span><span class="nc">-2</span><span class="w">             </span><span class="o">;</span><span class="nt">LOOP</span><span class="w"> </span><span class="nt">UNTIL</span><span class="w"> </span><span class="nt">SO</span>
+<span class="nt">001232</span><span class="w">  </span><span class="nt">077115</span><span class="w">                          </span><span class="nt">SOB</span><span class="w">     </span><span class="nt">R1</span><span class="o">,</span><span class="nt">LBIT</span><span class="w">         </span><span class="o">;</span><span class="nt">LOOP</span><span class="w"> </span><span class="nt">OVER</span><span class="w"> </span><span class="nt">BITS</span><span class="w"> </span><span class="nt">IN</span><span class="w"> </span><span class="nt">WORD</span>
+<span class="nt">001234</span><span class="w">  </span><span class="nt">012762</span><span class="w">  </span><span class="nt">000040</span><span class="w">  </span><span class="nt">000002</span><span class="w">          </span><span class="nt">MOV</span><span class="w">     </span><span class="p">#</span><span class="nn">40</span><span class="o">,</span><span class="nt">2</span><span class="o">(</span><span class="nt">R2</span><span class="o">)</span><span class="w">       </span><span class="o">;</span><span class="nt">OUTPUT</span><span class="w"> </span><span class="s1">&#39; &#39;</span><span class="w"> </span><span class="nt">TO</span><span class="w"> </span><span class="nt">SEPARATE</span><span class="w"> </span><span class="nt">WORDS</span>
+<span class="nt">001242</span><span class="w">  </span><span class="nt">105712</span><span class="w">                          </span><span class="nt">TSTB</span><span class="w">    </span><span class="o">(</span><span class="nt">R2</span><span class="o">)</span><span class="w">            </span><span class="o">;</span><span class="nt">CHECK</span><span class="w"> </span><span class="nt">XMIT</span><span class="w"> </span><span class="nt">CLEAR</span>
+<span class="nt">001244</span><span class="w">  </span><span class="nt">100376</span><span class="w">                          </span><span class="nt">BPL</span><span class="w">     </span><span class="p">.</span><span class="nc">-2</span><span class="w">             </span><span class="o">;</span><span class="nt">LOOP</span><span class="w"> </span><span class="nt">UNTIL</span><span class="w"> </span><span class="nt">SO</span>
+<span class="nt">001246</span><span class="w">  </span><span class="nt">077026</span><span class="w">                          </span><span class="nt">SOB</span><span class="w">     </span><span class="nt">R0</span><span class="o">,</span><span class="nt">LWORD</span><span class="w">        </span><span class="o">;</span><span class="nt">LOOP</span><span class="w"> </span><span class="nt">OVER</span><span class="w"> </span><span class="nt">WORDS</span><span class="w"> </span><span class="nt">IN</span><span class="w"> </span><span class="nt">QUAD</span>
+<span class="nt">001250</span><span class="w">  </span><span class="nt">012762</span><span class="w">  </span><span class="nt">000015</span><span class="w">  </span><span class="nt">000002</span><span class="w">          </span><span class="nt">MOV</span><span class="w">     </span><span class="p">#</span><span class="nn">15</span><span class="o">,</span><span class="nt">2</span><span class="o">(</span><span class="nt">R2</span><span class="o">)</span><span class="w">       </span><span class="o">;</span><span class="nt">OUTPUT</span><span class="w"> </span><span class="s1">&#39;\R&#39;</span>
+<span class="nt">001256</span><span class="w">  </span><span class="nt">105712</span><span class="w">                          </span><span class="nt">TSTB</span><span class="w">    </span><span class="o">(</span><span class="nt">R2</span><span class="o">)</span><span class="w">            </span><span class="o">;</span><span class="nt">CHECK</span><span class="w"> </span><span class="nt">XMIT</span><span class="w"> </span><span class="nt">CLEAR</span>
+<span class="nt">001260</span><span class="w">  </span><span class="nt">100376</span><span class="w">                          </span><span class="nt">BPL</span><span class="w">     </span><span class="p">.</span><span class="nc">-2</span><span class="w">             </span><span class="o">;</span><span class="nt">LOOP</span><span class="w"> </span><span class="nt">UNTIL</span><span class="w"> </span><span class="nt">SO</span>
+<span class="nt">001262</span><span class="w">  </span><span class="nt">012762</span><span class="w">  </span><span class="nt">000012</span><span class="w">  </span><span class="nt">000002</span><span class="w">          </span><span class="nt">MOV</span><span class="w">     </span><span class="p">#</span><span class="nn">12</span><span class="o">,</span><span class="nt">2</span><span class="o">(</span><span class="nt">R2</span><span class="o">)</span><span class="w">       </span><span class="o">;</span><span class="nt">OUTPUT</span><span class="w"> </span><span class="s1">&#39;\N&#39;</span>
+<span class="nt">001270</span><span class="w">  </span><span class="nt">105712</span><span class="w">                          </span><span class="nt">TSTB</span><span class="w">    </span><span class="o">(</span><span class="nt">R2</span><span class="o">)</span><span class="w">            </span><span class="o">;</span><span class="nt">CHECK</span><span class="w"> </span><span class="nt">XMIT</span><span class="w"> </span><span class="nt">CLEAR</span>
+<span class="nt">001272</span><span class="w">  </span><span class="nt">100376</span><span class="w">                          </span><span class="nt">BPL</span><span class="w">     </span><span class="p">.</span><span class="nc">-2</span><span class="w">             </span><span class="o">;</span><span class="nt">LOOP</span><span class="w"> </span><span class="nt">UNTIL</span><span class="w"> </span><span class="nt">SO</span>
+<span class="nt">001274</span><span class="w">  </span><span class="nt">020427</span><span class="w">  </span><span class="nt">000071</span><span class="w">                  </span><span class="nt">CMP</span><span class="w">     </span><span class="nt">R4</span><span class="o">,</span><span class="p">#</span><span class="nn">71</span><span class="w">          </span><span class="o">;</span><span class="nt">CHECK</span><span class="w"> </span><span class="nt">PASSES</span><span class="w"> </span><span class="nt">AGAINST</span><span class="w"> </span><span class="nt">57</span>
+<span class="nt">001300</span><span class="w">  </span><span class="nt">100663</span><span class="w">                          </span><span class="nt">BMI</span><span class="w">     </span><span class="nt">NXTMUL</span><span class="w">          </span><span class="o">;</span><span class="nt">LESS</span><span class="o">:</span><span class="w"> </span><span class="nt">DO</span><span class="w"> </span><span class="nt">NEXT</span><span class="w"> </span><span class="nt">PASS</span>
+<span class="nt">001302</span><span class="w">  </span><span class="nt">001402</span><span class="w">                          </span><span class="nt">BEQ</span><span class="w">     </span><span class="nt">LSTPAS</span><span class="w">          </span><span class="o">;</span><span class="nt">EQUAL</span><span class="o">:</span><span class="w"> </span><span class="nt">DO</span><span class="w"> </span><span class="nt">LAST</span><span class="w"> </span><span class="nt">PASS</span>
+<span class="nt">001304</span><span class="w">  </span><span class="nt">000167</span><span class="w">  </span><span class="nt">171470</span><span class="w">                  </span><span class="nt">JMP</span><span class="w">     </span><span class="nt">173000</span><span class="w">          </span><span class="o">;</span><span class="nt">GREATER</span><span class="o">:</span><span class="w"> </span><span class="nt">RETURN</span><span class="w"> </span><span class="nt">TO</span><span class="w"> </span><span class="nt">M9301</span><span class="w"> </span><span class="nt">MONITOR</span>
+<span class="nt">001310</span><span class="w">  </span><span class="nt">005204</span><span class="w">                  </span><span class="nt">LSTPAS</span><span class="o">:</span><span class="w"> </span><span class="nt">INC</span><span class="w">     </span><span class="nt">R4</span><span class="w">              </span><span class="o">;</span><span class="nt">INDICATE</span><span class="w"> </span><span class="nt">58TH</span><span class="w"> </span><span class="nt">PASS</span>
+<span class="nt">001312</span><span class="w">  </span><span class="nt">000167</span><span class="w">  </span><span class="nt">177536</span><span class="w">                  </span><span class="nt">JMP</span><span class="w">     </span><span class="nt">LSTMUL</span><span class="w">          </span><span class="o">;</span><span class="nt">DO</span><span class="w"> </span><span class="nt">LAST</span><span class="w"> </span><span class="nt">PASS</span><span class="w"> </span><span class="nt">WITHOUT</span><span class="w"> </span><span class="nt">LOADING</span><span class="w"> </span><span class="nt">SC</span>
+<span class="nt">001316</span><span class="w">  </span><span class="nt">040200</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">MCND</span><span class="o">:</span><span class="w">   </span><span class="p">.</span><span class="nc">WORD</span><span class="w">   </span><span class="nt">040200</span><span class="o">,</span><span class="w"> </span><span class="nt">000000</span><span class="o">,</span><span class="w"> </span><span class="nt">000000</span><span class="o">,</span><span class="w"> </span><span class="nt">000000</span>
+<span class="nt">001324</span><span class="w">  </span><span class="nt">000000</span>
+<span class="nt">001326</span><span class="w">  </span><span class="nt">040300</span><span class="w">  </span><span class="nt">000300</span><span class="w">  </span><span class="nt">000300</span><span class="w">  </span><span class="nt">MLYR</span><span class="o">:</span><span class="w">   </span><span class="p">.</span><span class="nc">WORD</span><span class="w">   </span><span class="nt">040300</span><span class="o">,</span><span class="w"> </span><span class="nt">000300</span><span class="o">,</span><span class="w"> </span><span class="nt">000300</span><span class="o">,</span><span class="w"> </span><span class="nt">000300</span>
+<span class="nt">001334</span><span class="w">  </span><span class="nt">000300</span>
+<span class="nt">001336</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">AR</span><span class="o">:</span><span class="w">     </span><span class="p">.</span><span class="nc">FLT4</span><span class="w">   </span><span class="nt">0</span>
+<span class="nt">001344</span><span class="w">  </span><span class="nt">000000</span>
+<span class="nt">001346</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">QR</span><span class="o">:</span><span class="w">     </span><span class="p">.</span><span class="nc">FLT4</span><span class="w">   </span><span class="nt">0</span>
+<span class="nt">001354</span><span class="w">  </span><span class="nt">000000</span>
+<span class="nt">001356</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">TEMP</span><span class="o">:</span><span class="w">   </span><span class="p">.</span><span class="nc">FLT4</span><span class="w">   </span><span class="nt">0</span>
+<span class="nt">001364</span><span class="w">  </span><span class="nt">000000</span>
+<span class="w">        </span><span class="nt">001000</span><span class="w">                          </span><span class="p">.</span><span class="nc">END</span><span class="w">    </span><span class="nt">START</span>
+</pre></div></td></tr></table></div>
+
+
 <p>The idea here is to use the LDUB (load micro-break) and LDSC (load step-counter) maintenance instructions to
 cause a multiplication to halt partway through.  STA0 and STQ0 (store AR, store QR) instructions, in
 conjunction with the MRS (maintenance right shift) instruction, allow retrieval of the internal fraction
@@ -540,47 +602,48 @@ and the FP add/subtract problem is fixed.  The following FP11 diagnostics now pa
 
 <p>...which is almost everything.  The last failing diagnostic is CFPLB0, which tests MODF and MODD.  Set up
 a similar test program for this instruction:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20</pre></div></td><td class="code"><div class="highlight"><pre><span></span>        <span class="nt">000000</span>                          <span class="nt">AC0</span><span class="o">=%</span><span class="nt">0</span>
-        <span class="nt">000001</span>                          <span class="nt">AC1</span><span class="o">=%</span><span class="nt">1</span>
-<span class="nt">000000</span>                                  <span class="p">.</span><span class="nc">ASECT</span>
-        <span class="nt">001000</span>                          <span class="o">.=</span><span class="nt">1000</span>
-<span class="nt">001000</span>  <span class="nt">170011</span>                  <span class="nt">START</span><span class="o">:</span>  <span class="nt">SETD</span>                <span class="o">;</span><span class="nt">SET</span> <span class="nt">DOUBLE</span> <span class="nt">PRECISION</span> <span class="nt">MODE</span>
-<span class="nt">001002</span>  <span class="nt">172467</span>  <span class="nt">000020</span>                  <span class="nt">LDD</span>     <span class="nt">D1</span><span class="o">,</span><span class="nt">AC0</span>      <span class="o">;</span><span class="nt">FETCH</span> <span class="nt">FIRST</span> <span class="nt">OPERAND</span> <span class="nt">FROM</span> <span class="nt">D1</span>
-<span class="nt">001006</span>  <span class="nt">172567</span>  <span class="nt">000024</span>                  <span class="nt">LDD</span>     <span class="nt">D2</span><span class="o">,</span><span class="nt">AC1</span>      <span class="o">;</span><span class="nt">FETCH</span> <span class="nt">SECOND</span> <span class="nt">OPERAND</span> <span class="nt">FROM</span> <span class="nt">D2</span>
-<span class="nt">001012</span>  <span class="nt">171401</span>                          <span class="nt">MODD</span>    <span class="nt">AC1</span><span class="o">,</span><span class="nt">AC0</span>     <span class="o">;</span><span class="nt">MOD</span> <span class="o">(</span><span class="nt">FRAC</span> <span class="nt">IN</span> <span class="nt">AC0</span><span class="o">,</span> <span class="nt">INT</span> <span class="nt">IN</span> <span class="nt">AC1</span><span class="o">)</span>
-<span class="nt">001014</span>  <span class="nt">174067</span>  <span class="nt">000026</span>                  <span class="nt">STD</span>     <span class="nt">AC0</span><span class="o">,</span><span class="nt">D3</span>      <span class="o">;</span><span class="nt">STORE</span> <span class="nt">FRAC</span> <span class="nt">TO</span> <span class="nt">D3</span>
-<span class="nt">001020</span>  <span class="nt">174167</span>  <span class="nt">000032</span>                  <span class="nt">STD</span>     <span class="nt">AC1</span><span class="o">,</span><span class="nt">D4</span>      <span class="o">;</span><span class="nt">STORE</span> <span class="nt">INT</span> <span class="nt">TO</span> <span class="nt">D4</span>
-<span class="nt">001024</span>  <span class="nt">000000</span>                          <span class="nt">HALT</span>
-<span class="nt">001026</span>  <span class="nt">040200</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D1</span><span class="o">:</span>     <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">040200</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span> <span class="o">;</span><span class="nt">1</span><span class="p">.</span><span class="nc">0</span>
-<span class="nt">001034</span>  <span class="nt">000000</span>
-<span class="nt">001036</span>  <span class="nt">040300</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D2</span><span class="o">:</span>     <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">040300</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span> <span class="o">;</span><span class="nt">1</span><span class="p">.</span><span class="nc">5</span>
-<span class="nt">001044</span>  <span class="nt">000000</span>
-<span class="nt">001046</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D3</span><span class="o">:</span>     <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span>
-<span class="nt">001054</span>  <span class="nt">000000</span>
-<span class="nt">001056</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D4</span><span class="o">:</span>     <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span>
-<span class="nt">001064</span>  <span class="nt">000000</span>
-        <span class="nt">001000</span>                          <span class="p">.</span><span class="nc">END</span>    <span class="nt">START</span>
-</pre></div>
-</td></tr></table>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span></pre></div></td><td class="code"><div><pre><span></span><span class="w">        </span><span class="nt">000000</span><span class="w">                          </span><span class="nt">AC0</span><span class="o">=%</span><span class="nt">0</span>
+<span class="w">        </span><span class="nt">000001</span><span class="w">                          </span><span class="nt">AC1</span><span class="o">=%</span><span class="nt">1</span>
+<span class="nt">000000</span><span class="w">                                  </span><span class="p">.</span><span class="nc">ASECT</span>
+<span class="w">        </span><span class="nt">001000</span><span class="w">                          </span><span class="o">.=</span><span class="nt">1000</span>
+<span class="nt">001000</span><span class="w">  </span><span class="nt">170011</span><span class="w">                  </span><span class="nt">START</span><span class="o">:</span><span class="w">  </span><span class="nt">SETD</span><span class="w">                </span><span class="o">;</span><span class="nt">SET</span><span class="w"> </span><span class="nt">DOUBLE</span><span class="w"> </span><span class="nt">PRECISION</span><span class="w"> </span><span class="nt">MODE</span>
+<span class="nt">001002</span><span class="w">  </span><span class="nt">172467</span><span class="w">  </span><span class="nt">000020</span><span class="w">                  </span><span class="nt">LDD</span><span class="w">     </span><span class="nt">D1</span><span class="o">,</span><span class="nt">AC0</span><span class="w">      </span><span class="o">;</span><span class="nt">FETCH</span><span class="w"> </span><span class="nt">FIRST</span><span class="w"> </span><span class="nt">OPERAND</span><span class="w"> </span><span class="nt">FROM</span><span class="w"> </span><span class="nt">D1</span>
+<span class="nt">001006</span><span class="w">  </span><span class="nt">172567</span><span class="w">  </span><span class="nt">000024</span><span class="w">                  </span><span class="nt">LDD</span><span class="w">     </span><span class="nt">D2</span><span class="o">,</span><span class="nt">AC1</span><span class="w">      </span><span class="o">;</span><span class="nt">FETCH</span><span class="w"> </span><span class="nt">SECOND</span><span class="w"> </span><span class="nt">OPERAND</span><span class="w"> </span><span class="nt">FROM</span><span class="w"> </span><span class="nt">D2</span>
+<span class="nt">001012</span><span class="w">  </span><span class="nt">171401</span><span class="w">                          </span><span class="nt">MODD</span><span class="w">    </span><span class="nt">AC1</span><span class="o">,</span><span class="nt">AC0</span><span class="w">     </span><span class="o">;</span><span class="nt">MOD</span><span class="w"> </span><span class="o">(</span><span class="nt">FRAC</span><span class="w"> </span><span class="nt">IN</span><span class="w"> </span><span class="nt">AC0</span><span class="o">,</span><span class="w"> </span><span class="nt">INT</span><span class="w"> </span><span class="nt">IN</span><span class="w"> </span><span class="nt">AC1</span><span class="o">)</span>
+<span class="nt">001014</span><span class="w">  </span><span class="nt">174067</span><span class="w">  </span><span class="nt">000026</span><span class="w">                  </span><span class="nt">STD</span><span class="w">     </span><span class="nt">AC0</span><span class="o">,</span><span class="nt">D3</span><span class="w">      </span><span class="o">;</span><span class="nt">STORE</span><span class="w"> </span><span class="nt">FRAC</span><span class="w"> </span><span class="nt">TO</span><span class="w"> </span><span class="nt">D3</span>
+<span class="nt">001020</span><span class="w">  </span><span class="nt">174167</span><span class="w">  </span><span class="nt">000032</span><span class="w">                  </span><span class="nt">STD</span><span class="w">     </span><span class="nt">AC1</span><span class="o">,</span><span class="nt">D4</span><span class="w">      </span><span class="o">;</span><span class="nt">STORE</span><span class="w"> </span><span class="nt">INT</span><span class="w"> </span><span class="nt">TO</span><span class="w"> </span><span class="nt">D4</span>
+<span class="nt">001024</span><span class="w">  </span><span class="nt">000000</span><span class="w">                          </span><span class="nt">HALT</span>
+<span class="nt">001026</span><span class="w">  </span><span class="nt">040200</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">D1</span><span class="o">:</span><span class="w">     </span><span class="p">.</span><span class="nc">WORD</span><span class="w">   </span><span class="nt">040200</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="w"> </span><span class="o">;</span><span class="nt">1</span><span class="p">.</span><span class="nc">0</span>
+<span class="nt">001034</span><span class="w">  </span><span class="nt">000000</span>
+<span class="nt">001036</span><span class="w">  </span><span class="nt">040300</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">D2</span><span class="o">:</span><span class="w">     </span><span class="p">.</span><span class="nc">WORD</span><span class="w">   </span><span class="nt">040300</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="w"> </span><span class="o">;</span><span class="nt">1</span><span class="p">.</span><span class="nc">5</span>
+<span class="nt">001044</span><span class="w">  </span><span class="nt">000000</span>
+<span class="nt">001046</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">D3</span><span class="o">:</span><span class="w">     </span><span class="p">.</span><span class="nc">WORD</span><span class="w">   </span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span>
+<span class="nt">001054</span><span class="w">  </span><span class="nt">000000</span>
+<span class="nt">001056</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">D4</span><span class="o">:</span><span class="w">     </span><span class="p">.</span><span class="nc">WORD</span><span class="w">   </span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span>
+<span class="nt">001064</span><span class="w">  </span><span class="nt">000000</span>
+<span class="w">        </span><span class="nt">001000</span><span class="w">                          </span><span class="p">.</span><span class="nc">END</span><span class="w">    </span><span class="nt">START</span>
+</pre></div></td></tr></table></div>
+
+
 <p>This does show a problem: after exection, the integer result at D4 seems correct, but the fractional result
 in D3 is incorrect (037777 177777 177777 177777).  Verified the correct microflow with the KM11.</p>
 <p>Stopped in microstate MOD.22, and examined ALUs on FRL where the fractional result is masked.  ALU function
@@ -608,41 +671,42 @@ by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">F
 works fine, but double-precision results come back with some erroneous bits set in the fraction.
 Here's the test code I ended up using for troublshooting -- when executed on my machine, bits 24 and 25
 end up incorrectly set in the result at D3:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17</pre></div></td><td class="code"><div class="highlight"><pre><span></span>        <span class="nt">000000</span>                          <span class="nt">AC0</span><span class="o">=%</span><span class="nt">0</span>
-        <span class="nt">000001</span>                          <span class="nt">AC1</span><span class="o">=%</span><span class="nt">1</span>
-<span class="nt">000000</span>                                  <span class="p">.</span><span class="nc">ASECT</span>
-        <span class="nt">001000</span>                          <span class="o">.=</span><span class="nt">1000</span>
-<span class="nt">001000</span>  <span class="nt">170011</span>                  <span class="nt">START</span><span class="o">:</span>  <span class="nt">SETD</span>                <span class="o">;</span><span class="nt">SET</span> <span class="nt">DOUBLE</span> <span class="nt">PRECISION</span> <span class="nt">MODE</span>
-<span class="nt">001002</span>  <span class="nt">172467</span>  <span class="nt">000014</span>                  <span class="nt">LDD</span>     <span class="nt">D1</span><span class="o">,</span><span class="nt">AC0</span>      <span class="o">;</span><span class="nt">FETCH</span> <span class="nt">FIRST</span> <span class="nt">ADDEND</span> <span class="nt">FROM</span> <span class="nt">D1</span>
-<span class="nt">001006</span>  <span class="nt">172567</span>  <span class="nt">000020</span>                  <span class="nt">LDD</span>     <span class="nt">D2</span><span class="o">,</span><span class="nt">AC1</span>      <span class="o">;</span><span class="nt">FETCH</span> <span class="nt">SECOND</span> <span class="nt">ADDEND</span> <span class="nt">FROM</span> <span class="nt">D2</span>
-<span class="nt">001012</span>  <span class="nt">172100</span>                          <span class="nt">ADDD</span>    <span class="nt">AC0</span><span class="o">,</span><span class="nt">AC1</span>     <span class="o">;</span><span class="nt">ADD</span> <span class="nt">THEM</span> <span class="o">(</span><span class="nt">RESULT</span> <span class="nt">IN</span> <span class="nt">AC1</span><span class="o">)</span>
-<span class="nt">001014</span>  <span class="nt">174167</span>  <span class="nt">000022</span>                  <span class="nt">STD</span>     <span class="nt">AC1</span><span class="o">,</span><span class="nt">D3</span>      <span class="o">;</span><span class="nt">STORE</span> <span class="nt">RESULT</span> <span class="nt">TO</span> <span class="nt">D3</span>
-<span class="nt">001020</span>  <span class="nt">000000</span>                          <span class="nt">HALT</span>
-<span class="nt">001022</span>  <span class="nt">040200</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D1</span><span class="o">:</span>     <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">040000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span> <span class="o">;</span><span class="nt">0</span><span class="p">.</span><span class="nc">5</span>
-<span class="nt">001030</span>  <span class="nt">000000</span>
-<span class="nt">001032</span>  <span class="nt">040200</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D2</span><span class="o">:</span>     <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">040000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span> <span class="o">;</span><span class="nt">0</span><span class="p">.</span><span class="nc">5</span>
-<span class="nt">001040</span>  <span class="nt">000000</span>
-<span class="nt">001042</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D3</span><span class="o">:</span>     <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span>
-<span class="nt">001050</span>  <span class="nt">000000</span>
-        <span class="nt">001000</span>                          <span class="p">.</span><span class="nc">END</span>    <span class="nt">START</span>
-</pre></div>
-</td></tr></table>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span></pre></div></td><td class="code"><div><pre><span></span><span class="w">        </span><span class="nt">000000</span><span class="w">                          </span><span class="nt">AC0</span><span class="o">=%</span><span class="nt">0</span>
+<span class="w">        </span><span class="nt">000001</span><span class="w">                          </span><span class="nt">AC1</span><span class="o">=%</span><span class="nt">1</span>
+<span class="nt">000000</span><span class="w">                                  </span><span class="p">.</span><span class="nc">ASECT</span>
+<span class="w">        </span><span class="nt">001000</span><span class="w">                          </span><span class="o">.=</span><span class="nt">1000</span>
+<span class="nt">001000</span><span class="w">  </span><span class="nt">170011</span><span class="w">                  </span><span class="nt">START</span><span class="o">:</span><span class="w">  </span><span class="nt">SETD</span><span class="w">                </span><span class="o">;</span><span class="nt">SET</span><span class="w"> </span><span class="nt">DOUBLE</span><span class="w"> </span><span class="nt">PRECISION</span><span class="w"> </span><span class="nt">MODE</span>
+<span class="nt">001002</span><span class="w">  </span><span class="nt">172467</span><span class="w">  </span><span class="nt">000014</span><span class="w">                  </span><span class="nt">LDD</span><span class="w">     </span><span class="nt">D1</span><span class="o">,</span><span class="nt">AC0</span><span class="w">      </span><span class="o">;</span><span class="nt">FETCH</span><span class="w"> </span><span class="nt">FIRST</span><span class="w"> </span><span class="nt">ADDEND</span><span class="w"> </span><span class="nt">FROM</span><span class="w"> </span><span class="nt">D1</span>
+<span class="nt">001006</span><span class="w">  </span><span class="nt">172567</span><span class="w">  </span><span class="nt">000020</span><span class="w">                  </span><span class="nt">LDD</span><span class="w">     </span><span class="nt">D2</span><span class="o">,</span><span class="nt">AC1</span><span class="w">      </span><span class="o">;</span><span class="nt">FETCH</span><span class="w"> </span><span class="nt">SECOND</span><span class="w"> </span><span class="nt">ADDEND</span><span class="w"> </span><span class="nt">FROM</span><span class="w"> </span><span class="nt">D2</span>
+<span class="nt">001012</span><span class="w">  </span><span class="nt">172100</span><span class="w">                          </span><span class="nt">ADDD</span><span class="w">    </span><span class="nt">AC0</span><span class="o">,</span><span class="nt">AC1</span><span class="w">     </span><span class="o">;</span><span class="nt">ADD</span><span class="w"> </span><span class="nt">THEM</span><span class="w"> </span><span class="o">(</span><span class="nt">RESULT</span><span class="w"> </span><span class="nt">IN</span><span class="w"> </span><span class="nt">AC1</span><span class="o">)</span>
+<span class="nt">001014</span><span class="w">  </span><span class="nt">174167</span><span class="w">  </span><span class="nt">000022</span><span class="w">                  </span><span class="nt">STD</span><span class="w">     </span><span class="nt">AC1</span><span class="o">,</span><span class="nt">D3</span><span class="w">      </span><span class="o">;</span><span class="nt">STORE</span><span class="w"> </span><span class="nt">RESULT</span><span class="w"> </span><span class="nt">TO</span><span class="w"> </span><span class="nt">D3</span>
+<span class="nt">001020</span><span class="w">  </span><span class="nt">000000</span><span class="w">                          </span><span class="nt">HALT</span>
+<span class="nt">001022</span><span class="w">  </span><span class="nt">040200</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">D1</span><span class="o">:</span><span class="w">     </span><span class="p">.</span><span class="nc">WORD</span><span class="w">   </span><span class="nt">040000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="w"> </span><span class="o">;</span><span class="nt">0</span><span class="p">.</span><span class="nc">5</span>
+<span class="nt">001030</span><span class="w">  </span><span class="nt">000000</span>
+<span class="nt">001032</span><span class="w">  </span><span class="nt">040200</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">D2</span><span class="o">:</span><span class="w">     </span><span class="p">.</span><span class="nc">WORD</span><span class="w">   </span><span class="nt">040000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="w"> </span><span class="o">;</span><span class="nt">0</span><span class="p">.</span><span class="nc">5</span>
+<span class="nt">001040</span><span class="w">  </span><span class="nt">000000</span>
+<span class="nt">001042</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">D3</span><span class="o">:</span><span class="w">     </span><span class="p">.</span><span class="nc">WORD</span><span class="w">   </span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span>
+<span class="nt">001050</span><span class="w">  </span><span class="nt">000000</span>
+<span class="w">        </span><span class="nt">001000</span><span class="w">                          </span><span class="p">.</span><span class="nc">END</span><span class="w">    </span><span class="nt">START</span>
+</pre></div></td></tr></table></div>
+
+
 <p>So, the usual procedure: KM11 in the floating point slot, and FRL (where these bits are handled) out on
 extenders.  First step is to verify the microcode sequencing with the KM11 and front panel, and it looks good.
 In particular, the FPU is sequencing through states ADD.04 and ADD.06 per expectation for double-precision,
@@ -811,25 +875,26 @@ RC clock.</p>
 </li>
 </ul>
 <p>Okay, so here's my first simple test program for STST:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6
-7
-8
-9</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">000000</span>                          <span class="nt">AC0</span><span class="o">=%</span><span class="nt">0</span>
-<span class="nt">000000</span>                          <span class="p">.</span><span class="nc">ASECT</span>
-<span class="nt">001000</span>                          <span class="o">.=</span><span class="nt">1000</span>
-<span class="nt">001000</span>  <span class="nt">170127</span>  <span class="nt">044000</span>  <span class="nt">START</span><span class="o">:</span>  <span class="nt">LDFPS</span>   <span class="p">#</span><span class="nn">044000</span>         <span class="o">;</span><span class="nt">FID</span><span class="o">+</span><span class="nt">FIUV</span>
-<span class="nt">001004</span>  <span class="nt">172467</span>  <span class="nt">000004</span>          <span class="nt">LDF</span>     <span class="nt">NEGZ</span><span class="o">,</span><span class="nt">AC0</span>        <span class="o">;</span><span class="nt">LOAD</span> <span class="nt">A</span> <span class="nt">MINUS-ZERO</span>
-<span class="nt">001010</span>  <span class="nt">170300</span>                  <span class="nt">STST</span>    <span class="nt">R0</span>              <span class="o">;</span><span class="nt">STORE</span> <span class="nt">FEC</span> <span class="nt">TO</span> <span class="nt">R0</span>
-<span class="nt">001012</span>  <span class="nt">000000</span>                  <span class="nt">HALT</span>
-<span class="nt">001014</span>  <span class="nt">100000</span>  <span class="nt">000000</span>  <span class="nt">NEGZ</span><span class="o">:</span>   <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">100000</span><span class="o">,</span><span class="nt">000000</span>   <span class="o">;</span><span class="nt">MINUS-ZERO</span>
-<span class="nt">001000</span>                          <span class="p">.</span><span class="nc">END</span>    <span class="nt">START</span>
-</pre></div>
-</td></tr></table>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span>
+<span class="normal">9</span></pre></div></td><td class="code"><div><pre><span></span><span class="mf">000000</span><span class="w">                          </span><span class="n">AC0</span><span class="o">=</span><span class="err">%</span><span class="mf">0</span>
+<span class="mf">000000</span><span class="w">                          </span><span class="mf">.</span><span class="n">ASECT</span>
+<span class="mf">001000</span><span class="w">                          </span><span class="mf">.</span><span class="o">=</span><span class="mf">1000</span>
+<span class="mf">001000</span><span class="w">  </span><span class="mf">170127</span><span class="w">  </span><span class="mf">044000</span><span class="w">  </span><span class="n">START</span><span class="p">:</span><span class="w">  </span><span class="n">LDFPS</span><span class="w">   </span><span class="err">#</span><span class="mf">044000</span><span class="w">         </span><span class="p">;</span><span class="n">FID</span><span class="o">+</span><span class="n">FIUV</span>
+<span class="mf">001004</span><span class="w">  </span><span class="mf">172467</span><span class="w">  </span><span class="mf">000004</span><span class="w">          </span><span class="n">LDF</span><span class="w">     </span><span class="n">NEGZ</span><span class="p">,</span><span class="n">AC0</span><span class="w">        </span><span class="p">;</span><span class="kr">LOAD</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="n">MINUS</span><span class="o">-</span><span class="n">ZERO</span>
+<span class="mf">001010</span><span class="w">  </span><span class="mf">170300</span><span class="w">                  </span><span class="n">STST</span><span class="w">    </span><span class="n">R0</span><span class="w">              </span><span class="p">;</span><span class="n">STORE</span><span class="w"> </span><span class="n">FEC</span><span class="w"> </span><span class="kr">TO</span><span class="w"> </span><span class="n">R0</span>
+<span class="mf">001012</span><span class="w">  </span><span class="mf">000000</span><span class="w">                  </span><span class="n">HALT</span>
+<span class="mf">001014</span><span class="w">  </span><span class="mf">100000</span><span class="w">  </span><span class="mf">000000</span><span class="w">  </span><span class="n">NEGZ</span><span class="p">:</span><span class="w">   </span><span class="mf">.</span><span class="n">WORD</span><span class="w">   </span><span class="mf">100000</span><span class="p">,</span><span class="mf">000000</span><span class="w">   </span><span class="p">;</span><span class="n">MINUS</span><span class="o">-</span><span class="n">ZERO</span>
+<span class="mf">001000</span><span class="w">                          </span><span class="mf">.</span><span class="kr">END</span><span class="w">    </span><span class="n">START</span>
+</pre></div></td></tr></table></div>
+
+
 <p>This would be expected to produce the 000014 "Floating Undefined Variable" (minus-zero) exception code in R0, but I see
 an incorrect value of 177417.  Using the KM11 on the FPU shows the -0 trap and STST microstate flow is per expectation.</p>
 <p>Put the FRL out on the extender and started stepping the microcode, examining the state of the pins at the AC register
@@ -918,32 +983,6 @@ for these to work correctly.</p>
     <hr />
 </div>
     
-
-        
-
-<div class='article'>
-    <div class="content-title">
-        <a href="https://fritzm.github.io/diagnostics-6.html"><h1>PDP-11/45: Diagnostics VI - GRA ALU PROM repair</h1></a>
-Sun 07 August 2016
-
-by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
- 
-    </div>
-    
-    <div><p>Data I/O Series 22 PROM programmer from eBay showed up, as well as some unprogrammed Signetics 82S123. 
-Punched in the subsidiary ALU control ROM contents from the listing on GRAK in the 11/45 engineering drawings
-and burnt a new PROM. Put a socket and the new PROM in place of the failed part on my original GRA, slotted it
-into the CPU, and success! Diagnostic CKBOA0 now passes.  I will probably return to the other faulty GRA at a
-later point, as it is partially diagnosed and I like to have spares working and ready to go.</p>
-<p>Next time I'll be moving on to the CKT series of tests for the KT11 memory management cards...</p>
-<p><img src='/images/pdp11/prom-programmer_thumbnail_tall.jpg' title='Data I/O series 22 PROM programmer, arrived from eBay' onclick='pswipe("pdp11",36);'/>
-<img src='/images/pdp11/alu-prom-replaced_thumbnail_tall.jpg' title='GRA board with replaced ALU PROM' onclick='pswipe("pdp11",37);'/></p></div>
-    <hr />
-</div>
-    
 <div class="pagination">
 <ul>
     <li class="prev"><a href="https://fritzm.github.io/category/pdp-113.html">&larr; Previous</a></li>
@@ -1022,7 +1061,7 @@ later point, as it is partially diagnosed and I like to have spares working and 
     </div>     </div> 
 <footer>
 <br />
-<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2021</p>
+<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2023</p>
 </footer>
 
 </div> <!-- /container -->

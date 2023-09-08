@@ -74,6 +74,37 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="https://fritzm.github.io/diagnostics-2.html"><h1>PDP-11/45: Diagnostics II</h1></a>
+Mon 04 July 2016
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p>Investigated some of the halted diagnostics a bit today.  CKBGB0 (SPL instruction test) was halting at 001404.
+Looking at the sources, the diagnostic was waiting at this point for a transmit interrupt from the DL11 that didn't
+seem to be arriving. Some troubleshooting turned up that the vector address on my DL11 was jumpered incorrectly.  Fixed this, and the diagnostic now passes.</p>
+<p>CKBME0 (11/45 traps test) is a bit more complicated.  The halt address of 005320 here indicates that the floating
+point coprocessor is detected but not trapping per design.  Pulled the floating point cards for now; the diagnostic
+now runs through several passes successfully, but regularly hangs up at 013640.  Hitting the halt
+switch when it is hung up displays 000342 in the address lights, then with a couple continues it will start up again,
+run a bunch more passes, but sooner or later hang up at 013640 again with the same behavior.  This behavior is a
+little more difficult to decode because the diagnostic itself is more complicated, and also the binary available from
+classicmp is a later revision than the available source code so the addresses don't quite match up.  So I'll need to
+spend a little more time reading the diagnostic sources and examining the disassembly in PDP11GUI to make sense of this
+one.  And it looks like there will be some downstream work to debug the floating point unit as well; I haven't studied
+its design yet at all.</p></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
         <a href="https://fritzm.github.io/diagnostics.html"><h1>PDP-11/45: Diagnostics with PDP11GUI</h1></a>
 Sun 03 July 2016
 
@@ -236,23 +267,24 @@ is a board fault or a chip fault.  In the meantime, I have a spare GRA which I h
 has a "bad" sticker on it...  Decided to give it a try anyway, and it seems to be working much better than the one I
 have been debugging.</p>
 <p>Now have enough of the CPU debugged to toggle in and run a simple light chaser program:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6
-7
-8</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">000000</span>  <span class="nt">013700</span>  <span class="nt">177570</span>  <span class="nt">L0</span><span class="o">:</span>     <span class="nt">MOV</span>     <span class="o">@</span><span class="p">#</span><span class="nn">177570</span><span class="o">,</span> <span class="nt">R0</span>    <span class="o">;</span><span class="nt">LOAD</span> <span class="nt">COUNT</span> <span class="nt">FROM</span> <span class="nt">SWITCH</span> <span class="nt">REGISTER</span>
-<span class="nt">000004</span>  <span class="nt">005300</span>          <span class="nt">L1</span><span class="o">:</span>     <span class="nt">DEC</span>     <span class="nt">R0</span>              <span class="o">;</span><span class="nt">COUNT</span> <span class="nt">DOWN</span>
-<span class="nt">000006</span>  <span class="nt">001376</span>                  <span class="nt">BNE</span>     <span class="nt">L1</span>              <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">UNTIL</span> <span class="nt">ZERO</span>
-<span class="nt">000010</span>  <span class="nt">006301</span>                  <span class="nt">ASL</span>     <span class="nt">R1</span>              <span class="o">;</span><span class="nt">SHIFT</span> <span class="nt">DISPLAY</span> <span class="nt">VALUE</span>
-<span class="nt">000012</span>  <span class="nt">001002</span>                  <span class="nt">BNE</span>     <span class="nt">L2</span>              <span class="o">;</span><span class="nt">SKIP</span> <span class="nt">AHEAD</span> <span class="nt">IF</span> <span class="nt">NOT</span> <span class="nt">SHIFTED</span> <span class="nt">OUT</span>
-<span class="nt">000014</span>  <span class="nt">012701</span>  <span class="nt">000001</span>          <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">1</span><span class="o">,</span><span class="nt">R1</span>           <span class="o">;</span><span class="nt">ELSE</span> <span class="nt">RELOAD</span>
-<span class="nt">000020</span>  <span class="nt">010137</span>  <span class="nt">177570</span>  <span class="nt">L2</span><span class="o">:</span>     <span class="nt">MOV</span>     <span class="nt">R1</span><span class="o">,@</span><span class="p">#</span><span class="nn">177570</span>     <span class="o">;</span><span class="nt">STORE</span> <span class="nt">TO</span> <span class="nt">DISPLAY</span> <span class="nt">REGISTER</span>
-<span class="nt">000024</span>  <span class="nt">000765</span>                  <span class="nt">BR</span>      <span class="nt">L0</span>              <span class="o">;</span><span class="nt">REPEAT</span> <span class="nt">FROM</span> <span class="nt">THE</span> <span class="nt">TOP</span>
-</pre></div>
-</td></tr></table>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span></pre></div></td><td class="code"><div><pre><span></span><span class="mf">000000</span><span class="w">  </span><span class="mf">013700</span><span class="w">  </span><span class="mf">177570</span><span class="w">  </span><span class="n">L0</span><span class="p">:</span><span class="w">     </span><span class="n">MOV</span><span class="w">     </span><span class="err">@#</span><span class="mf">177570</span><span class="p">,</span><span class="w"> </span><span class="n">R0</span><span class="w">    </span><span class="p">;</span><span class="kr">LOAD</span><span class="w"> </span><span class="n">COUNT</span><span class="w"> </span><span class="n">FROM</span><span class="w"> </span><span class="n">SWITCH</span><span class="w"> </span><span class="n">REGISTER</span>
+<span class="mf">000004</span><span class="w">  </span><span class="mf">005300</span><span class="w">          </span><span class="n">L1</span><span class="p">:</span><span class="w">     </span><span class="n">DEC</span><span class="w">     </span><span class="n">R0</span><span class="w">              </span><span class="p">;</span><span class="n">COUNT</span><span class="w"> </span><span class="n">DOWN</span>
+<span class="mf">000006</span><span class="w">  </span><span class="mf">001376</span><span class="w">                  </span><span class="n">BNE</span><span class="w">     </span><span class="n">L1</span><span class="w">              </span><span class="p">;</span><span class="n">LOOP</span><span class="w"> </span><span class="n">UNTIL</span><span class="w"> </span><span class="n">ZERO</span>
+<span class="mf">000010</span><span class="w">  </span><span class="mf">006301</span><span class="w">                  </span><span class="n">ASL</span><span class="w">     </span><span class="n">R1</span><span class="w">              </span><span class="p">;</span><span class="n">SHIFT</span><span class="w"> </span><span class="n">DISPLAY</span><span class="w"> </span><span class="nb">VAL</span><span class="n">UE</span>
+<span class="mf">000012</span><span class="w">  </span><span class="mf">001002</span><span class="w">                  </span><span class="n">BNE</span><span class="w">     </span><span class="n">L2</span><span class="w">              </span><span class="p">;</span><span class="n">SKIP</span><span class="w"> </span><span class="n">AHEAD</span><span class="w"> </span><span class="kr">IF</span><span class="w"> </span><span class="ow">NOT</span><span class="w"> </span><span class="n">SHIFTED</span><span class="w"> </span><span class="n">OUT</span>
+<span class="mf">000014</span><span class="w">  </span><span class="mf">012701</span><span class="w">  </span><span class="mf">000001</span><span class="w">          </span><span class="n">MOV</span><span class="w">     </span><span class="err">#</span><span class="mf">1</span><span class="p">,</span><span class="n">R1</span><span class="w">           </span><span class="p">;</span><span class="n">ELSE</span><span class="w"> </span><span class="n">RELOAD</span>
+<span class="mf">000020</span><span class="w">  </span><span class="mf">010137</span><span class="w">  </span><span class="mf">177570</span><span class="w">  </span><span class="n">L2</span><span class="p">:</span><span class="w">     </span><span class="n">MOV</span><span class="w">     </span><span class="n">R1</span><span class="p">,</span><span class="err">@#</span><span class="mf">177570</span><span class="w">     </span><span class="p">;</span><span class="n">STORE</span><span class="w"> </span><span class="kr">TO</span><span class="w"> </span><span class="n">DISPLAY</span><span class="w"> </span><span class="n">REGISTER</span>
+<span class="mf">000024</span><span class="w">  </span><span class="mf">000765</span><span class="w">                  </span><span class="n">BR</span><span class="w">      </span><span class="n">L0</span><span class="w">              </span><span class="p">;</span><span class="n">REPEAT</span><span class="w"> </span><span class="n">FROM</span><span class="w"> </span><span class="n">THE</span><span class="w"> </span><span class="kr">TO</span><span class="n">P</span>
+</pre></div></td></tr></table></div>
+
+
 <p><span class="videobox">
                     <iframe width="640" height="390"
                         src='https://www.youtube.com/embed/ZhuzC9v3q-k?rel=0'
@@ -415,15 +447,17 @@ really help with the CPU debug.</p>
 <p>Swapped DAP for a spare, and this has fixed the stuck PC issue.  Memory issues remain, but by choosing a
 working memory range, I can start to toggle in and attempt to execute very simple programs.</p>
 <p>The simplest possible program, unconditional branch to self, seems to execute correctly:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span></span>001000 000777         BR      .-0
-</pre></div>
-</td></tr></table>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><span class="mf">001000</span><span class="w"> </span><span class="mf">000777</span><span class="w">         </span><span class="n">BR</span><span class="w">      </span><span class="mf">.</span><span class="o">-</span><span class="mf">0</span>
+</pre></div></td></tr></table></div>
+
+
 <p>A register to register data move test does not however:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2</pre></div></td><td class="code"><div class="highlight"><pre><span></span>001000 010203         MOV     R2,R3
-001002 000776         BR      .-2
-</pre></div>
-</td></tr></table>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><span class="mf">001000</span><span class="w"> </span><span class="mf">010203</span><span class="w">         </span><span class="n">MOV</span><span class="w">     </span><span class="n">R2</span><span class="p">,</span><span class="n">R3</span>
+<span class="mf">001002</span><span class="w"> </span><span class="mf">000776</span><span class="w">         </span><span class="n">BR</span><span class="w">      </span><span class="mf">.</span><span class="o">-</span><span class="mf">2</span>
+</pre></div></td></tr></table></div>
+
+
 <p>Control flow is as expected, but the value that ends up in R3 seems to be negated.  Still, pretty good
 progress! Now that I can step machine states, the next step will be to put the DAP out on an extender card and
 start tracking down signals with a logic probe.</p>
@@ -502,40 +536,6 @@ and put on order a modern equivalent (OL-6003BP) for the indicator bulbs on the 
 <p>Next steps will be to verify various Unibus signals on the backplane, then maybe play some swap games with CPU
 card spares to see if I can get closer to a working console as a starting point.  All I have time for this
 weekend, though; sorry nothing new to see so no new pictures this time!</p></div>
-    <hr />
-</div>
-    
-
-        
-
-<div class='article'>
-    <div class="content-title">
-        <a href="https://fritzm.github.io/initial-power-on.html"><h1>PDP-11/45: Initial Power On!</h1></a>
-Sun 08 May 2016
-
-by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
- 
-    </div>
-    
-    <div><p>Beeped out the new harness to check for shorts or incorrect pins, then plugged in just the H742s and fired it
-up.  All the DC regulator modules seem to be working, and I was able to trim them up to nominal voltages at
-the CPU end of the harness.  The indicator lamps on all but one of the DC regulators seem to be burned out,
-though, so I put some new lamps on order (at last for the +5V regulators; a modern equivalent for the -15V
-regulators is tougher to find).</p>
-<p>Given that success, I plugged in the CPU side of the harness, took a deep breath, and powered on!  Hmmm.  No
-detonations or smoke, but all data/address/mode lights lit (see below), which is not right...  Front panel
-lamp test and data address mode switches and indicators are working though at least.</p>
-<p>Some investigation on the backplane turned up no +5V to slots 10 though 15, which could be part of the
-problem.  Ah, that's what the mysterious clipped red wire soldered to the backplane might have been about
-(visible in the top right <a href="https://fritzm.github.io/images/pdp11/kb11a-backplane.jpg">here</a>...)  Sure enough, some inspection
-shows the corresponding trace on the backplane looks burnt!  I could hack this red wire into my new harness I
-guess, but I'd rather remove it and try to repair the board trace with a shunt.  So the backplane will have to
-come out.  I guess that's what I get for not investigating the weird red wire and for not beeping out the
-power distribution on the backplane before mounting and populating it...</p>
-<p><img src='/images/pdp11/initial-power-on_thumbnail_tall.jpg' title='Initial power on!  No smoke, but all lights on (not right).  Well, it&#39;s a start!' onclick='pswipe("pdp11",27);'/></p></div>
     <hr />
 </div>
     
@@ -618,7 +618,7 @@ power distribution on the backplane before mounting and populating it...</p>
     </div>     </div> 
 <footer>
 <br />
-<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2022</p>
+<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2023</p>
 </footer>
 
 </div> <!-- /container -->

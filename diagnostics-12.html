@@ -111,47 +111,48 @@ and the FP add/subtract problem is fixed.  The following FP11 diagnostics now pa
 
 <p>...which is almost everything.  The last failing diagnostic is CFPLB0, which tests MODF and MODD.  Set up
 a similar test program for this instruction:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20</pre></div></td><td class="code"><div class="highlight"><pre><span></span>        <span class="nt">000000</span>                          <span class="nt">AC0</span><span class="o">=%</span><span class="nt">0</span>
-        <span class="nt">000001</span>                          <span class="nt">AC1</span><span class="o">=%</span><span class="nt">1</span>
-<span class="nt">000000</span>                                  <span class="p">.</span><span class="nc">ASECT</span>
-        <span class="nt">001000</span>                          <span class="o">.=</span><span class="nt">1000</span>
-<span class="nt">001000</span>  <span class="nt">170011</span>                  <span class="nt">START</span><span class="o">:</span>  <span class="nt">SETD</span>                <span class="o">;</span><span class="nt">SET</span> <span class="nt">DOUBLE</span> <span class="nt">PRECISION</span> <span class="nt">MODE</span>
-<span class="nt">001002</span>  <span class="nt">172467</span>  <span class="nt">000020</span>                  <span class="nt">LDD</span>     <span class="nt">D1</span><span class="o">,</span><span class="nt">AC0</span>      <span class="o">;</span><span class="nt">FETCH</span> <span class="nt">FIRST</span> <span class="nt">OPERAND</span> <span class="nt">FROM</span> <span class="nt">D1</span>
-<span class="nt">001006</span>  <span class="nt">172567</span>  <span class="nt">000024</span>                  <span class="nt">LDD</span>     <span class="nt">D2</span><span class="o">,</span><span class="nt">AC1</span>      <span class="o">;</span><span class="nt">FETCH</span> <span class="nt">SECOND</span> <span class="nt">OPERAND</span> <span class="nt">FROM</span> <span class="nt">D2</span>
-<span class="nt">001012</span>  <span class="nt">171401</span>                          <span class="nt">MODD</span>    <span class="nt">AC1</span><span class="o">,</span><span class="nt">AC0</span>     <span class="o">;</span><span class="nt">MOD</span> <span class="o">(</span><span class="nt">FRAC</span> <span class="nt">IN</span> <span class="nt">AC0</span><span class="o">,</span> <span class="nt">INT</span> <span class="nt">IN</span> <span class="nt">AC1</span><span class="o">)</span>
-<span class="nt">001014</span>  <span class="nt">174067</span>  <span class="nt">000026</span>                  <span class="nt">STD</span>     <span class="nt">AC0</span><span class="o">,</span><span class="nt">D3</span>      <span class="o">;</span><span class="nt">STORE</span> <span class="nt">FRAC</span> <span class="nt">TO</span> <span class="nt">D3</span>
-<span class="nt">001020</span>  <span class="nt">174167</span>  <span class="nt">000032</span>                  <span class="nt">STD</span>     <span class="nt">AC1</span><span class="o">,</span><span class="nt">D4</span>      <span class="o">;</span><span class="nt">STORE</span> <span class="nt">INT</span> <span class="nt">TO</span> <span class="nt">D4</span>
-<span class="nt">001024</span>  <span class="nt">000000</span>                          <span class="nt">HALT</span>
-<span class="nt">001026</span>  <span class="nt">040200</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D1</span><span class="o">:</span>     <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">040200</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span> <span class="o">;</span><span class="nt">1</span><span class="p">.</span><span class="nc">0</span>
-<span class="nt">001034</span>  <span class="nt">000000</span>
-<span class="nt">001036</span>  <span class="nt">040300</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D2</span><span class="o">:</span>     <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">040300</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span> <span class="o">;</span><span class="nt">1</span><span class="p">.</span><span class="nc">5</span>
-<span class="nt">001044</span>  <span class="nt">000000</span>
-<span class="nt">001046</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D3</span><span class="o">:</span>     <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span>
-<span class="nt">001054</span>  <span class="nt">000000</span>
-<span class="nt">001056</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D4</span><span class="o">:</span>     <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span>
-<span class="nt">001064</span>  <span class="nt">000000</span>
-        <span class="nt">001000</span>                          <span class="p">.</span><span class="nc">END</span>    <span class="nt">START</span>
-</pre></div>
-</td></tr></table>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span></pre></div></td><td class="code"><div><pre><span></span><span class="w">        </span><span class="nt">000000</span><span class="w">                          </span><span class="nt">AC0</span><span class="o">=%</span><span class="nt">0</span>
+<span class="w">        </span><span class="nt">000001</span><span class="w">                          </span><span class="nt">AC1</span><span class="o">=%</span><span class="nt">1</span>
+<span class="nt">000000</span><span class="w">                                  </span><span class="p">.</span><span class="nc">ASECT</span>
+<span class="w">        </span><span class="nt">001000</span><span class="w">                          </span><span class="o">.=</span><span class="nt">1000</span>
+<span class="nt">001000</span><span class="w">  </span><span class="nt">170011</span><span class="w">                  </span><span class="nt">START</span><span class="o">:</span><span class="w">  </span><span class="nt">SETD</span><span class="w">                </span><span class="o">;</span><span class="nt">SET</span><span class="w"> </span><span class="nt">DOUBLE</span><span class="w"> </span><span class="nt">PRECISION</span><span class="w"> </span><span class="nt">MODE</span>
+<span class="nt">001002</span><span class="w">  </span><span class="nt">172467</span><span class="w">  </span><span class="nt">000020</span><span class="w">                  </span><span class="nt">LDD</span><span class="w">     </span><span class="nt">D1</span><span class="o">,</span><span class="nt">AC0</span><span class="w">      </span><span class="o">;</span><span class="nt">FETCH</span><span class="w"> </span><span class="nt">FIRST</span><span class="w"> </span><span class="nt">OPERAND</span><span class="w"> </span><span class="nt">FROM</span><span class="w"> </span><span class="nt">D1</span>
+<span class="nt">001006</span><span class="w">  </span><span class="nt">172567</span><span class="w">  </span><span class="nt">000024</span><span class="w">                  </span><span class="nt">LDD</span><span class="w">     </span><span class="nt">D2</span><span class="o">,</span><span class="nt">AC1</span><span class="w">      </span><span class="o">;</span><span class="nt">FETCH</span><span class="w"> </span><span class="nt">SECOND</span><span class="w"> </span><span class="nt">OPERAND</span><span class="w"> </span><span class="nt">FROM</span><span class="w"> </span><span class="nt">D2</span>
+<span class="nt">001012</span><span class="w">  </span><span class="nt">171401</span><span class="w">                          </span><span class="nt">MODD</span><span class="w">    </span><span class="nt">AC1</span><span class="o">,</span><span class="nt">AC0</span><span class="w">     </span><span class="o">;</span><span class="nt">MOD</span><span class="w"> </span><span class="o">(</span><span class="nt">FRAC</span><span class="w"> </span><span class="nt">IN</span><span class="w"> </span><span class="nt">AC0</span><span class="o">,</span><span class="w"> </span><span class="nt">INT</span><span class="w"> </span><span class="nt">IN</span><span class="w"> </span><span class="nt">AC1</span><span class="o">)</span>
+<span class="nt">001014</span><span class="w">  </span><span class="nt">174067</span><span class="w">  </span><span class="nt">000026</span><span class="w">                  </span><span class="nt">STD</span><span class="w">     </span><span class="nt">AC0</span><span class="o">,</span><span class="nt">D3</span><span class="w">      </span><span class="o">;</span><span class="nt">STORE</span><span class="w"> </span><span class="nt">FRAC</span><span class="w"> </span><span class="nt">TO</span><span class="w"> </span><span class="nt">D3</span>
+<span class="nt">001020</span><span class="w">  </span><span class="nt">174167</span><span class="w">  </span><span class="nt">000032</span><span class="w">                  </span><span class="nt">STD</span><span class="w">     </span><span class="nt">AC1</span><span class="o">,</span><span class="nt">D4</span><span class="w">      </span><span class="o">;</span><span class="nt">STORE</span><span class="w"> </span><span class="nt">INT</span><span class="w"> </span><span class="nt">TO</span><span class="w"> </span><span class="nt">D4</span>
+<span class="nt">001024</span><span class="w">  </span><span class="nt">000000</span><span class="w">                          </span><span class="nt">HALT</span>
+<span class="nt">001026</span><span class="w">  </span><span class="nt">040200</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">D1</span><span class="o">:</span><span class="w">     </span><span class="p">.</span><span class="nc">WORD</span><span class="w">   </span><span class="nt">040200</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="w"> </span><span class="o">;</span><span class="nt">1</span><span class="p">.</span><span class="nc">0</span>
+<span class="nt">001034</span><span class="w">  </span><span class="nt">000000</span>
+<span class="nt">001036</span><span class="w">  </span><span class="nt">040300</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">D2</span><span class="o">:</span><span class="w">     </span><span class="p">.</span><span class="nc">WORD</span><span class="w">   </span><span class="nt">040300</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="w"> </span><span class="o">;</span><span class="nt">1</span><span class="p">.</span><span class="nc">5</span>
+<span class="nt">001044</span><span class="w">  </span><span class="nt">000000</span>
+<span class="nt">001046</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">D3</span><span class="o">:</span><span class="w">     </span><span class="p">.</span><span class="nc">WORD</span><span class="w">   </span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span>
+<span class="nt">001054</span><span class="w">  </span><span class="nt">000000</span>
+<span class="nt">001056</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">D4</span><span class="o">:</span><span class="w">     </span><span class="p">.</span><span class="nc">WORD</span><span class="w">   </span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span>
+<span class="nt">001064</span><span class="w">  </span><span class="nt">000000</span>
+<span class="w">        </span><span class="nt">001000</span><span class="w">                          </span><span class="p">.</span><span class="nc">END</span><span class="w">    </span><span class="nt">START</span>
+</pre></div></td></tr></table></div>
+
+
 <p>This does show a problem: after exection, the integer result at D4 seems correct, but the fractional result
 in D3 is incorrect (037777 177777 177777 177777).  Verified the correct microflow with the KM11.</p>
 <p>Stopped in microstate MOD.22, and examined ALUs on FRL where the fractional result is masked.  ALU function
@@ -222,7 +223,7 @@ are all ones except the least significant bit, which seems incorrect.  All for n
     </div>     </div> 
 <footer>
 <br />
-<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2022</p>
+<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2023</p>
 </footer>
 
 </div> <!-- /container -->

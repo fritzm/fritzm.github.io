@@ -115,39 +115,40 @@ patch locations, as described previously, are summarized here for future referen
 
 <p>Of the "CKB" series of tests, CKBOA0 (11/45 states) is the only one I that is not yet passing.  Looking into
 this a little further, the first failing sub-test is T65:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">010540</span> <span class="nt">010701</span>                  <span class="nt">T65</span><span class="o">:</span>    <span class="nt">SCOPE</span>                    <span class="o">;</span>
-<span class="nt">010542</span> <span class="nt">012737</span>  <span class="nt">030000</span>  <span class="nt">177776</span>          <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">PUM</span><span class="o">,@</span><span class="p">#</span><span class="nn">PSW</span>       <span class="o">;</span><span class="nt">KERNEL</span> <span class="nt">MODE</span><span class="o">,</span> <span class="nt">PREV</span> <span class="nt">USER</span> <span class="nt">MODE</span>
-<span class="nt">010550</span> <span class="nt">012706</span>  <span class="nt">000500</span>                  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">KPTR</span><span class="o">,</span><span class="nt">KSP</span>        <span class="o">;</span><span class="nt">SET</span> <span class="nt">KERNEL</span> <span class="nt">STACK</span> <span class="nt">POINTER</span>
-<span class="nt">010554</span> <span class="nt">012716</span>  <span class="nt">000700</span>                  <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">UPTR</span><span class="o">,(</span><span class="nt">KSP</span><span class="o">)</span>
-<span class="nt">010560</span> <span class="nt">106606</span>                          <span class="nt">MTPD</span>    <span class="nt">USP</span>              <span class="o">;</span><span class="nt">SET</span> <span class="nt">USER</span> <span class="nt">STATCK</span> <span class="nt">POINTER</span>
-<span class="nt">010562</span> <span class="nt">005067</span>  <span class="nt">170110</span>                  <span class="nt">CLR</span>     <span class="nt">UPTR-2</span>
-<span class="nt">010566</span> <span class="nt">052737</span>  <span class="nt">140000</span>  <span class="nt">177776</span>          <span class="nt">BIS</span>     <span class="p">#</span><span class="nn">UM</span><span class="o">,@</span><span class="p">#</span><span class="nn">PSW</span>        <span class="o">;</span><span class="nt">USER</span> <span class="nt">MODE</span><span class="o">,</span> <span class="nt">PREV</span> <span class="nt">USER</span> <span class="nt">MODE</span>
-<span class="nt">010574</span> <span class="nt">106506</span>                          <span class="nt">MFPD</span>    <span class="nt">USP</span>              <span class="o">;</span><span class="nt">PUSH</span> <span class="nt">USER</span> <span class="nt">STACK</span> <span class="nt">POINTER</span> <span class="nt">ONTO</span> <span class="nt">USER</span> <span class="nt">STACK</span>
-<span class="nt">010576</span> <span class="nt">042737</span>  <span class="nt">140000</span>  <span class="nt">177776</span>          <span class="nt">BIC</span>     <span class="p">#</span><span class="nn">UM</span><span class="o">,@</span><span class="p">#</span><span class="nn">PSW</span>        <span class="o">;</span><span class="nt">KERNEL</span> <span class="nt">MODE</span><span class="o">,</span> <span class="nt">PREV</span> <span class="nt">USER</span> <span class="nt">MODE</span>
-<span class="nt">010604</span> <span class="nt">106506</span>                          <span class="nt">MFPD</span>    <span class="nt">USP</span>              <span class="o">;</span><span class="nt">PUSH</span> <span class="nt">USER</span> <span class="nt">STACK</span> <span class="nt">POINTER</span> <span class="nt">ONTO</span> <span class="nt">KERNEL</span> <span class="nt">STACK</span>
-<span class="nt">010606</span> <span class="nt">022716</span>  <span class="nt">000676</span>                  <span class="nt">CMP</span>     <span class="p">#</span><span class="nn">UPTR-2</span><span class="o">,(</span><span class="nt">KSP</span><span class="o">)</span>    <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">THAT</span> <span class="nt">USER</span> <span class="nt">STACK</span> <span class="nt">POINTER</span> <span class="nt">WAS</span>
-<span class="nt">010612</span> <span class="nt">001401</span>                          <span class="nt">BEQ</span>     <span class="o">.+</span><span class="nt">4</span>              <span class="o">;</span><span class="nt">PUSHED</span> <span class="nt">PROPERLY</span> <span class="o">(</span><span class="nt">ONCE</span><span class="o">)</span>
-<span class="nt">010614</span> <span class="nt">000000</span>                          <span class="nt">HLT</span>                      <span class="o">;</span><span class="nt">ERROR</span><span class="o">!</span>
-<span class="nt">010616</span> <span class="nt">022767</span>  <span class="nt">000700</span>  <span class="nt">170052</span>          <span class="nt">CMP</span>     <span class="p">#</span><span class="nn">UPTR</span><span class="o">,</span><span class="nt">UPTR-2</span>     <span class="o">;</span><span class="nt">CHECK</span> <span class="nt">THAT</span> <span class="nt">USER</span> <span class="nt">STACK</span> <span class="nt">POINTER</span> <span class="nt">IS</span> <span class="nt">ON</span> <span class="nt">THE</span>
-<span class="nt">010624</span> <span class="nt">001401</span>                          <span class="nt">BEQ</span>     <span class="o">.+</span><span class="nt">4</span>              <span class="o">;</span><span class="nt">USERS</span> <span class="nt">STACK</span>
-<span class="nt">010626</span> <span class="nt">000000</span>                          <span class="nt">HLT</span>                      <span class="o">;</span><span class="nt">ERROR</span><span class="o">!</span>
-</pre></div>
-</td></tr></table>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span></pre></div></td><td class="code"><div><pre><span></span><span class="mf">010540</span><span class="w"> </span><span class="mf">010701</span><span class="w">                  </span><span class="n">T65</span><span class="p">:</span><span class="w">    </span><span class="n">SCOPE</span><span class="w">                    </span><span class="p">;</span>
+<span class="mf">010542</span><span class="w"> </span><span class="mf">012737</span><span class="w">  </span><span class="mf">030000</span><span class="w">  </span><span class="mf">177776</span><span class="w">          </span><span class="n">MOV</span><span class="w">     </span><span class="err">#</span><span class="n">PUM</span><span class="p">,</span><span class="err">@#</span><span class="n">PSW</span><span class="w">       </span><span class="p">;</span><span class="n">KERNEL</span><span class="w"> </span><span class="n">MODE</span><span class="p">,</span><span class="w"> </span><span class="n">PREV</span><span class="w"> </span><span class="n">USER</span><span class="w"> </span><span class="n">MODE</span>
+<span class="mf">010550</span><span class="w"> </span><span class="mf">012706</span><span class="w">  </span><span class="mf">000500</span><span class="w">                  </span><span class="n">MOV</span><span class="w">     </span><span class="err">#</span><span class="n">KPTR</span><span class="p">,</span><span class="n">KSP</span><span class="w">        </span><span class="p">;</span><span class="n">SET</span><span class="w"> </span><span class="n">KERNEL</span><span class="w"> </span><span class="n">STACK</span><span class="w"> </span><span class="n">POINTER</span>
+<span class="mf">010554</span><span class="w"> </span><span class="mf">012716</span><span class="w">  </span><span class="mf">000700</span><span class="w">                  </span><span class="n">MOV</span><span class="w">     </span><span class="err">#</span><span class="n">UPTR</span><span class="p">,(</span><span class="n">KSP</span><span class="p">)</span>
+<span class="mf">010560</span><span class="w"> </span><span class="mf">106606</span><span class="w">                          </span><span class="n">MTPD</span><span class="w">    </span><span class="n">USP</span><span class="w">              </span><span class="p">;</span><span class="n">SET</span><span class="w"> </span><span class="n">USER</span><span class="w"> </span><span class="n">STATCK</span><span class="w"> </span><span class="n">POINTER</span>
+<span class="mf">010562</span><span class="w"> </span><span class="mf">005067</span><span class="w">  </span><span class="mf">170110</span><span class="w">                  </span><span class="kr">CLR</span><span class="w">     </span><span class="n">UPTR</span><span class="o">-</span><span class="mf">2</span>
+<span class="mf">010566</span><span class="w"> </span><span class="mf">052737</span><span class="w">  </span><span class="mf">140000</span><span class="w">  </span><span class="mf">177776</span><span class="w">          </span><span class="n">BIS</span><span class="w">     </span><span class="err">#</span><span class="n">UM</span><span class="p">,</span><span class="err">@#</span><span class="n">PSW</span><span class="w">        </span><span class="p">;</span><span class="n">USER</span><span class="w"> </span><span class="n">MODE</span><span class="p">,</span><span class="w"> </span><span class="n">PREV</span><span class="w"> </span><span class="n">USER</span><span class="w"> </span><span class="n">MODE</span>
+<span class="mf">010574</span><span class="w"> </span><span class="mf">106506</span><span class="w">                          </span><span class="n">MFPD</span><span class="w">    </span><span class="n">USP</span><span class="w">              </span><span class="p">;</span><span class="n">PUSH</span><span class="w"> </span><span class="n">USER</span><span class="w"> </span><span class="n">STACK</span><span class="w"> </span><span class="n">POINTER</span><span class="w"> </span><span class="kr">ONTO</span><span class="w"> </span><span class="n">USER</span><span class="w"> </span><span class="n">STACK</span>
+<span class="mf">010576</span><span class="w"> </span><span class="mf">042737</span><span class="w">  </span><span class="mf">140000</span><span class="w">  </span><span class="mf">177776</span><span class="w">          </span><span class="n">BIC</span><span class="w">     </span><span class="err">#</span><span class="n">UM</span><span class="p">,</span><span class="err">@#</span><span class="n">PSW</span><span class="w">        </span><span class="p">;</span><span class="n">KERNEL</span><span class="w"> </span><span class="n">MODE</span><span class="p">,</span><span class="w"> </span><span class="n">PREV</span><span class="w"> </span><span class="n">USER</span><span class="w"> </span><span class="n">MODE</span>
+<span class="mf">010604</span><span class="w"> </span><span class="mf">106506</span><span class="w">                          </span><span class="n">MFPD</span><span class="w">    </span><span class="n">USP</span><span class="w">              </span><span class="p">;</span><span class="n">PUSH</span><span class="w"> </span><span class="n">USER</span><span class="w"> </span><span class="n">STACK</span><span class="w"> </span><span class="n">POINTER</span><span class="w"> </span><span class="kr">ONTO</span><span class="w"> </span><span class="n">KERNEL</span><span class="w"> </span><span class="n">STACK</span>
+<span class="mf">010606</span><span class="w"> </span><span class="mf">022716</span><span class="w">  </span><span class="mf">000676</span><span class="w">                  </span><span class="n">CMP</span><span class="w">     </span><span class="err">#</span><span class="n">UPTR</span><span class="o">-</span><span class="mf">2</span><span class="p">,(</span><span class="n">KSP</span><span class="p">)</span><span class="w">    </span><span class="p">;</span><span class="n">CHECK</span><span class="w"> </span><span class="n">THAT</span><span class="w"> </span><span class="n">USER</span><span class="w"> </span><span class="n">STACK</span><span class="w"> </span><span class="n">POINTER</span><span class="w"> </span><span class="n">WAS</span>
+<span class="mf">010612</span><span class="w"> </span><span class="mf">001401</span><span class="w">                          </span><span class="n">BEQ</span><span class="w">     </span><span class="mf">.</span><span class="o">+</span><span class="mf">4</span><span class="w">              </span><span class="p">;</span><span class="n">PUSHED</span><span class="w"> </span><span class="n">PROPERLY</span><span class="w"> </span><span class="p">(</span><span class="kr">ON</span><span class="n">CE</span><span class="p">)</span>
+<span class="mf">010614</span><span class="w"> </span><span class="mf">000000</span><span class="w">                          </span><span class="n">HLT</span><span class="w">                      </span><span class="p">;</span><span class="n">ERROR</span><span class="err">!</span>
+<span class="mf">010616</span><span class="w"> </span><span class="mf">022767</span><span class="w">  </span><span class="mf">000700</span><span class="w">  </span><span class="mf">170052</span><span class="w">          </span><span class="n">CMP</span><span class="w">     </span><span class="err">#</span><span class="n">UPTR</span><span class="p">,</span><span class="n">UPTR</span><span class="o">-</span><span class="mf">2</span><span class="w">     </span><span class="p">;</span><span class="n">CHECK</span><span class="w"> </span><span class="n">THAT</span><span class="w"> </span><span class="n">USER</span><span class="w"> </span><span class="n">STACK</span><span class="w"> </span><span class="n">POINTER</span><span class="w"> </span><span class="n">IS</span><span class="w"> </span><span class="kr">ON</span><span class="w"> </span><span class="n">THE</span>
+<span class="mf">010624</span><span class="w"> </span><span class="mf">001401</span><span class="w">                          </span><span class="n">BEQ</span><span class="w">     </span><span class="mf">.</span><span class="o">+</span><span class="mf">4</span><span class="w">              </span><span class="p">;</span><span class="n">USERS</span><span class="w"> </span><span class="n">STACK</span>
+<span class="mf">010626</span><span class="w"> </span><span class="mf">000000</span><span class="w">                          </span><span class="n">HLT</span><span class="w">                      </span><span class="p">;</span><span class="n">ERROR</span><span class="err">!</span>
+</pre></div></td></tr></table></div>
+
+
 <p>This runs amok on the MFPD instruction at 010574, which should push the user stack pointer onto the user stack.
 Instead, the user stack pointer is pushed to memory at an incorrect address; 010676 instead of 000676.  This actually
 overwrites subsequent test code. Since the value pushed is 000700, a hard-coded loop is created that prevents the
@@ -254,7 +255,7 @@ solder on the affected mechanism as a next step.</p>
     </div>     </div> 
 <footer>
 <br />
-<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2022</p>
+<p><a href="https://fritzm.github.io">fritzm.github.io</a> &copy; Fritz Mueller 2023</p>
 </footer>
 
 </div> <!-- /container -->
