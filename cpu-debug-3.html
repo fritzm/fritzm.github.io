@@ -85,16 +85,16 @@ really help with the CPU debug.</p>
 <p>Swapped DAP for a spare, and this has fixed the stuck PC issue.  Memory issues remain, but by choosing a
 working memory range, I can start to toggle in and attempt to execute very simple programs.</p>
 <p>The simplest possible program, unconditional branch to self, seems to execute correctly:</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><span class="mf">001000</span><span class="w"> </span><span class="mf">000777</span><span class="w">         </span><span class="n">BR</span><span class="w">      </span><span class="mf">.</span><span class="o">-</span><span class="mf">0</span>
-</pre></div></td></tr></table></div>
-
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span></span>001000 000777         BR      .-0
+</pre></div>
+</td></tr></table>
 
 <p>A register to register data move test does not however:</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span>
-<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><span class="mf">001000</span><span class="w"> </span><span class="mf">010203</span><span class="w">         </span><span class="n">MOV</span><span class="w">     </span><span class="n">R2</span><span class="p">,</span><span class="n">R3</span>
-<span class="mf">001002</span><span class="w"> </span><span class="mf">000776</span><span class="w">         </span><span class="n">BR</span><span class="w">      </span><span class="mf">.</span><span class="o">-</span><span class="mf">2</span>
-</pre></div></td></tr></table></div>
-
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span></span>001000 010203         MOV     R2,R3
+001002 000776         BR      .-2
+</pre></div>
+</td></tr></table>
 
 <p>Control flow is as expected, but the value that ends up in R3 seems to be negated.  Still, pretty good
 progress! Now that I can step machine states, the next step will be to put the DAP out on an extender card and

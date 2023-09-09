@@ -85,23 +85,23 @@ is a board fault or a chip fault.  In the meantime, I have a spare GRA which I h
 has a "bad" sticker on it...  Decided to give it a try anyway, and it seems to be working much better than the one I
 have been debugging.</p>
 <p>Now have enough of the CPU debugged to toggle in and run a simple light chaser program:</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span>
-<span class="normal">2</span>
-<span class="normal">3</span>
-<span class="normal">4</span>
-<span class="normal">5</span>
-<span class="normal">6</span>
-<span class="normal">7</span>
-<span class="normal">8</span></pre></div></td><td class="code"><div><pre><span></span><span class="mf">000000</span><span class="w">  </span><span class="mf">013700</span><span class="w">  </span><span class="mf">177570</span><span class="w">  </span><span class="n">L0</span><span class="p">:</span><span class="w">     </span><span class="n">MOV</span><span class="w">     </span><span class="err">@#</span><span class="mf">177570</span><span class="p">,</span><span class="w"> </span><span class="n">R0</span><span class="w">    </span><span class="p">;</span><span class="kr">LOAD</span><span class="w"> </span><span class="n">COUNT</span><span class="w"> </span><span class="n">FROM</span><span class="w"> </span><span class="n">SWITCH</span><span class="w"> </span><span class="n">REGISTER</span>
-<span class="mf">000004</span><span class="w">  </span><span class="mf">005300</span><span class="w">          </span><span class="n">L1</span><span class="p">:</span><span class="w">     </span><span class="n">DEC</span><span class="w">     </span><span class="n">R0</span><span class="w">              </span><span class="p">;</span><span class="n">COUNT</span><span class="w"> </span><span class="n">DOWN</span>
-<span class="mf">000006</span><span class="w">  </span><span class="mf">001376</span><span class="w">                  </span><span class="n">BNE</span><span class="w">     </span><span class="n">L1</span><span class="w">              </span><span class="p">;</span><span class="n">LOOP</span><span class="w"> </span><span class="n">UNTIL</span><span class="w"> </span><span class="n">ZERO</span>
-<span class="mf">000010</span><span class="w">  </span><span class="mf">006301</span><span class="w">                  </span><span class="n">ASL</span><span class="w">     </span><span class="n">R1</span><span class="w">              </span><span class="p">;</span><span class="n">SHIFT</span><span class="w"> </span><span class="n">DISPLAY</span><span class="w"> </span><span class="nb">VAL</span><span class="n">UE</span>
-<span class="mf">000012</span><span class="w">  </span><span class="mf">001002</span><span class="w">                  </span><span class="n">BNE</span><span class="w">     </span><span class="n">L2</span><span class="w">              </span><span class="p">;</span><span class="n">SKIP</span><span class="w"> </span><span class="n">AHEAD</span><span class="w"> </span><span class="kr">IF</span><span class="w"> </span><span class="ow">NOT</span><span class="w"> </span><span class="n">SHIFTED</span><span class="w"> </span><span class="n">OUT</span>
-<span class="mf">000014</span><span class="w">  </span><span class="mf">012701</span><span class="w">  </span><span class="mf">000001</span><span class="w">          </span><span class="n">MOV</span><span class="w">     </span><span class="err">#</span><span class="mf">1</span><span class="p">,</span><span class="n">R1</span><span class="w">           </span><span class="p">;</span><span class="n">ELSE</span><span class="w"> </span><span class="n">RELOAD</span>
-<span class="mf">000020</span><span class="w">  </span><span class="mf">010137</span><span class="w">  </span><span class="mf">177570</span><span class="w">  </span><span class="n">L2</span><span class="p">:</span><span class="w">     </span><span class="n">MOV</span><span class="w">     </span><span class="n">R1</span><span class="p">,</span><span class="err">@#</span><span class="mf">177570</span><span class="w">     </span><span class="p">;</span><span class="n">STORE</span><span class="w"> </span><span class="kr">TO</span><span class="w"> </span><span class="n">DISPLAY</span><span class="w"> </span><span class="n">REGISTER</span>
-<span class="mf">000024</span><span class="w">  </span><span class="mf">000765</span><span class="w">                  </span><span class="n">BR</span><span class="w">      </span><span class="n">L0</span><span class="w">              </span><span class="p">;</span><span class="n">REPEAT</span><span class="w"> </span><span class="n">FROM</span><span class="w"> </span><span class="n">THE</span><span class="w"> </span><span class="kr">TO</span><span class="n">P</span>
-</pre></div></td></tr></table></div>
-
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">000000</span>  <span class="nt">013700</span>  <span class="nt">177570</span>  <span class="nt">L0</span><span class="o">:</span>     <span class="nt">MOV</span>     <span class="o">@</span><span class="p">#</span><span class="nn">177570</span><span class="o">,</span> <span class="nt">R0</span>    <span class="o">;</span><span class="nt">LOAD</span> <span class="nt">COUNT</span> <span class="nt">FROM</span> <span class="nt">SWITCH</span> <span class="nt">REGISTER</span>
+<span class="nt">000004</span>  <span class="nt">005300</span>          <span class="nt">L1</span><span class="o">:</span>     <span class="nt">DEC</span>     <span class="nt">R0</span>              <span class="o">;</span><span class="nt">COUNT</span> <span class="nt">DOWN</span>
+<span class="nt">000006</span>  <span class="nt">001376</span>                  <span class="nt">BNE</span>     <span class="nt">L1</span>              <span class="o">;</span><span class="nt">LOOP</span> <span class="nt">UNTIL</span> <span class="nt">ZERO</span>
+<span class="nt">000010</span>  <span class="nt">006301</span>                  <span class="nt">ASL</span>     <span class="nt">R1</span>              <span class="o">;</span><span class="nt">SHIFT</span> <span class="nt">DISPLAY</span> <span class="nt">VALUE</span>
+<span class="nt">000012</span>  <span class="nt">001002</span>                  <span class="nt">BNE</span>     <span class="nt">L2</span>              <span class="o">;</span><span class="nt">SKIP</span> <span class="nt">AHEAD</span> <span class="nt">IF</span> <span class="nt">NOT</span> <span class="nt">SHIFTED</span> <span class="nt">OUT</span>
+<span class="nt">000014</span>  <span class="nt">012701</span>  <span class="nt">000001</span>          <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">1</span><span class="o">,</span><span class="nt">R1</span>           <span class="o">;</span><span class="nt">ELSE</span> <span class="nt">RELOAD</span>
+<span class="nt">000020</span>  <span class="nt">010137</span>  <span class="nt">177570</span>  <span class="nt">L2</span><span class="o">:</span>     <span class="nt">MOV</span>     <span class="nt">R1</span><span class="o">,@</span><span class="p">#</span><span class="nn">177570</span>     <span class="o">;</span><span class="nt">STORE</span> <span class="nt">TO</span> <span class="nt">DISPLAY</span> <span class="nt">REGISTER</span>
+<span class="nt">000024</span>  <span class="nt">000765</span>                  <span class="nt">BR</span>      <span class="nt">L0</span>              <span class="o">;</span><span class="nt">REPEAT</span> <span class="nt">FROM</span> <span class="nt">THE</span> <span class="nt">TOP</span>
+</pre></div>
+</td></tr></table>
 
 <p><span class="videobox">
                     <iframe width="640" height="390"

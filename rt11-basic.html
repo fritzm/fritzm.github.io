@@ -98,33 +98,33 @@ http://www.bitsavers.org/bits/DEC/pdp11/floppyimages/rx02/</p>
 sectors and ignored unused logical sectors at the end of the floppy, and maybe PUTR doesn't handle disk
 image files that are not the expected full size?</p>
 <p>Example of padding the 486,400 byte BASIC.DSK image file to a size of 512,512 bytes on a Windows system:</p>
-<div class="highlight"><pre><span></span><span class="n">FSUTIL</span><span class="w"> </span><span class="k">FILE</span><span class="w"> </span><span class="n">CREATENEW</span><span class="w"> </span><span class="n">BLANK</span><span class="w"> </span><span class="mi">26112</span>
-<span class="n">COPY</span><span class="w"> </span><span class="o">/</span><span class="n">B</span><span class="w"> </span><span class="n">BASIC</span><span class="p">.</span><span class="n">DSK</span><span class="o">+</span><span class="n">BLANK</span><span class="w"> </span><span class="n">TEST</span><span class="p">.</span><span class="n">DSK</span>
+<div class="highlight"><pre><span></span>FSUTIL FILE CREATENEW BLANK 26112
+COPY /B BASIC.DSK+BLANK TEST.DSK
 
-<span class="nl">C</span><span class="p">:</span><span class="err">\</span><span class="n">PUTR</span><span class="o">&gt;</span><span class="n">DIR</span><span class="w"> </span><span class="n">TEST</span><span class="p">.</span><span class="n">DSK</span>
-<span class="n">Volume</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">drive</span><span class="w"> </span><span class="n">C</span><span class="w"> </span><span class="n">has</span><span class="w"> </span><span class="k">no</span><span class="w"> </span><span class="n">label</span><span class="p">.</span>
-<span class="n">Volume</span><span class="w"> </span><span class="n">Serial</span><span class="w"> </span><span class="n">Number</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="mi">14</span><span class="n">CE</span><span class="o">-</span><span class="mi">1</span><span class="n">A29</span>
-<span class="n">Directory</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nl">C</span><span class="p">:</span><span class="err">\</span><span class="n">PUTR</span>
-<span class="mi">08</span><span class="o">/</span><span class="mi">11</span><span class="o">/</span><span class="mi">2021</span><span class="w">  </span><span class="mi">12</span><span class="err">:</span><span class="mi">55</span><span class="n">p</span><span class="w">             </span><span class="mi">512</span><span class="p">,</span><span class="mi">512</span><span class="w"> </span><span class="n">TEST</span><span class="p">.</span><span class="n">DSK</span>
+C:\PUTR&gt;DIR TEST.DSK
+Volume in drive C has no label.
+Volume Serial Number is 14CE-1A29
+Directory of C:\PUTR
+08/11/2021  12:55p             512,512 TEST.DSK
 
-<span class="nl">C</span><span class="p">:</span><span class="err">\</span><span class="n">PUTR</span><span class="o">&gt;</span><span class="n">PUTR</span>
-<span class="n">PUTR</span><span class="w"> </span><span class="n">V2</span><span class="mf">.01</span><span class="w">  </span><span class="n">Copyright</span><span class="w"> </span><span class="p">(</span><span class="n">C</span><span class="p">)</span><span class="w"> </span><span class="mi">1995</span><span class="o">-</span><span class="mi">2001</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="n">John</span><span class="w"> </span><span class="n">Wilson</span><span class="w"> </span><span class="o">&lt;</span><span class="n">wilson</span><span class="nv">@dbit</span><span class="p">.</span><span class="n">com</span><span class="o">&gt;</span><span class="p">.</span>
-<span class="ow">All</span><span class="w"> </span><span class="n">rights</span><span class="w"> </span><span class="n">reserved</span><span class="p">.</span><span class="w">  </span><span class="n">See</span><span class="w"> </span><span class="n">www</span><span class="p">.</span><span class="n">dbit</span><span class="p">.</span><span class="n">com</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">other</span><span class="w"> </span><span class="k">DEC</span><span class="o">-</span><span class="n">related</span><span class="w"> </span><span class="n">software</span><span class="p">.</span>
+C:\PUTR&gt;PUTR
+PUTR V2.01  Copyright (C) 1995-2001 by John Wilson &lt;wilson@dbit.com&gt;.
+All rights reserved.  See www.dbit.com for other DEC-related software.
 
-<span class="n">COPY</span><span class="w"> </span><span class="n">mode</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="nf">ASCII</span><span class="p">,</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">COPY</span><span class="w"> </span><span class="nc">BINARY</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">change</span>
-<span class="p">(</span><span class="nl">C</span><span class="p">:</span><span class="err">\</span><span class="n">PUTR</span><span class="p">)</span><span class="o">&gt;</span><span class="n">MOUNT</span><span class="w"> </span><span class="nl">RX</span><span class="p">:</span><span class="w"> </span><span class="n">TEST</span><span class="p">.</span><span class="n">DSK</span><span class="w"> </span><span class="o">/</span><span class="n">RX02</span><span class="w"> </span><span class="o">/</span><span class="n">RT11</span><span class="w"> </span><span class="o">/</span><span class="n">RONLY</span>
-<span class="p">(</span><span class="nl">C</span><span class="p">:</span><span class="err">\</span><span class="n">PUTR</span><span class="p">)</span><span class="o">&gt;</span><span class="n">DIR</span><span class="w"> </span><span class="nl">RX</span><span class="p">:</span>
+COPY mode is ASCII, SET COPY BINARY to change
+(C:\PUTR)&gt;MOUNT RX: TEST.DSK /RX02 /RT11 /RONLY
+(C:\PUTR)&gt;DIR RX:
 
-<span class="n">Volume</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">drive</span><span class="w"> </span><span class="n">RX</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">RT11A</span>
-<span class="n">Directory</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nl">RX</span><span class="p">:</span><span class="err">\</span><span class="o">*</span><span class="p">.</span><span class="o">*</span>
+Volume in drive RX is RT11A
+Directory of RX:\*.*
 
-<span class="mi">11</span><span class="o">-</span><span class="n">Aug</span><span class="o">-</span><span class="mi">2021</span>
-<span class="n">BSOT0D</span><span class="p">.</span><span class="n">EAE</span><span class="w">    </span><span class="mi">12</span><span class="w">  </span><span class="mi">04</span><span class="o">-</span><span class="n">Apr</span><span class="o">-</span><span class="mi">1983</span>
-<span class="n">BSOT0S</span><span class="p">.</span><span class="n">EAE</span><span class="w">    </span><span class="mi">10</span><span class="w">  </span><span class="mi">04</span><span class="o">-</span><span class="n">Apr</span><span class="o">-</span><span class="mi">1983</span>
-<span class="n">BSOT1D</span><span class="p">.</span><span class="n">EAE</span><span class="w">     </span><span class="mi">9</span><span class="w">  </span><span class="mi">04</span><span class="o">-</span><span class="n">Apr</span><span class="o">-</span><span class="mi">1983</span>
-<span class="n">BSOT1S</span><span class="p">.</span><span class="n">EAE</span><span class="w">     </span><span class="mi">6</span><span class="w">  </span><span class="mi">04</span><span class="o">-</span><span class="n">Apr</span><span class="o">-</span><span class="mi">1983</span>
-<span class="n">BSOT0D</span><span class="p">.</span><span class="n">EIS</span><span class="w">    </span><span class="mi">12</span><span class="w">  </span><span class="mi">04</span><span class="o">-</span><span class="n">Apr</span><span class="o">-</span><span class="mi">1983</span>
-<span class="p">...</span>
+11-Aug-2021
+BSOT0D.EAE    12  04-Apr-1983
+BSOT0S.EAE    10  04-Apr-1983
+BSOT1D.EAE     9  04-Apr-1983
+BSOT1S.EAE     6  04-Apr-1983
+BSOT0D.EIS    12  04-Apr-1983
+...
 </pre></div>
 
 
@@ -169,21 +169,21 @@ order and output an RX-02 disk image file in physical sector order.</p>
 <span class="cm">*  (or 6 depending on density).</span>
 <span class="cm">*/</span>
 <span class="k">static</span>
-<span class="n">rxfactr</span><span class="p">(</span><span class="n">sectr</span><span class="p">,</span><span class="w"> </span><span class="n">psectr</span><span class="p">,</span><span class="w"> </span><span class="n">ptrck</span><span class="p">)</span>
-<span class="w">   </span><span class="k">register</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">sectr</span><span class="p">;</span>
-<span class="w">   </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="n">psectr</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="n">ptrck</span><span class="p">;</span>
+<span class="nf">rxfactr</span><span class="p">(</span><span class="n">sectr</span><span class="p">,</span> <span class="n">psectr</span><span class="p">,</span> <span class="n">ptrck</span><span class="p">)</span>
+   <span class="k">register</span> <span class="kt">int</span> <span class="n">sectr</span><span class="p">;</span>
+   <span class="kt">int</span> <span class="o">*</span><span class="n">psectr</span><span class="p">,</span> <span class="o">*</span><span class="n">ptrck</span><span class="p">;</span>
 <span class="p">{</span>
-<span class="w">   </span><span class="k">register</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">p1</span><span class="p">,</span><span class="w"> </span><span class="n">p2</span><span class="p">;</span>
+   <span class="k">register</span> <span class="kt">int</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">;</span>
 
-<span class="w">   </span><span class="n">p1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sectr</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">26</span><span class="p">;</span>
-<span class="w">   </span><span class="n">p2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sectr</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">26</span><span class="p">;</span>
-<span class="w">   </span><span class="cm">/* 2 to 1 interleave */</span>
-<span class="w">   </span><span class="n">p2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">p2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">p2</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">13</span><span class="w"> </span><span class="o">?</span><span class="w">  </span><span class="mi">1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mi">0</span><span class="p">))</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">26</span><span class="p">;</span>
-<span class="w">   </span><span class="cm">/* 6 sector per track slew */</span>
-<span class="w">   </span><span class="o">*</span><span class="n">psectr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">p2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">6</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">p1</span><span class="p">)</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">26</span><span class="p">;</span>
-<span class="w">   </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">++</span><span class="n">p1</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">77</span><span class="p">)</span>
-<span class="w">       </span><span class="n">p1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<span class="w">   </span><span class="o">*</span><span class="n">ptrck</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p1</span><span class="p">;</span>
+   <span class="n">p1</span> <span class="o">=</span> <span class="n">sectr</span> <span class="o">/</span> <span class="mi">26</span><span class="p">;</span>
+   <span class="n">p2</span> <span class="o">=</span> <span class="n">sectr</span> <span class="o">%</span> <span class="mi">26</span><span class="p">;</span>
+   <span class="cm">/* 2 to 1 interleave */</span>
+   <span class="n">p2</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">p2</span> <span class="o">+</span> <span class="p">(</span><span class="n">p2</span> <span class="o">&gt;=</span> <span class="mi">13</span> <span class="o">?</span>  <span class="mi">1</span> <span class="o">:</span> <span class="mi">0</span><span class="p">))</span> <span class="o">%</span> <span class="mi">26</span><span class="p">;</span>
+   <span class="cm">/* 6 sector per track slew */</span>
+   <span class="o">*</span><span class="n">psectr</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">p2</span> <span class="o">+</span> <span class="mi">6</span> <span class="o">*</span> <span class="n">p1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">26</span><span class="p">;</span>
+   <span class="k">if</span> <span class="p">(</span><span class="o">++</span><span class="n">p1</span> <span class="o">&gt;=</span> <span class="mi">77</span><span class="p">)</span>
+       <span class="n">p1</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+   <span class="o">*</span><span class="n">ptrck</span> <span class="o">=</span> <span class="n">p1</span><span class="p">;</span>
 <span class="p">}</span>
 </pre></div>
 
@@ -201,23 +201,23 @@ manipulation for removing track 0 if present, is there any reason this would not
 </blockquote>
 <p>Hmm, it didn't occur to me to try that. Mounting the logical sector order RX-02 disk image, without any
 modification necessary, as a raw MSCP disk does indeed appear to work!</p>
-<div class="highlight"><pre><span></span><span class="nf">sim</span><span class="err">&gt;</span><span class="w"> </span><span class="no">ATTACH</span><span class="w"> </span><span class="no">RQ1</span><span class="w"> </span><span class="no">BASIC.DSK</span>
-<span class="nl">RQ1:</span><span class="w"> </span><span class="err">&#39;</span><span class="nf">BASIC.DSK</span><span class="err">&#39;</span><span class="w"> </span><span class="no">Contains</span><span class="w"> </span><span class="no">RT11</span><span class="w"> </span><span class="no">partitions</span>
-<span class="err">1</span><span class="w"> </span><span class="nf">valid</span><span class="w"> </span><span class="no">partition</span><span class="p">,</span><span class="w"> </span><span class="no">Type</span><span class="p">:</span><span class="w"> </span><span class="no">V05</span><span class="p">,</span><span class="w"> </span><span class="no">Sectors</span><span class="w"> </span><span class="no">On</span><span class="w"> </span><span class="no">Disk</span><span class="p">:</span><span class="w"> </span><span class="mi">950</span>
+<div class="highlight"><pre><span></span>sim&gt; ATTACH RQ1 BASIC.DSK
+RQ1: &#39;BASIC.DSK&#39; Contains RT11 partitions
+1 valid partition, Type: V05, Sectors On Disk: 950
 
-<span class="nf">sim</span><span class="err">&gt;</span><span class="w"> </span><span class="no">SHOW</span><span class="w"> </span><span class="no">RQ1</span>
-<span class="nf">RQ1</span><span class="w">     </span><span class="mi">486</span><span class="no">KB</span><span class="p">,</span><span class="w"> </span><span class="no">attached</span><span class="w"> </span><span class="no">to</span><span class="w"> </span><span class="no">BASIC.DSK</span><span class="p">,</span><span class="w"> </span><span class="no">write</span><span class="w"> </span><span class="no">locked</span>
-<span class="w">       </span><span class="nf">RD54</span><span class="p">,</span><span class="w"> </span><span class="no">UNIT</span><span class="err">=</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="no">autosize</span>
-<span class="w">       </span><span class="nf">RAW</span><span class="w"> </span><span class="no">format</span>
+sim&gt; SHOW RQ1
+RQ1     486KB, attached to BASIC.DSK, write locked
+       RD54, UNIT=1, autosize
+       RAW format
 
-<span class="na">.DIR</span><span class="w"> </span><span class="no">DU1</span><span class="p">:</span>
+.DIR DU1:
 
-<span class="nf">BSOT0D.EAE</span><span class="w">    </span><span class="mi">12</span><span class="w">  </span><span class="mi">04</span><span class="p">-</span><span class="no">Apr-83</span><span class="w">      </span><span class="no">BSOT0S.EAE</span><span class="w">    </span><span class="mi">10</span><span class="w">  </span><span class="mi">04</span><span class="p">-</span><span class="no">Apr-83</span>
-<span class="nf">BSOT1D.EAE</span><span class="w">     </span><span class="mi">9</span><span class="w">  </span><span class="mi">04</span><span class="p">-</span><span class="no">Apr-83</span><span class="w">      </span><span class="no">BSOT1S.EAE</span><span class="w">     </span><span class="mi">6</span><span class="w">  </span><span class="mi">04</span><span class="p">-</span><span class="no">Apr-83</span>
-<span class="nf">BSOT0D.EIS</span><span class="w">    </span><span class="mi">12</span><span class="w">  </span><span class="mi">04</span><span class="p">-</span><span class="no">Apr-83</span><span class="w">      </span><span class="no">BSOT0S.EIS</span><span class="w">     </span><span class="mi">9</span><span class="w">  </span><span class="mi">04</span><span class="p">-</span><span class="no">Apr-83</span>
-<span class="nf">BSOT1D.EIS</span><span class="w">     </span><span class="mi">9</span><span class="w">  </span><span class="mi">04</span><span class="p">-</span><span class="no">Apr-83</span><span class="w">      </span><span class="no">BSOT1S.EIS</span><span class="w">     </span><span class="mi">6</span><span class="w">  </span><span class="mi">04</span><span class="p">-</span><span class="no">Apr-83</span>
-<span class="nf">BSOT0S.FIS</span><span class="w">     </span><span class="mi">7</span><span class="w">  </span><span class="mi">04</span><span class="p">-</span><span class="no">Apr-83</span><span class="w">      </span><span class="no">BSOT1S.FIS</span><span class="w">     </span><span class="mi">6</span><span class="w">  </span><span class="mi">04</span><span class="p">-</span><span class="no">Apr-83</span>
-<span class="na">...</span>
+BSOT0D.EAE    12  04-Apr-83      BSOT0S.EAE    10  04-Apr-83
+BSOT1D.EAE     9  04-Apr-83      BSOT1S.EAE     6  04-Apr-83
+BSOT0D.EIS    12  04-Apr-83      BSOT0S.EIS     9  04-Apr-83
+BSOT1D.EIS     9  04-Apr-83      BSOT1S.EIS     6  04-Apr-83
+BSOT0S.FIS     7  04-Apr-83      BSOT1S.FIS     6  04-Apr-83
+...
 </pre></div>
 
 

@@ -93,17 +93,17 @@ LDFPS/STFPS, SETI/SETL, SETF/SETD, etc.</p>
 failures with short toggle-in programs given the names and descriptions of the failing diagnostics. In this
 case, the following simple code to exercise an LDFPS/STFPS sequence from the front panel switches and lights
 showed that bits 10 and 11 of the floating point status/control word would come back erroneously toggled:</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span>
-<span class="normal">2</span>
-<span class="normal">3</span>
-<span class="normal">4</span>
-<span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><span class="mf">001000</span><span class="w">  </span><span class="mf">170137</span><span class="w">  </span><span class="n">START</span><span class="p">:</span><span class="w">  </span><span class="n">LDFPS</span><span class="w">   </span><span class="err">@#</span><span class="mf">177570</span><span class="w">        </span><span class="p">;</span><span class="kr">LOAD</span><span class="w"> </span><span class="n">FPS</span><span class="w"> </span><span class="n">FROM</span><span class="w"> </span><span class="n">SWITCH</span><span class="w"> </span><span class="n">REGISTER</span>
-<span class="w">        </span><span class="mf">177570</span>
-<span class="mf">001004</span><span class="w">  </span><span class="mf">170237</span><span class="w">          </span><span class="n">STFPS</span><span class="w">   </span><span class="err">@#</span><span class="mf">177570</span><span class="w">        </span><span class="p">;</span><span class="ow">AND</span><span class="w"> </span><span class="n">STORE</span><span class="w"> </span><span class="n">BACK</span><span class="w"> </span><span class="kr">TO</span><span class="w"> </span><span class="n">DISPLAY</span><span class="w"> </span><span class="n">REGISTER</span>
-<span class="w">        </span><span class="mf">177570</span>
-<span class="mf">001010</span><span class="w">  </span><span class="mf">000773</span><span class="w">          </span><span class="n">BR</span><span class="w">      </span><span class="n">START</span><span class="w">           </span><span class="p">;</span><span class="n">REPEAT</span>
-</pre></div></td></tr></table></div>
-
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">001000</span>  <span class="nt">170137</span>  <span class="nt">START</span><span class="o">:</span>  <span class="nt">LDFPS</span>   <span class="o">@</span><span class="p">#</span><span class="nn">177570</span>        <span class="o">;</span><span class="nt">LOAD</span> <span class="nt">FPS</span> <span class="nt">FROM</span> <span class="nt">SWITCH</span> <span class="nt">REGISTER</span>
+        <span class="nt">177570</span>
+<span class="nt">001004</span>  <span class="nt">170237</span>          <span class="nt">STFPS</span>   <span class="o">@</span><span class="p">#</span><span class="nn">177570</span>        <span class="o">;</span><span class="nt">AND</span> <span class="nt">STORE</span> <span class="nt">BACK</span> <span class="nt">TO</span> <span class="nt">DISPLAY</span> <span class="nt">REGISTER</span>
+        <span class="nt">177570</span>
+<span class="nt">001010</span>  <span class="nt">000773</span>          <span class="nt">BR</span>      <span class="nt">START</span>           <span class="o">;</span><span class="nt">REPEAT</span>
+</pre></div>
+</td></tr></table>
 
 <p>First things first, check power to the FPU and its clock; these look fine.  Next, plug the KM11 into the
 floating point slot and check the FPU microcode sequences while executing LDFPS and STFPS instructions.
@@ -140,41 +140,41 @@ After this fix, LDFPS/STFPS function correctly in the toggle-in test program, an
 <p>Not out of the woods yet, though...  Progressing down the sequence of MAINDECS, diagnostic CFPDC0
 (add/subtract) now fails :-(  For this, we bring back the simple "add two floats" diagnostic used during
 previous FP11 debug:</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
-<span class="normal"> 2</span>
-<span class="normal"> 3</span>
-<span class="normal"> 4</span>
-<span class="normal"> 5</span>
-<span class="normal"> 6</span>
-<span class="normal"> 7</span>
-<span class="normal"> 8</span>
-<span class="normal"> 9</span>
-<span class="normal">10</span>
-<span class="normal">11</span>
-<span class="normal">12</span>
-<span class="normal">13</span>
-<span class="normal">14</span>
-<span class="normal">15</span>
-<span class="normal">16</span>
-<span class="normal">17</span></pre></div></td><td class="code"><div><pre><span></span><span class="w">        </span><span class="nt">000000</span><span class="w">                          </span><span class="nt">AC0</span><span class="o">=%</span><span class="nt">0</span>
-<span class="w">        </span><span class="nt">000001</span><span class="w">                          </span><span class="nt">AC1</span><span class="o">=%</span><span class="nt">1</span>
-<span class="nt">000000</span><span class="w">                                  </span><span class="p">.</span><span class="nc">ASECT</span>
-<span class="w">        </span><span class="nt">001000</span><span class="w">                          </span><span class="o">.=</span><span class="nt">1000</span>
-<span class="nt">001000</span><span class="w">  </span><span class="nt">170011</span><span class="w">                  </span><span class="nt">START</span><span class="o">:</span><span class="w">  </span><span class="nt">SETD</span><span class="w">                </span><span class="o">;</span><span class="nt">SET</span><span class="w"> </span><span class="nt">DOUBLE</span><span class="w"> </span><span class="nt">PRECISION</span><span class="w"> </span><span class="nt">MODE</span>
-<span class="nt">001002</span><span class="w">  </span><span class="nt">172467</span><span class="w">  </span><span class="nt">000014</span><span class="w">                  </span><span class="nt">LDD</span><span class="w">     </span><span class="nt">D1</span><span class="o">,</span><span class="nt">AC0</span><span class="w">      </span><span class="o">;</span><span class="nt">FETCH</span><span class="w"> </span><span class="nt">FIRST</span><span class="w"> </span><span class="nt">ADDEND</span><span class="w"> </span><span class="nt">FROM</span><span class="w"> </span><span class="nt">D1</span>
-<span class="nt">001006</span><span class="w">  </span><span class="nt">172567</span><span class="w">  </span><span class="nt">000020</span><span class="w">                  </span><span class="nt">LDD</span><span class="w">     </span><span class="nt">D2</span><span class="o">,</span><span class="nt">AC1</span><span class="w">      </span><span class="o">;</span><span class="nt">FETCH</span><span class="w"> </span><span class="nt">SECOND</span><span class="w"> </span><span class="nt">ADDEND</span><span class="w"> </span><span class="nt">FROM</span><span class="w"> </span><span class="nt">D2</span>
-<span class="nt">001012</span><span class="w">  </span><span class="nt">172100</span><span class="w">                          </span><span class="nt">ADDD</span><span class="w">    </span><span class="nt">AC0</span><span class="o">,</span><span class="nt">AC1</span><span class="w">     </span><span class="o">;</span><span class="nt">ADD</span><span class="w"> </span><span class="nt">THEM</span><span class="w"> </span><span class="o">(</span><span class="nt">RESULT</span><span class="w"> </span><span class="nt">IN</span><span class="w"> </span><span class="nt">AC1</span><span class="o">)</span>
-<span class="nt">001014</span><span class="w">  </span><span class="nt">174167</span><span class="w">  </span><span class="nt">000022</span><span class="w">                  </span><span class="nt">STD</span><span class="w">     </span><span class="nt">AC1</span><span class="o">,</span><span class="nt">D3</span><span class="w">      </span><span class="o">;</span><span class="nt">STORE</span><span class="w"> </span><span class="nt">RESULT</span><span class="w"> </span><span class="nt">TO</span><span class="w"> </span><span class="nt">D3</span>
-<span class="nt">001020</span><span class="w">  </span><span class="nt">000000</span><span class="w">                          </span><span class="nt">HALT</span>
-<span class="nt">001022</span><span class="w">  </span><span class="nt">040200</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">D1</span><span class="o">:</span><span class="w">     </span><span class="p">.</span><span class="nc">WORD</span><span class="w">   </span><span class="nt">040000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="w"> </span><span class="o">;</span><span class="nt">0</span><span class="p">.</span><span class="nc">5</span>
-<span class="nt">001030</span><span class="w">  </span><span class="nt">000000</span>
-<span class="nt">001032</span><span class="w">  </span><span class="nt">040200</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">D2</span><span class="o">:</span><span class="w">     </span><span class="p">.</span><span class="nc">WORD</span><span class="w">   </span><span class="nt">040000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="w"> </span><span class="o">;</span><span class="nt">0</span><span class="p">.</span><span class="nc">5</span>
-<span class="nt">001040</span><span class="w">  </span><span class="nt">000000</span>
-<span class="nt">001042</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">000000</span><span class="w">  </span><span class="nt">D3</span><span class="o">:</span><span class="w">     </span><span class="p">.</span><span class="nc">WORD</span><span class="w">   </span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span>
-<span class="nt">001050</span><span class="w">  </span><span class="nt">000000</span>
-<span class="w">        </span><span class="nt">001000</span><span class="w">                          </span><span class="p">.</span><span class="nc">END</span><span class="w">    </span><span class="nt">START</span>
-</pre></div></td></tr></table></div>
-
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17</pre></div></td><td class="code"><div class="highlight"><pre><span></span>        <span class="nt">000000</span>                          <span class="nt">AC0</span><span class="o">=%</span><span class="nt">0</span>
+        <span class="nt">000001</span>                          <span class="nt">AC1</span><span class="o">=%</span><span class="nt">1</span>
+<span class="nt">000000</span>                                  <span class="p">.</span><span class="nc">ASECT</span>
+        <span class="nt">001000</span>                          <span class="o">.=</span><span class="nt">1000</span>
+<span class="nt">001000</span>  <span class="nt">170011</span>                  <span class="nt">START</span><span class="o">:</span>  <span class="nt">SETD</span>                <span class="o">;</span><span class="nt">SET</span> <span class="nt">DOUBLE</span> <span class="nt">PRECISION</span> <span class="nt">MODE</span>
+<span class="nt">001002</span>  <span class="nt">172467</span>  <span class="nt">000014</span>                  <span class="nt">LDD</span>     <span class="nt">D1</span><span class="o">,</span><span class="nt">AC0</span>      <span class="o">;</span><span class="nt">FETCH</span> <span class="nt">FIRST</span> <span class="nt">ADDEND</span> <span class="nt">FROM</span> <span class="nt">D1</span>
+<span class="nt">001006</span>  <span class="nt">172567</span>  <span class="nt">000020</span>                  <span class="nt">LDD</span>     <span class="nt">D2</span><span class="o">,</span><span class="nt">AC1</span>      <span class="o">;</span><span class="nt">FETCH</span> <span class="nt">SECOND</span> <span class="nt">ADDEND</span> <span class="nt">FROM</span> <span class="nt">D2</span>
+<span class="nt">001012</span>  <span class="nt">172100</span>                          <span class="nt">ADDD</span>    <span class="nt">AC0</span><span class="o">,</span><span class="nt">AC1</span>     <span class="o">;</span><span class="nt">ADD</span> <span class="nt">THEM</span> <span class="o">(</span><span class="nt">RESULT</span> <span class="nt">IN</span> <span class="nt">AC1</span><span class="o">)</span>
+<span class="nt">001014</span>  <span class="nt">174167</span>  <span class="nt">000022</span>                  <span class="nt">STD</span>     <span class="nt">AC1</span><span class="o">,</span><span class="nt">D3</span>      <span class="o">;</span><span class="nt">STORE</span> <span class="nt">RESULT</span> <span class="nt">TO</span> <span class="nt">D3</span>
+<span class="nt">001020</span>  <span class="nt">000000</span>                          <span class="nt">HALT</span>
+<span class="nt">001022</span>  <span class="nt">040200</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D1</span><span class="o">:</span>     <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">040000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span> <span class="o">;</span><span class="nt">0</span><span class="p">.</span><span class="nc">5</span>
+<span class="nt">001030</span>  <span class="nt">000000</span>
+<span class="nt">001032</span>  <span class="nt">040200</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D2</span><span class="o">:</span>     <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">040000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span> <span class="o">;</span><span class="nt">0</span><span class="p">.</span><span class="nc">5</span>
+<span class="nt">001040</span>  <span class="nt">000000</span>
+<span class="nt">001042</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">000000</span>  <span class="nt">D3</span><span class="o">:</span>     <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span><span class="o">,</span><span class="nt">000000</span>
+<span class="nt">001050</span>  <span class="nt">000000</span>
+        <span class="nt">001000</span>                          <span class="p">.</span><span class="nc">END</span>    <span class="nt">START</span>
+</pre></div>
+</td></tr></table>
 
 <p>Sure enough, this is producing incorrect results.  The microcode flows for add/subtract/compare are a bit more
 involved than the simple load/store sequences above.  The sequence starts with common prolog <code>RDY.00</code>,

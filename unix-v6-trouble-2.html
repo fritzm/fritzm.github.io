@@ -258,8 +258,8 @@ machine again and trying that now...</p>
 <p>It works; I end up stopped at the breakpoint and start extracting data:</p>
 <blockquote>
 <p>Hmmm:</p>
-<div class="highlight"><pre><span></span><span class="n">PA</span><span class="o">:</span><span class="mi">161400</span><span class="o">:</span><span class="w"> </span><span class="mi">141644</span><span class="w"> </span><span class="mi">141660</span><span class="w"> </span><span class="mi">000000</span><span class="w"> </span><span class="mi">000000</span><span class="w"> </span><span class="mi">000000</span><span class="w"> </span><span class="mi">000000</span><span class="w"> </span><span class="mi">000000</span><span class="w"> </span><span class="mi">000000</span>
-<span class="n">PA</span><span class="o">:</span><span class="mi">161420</span><span class="o">:</span><span class="w"> </span><span class="mi">000000</span><span class="w"> </span><span class="mi">000000</span><span class="w"> </span><span class="mi">000000</span><span class="w"> </span><span class="mi">000000</span><span class="w"> </span><span class="mi">000000</span><span class="w"> </span><span class="mi">000000</span><span class="w"> </span><span class="mi">000000</span><span class="w"> </span><span class="mi">000000</span>
+<div class="highlight"><pre><span></span><span class="n">PA</span><span class="o">:</span><span class="mi">161400</span><span class="o">:</span> <span class="mi">141644</span> <span class="mi">141660</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">000000</span>
+<span class="n">PA</span><span class="o">:</span><span class="mi">161420</span><span class="o">:</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">000000</span> <span class="mi">000000</span>
 </pre></div>
 
 
@@ -270,14 +270,14 @@ machine again and trying that now...</p>
 </blockquote>
 <p>Fritz:</p>
 <blockquote>
-<div class="highlight"><pre><span></span><span class="n">UISA0</span><span class="o">:</span><span class="w"> </span><span class="mi">001654</span>
+<div class="highlight"><pre><span></span><span class="n">UISA0</span><span class="o">:</span> <span class="mi">001654</span>
 
-<span class="n">PA</span><span class="o">:</span><span class="mi">165400</span><span class="o">:</span><span class="w"> </span><span class="mi">170011</span><span class="w"> </span><span class="mi">010600</span><span class="w"> </span><span class="mi">011046</span><span class="w"> </span><span class="mi">005720</span><span class="w"> </span><span class="mi">010066</span><span class="w"> </span><span class="mi">000002</span><span class="w"> </span><span class="mi">004767</span><span class="w"> </span><span class="mi">000010</span>
+<span class="n">PA</span><span class="o">:</span><span class="mi">165400</span><span class="o">:</span> <span class="mi">170011</span> <span class="mi">010600</span> <span class="mi">011046</span> <span class="mi">005720</span> <span class="mi">010066</span> <span class="mi">000002</span> <span class="mi">004767</span> <span class="mi">000010</span>
 
-<span class="n">KSP</span><span class="o">:</span><span class="w"> </span><span class="mi">141656</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">PA</span><span class="o">:</span><span class="mi">165256</span>
+<span class="n">KSP</span><span class="o">:</span> <span class="mi">141656</span> <span class="o">-&gt;</span> <span class="n">PA</span><span class="o">:</span><span class="mi">165256</span>
 
-<span class="n">PA</span><span class="o">:</span><span class="mi">165256</span><span class="o">:</span><span class="w"> </span><span class="mi">007656</span><span class="w"> </span><span class="mi">001654</span><span class="w"> </span><span class="mi">000104</span><span class="w"> </span><span class="mi">000000</span><span class="w"> </span><span class="mi">101602</span><span class="w"> </span><span class="mi">066312</span><span class="w"> </span><span class="mi">000000</span><span class="w"> </span><span class="mi">141726</span>
-<span class="n">PA</span><span class="o">:</span><span class="mi">175600</span><span class="o">:</span><span class="w"> </span><span class="mi">110024</span><span class="w"> </span><span class="mi">010400</span><span class="w"> </span><span class="mi">000167</span><span class="w"> </span><span class="mi">000016</span><span class="w"> </span><span class="mi">010500</span><span class="w"> </span><span class="mi">010605</span><span class="w"> </span><span class="mi">101446</span><span class="w"> </span><span class="mi">010346</span>
+<span class="n">PA</span><span class="o">:</span><span class="mi">165256</span><span class="o">:</span> <span class="mi">007656</span> <span class="mi">001654</span> <span class="mi">000104</span> <span class="mi">000000</span> <span class="mi">101602</span> <span class="mi">066312</span> <span class="mi">000000</span> <span class="mi">141726</span>
+<span class="n">PA</span><span class="o">:</span><span class="mi">175600</span><span class="o">:</span> <span class="mi">110024</span> <span class="mi">010400</span> <span class="mi">000167</span> <span class="mi">000016</span> <span class="mi">010500</span> <span class="mi">010605</span> <span class="mi">101446</span> <span class="mi">010346</span>
 </pre></div>
 
 
@@ -294,7 +294,7 @@ off the swap device, once I decipher the stack?</p>
 </blockquote>
 <hr>
 <blockquote>
-<div class="highlight"><pre><span></span><span class="n">PA</span><span class="o">:</span><span class="mi">165256</span><span class="o">:</span><span class="w"> </span><span class="mi">007656</span><span class="w"> </span><span class="mi">001654</span><span class="w"> </span><span class="mi">000104</span><span class="w"> </span><span class="mi">000000</span><span class="w"> </span><span class="mi">101602</span><span class="w"> </span><span class="mi">066312</span><span class="w"> </span><span class="mi">000000</span><span class="w"> </span><span class="mi">141726</span>
+<div class="highlight"><pre><span></span><span class="n">PA</span><span class="o">:</span><span class="mi">165256</span><span class="o">:</span> <span class="mi">007656</span> <span class="mi">001654</span> <span class="mi">000104</span> <span class="mi">000000</span> <span class="mi">101602</span> <span class="mi">066312</span> <span class="mi">000000</span> <span class="mi">141726</span>
 </pre></div>
 
 
@@ -319,19 +319,19 @@ to have a look. We want blocks 4014-4022, then? (9 x 512-byte blocks = 0110 clic
 <p>Fritz:</p>
 <p>Hmm, the beginning looks good, but it seems to cut off to soon:</p>
 <blockquote>
-<div class="highlight"><pre><span></span><span class="mf">0000000</span><span class="w">    </span><span class="mf">000000</span><span class="w">  </span><span class="mf">000000</span><span class="w">  </span><span class="mf">000000</span><span class="w">  </span><span class="mf">000000</span><span class="w">  </span><span class="mf">000000</span><span class="w">  </span><span class="mf">000000</span><span class="w">  </span><span class="mf">000000</span><span class="w">  </span><span class="mf">000000</span>
-<span class="o">*</span>
-<span class="mf">7656000</span><span class="w">    </span><span class="mf">170011</span><span class="w">  </span><span class="mf">010600</span><span class="w">  </span><span class="mf">011046</span><span class="w">  </span><span class="mf">005720</span><span class="w">  </span><span class="mf">010066</span><span class="w">  </span><span class="mf">000002</span><span class="w">  </span><span class="mf">004767</span><span class="w">  </span><span class="mf">000010</span>
-<span class="mf">7656020</span><span class="w">    </span><span class="mf">010016</span><span class="w">  </span><span class="mf">004737</span><span class="w">  </span><span class="mf">006374</span><span class="w">  </span><span class="mf">104401</span><span class="w">  </span><span class="mf">004567</span><span class="w">  </span><span class="mf">010154</span><span class="w">  </span><span class="mf">162706</span><span class="w">  </span><span class="mf">000044</span>
-<span class="mf">7656040</span><span class="w">    </span><span class="mf">012716</span><span class="w">  </span><span class="mf">000001</span><span class="w">  </span><span class="mf">004737</span><span class="w">  </span><span class="mf">004652</span><span class="w">  </span><span class="mf">010067</span><span class="w">  </span><span class="mf">022314</span><span class="w">  </span><span class="mf">010516</span><span class="w">  </span><span class="mf">062716</span>
-<span class="mf">7656060</span><span class="w">    </span><span class="mf">177762</span><span class="w">  </span><span class="mf">004737</span><span class="w">  </span><span class="mf">006346</span><span class="w">  </span><span class="mf">016500</span><span class="w">  </span><span class="mf">177762</span><span class="w">  </span><span class="mf">062700</span><span class="w">  </span><span class="mf">177413</span><span class="w">  </span><span class="mf">010067</span>
-<span class="w">   </span><span class="err">|</span>
-<span class="mf">7660320</span><span class="w">    </span><span class="mf">000137</span><span class="w">  </span><span class="mf">002346</span><span class="w">  </span><span class="mf">016516</span><span class="w">  </span><span class="mf">000004</span><span class="w">  </span><span class="mf">012746</span><span class="w">  </span><span class="mf">020452</span><span class="w">  </span><span class="mf">004737</span><span class="w">  </span><span class="mf">003562</span>
-<span class="mf">7660340</span><span class="w">    </span><span class="mf">005726</span><span class="w">  </span><span class="mf">000137</span><span class="w">  </span><span class="mf">002542</span><span class="w">  </span><span class="mf">005067</span><span class="w">  </span><span class="mf">017552</span><span class="w">  </span><span class="mf">012704</span><span class="w">  </span><span class="mf">022336</span><span class="w">  </span><span class="mf">005003</span>
-<span class="mf">7660360</span><span class="w">    </span><span class="mf">012716</span><span class="w">  </span><span class="mf">021050</span><span class="w">  </span><span class="mf">004737</span><span class="w">  </span><span class="mf">005042</span><span class="w">  </span><span class="mf">110024</span><span class="w">  </span><span class="mf">005203</span><span class="w">  </span><span class="mf">022703</span><span class="w">  </span><span class="mf">000020</span>
-<span class="mf">7660400</span><span class="w">    </span><span class="mf">000000</span><span class="w">  </span><span class="mf">000000</span><span class="w">  </span><span class="mf">000000</span><span class="w">  </span><span class="mf">000000</span><span class="w">  </span><span class="mf">000000</span><span class="w">  </span><span class="mf">000000</span><span class="w">  </span><span class="mf">000000</span><span class="w">  </span><span class="mf">000000</span>
-<span class="o">*</span>
-<span class="mf">11410000</span>
+<div class="highlight"><pre><span></span>0000000    000000  000000  000000  000000  000000  000000  000000  000000
+*
+7656000    170011  010600  011046  005720  010066  000002  004767  000010
+7656020    010016  004737  006374  104401  004567  010154  162706  000044
+7656040    012716  000001  004737  004652  010067  022314  010516  062716
+7656060    177762  004737  006346  016500  177762  062700  177413  010067
+   |
+7660320    000137  002346  016516  000004  012746  020452  004737  003562
+7660340    005726  000137  002542  005067  017552  012704  022336  005003
+7660360    012716  021050  004737  005042  110024  005203  022703  000020
+7660400    000000  000000  000000  000000  000000  000000  000000  000000
+*
+11410000
 </pre></div>
 
 
@@ -339,15 +339,15 @@ to have a look. We want blocks 4014-4022, then? (9 x 512-byte blocks = 0110 clic
 <p>Noel:</p>
 <blockquote>
 <blockquote>
-<div class="highlight"><pre><span></span><span class="mf">7656000</span><span class="w">    </span><span class="mf">170011</span><span class="w">  </span><span class="mf">010600</span><span class="w">  </span><span class="mf">011046</span><span class="w">  </span><span class="mf">005720</span><span class="w">  </span><span class="mf">010066</span><span class="w">  </span><span class="mf">000002</span><span class="w">  </span><span class="mf">004767</span><span class="w">  </span><span class="mf">000010</span>
+<div class="highlight"><pre><span></span>7656000    170011  010600  011046  005720  010066  000002  004767  000010
 </pre></div>
 
 
 </blockquote>
 <p>Yup, good start; SETD, etc.</p>
 <blockquote>
-<div class="highlight"><pre><span></span><span class="mf">7660360</span><span class="w">    </span><span class="mf">012716</span><span class="w">  </span><span class="mf">021050</span><span class="w">  </span><span class="mf">004737</span><span class="w">  </span><span class="mf">005042</span><span class="w">  </span><span class="mf">110024</span><span class="w">  </span><span class="mf">005203</span><span class="w">  </span><span class="mf">022703</span><span class="w">  </span><span class="mf">000020</span>
-<span class="mf">7660400</span><span class="w">    </span><span class="mf">000000</span><span class="w">  </span><span class="mf">000000</span><span class="w">  </span><span class="mf">000000</span><span class="w">  </span><span class="mf">000000</span><span class="w">  </span><span class="mf">000000</span><span class="w">  </span><span class="mf">000000</span><span class="w">  </span><span class="mf">000000</span><span class="w">  </span><span class="mf">000000</span>
+<div class="highlight"><pre><span></span>7660360    012716  021050  004737  005042  110024  005203  022703  000020
+7660400    000000  000000  000000  000000  000000  000000  000000  000000
 </pre></div>
 
 
@@ -363,12 +363,12 @@ stopped half-way through the 060000's.)</p>
 <p>Okay, the write should be from PA:165400 - PA:175777, to sectors 07656 - 07667.  Block 7667 encodes to an
 RKDA value of 012363.</p>
 <p>After the halt, I find:</p>
-<div class="highlight"><pre><span></span><span class="n">RKDS</span><span class="o">:</span><span class="w"> </span><span class="mi">004707</span><span class="w"> </span><span class="o">(</span><span class="n">OK</span><span class="o">)</span>
-<span class="n">RKER</span><span class="o">:</span><span class="w"> </span><span class="mi">000000</span><span class="w"> </span><span class="o">(</span><span class="n">OK</span><span class="o">)</span>
-<span class="n">RKCS</span><span class="o">:</span><span class="w"> </span><span class="mi">000322</span><span class="w"> </span><span class="o">(</span><span class="n">BOGUS</span><span class="o">!</span><span class="w"> </span><span class="n">EX</span><span class="o">.</span><span class="na">MEM</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">01</span><span class="o">)</span>
-<span class="n">RKWC</span><span class="o">:</span><span class="w"> </span><span class="mi">000000</span><span class="w"> </span><span class="o">(</span><span class="n">OK</span><span class="o">)</span>
-<span class="n">RKBA</span><span class="o">:</span><span class="w"> </span><span class="mi">176000</span><span class="w"> </span><span class="o">(</span><span class="n">OK</span><span class="o">)</span>
-<span class="n">RKDA</span><span class="o">:</span><span class="w"> </span><span class="mi">012363</span><span class="w"> </span><span class="o">(</span><span class="n">OK</span><span class="o">)</span>
+<div class="highlight"><pre><span></span><span class="n">RKDS</span><span class="o">:</span> <span class="mi">004707</span> <span class="o">(</span><span class="n">OK</span><span class="o">)</span>
+<span class="n">RKER</span><span class="o">:</span> <span class="mi">000000</span> <span class="o">(</span><span class="n">OK</span><span class="o">)</span>
+<span class="n">RKCS</span><span class="o">:</span> <span class="mi">000322</span> <span class="o">(</span><span class="n">BOGUS</span><span class="o">!</span> <span class="n">EX</span><span class="o">.</span><span class="na">MEM</span> <span class="o">=</span> <span class="mi">01</span><span class="o">)</span>
+<span class="n">RKWC</span><span class="o">:</span> <span class="mi">000000</span> <span class="o">(</span><span class="n">OK</span><span class="o">)</span>
+<span class="n">RKBA</span><span class="o">:</span> <span class="mi">176000</span> <span class="o">(</span><span class="n">OK</span><span class="o">)</span>
+<span class="n">RKDA</span><span class="o">:</span> <span class="mi">012363</span> <span class="o">(</span><span class="n">OK</span><span class="o">)</span>
 </pre></div>
 
 
