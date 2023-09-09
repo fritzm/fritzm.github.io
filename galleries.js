@@ -113,6 +113,11 @@ var galleries = {
                             {src:"/images/pdp11/GT40-KM11.jpg", w:3024, h:4032, title:"GT40 system unit with KM11 replica board and microcode control board out on debug extender below.  The next microcode address is displayed in the bottom two rows of LEDs, with the LSB at the bottom right. Dark LEDs are logic 1, and lit are logic 0.  The next address displayed here is octal 316. From the microcode listings, we can see we are about to branch to micro-state CCS-1 (console continue switch), and can deduce that we are currently in micro-state H-2, about to branch out of the halt microcode loop to the continue switch handler."},
                             {src:"/images/pdp11/GT40-good-sign.jpeg", w:4032, h:3024, title:"First sign of end-to-end life on the GT40: terminal emulator boostrap running, and rendering received characters."},
                             {src:"/images/pdp11/GT40-square.jpeg", w:3024, h:3024, title:"GT40 display list processor running, rendering a square."},
+                            {src:"/images/pdp11/gt40-line-feeds.jpg", w:540, h:720, title:"GT40 displaying multiple lines after CMPB (R2)+,R0 fix."},
+                            {src:"/images/pdp11/gt40-first-lunar-run.jpg", w:540, h:720, title:"GT40 running the lunar lander game, but still with some display issues."},
+                            {src:"/images/pdp11/gt40-diags.jpg", w:720, h:540, title:"Repaired GT40 running diagnostic MAINDEC-DDGTE."},
+                            {src:"/images/pdp11/gt40-lunar-better.jpg", w:720, h:540, title:"Repaired GT40 running the lunar lander game."},
+                            {src:"/images/pdp11/gt40-cheeseburger.jpg", w:720, h:540, title:"Repaired GT40: Scott lands on the moon and gets his cheesburger!"},
                     ],
             radios: [
                             {src:"/images/radios/travler-5028.jpeg", w:4032, h:3024, title:"A 1948 Trav-ler 5028 portable tube AM radio"},

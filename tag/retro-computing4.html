@@ -74,6 +74,57 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="https://fritzm.github.io/rk05.html"><h1>PDP-11/45: RK05</h1></a>
+Sun 19 March 2017
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p>Started going through the two RK05 drives.  Lots of work to remove and clean up all the decaying foam.
+Replaced the emergency head retract NiCd battery packs on both units.  They were both slightly leaky, but
+luckily neither had made a big mess.</p>
+<p>Air filter elbows are intact on both units, and still slightly flexible, though they do have a white
+powdery coating where the material is degenerating.  Cleaned up okay with some warm soapy water and a
+toothbrush.  I'm sure these will continue to decompose/decay, however, and in the long term having loose
+particulates develop inside the elbow seems a certain recipe for a head crash.  I may explore the possibility
+of 3D printing some sort of modern replacement for these.</p>
+<p>Heads on the first unit look to be in decent shape, but some oxide buildup.  In the second unit, the
+carriage was not parked, so the heads were in contact with each other.  They don't look damaged from a
+preliminary inspection, but this head pair has considerably more oxide.  Before and after cleaning shots of
+the upper and lower heads on the first unit below.</p>
+<p>Pulled the H743 power supplies and reformed the larger electrolytics.  After this, both power supplies
+powered up fine, though the -15V regulator on the first unit was trimmed very hot (-23 or so).  Trimmed this
+down, put the supply back in the first unit and powered up.  Under load, the -15V regulator drooped to -8,
+and a pico fuse on the +15V supply blew immediately.</p>
+<p>Swapped in the -15V regulator from the second supply, which was not trimmed hot, and replaced the blown
+pico fuse.  Now under load the supply held without drooping, and the +15V pico did not reblow.  So looks
+like a bad -15V regulator.  Put a few 723 regulator ICs on order in advance of debugging this.</p>
+<p>After getting the power supply in the first unit up and going, blower powers on, power indicator lights, and
+after about three seconds the door safety relay clunks and load indicator lights. Write protect indicator
+toggles with panel switch presses per expectation.  If the cartridge-on switch is depressed manually and the
+load toggle is hit, the spindle motor spins up and runs smoothly.</p>
+<p>There are some significant abrasions on the lower panel of the first unit under both the spindle and spindle
+motor axles.  It looks like a spacer button which is intended to hold off the lower panel has decayed; will
+need to improvise some sort of replacement.</p>
+<p><img src='/images/pdp11/rk05_thumbnail_tall.jpg' title='RK05 drive internals' onclick='pswipe("pdp11",47);'/>
+<img src='/images/pdp11/h743_thumbnail_tall.jpg' title='H743 power supply pulled and on bench' onclick='pswipe("pdp11",48);'/>
+<img src='/images/pdp11/rk05-lower-before_thumbnail_tall.jpg' title='First RK05 lower head before cleaning' onclick='pswipe("pdp11",49);'/>
+<img src='/images/pdp11/rk05-lower-after_thumbnail_tall.jpg' title='First RK05 lower head after cleaning' onclick='pswipe("pdp11",50);'/>
+<img src='/images/pdp11/rk05-upper-before_thumbnail_tall.jpg' title='First RK05 upper head before cleaning' onclick='pswipe("pdp11",51);'/>
+<img src='/images/pdp11/rk05-upper-after_thumbnail_tall.jpg' title='First RK05 upder head after cleaning' onclick='pswipe("pdp11",52);'/>
+<img src='/images/pdp11/lower-cover-abrasions_thumbnail_tall.jpg' title='Abrasions on first RK05 lower cover, from contact with spindle motor shafts' onclick='pswipe("pdp11",53);'/></p></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
         <a href="https://fritzm.github.io/rk11-3.html"><h1>PDP-11/45: RK11 III</h1></a>
 Sun 26 February 2017
 
@@ -978,68 +1029,6 @@ since they've been sitting idle for upwards of 30yrs!  Also, one obviously leaki
 I'll replace this and all its identical twins.  Parts on order...</p>
 <p><img src='/images/pdp11/h720e-breakdown_thumbnail_tall.jpg' title='Tearing down the H720E power supply for the RK11 storage controller' onclick='pswipe("pdp11",38);'/>
 <img src='/images/pdp11/h720e-leaking-cap_thumbnail_tall.jpg' title='Leaking tantalum cap on H720e regulator board' onclick='pswipe("pdp11",39);'/></p></div>
-    <hr />
-</div>
-    
-
-        
-
-<div class='article'>
-    <div class="content-title">
-        <a href="https://fritzm.github.io/diagnostics-9.html"><h1>PDP-11/45: Diagnostics IX - FP11 FPU, cont.</h1></a>
-Sat 10 September 2016
-
-by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
- 
-    </div>
-    
-    <div><p>Did a lot of reading on the FP11 design.  A few interesting notes that are buried in the maintenance manual:</p>
-<ul>
-<li>
-<p>When debugging FP11 microcode with a KM11 in single-microstep mode, the 11/45 front panel microcode display shows
-the address of the <em>next</em> microinstruction, NOT the current microinstruction.  This is because the stop-point for
-single microinstruction is at a point between T2 and T3, just <em>after</em> the next microinstruction addr has been
-calculated.  This is different behavior than the 11/45 CPU front panel microaddress display.</p>
-</li>
-<li>
-<p>There's a note in the maintenance manual that explicitly cautions that when using extender boards for debug, the
-RC maintenance clock should be used, and set with period &gt;50ns.  I had not been doing similar while debugging the
-KB11-A CPU, and maybe this explains the occasional different behavior I'd see when throwing boards out on extenders...
-In particular, I had seen this when debugging a spare CPU GRA; next time I return to that board I will try the CPU
-RC clock.</p>
-</li>
-</ul>
-<p>Okay, so here's my first simple test program for STST:</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6
-7
-8
-9</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">000000</span>                          <span class="nt">AC0</span><span class="o">=%</span><span class="nt">0</span>
-<span class="nt">000000</span>                          <span class="p">.</span><span class="nc">ASECT</span>
-<span class="nt">001000</span>                          <span class="o">.=</span><span class="nt">1000</span>
-<span class="nt">001000</span>  <span class="nt">170127</span>  <span class="nt">044000</span>  <span class="nt">START</span><span class="o">:</span>  <span class="nt">LDFPS</span>   <span class="p">#</span><span class="nn">044000</span>         <span class="o">;</span><span class="nt">FID</span><span class="o">+</span><span class="nt">FIUV</span>
-<span class="nt">001004</span>  <span class="nt">172467</span>  <span class="nt">000004</span>          <span class="nt">LDF</span>     <span class="nt">NEGZ</span><span class="o">,</span><span class="nt">AC0</span>        <span class="o">;</span><span class="nt">LOAD</span> <span class="nt">A</span> <span class="nt">MINUS-ZERO</span>
-<span class="nt">001010</span>  <span class="nt">170300</span>                  <span class="nt">STST</span>    <span class="nt">R0</span>              <span class="o">;</span><span class="nt">STORE</span> <span class="nt">FEC</span> <span class="nt">TO</span> <span class="nt">R0</span>
-<span class="nt">001012</span>  <span class="nt">000000</span>                  <span class="nt">HALT</span>
-<span class="nt">001014</span>  <span class="nt">100000</span>  <span class="nt">000000</span>  <span class="nt">NEGZ</span><span class="o">:</span>   <span class="p">.</span><span class="nc">WORD</span>   <span class="nt">100000</span><span class="o">,</span><span class="nt">000000</span>   <span class="o">;</span><span class="nt">MINUS-ZERO</span>
-<span class="nt">001000</span>                          <span class="p">.</span><span class="nc">END</span>    <span class="nt">START</span>
-</pre></div>
-</td></tr></table>
-
-<p>This would be expected to produce the 000014 "Floating Undefined Variable" (minus-zero) exception code in R0, but I see
-an incorrect value of 177417.  Using the KM11 on the FPU shows the -0 trap and STST microstate flow is per expectation.</p>
-<p>Put the FRL out on the extender and started stepping the microcode, examining the state of the pins at the AC register
-file along the way.  In the -0 trap flow, the FEC code 000014 presented (inverted) at TRP.50 via the EALU, and
-subsequently retrieved at TRP.60 looks correct. However, the value presented at TRP.70 via QR, BR, and the FALU does
-not.  Out of time this weekend; Will have to chase signals back through those paths next time!</p>
-<p><img src='/images/pdp11/minus-zero-microcode.png'/></p></div>
     <hr />
 </div>
     

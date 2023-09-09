@@ -74,6 +74,37 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="https://fritzm.github.io/power-fixes.html"><h1>PDP-11/45: Power fixes and CPU debug</h1></a>
+Mon 30 May 2016
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p>Connected up the aforementioned red wire hack to the new power harness, and verified +5V to slots 10 through
+15. Console is no longer all address and data lights on, but basic console load address / examine / deposit
+operations are still not working.  A random assortment of address lines seem stuck, different on each power
+cycle.  About the only thing that reliably functions from the console is loading the two highest address bits
+from the switches immediately after a reset.  Pulled the floating point unit, unjumpered the DD11 expansion
+backplane, and removed all peripherals except the M792 diode ROM; same (broken) behavior...</p>
+<p>Scoped all the DC voltages, and did not notice any glitches.  Pulled the H742s for some bench work: verified
+AC LO and DC LO signaling on both units, replaced a broken Mate-n-Lok connector on one of the units, blew out
+dust from all the 5V regulators and replaced their indicator bulbs with modern equivalent (CM7381). Sourced
+and put on order a modern equivalent (OL-6003BP) for the indicator bulbs on the -15V regulators.</p>
+<p>Next steps will be to verify various Unibus signals on the backplane, then maybe play some swap games with CPU
+card spares to see if I can get closer to a working console as a starting point.  All I have time for this
+weekend, though; sorry nothing new to see so no new pictures this time!</p></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
         <a href="https://fritzm.github.io/initial-power-on.html"><h1>PDP-11/45: Initial Power On!</h1></a>
 Sun 08 May 2016
 
@@ -398,31 +429,6 @@ by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">F
 looking pretty good.  Even the big electrolytics seem fine on first look.  These things were built with very
 high quality components, and they really seem to last and last.</p>
 <p><img src='/images/pdp11/pwr-ctrls_thumbnail_tall.jpg' title='H742 power controller boards' onclick='pswipe("pdp11",8);'/></p></div>
-    <hr />
-</div>
-    
-
-        
-
-<div class='article'>
-    <div class="content-title">
-        <a href="https://fritzm.github.io/corrosion.html"><h1>PDP-11/45: Teardown and corrosion remediation</h1></a>
-Sat 11 April 2015
-
-by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
- 
-    </div>
-    
-    <div><p>Had a little more time to work on the PDP-11 this weekend.  Mostly going after some corrosion on the CPU
-cabinet and H742 power supplies.  Tore these down, sanded down the corroded bits, then hit with a satin finish
-Rustoleum rattle-can which dries to a reasonable approximation of the original powder-coat.</p>
-<p>Neon indicators on the H742s are dim and flickery, so ordered some replacements for these, too.</p>
-<p><img src='/images/pdp11/h742-teardown_thumbnail_tall.jpg' title='Tearing down the H742 power supplies' onclick='pswipe("pdp11",5);'/>
-<img src='/images/pdp11/h742-corrosion_thumbnail_tall.jpg' title='Corrosion on part of an H742 chassis, to be sanded and painted' onclick='pswipe("pdp11",6);'/>
-<img src='/images/pdp11/cpu-cabinet_thumbnail_tall.jpg' title='CPU cabinet getting some touch-up paint after sanding corroded spots' onclick='pswipe("pdp11",7);'/></p></div>
     <hr />
 </div>
     

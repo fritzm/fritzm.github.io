@@ -74,6 +74,144 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="https://fritzm.github.io/dl11-bodge.html"><h1>PDP-11/45: Reversing a vintage DL11 hack</h1></a>
+Fri 27 November 2020
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p>I recently had need to assess and repair several DL11 serial interfaces in my stock of spares. One of these
+had had some sort of end-user hack applied; in the course of putting the board back to factory condition, I
+did some analysis of the hack and its intended purpose, documented here.</p>
+<p><img src='/images/pdp11/dl11-user-hack_thumbnail_tall.jpg' title='DL11 with end-user hack' onclick='pswipe("pdp11",85);'/>
+<img src='/images/pdp11/dl11-hack-front_thumbnail_tall.png' title='DL11 user hack front' onclick='pswipe("pdp11",86);'/>
+<img src='/images/pdp11/dl11-hack-back_thumbnail_tall.png' title='DL11 user hack back' onclick='pswipe("pdp11",87);'/></p>
+<p>Easy enough to beep this out and reverse to a schematic:</p>
+<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/dl11-hack-schem.png" 
+title="Schematic of DL11 hack"/></p>
+<p>So, the hack appears to dynamically alter the CSR address and interrupt vector of the card, choosing between
+two hard-wired presets, based on whether P1A/P1B are connected together or not.</p>
+<p>The CSR jumpers on a stock DL11 operate with pull-ups upstream of the address decode logic, so these can be
+directly driven by the hack so long as the jumpers for the bits-to-be-hacked are left open on the board.  The
+vector address bits, however, must be driven by the DL11 onto to the Unibus contingent on an appropriate
+global enable. On a stock DL11, drivers for <em>all</em> configurable vector bits are activated by a single global
+enable, and jumpers downstream of the drivers control which of these activated bits will be admitted to bus.
+So, for the vector address part of the hack to function, hack control must be asserted instead of the global
+enable for each of the to-be-driven bits, and the corresponding jumpers for these bits must be left in.  And
+indeed, upon inspection of the DL11 there are trace cuts that have been done (marked here with "X") to lift
+the global enable and allow individual hack control of each of the affected bits:</p>
+<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/dl11-hack-cuts.png" 
+title="Trace cuts for DL11 hack"/></p>
+<p></br></p>
+<p>Last, we can look at the board jumpering and the wiring of the hack to determine the specific CSR and
+vector addresses at play:</p>
+<style>
+.bitlist { border-collapse: collapse; margin-left: auto; margin-right: auto; margin-bottom: 2ex; }
+.bitlist caption { font-weight: bold; }
+.bitlist .hacked { font-weight: bold; }
+.bitlist tr:nth-child(even) :not(th) { background-color: #f2f2f2; }
+.bitlist td:nth-child(3n+2) { border-left-color: #000000; }
+.bitlist td:nth-child(3n+1) { border-right-color: #000000; }
+.bitlist th, .bitlist td { padding: 5px; }
+.bitlist td { border: 1px solid lightgray; font-family: Menlo,Consolas,monospace; }
+.bitlist tr:first-child td { border-top-color: #000000; }
+.bitlist tr:last-child td { border-bottom-color: #000000; }
+</style>
+
+<table class="bitlist">
+<thead><tr>
+    <th></th>
+    <th>A11</th><th>A10</th><th>A9</th>
+    <th>A8</th><th>A7</th><th>A6</th>
+    <th>A5</th><th>A4</th><th>A3</th>
+    <th>A2</th><th>A1</th><th>A0</th>
+    <th></th>
+</tr></thead>
+<tbody><tr>
+    <th>P1 Open</th>
+    <td>1</td>
+    <td>1</td>
+    <td class="hacked">0</td>
+    <td>1</td>
+    <td>0</td>
+    <td>1</td>
+    <td class="hacked">0</td>
+    <td class="hacked">0</td>
+    <td class="hacked">1</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+    <th>776510</th>
+</tr><tr>
+    <th>P1 Closed</th>
+    <td>1</td>
+    <td>1</td>
+    <td class="hacked">1</td>
+    <td>1</td>
+    <td>0</td>
+    <td>1</td>
+    <td class="hacked">1</td>
+    <td class="hacked">1</td>
+    <td class="hacked">0</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+    <th>777560</th>
+</tr></tbody>
+</table>
+
+<table class="bitlist">
+<thead><tr>
+    <th></th>
+    <th>V8</th><th>V7</th><th>V6</th>
+    <th>V5</th><th>V4</th><th>V3</th>
+    <th>V2</th><th>V1</th><th>V0</th>
+    <th></th>
+</tr></thead>
+<tbody><tr>
+    <th>P1 Open</th>
+    <td>0</td>
+    <td class="hacked">1</td>
+    <td class="hacked">1</td>
+    <td class="hacked">0</td>
+    <td class="hacked">0</td>
+    <td class="hacked">1</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+    <th>310</th>
+</tr><tr>
+    <th>P1 Closed</th>
+    <td>0</td>
+    <td class="hacked">0</td>
+    <td class="hacked">0</td>
+    <td class="hacked">1</td>
+    <td class="hacked">1</td>
+    <td class="hacked">0</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+    <th>060</th>
+</tr></tbody>
+</table>
+
+<p><br/></p>
+<p>We see from these specific addresses that closing the contacts of P1 would dynamically re-jumper the board
+from assignment as the 2nd non-console interface to assignment as the console interface.  So perhaps this was
+once used (in conjunction with another similarly hacked interface?) to swap console terminals with the flip of
+a single switch.</p></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
         <a href="https://fritzm.github.io/fp11-again.html"><h1>PDP-11/45: Some more floating point trouble</h1></a>
 Sat 21 November 2020
 
@@ -3443,60 +3581,6 @@ Adventure:</p>
                         mozallowfullscreen allowFullScreen>
                     </iframe>
                 </span></p></div>
-    <hr />
-</div>
-    
-
-        
-
-<div class='article'>
-    <div class="content-title">
-        <a href="https://fritzm.github.io/la30-3.html"><h1>PDP-11/45: LA30 repair III</h1></a>
-Sat 02 December 2017
-
-by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
- 
-    </div>
-    
-    <div><p>Digging in on the flip-flops identified as potentially problematic in the previous post, found that E5 had
-failed.  Pulled, socketed, and replaced; character generator now correctly clocks all five character columns:</p>
-<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/la30-chargen-clock-
-trace-fixed.jpg" title="LA30 character generator clocking trace after repair.  Runs correctly to five character columns"/></p>
-<p>After this repair, characters were printing full width, but two problems remained: about half of the
-characters printed in response to typing on the keyboard were the wrong character, and the top row was not
-printing at all on any character:</p>
-<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/la30-second-print.jpg"
-title="LA30 second print attempt -- incorrect characters and top row missing"/></p>
-<p>Looking at the incorrect characters problem first, it was clear that bit 4 was not being received by the
-character generator correctly.  I was a bit worried that the SMC KR2376-17 scanner/ROM on the keyboard
-assembly might be at fault, since Mattis had had some trouble with his.  This is a pretty cool part; a
-combined scanner and code translator, with an internal oscillator, rollover logic, debounce delay, and
-flexible interfacing:</p>
-<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/kr2376-schematic.jpg"
-title="KR2376-17 keyboard scanner/encoder internal schematic"/></p>
-<p>...not to mention the very cool vintage ceramic/gold packaging (see below.)  Fortunately, inspection with an
-oscilloscope showed that the outputs from the scanner were just fine; chasing downstream, the problem was
-found to be just a loose pin (SS) on the keyboard cable Berg connector.  With that sorted, we now have this:</p>
-<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/la30-third-print.jpg"
-title="LA30 third print attempt -- characters correct, but still missing top row"/></p>
-<p>For the final issue with the top row not printing, verified that the problem followed a particular G380
-solenoid driver card when swapping them around, and that with a functional G380 in the appropriate backplane
-slot pin 1 fires and prints correctly. Inspection of the problematic G380 revealed a failed power transistor
-and blown associated micro-fuse; replacement parts on order.</p>
-<p>For the ribbon advance issue, I pulled the ribbon motors and disassembled their top-side reduction gear cases
-in order to gain access to the upper rotor bearings.  Cleaning and lubrication of these bearings, plus a few
-more taps with a mallet after reassembly, achieved an improved bearing alignment.  With the increased output
-torque, the ribbon now advances reliably.</p>
-<p>Other minor items: Replacement vibration isolators arrived, and were installed.  Threaded inserts in the
-fiberglass top shell that had pulled out were reattached with epoxy.</p>
-<p>Have some more travel coming up for work, so may not be able to get back to this for a bit.  Next steps will
-be repair of the failed solenoid driver channel, calibrations, then any debug necessary on the M7910 interface
-card for the PDP-11.</p>
-<p><img src='/images/pdp11/kr2736_thumbnail_tall.jpg' title='The SMC KR2736-17 keyboard scanner/encoder in the LA30' onclick='pswipe("pdp11",74);'/>
-<img src='/images/pdp11/G380_thumbnail_tall.jpg' title='G380 solenoid driver card from the LA30, with failed parts pulled' onclick='pswipe("pdp11",75);'/></p></div>
     <hr />
 </div>
     

@@ -74,6 +74,115 @@
 
 <div class='article'>
     <div class="content-title">
+        <a href="https://fritzm.github.io/gt40-2.html"><h1>GT40 Terminal II: Lunar Lander</h1></a>
+Fri 01 September 2023
+
+by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
+ 
+
+
+ 
+    </div>
+    
+    <div><p><em>[Continuation of restoration work on a DEC GT40 graphic display terminal; part one
+<a href="https://fritzm.github.io/gt40.html">here</a>.]</em></p>
+<p>At this point, Scott has taken over the restoration work as I have had to leave town for work.  We consulted a
+few times via IMs and video calls over the next couple weeks; the following is a narrative of Scott's
+continued work on the project as I understood it remotely.</p>
+<p>The next thing that needed doing was to replace the failed microcode PROM described at the end of the previous
+article.  I did some work to manually transcribe the PROM contents from the binary microcode listings included
+in the engineering drawings (4 bits x 256 microcode locations).  Scott double-checked my work here and found
+and fixed at least three transcription errors (always good to have a double check on tedious tasks like this,
+and I seem to be developing a worsening dyslexia with age -- thanks, Scott!)</p>
+<p>Scott tracked down and burned a replacement PROM and replaced the failing one on the board, and we were back
+again to the previous high water mark (able to run toggle in programs and the ROM bootstrap terminal emulator,
+with the same linefeed and binary load failures I had seen previously).</p>
+<p>Scott played around with the binary loader for a bit, but it seemed to be suffering a pretty frustrating blend
+of several different issues.  Attention is turned back to the bootstrap ROM terminal emulator LF handling
+problem, which is consistent and repeatable.  Scott begins single stepping the code by instruction, using the
+listings in the GT40/GT42 User's Guide, and soon makes two discoveries:</p>
+<ul>
+<li>
+<p>The unit has the GT42 version of the boostrap ROM, and not the GT40 version (this can be seen because
+  the bootstrap terminal emumator handles TAB characters).</p>
+</li>
+<li>
+<p>Upon receiving a LF char, the bootstrap code gets to a loop which is scanning the input buffer looking for
+  LFs, but it fails to find any and loops indefinitely.</p>
+</li>
+</ul>
+<p>The malfunctioning ROM code scanning for LFs can be seen at location 166310, in the listing on PDF page 81 of
+the User's Guide, and is as follows:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">166310</span>  <span class="nt">122300</span>              <span class="nt">LFLOOP</span><span class="o">:</span> <span class="nt">CMPB</span>    <span class="o">(</span><span class="nt">SCAN</span><span class="o">)+,</span><span class="nt">CHAR</span>        <span class="o">;</span><span class="nt">AND</span> <span class="nt">LOOK</span> <span class="nt">FOR</span> <span class="nt">A</span> <span class="nt">LINEFEED</span>
+<span class="nt">166312</span>  <span class="nt">001406</span>                      <span class="nt">BEQ</span>     <span class="nt">LFOUND</span>              <span class="o">;</span><span class="nt">GOT</span> <span class="nt">IT</span><span class="o">,</span> <span class="nt">SEARCH</span> <span class="nt">HAS</span> <span class="nt">ENDED</span>
+<span class="nt">166314</span>  <span class="nt">020327</span>  <span class="nt">007000</span>              <span class="nt">CMP</span>     <span class="nt">SCAN</span><span class="o">,</span><span class="p">#</span><span class="nn">BLIMIT</span>        <span class="o">;</span><span class="nt">ARE</span> <span class="nt">WE</span> <span class="nt">AT</span> <span class="nt">END</span> <span class="nt">OF</span> <span class="nt">BUFFER</span><span class="o">?</span>
+<span class="nt">166320</span>  <span class="nt">103773</span>                      <span class="nt">BLO</span>     <span class="nt">LFLOOP</span>              <span class="o">;</span><span class="nt">NOPE</span><span class="o">,</span> <span class="nt">KEEP</span> <span class="nt">ON</span> <span class="nt">LOOKING</span><span class="o">.</span>
+<span class="nt">166322</span>  <span class="nt">012703</span>  <span class="nt">001000</span>              <span class="nt">MOV</span>     <span class="p">#</span><span class="nn">BSTART</span><span class="o">,</span><span class="nt">SCAN</span>        <span class="o">;</span><span class="nt">IF</span> <span class="nt">AT</span> <span class="nt">TOP</span><span class="o">,</span> <span class="nt">RESET</span> <span class="nt">TO</span> <span class="nt">BOTTOM</span> <span class="nt">OF</span> <span class="nt">BUFFER</span>
+<span class="nt">166326</span>  <span class="nt">000770</span>                      <span class="nt">BR</span>      <span class="nt">LFLOOP</span>              <span class="o">;</span><span class="nt">AND</span> <span class="nt">KEEP</span> <span class="nt">ON</span> <span class="nt">LOOKING</span><span class="o">.</span>
+</pre></div>
+</td></tr></table>
+
+<p>Scott begins microstepping at address 166310, which is machine code 122300, <code>CMPB (R2)+,R0</code>.  The microcode
+flow traced through is as follows, using state names from the microcode listings in the engineering drawings:</p>
+<ul>
+<li><code>H-2</code>: Tracing activity starts with the machine halted and looping in microstate H-2.  The KM11 is set to
+   manual clock mode, front panel CONT swithch depressed, and several manual clocks taken causing microbranch
+   to...<br><br></li>
+<li><code>CCS-1</code>: Loads B←PC, causing PC to be displayed on console lights.</li>
+<li><code>CCS-2</code>: Loops waiting for CONT switch to be released.</li>
+<li><code>CCS-3</code>: Turns on RUN light.<br><br></li>
+<li><code>F-1</code>: Loads BA←PC, and initiates asynchronous bus cycle to fetch instruction.</li>
+<li><code>F-2</code>: Loads B←PC+2, causing next instruction address to be displayed on console lights.</li>
+<li><code>F-3</code>: Loads PC←B, updating the PC, and suspends processor clock until fetch bus cycle reaches SSYN.</li>
+<li><code>F-4</code>: Resume here when fetch data is on bus; latches bus data into B (displaying on console lights) and also
+  into the IR decode register; releases the bus.</li>
+<li><code>F-5</code>: First big microcode branch based on instruction type.<br><br></li>
+<li><code>S2-1</code>: Source addressing mode 2 (register auto-increment). BA←R[S], and initiates bus cycle to read
+  operand.</li>
+<li><code>S2-2</code>: B←R[S]+1+BYTE.BAR (increment source register by 1 or 2 depending on byte or word instruction).</li>
+<li><code>S2-3</code>: R[S]←B (store back incremented source register), suspend processor clock until read bus cycle
+  reaches SSYN.</li>
+<li><code>S1-2</code>: Resume here when source data on bus; latches bus data into B and releases the bus, then branches on
+  byte even, byte odd, or word.</li>
+</ul>
+<p>So far so good.  In the case being traced, we happen to be doing a byte read from an odd address.  In this
+case, the fetched source data must be shifted right 8 bits, then sign extended.  This is done over the course
+of the next 8 microsinstructions, <code>SBO-1</code> - <code>SBO-8</code>.  Here Scott notices a problem: bit 3 is always set in the
+B register after <em>any</em> single right shift, even if the bit to its left is zero.  This points directly at E044
+on sheet DPA, a four bit shift register which implements bits 0:3 of the B-register:</p>
+<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/KD11-B-bad-BREG-shift.png" title="KD11-B data path bad BREG shift register" width="85%"/></p>
+<p>This part was pulled and replaced, and the ROM terminal emulator could then correctly handles LFs!  After a
+few additional red herring with loose power connectors and occasional accidental bumping of the test switches
+on the M7013 display control board, Scott was also able to get the lunar lander code to load and run via
+the ROM bootstrap binary loader, though still with some display problems:</p>
+<p><img src='/images/pdp11/gt40-line-feeds_thumbnail_tall.jpg' title='GT40 displaying multiple lines after CMPB (R2)+,R0 fix.' onclick='pswipe("pdp11",113);'/>
+<img src='/images/pdp11/gt40-first-lunar-run_thumbnail_tall.jpg' title='GT40 running the lunar lander game, but still with some display issues.' onclick='pswipe("pdp11",114);'/></p>
+<p>Scott discovered a major clue concerning remaining loader problems: some GT40 binary-loader encoded binaries
+downloaded off other enthusiast web sites contain erroneous extra linefeed and "!" characters, which confuse
+the loader and/or trigger bad checksums.  After stripping these out, the loader was seen to work quite
+reliably.</p>
+<p>With diagnostics now in hand, Scott was able to track down a few remaining hardware issues (a bad register
+with a stuck high bit, and a swap of one of the DACs that had been acting flaky with one from a spare board.
+I don't have precise details on these particular fixes, but will expand here later if I get more details.)</p>
+<p>Below, some diagnostics, and at long last, Scott lands on the moon and gets his cheeseburger!  Drop by and
+visit Scott at his booth at VCFMW this weekend, see and play game, and hear tales of the restoration
+first-hand!</p>
+<p><img src='/images/pdp11/gt40-diags_thumbnail_tall.jpg' title='Repaired GT40 running diagnostic MAINDEC-DDGTE.' onclick='pswipe("pdp11",115);'/>
+<img src='/images/pdp11/gt40-lunar-better_thumbnail_tall.jpg' title='Repaired GT40 running the lunar lander game.' onclick='pswipe("pdp11",116);'/>
+<img src='/images/pdp11/gt40-cheeseburger_thumbnail_tall.jpg' title='Repaired GT40: Scott lands on the moon and gets his cheesburger!' onclick='pswipe("pdp11",117);'/></p></div>
+    <hr />
+</div>
+    
+
+        
+
+<div class='article'>
+    <div class="content-title">
         <a href="https://fritzm.github.io/gt40.html"><h1>GT40 Terminal</h1></a>
 Mon 21 August 2023
 
@@ -1525,144 +1634,6 @@ and managed to pull in some era-appropriate material from Radio Yesteryear on KT
                 </span></p>
 <p>This was a really fun project, and I learned a lot along the way -- looking forward to doing a few more like
 this in the future!</p></div>
-    <hr />
-</div>
-    
-
-        
-
-<div class='article'>
-    <div class="content-title">
-        <a href="https://fritzm.github.io/dl11-bodge.html"><h1>PDP-11/45: Reversing a vintage DL11 hack</h1></a>
-Fri 27 November 2020
-
-by <a class="url fn" href="https://fritzm.github.io/author/fritz-mueller.html">Fritz Mueller</a>
- 
-
-
- 
-    </div>
-    
-    <div><p>I recently had need to assess and repair several DL11 serial interfaces in my stock of spares. One of these
-had had some sort of end-user hack applied; in the course of putting the board back to factory condition, I
-did some analysis of the hack and its intended purpose, documented here.</p>
-<p><img src='/images/pdp11/dl11-user-hack_thumbnail_tall.jpg' title='DL11 with end-user hack' onclick='pswipe("pdp11",85);'/>
-<img src='/images/pdp11/dl11-hack-front_thumbnail_tall.png' title='DL11 user hack front' onclick='pswipe("pdp11",86);'/>
-<img src='/images/pdp11/dl11-hack-back_thumbnail_tall.png' title='DL11 user hack back' onclick='pswipe("pdp11",87);'/></p>
-<p>Easy enough to beep this out and reverse to a schematic:</p>
-<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/dl11-hack-schem.png" 
-title="Schematic of DL11 hack"/></p>
-<p>So, the hack appears to dynamically alter the CSR address and interrupt vector of the card, choosing between
-two hard-wired presets, based on whether P1A/P1B are connected together or not.</p>
-<p>The CSR jumpers on a stock DL11 operate with pull-ups upstream of the address decode logic, so these can be
-directly driven by the hack so long as the jumpers for the bits-to-be-hacked are left open on the board.  The
-vector address bits, however, must be driven by the DL11 onto to the Unibus contingent on an appropriate
-global enable. On a stock DL11, drivers for <em>all</em> configurable vector bits are activated by a single global
-enable, and jumpers downstream of the drivers control which of these activated bits will be admitted to bus.
-So, for the vector address part of the hack to function, hack control must be asserted instead of the global
-enable for each of the to-be-driven bits, and the corresponding jumpers for these bits must be left in.  And
-indeed, upon inspection of the DL11 there are trace cuts that have been done (marked here with "X") to lift
-the global enable and allow individual hack control of each of the affected bits:</p>
-<p><img style="display:block; margin-left:auto; margin-right:auto" src="/images/pdp11/dl11-hack-cuts.png" 
-title="Trace cuts for DL11 hack"/></p>
-<p></br></p>
-<p>Last, we can look at the board jumpering and the wiring of the hack to determine the specific CSR and
-vector addresses at play:</p>
-<style>
-.bitlist { border-collapse: collapse; margin-left: auto; margin-right: auto; margin-bottom: 2ex; }
-.bitlist caption { font-weight: bold; }
-.bitlist .hacked { font-weight: bold; }
-.bitlist tr:nth-child(even) :not(th) { background-color: #f2f2f2; }
-.bitlist td:nth-child(3n+2) { border-left-color: #000000; }
-.bitlist td:nth-child(3n+1) { border-right-color: #000000; }
-.bitlist th, .bitlist td { padding: 5px; }
-.bitlist td { border: 1px solid lightgray; font-family: Menlo,Consolas,monospace; }
-.bitlist tr:first-child td { border-top-color: #000000; }
-.bitlist tr:last-child td { border-bottom-color: #000000; }
-</style>
-
-<table class="bitlist">
-<thead><tr>
-    <th></th>
-    <th>A11</th><th>A10</th><th>A9</th>
-    <th>A8</th><th>A7</th><th>A6</th>
-    <th>A5</th><th>A4</th><th>A3</th>
-    <th>A2</th><th>A1</th><th>A0</th>
-    <th></th>
-</tr></thead>
-<tbody><tr>
-    <th>P1 Open</th>
-    <td>1</td>
-    <td>1</td>
-    <td class="hacked">0</td>
-    <td>1</td>
-    <td>0</td>
-    <td>1</td>
-    <td class="hacked">0</td>
-    <td class="hacked">0</td>
-    <td class="hacked">1</td>
-    <td>0</td>
-    <td>0</td>
-    <td>0</td>
-    <th>776510</th>
-</tr><tr>
-    <th>P1 Closed</th>
-    <td>1</td>
-    <td>1</td>
-    <td class="hacked">1</td>
-    <td>1</td>
-    <td>0</td>
-    <td>1</td>
-    <td class="hacked">1</td>
-    <td class="hacked">1</td>
-    <td class="hacked">0</td>
-    <td>0</td>
-    <td>0</td>
-    <td>0</td>
-    <th>777560</th>
-</tr></tbody>
-</table>
-
-<table class="bitlist">
-<thead><tr>
-    <th></th>
-    <th>V8</th><th>V7</th><th>V6</th>
-    <th>V5</th><th>V4</th><th>V3</th>
-    <th>V2</th><th>V1</th><th>V0</th>
-    <th></th>
-</tr></thead>
-<tbody><tr>
-    <th>P1 Open</th>
-    <td>0</td>
-    <td class="hacked">1</td>
-    <td class="hacked">1</td>
-    <td class="hacked">0</td>
-    <td class="hacked">0</td>
-    <td class="hacked">1</td>
-    <td>0</td>
-    <td>0</td>
-    <td>0</td>
-    <th>310</th>
-</tr><tr>
-    <th>P1 Closed</th>
-    <td>0</td>
-    <td class="hacked">0</td>
-    <td class="hacked">0</td>
-    <td class="hacked">1</td>
-    <td class="hacked">1</td>
-    <td class="hacked">0</td>
-    <td>0</td>
-    <td>0</td>
-    <td>0</td>
-    <th>060</th>
-</tr></tbody>
-</table>
-
-<p><br/></p>
-<p>We see from these specific addresses that closing the contacts of P1 would dynamically re-jumper the board
-from assignment as the 2nd non-console interface to assignment as the console interface.  So perhaps this was
-once used (in conjunction with another similarly hacked interface?) to swap console terminals with the flip of
-a single switch.</p></div>
     <hr />
 </div>
     
